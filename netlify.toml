@@ -1,0 +1,13 @@
+# Configuracion de deploy para Netlify.
+# El repo es un monorepo: cada proyecto vive en su carpeta.
+# Aca apuntamos al proyecto EchoNotes.
+[build]
+  base = "echonotes"
+  command = "npm run build"
+  publish = "dist"
+
+# SPA: cualquier ruta cae en index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
