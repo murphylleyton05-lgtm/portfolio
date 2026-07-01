@@ -1,4 +1,4 @@
-name: Deploy EchoNotes a GitHub Pages
+name: Deploy sitio (Landing + EchoNotes) a GitHub Pages
 
 on:
   push:
@@ -28,9 +28,15 @@ jobs:
         working-directory: echonotes
       - run: npm run build
         working-directory: echonotes
+      - name: Ensamblar sitio (landing en raiz + EchoNotes en /echonotes)
+        run: |
+          mkdir -p site
+          cp -r lleyton-ia-landing/* site/
+          mkdir -p site/echonotes
+          cp -r echonotes/dist/* site/echonotes/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: echonotes/dist
+          path: site
 
   deploy:
     needs: build
