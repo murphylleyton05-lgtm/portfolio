@@ -64,8 +64,9 @@ services:
       - WEBHOOK_URL=http://localhost:5678/
       - GENERIC_TIMEZONE=America/Argentina/Buenos_Aires
       - N8N_SECURE_COOKIE=false
-      # Se carga tu clave de Claude para que la IA responda en la demo
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # Clave de la IA. Gemini es gratis; Claude es opcional (de pago).
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       # n8n habla con Chatwoot por la red interna de Docker
       - CHATWOOT_URL=http://rails:3000
       - CHATWOOT_API_TOKEN=${CHATWOOT_API_TOKEN}

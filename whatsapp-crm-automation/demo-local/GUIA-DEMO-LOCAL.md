@@ -3,8 +3,8 @@
 Objetivo: correr Chatwoot + n8n + IA en tu propia PC, **sin gastar un peso**, para
 grabar un video de ventas mostrando la IA respondiendo sola y el CRM cargándose.
 
-> Único requisito con costo mínimo: una API key de Claude (Anthropic). El uso de la
-> demo son **centavos**. Todo lo demás es gratis.
+> **100% gratis** usando la IA de Google (Gemini), que tiene capa gratuita sin tarjeta.
+> Sacás la key en https://aistudio.google.com/apikey (login con tu cuenta de Google → "Create API key").
 
 ---
 
@@ -25,7 +25,7 @@ Opción fácil sin comandos:
 1. Copiá el archivo `.env.local.example` y renombralo a `.env.local`.
 2. Abrilo con el Bloc de notas y completá dos cosas:
    - `SECRET_KEY_BASE`: pegá cualquier texto largo (60+ caracteres al azar).
-   - `ANTHROPIC_API_KEY`: tu clave de Claude (`sk-ant-...`).
+   - `GEMINI_API_KEY`: tu clave gratuita de Gemini (sacala en https://aistudio.google.com/apikey).
 3. Guardá.
 
 ## Paso 4 — Levantar todo
@@ -55,7 +55,7 @@ La primera vez tarda unos minutos (descarga las imágenes). Cuando termina, ya e
    docker compose -f docker-compose.local.yml up -d n8n
    ```
 4. Abrí **http://localhost:5678**, creá el usuario local de n8n.
-5. **Import from File** → subí el workflow `../n8n/workflow-whatsapp-ia.json`.
+5. **Import from File** → subí el workflow `../n8n/workflow-whatsapp-ia-gemini.json` (versión gratis con Gemini).
 6. Activá el workflow (interruptor arriba a la derecha).
 
 ## Paso 7 — Enchufar el chat con la IA
@@ -96,7 +96,7 @@ Los datos quedan guardados para la próxima. Si querés borrar todo: agregá `-v
 ## Si algo falla
 
 - **No abre localhost:3000** → esperá 1-2 min más (Chatwoot tarda en arrancar). Revisá con `docker compose -f docker-compose.local.yml ps` que todo esté "Up".
-- **La IA no responde** → revisá que `ANTHROPIC_API_KEY` esté bien y que el workflow esté **activo** en n8n.
+- **La IA no responde** → revisá que `GEMINI_API_KEY` esté bien y que el workflow esté **activo** en n8n.
 - **Chatwoot no llama a n8n** → verificá que la URL del webhook sea exactamente `http://n8n:5678/webhook/chatwoot-mensaje`.
 
 Cualquier error, me lo pegás y lo resolvemos.
