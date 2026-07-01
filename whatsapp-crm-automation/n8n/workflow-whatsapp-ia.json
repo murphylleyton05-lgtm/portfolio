@@ -1,0 +1,147 @@
+{
+  "name": "WhatsApp + Chatwoot + IA (Claude) - Respuesta y CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatwoot-mensaje",
+        "responseMode": "onReceived"
+      },
+      "name": "Webhook - Evento Chatwoot",
+      "type": "n8n-nodes-base.webhook",
+      "position": [220, 320]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.body.event}}",
+              "operation": "equal",
+              "value2": "message_created"
+            },
+            {
+              "value1": "={{$json.body.message_type}}",
+              "operation": "equal",
+              "value2": "incoming"
+            }
+          ]
+        }
+      },
+      "name": "Filtro - Solo mensajes entrantes",
+      "type": "n8n-nodes-base.if",
+      "position": [440, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "x-api-key", "value": "={{$env.ANTHROPIC_API_KEY}}"},
+            {"name": "anthropic-version", "value": "2023-06-01"},
+            {"name": "content-type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "model", "value": "claude-sonnet-4-6"},
+            {"name": "max_tokens", "value": 800},
+            {
+              "name": "system",
+              "value": "Sos el asistente de atencion al cliente de Xelvia Store, una tienda argentina de tecnologia importada (Apple, Samsung, smartwatches y gadgets). Respondes por WhatsApp de forma breve, amable y en espanol rioplatense. Ayudas con consultas de productos, precios, stock, envios y estado de pedidos. Si no sabes un dato puntual (precio exacto, stock), decis que un asesor lo confirma enseguida. Responde SIEMPRE con un JSON valido con este formato: {\"categoria\": \"Consulta_producto|Precio|Envio|Postventa|Revendedor|Otro\", \"respuesta\": \"[tu respuesta lista para enviar por WhatsApp]\"}"
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\": \"user\", \"content\": \"Mensaje del cliente: {{$json.body.content}}\"}]"
+            }
+          ]
+        }
+      },
+      "name": "Claude - Entender y responder",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [700, 260]
+    },
+    {
+      "parameters": {
+        "functionCode": "const src = $('Webhook - Evento Chatwoot').item.json.body;\ntry {\n  const parsed = JSON.parse($input.item.json.content[0].text);\n  return [{ json: {\n    respuesta: parsed.respuesta,\n    categoria: parsed.categoria,\n    account_id: src.account?.id || src.account_id,\n    conversation_id: src.conversation?.id || src.conversation_id\n  } }];\n} catch (e) {\n  return [{ json: {\n    respuesta: 'Gracias por tu mensaje! En un momento un asesor te responde.',\n    categoria: 'Otro',\n    account_id: src.account?.id || src.account_id,\n    conversation_id: src.conversation?.id || src.conversation_id,\n    error: e.message\n  } }];\n}"
+      },
+      "name": "Funcion - Parsear respuesta IA",
+      "type": "n8n-nodes-base.code",
+      "position": [940, 260]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.CHATWOOT_URL}}/api/v1/accounts/{{$json.account_id}}/conversations/{{$json.conversation_id}}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "api_access_token", "value": "={{$env.CHATWOOT_API_TOKEN}}"},
+            {"name": "content-type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "content", "value": "={{$json.respuesta}}"},
+            {"name": "message_type", "value": "outgoing"}
+          ]
+        }
+      },
+      "name": "Chatwoot - Enviar respuesta",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1180, 260]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.CHATWOOT_URL}}/api/v1/accounts/{{$('Funcion - Parsear respuesta IA').item.json.account_id}}/conversations/{{$('Funcion - Parsear respuesta IA').item.json.conversation_id}}/labels",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "api_access_token", "value": "={{$env.CHATWOOT_API_TOKEN}}"},
+            {"name": "content-type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "labels", "value": "=[\"{{$('Funcion - Parsear respuesta IA').item.json.categoria}}\"]"}
+          ]
+        }
+      },
+      "name": "Chatwoot - Etiquetar en CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1420, 260]
+    }
+  ],
+  "connections": {
+    "Webhook - Evento Chatwoot": {
+      "main": [[ {"node": "Filtro - Solo mensajes entrantes", "type": "main", "index": 0} ]]
+    },
+    "Filtro - Solo mensajes entrantes": {
+      "main": [
+        [ {"node": "Claude - Entender y responder", "type": "main", "index": 0} ],
+        []
+      ]
+    },
+    "Claude - Entender y responder": {
+      "main": [[ {"node": "Funcion - Parsear respuesta IA", "type": "main", "index": 0} ]]
+    },
+    "Funcion - Parsear respuesta IA": {
+      "main": [[ {"node": "Chatwoot - Enviar respuesta", "type": "main", "index": 0} ]]
+    },
+    "Chatwoot - Enviar respuesta": {
+      "main": [[ {"node": "Chatwoot - Etiquetar en CRM", "type": "main", "index": 0} ]]
+    }
+  },
+  "settings": {
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}
