@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lleyton · Command Center — Cockpit de ventas</title>
+<meta name="description" content="CRM personal de ventas: pipeline, seguimiento y proyección de ingresos." />
+<style>
+  :root{
+    --bg:#0a0b13;--bg2:#12141f;--card:#171a29;--card2:#1d2131;--border:rgba(255,255,255,.08);
+    --text:#eef0fb;--soft:#9aa0c0;--primary:#7c5cff;--primary2:#9d84ff;--accent:#28d9b0;
+    --warn:#ffb454;--danger:#ff6b81;--radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--text);
+    background:radial-gradient(1000px 500px at 5% -10%,rgba(124,92,255,.22),transparent 55%),
+    radial-gradient(800px 400px at 100% 0,rgba(40,217,176,.12),transparent 50%),var(--bg);
+    min-height:100vh;padding:22px;font-size:15px}
+  .wrap{max-width:1240px;margin:0 auto}
+  a{color:var(--primary2)}
+  /* header */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .lg{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px;
+    background:linear-gradient(135deg,var(--primary),var(--accent))}
+  .brand h1{font-size:20px;font-weight:800;letter-spacing:-.3px}
+  .brand span{font-size:12.5px;color:var(--soft)}
+  .btn{border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;transition:transform .15s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+  .btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--text)}
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+  .stat .v{font-size:26px;font-weight:850}
+  .stat .l{font-size:12px;color:var(--soft);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  .stat.income .v{background:linear-gradient(120deg,var(--accent),var(--primary2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  /* board */
+  .board{display:grid;grid-template-columns:repeat(5,minmax(220px,1fr));gap:14px;overflow-x:auto;padding-bottom:14px}
+  .col{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--radius);padding:12px;min-height:220px;transition:background .15s}
+  .col.drag{background:rgba(124,92,255,.1);border-color:var(--primary)}
+  .col h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--soft);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+  .col h3 .cnt{background:var(--card2);border-radius:20px;padding:1px 9px;font-size:11px;color:var(--text)}
+  .col .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+  .card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:11px;padding:12px;margin-bottom:10px;cursor:grab;animation:pop .2s}
+  .card:active{cursor:grabbing}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .card .biz{font-weight:700;font-size:14.5px}
+  .card .con{font-size:12.5px;color:var(--soft);margin:1px 0 8px}
+  .card .row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .chip{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--card2);color:var(--soft)}
+  .val{font-weight:800;color:var(--accent);font-size:13px}
+  .fu{font-size:11.5px;margin-top:8px;display:flex;align-items:center;gap:5px;color:var(--soft)}
+  .fu.today{color:var(--warn)}.fu.over{color:var(--danger)}
+  .card .acts{display:flex;gap:6px;margin-top:9px}
+  .mini{background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--soft);font-size:11px;padding:3px 8px;cursor:pointer}
+  .mini:hover{color:#fff;border-color:var(--primary)}
+  .note{font-size:12px;color:var(--soft);margin-top:8px;background:rgba(255,255,255,.02);padding:7px 9px;border-radius:7px;white-space:pre-wrap}
+  /* templates */
+  details{margin-top:24px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 18px}
+  summary{cursor:pointer;font-weight:700;padding:10px 0}
+  .tpl{border-top:1px solid var(--border);padding:14px 0}
+  .tpl h4{font-size:13px;color:var(--accent);margin-bottom:6px}
+  .tpl p{font-size:13.5px;color:var(--soft);background:var(--bg2);padding:10px 12px;border-radius:9px;line-height:1.5}
+  .tpl button{margin-top:7px;font-size:12px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 12px;cursor:pointer}
+  /* modal */
+  .ov{position:fixed;inset:0;background:rgba(5,6,12,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+  .ov.on{display:flex}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:440px}
+  .modal h2{font-size:18px;margin-bottom:16px}
+  .modal label{display:block;font-size:12px;color:var(--soft);margin:10px 0 4px}
+  .modal input,.modal select,.modal textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:14px}
+  .modal .rowg{display:flex;gap:10px}.modal .rowg>div{flex:1}
+  .modal .foot{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+  .foot-note{text-align:center;color:var(--soft);font-size:12px;margin-top:26px}
+  @media(max-width:900px){.board{grid-template-columns:repeat(5,minmax(200px,1fr))}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="lg">🎯</div>
+      <div><h1>Command Center</h1><span>Tu cockpit de ventas · Lleyton IA Automation</span></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" onclick="resetSeed()">↺ Datos demo</button>
+      <button class="btn btn-primary" onclick="openModal()">+ Nuevo prospecto</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="board" id="board"></div>
+
+  <details>
+    <summary>💬 Mis plantillas de mensajes (clic para abrir)</summary>
+    <div class="tpl">
+      <h4>Opener — Instagram / WhatsApp</h4>
+      <p id="t1">Hola! Una consulta rápida: las de precios y stock por DM, ¿las contestás vos o tenés a alguien?</p>
+      <button onclick="cp('t1',this)">Copiar</button>
+    </div>
+    <div class="tpl">
+      <h4>Follow-up — cliente que pidió precio (ej. Marcos)</h4>
+      <p id="t2">Cómo andás. Quedó picando lo del sistema con el CRM. Cualquier duda del presupuesto o de cómo funciona, me decís y lo vemos. Si querés, en una llamada corta te muestro cómo quedaría andando. Sin apuro.</p>
+      <button onclick="cp('t2',this)">Copiar</button>
+    </div>
+    <div class="tpl">
+      <h4>Cierre suave — lead dormido</h4>
+      <p id="t3">¿Seguís con la idea de armarlo o lo pausamos por ahora? Cualquier respuesta está bien, es solo para saber cómo seguir.</p>
+      <button onclick="cp('t3',this)">Copiar</button>
+    </div>
+    <div class="tpl">
+      <h4>Email en frío — tiendas</h4>
+      <p id="t4">Hola [nombre]! Vi que en [tienda] manejan un montón de consultas por WhatsApp e Instagram. Ayudo a tiendas como la tuya a que un asistente con IA responda todo eso al instante y 24/7, así no se pierden ventas. Si te interesa te muestro un ejemplo hecho para tu tienda, sin compromiso. ¿Te lo paso? — Lleyton</p>
+      <button onclick="cp('t4',this)">Copiar</button>
+    </div>
+  </details>
+
+  <p class="foot-note">Todo se guarda en tu navegador. Arrastrá las tarjetas entre columnas para mover cada trato. Hecho por Lleyton IA Automation.</p>
+</div>
+
+<!-- modal -->
+<div class="ov" id="ov">
+  <div class="modal">
+    <h2 id="mtitle">Nuevo prospecto</h2>
+    <input type="hidden" id="f_id">
+    <label>Negocio</label><input id="f_biz" placeholder="Ej. Xelvia Store">
+    <label>Contacto / handle</label><input id="f_con" placeholder="Ej. Marcos · @xelviastore">
+    <div class="rowg">
+      <div><label>Canal</label><select id="f_ch"><option>Instagram</option><option>WhatsApp</option><option>Email</option><option>LinkedIn</option><option>Referido</option></select></div>
+      <div><label>Valor (USD)</label><input id="f_val" type="number" placeholder="400"></div>
+    </div>
+    <div class="rowg">
+      <div><label>Etapa</label><select id="f_stage"></select></div>
+      <div><label>Próximo seguimiento</label><input id="f_fu" type="date"></div>
+    </div>
+    <label>Nota</label><textarea id="f_note" rows="2" placeholder="Qué quedó pendiente..."></textarea>
+    <div class="foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveP()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STAGES=[
+  {id:'nuevo',name:'Nuevo',color:'#9aa0c0'},
+  {id:'contactado',name:'Contactado',color:'#7c5cff'},
+  {id:'respondio',name:'Respondió',color:'#4d9dff'},
+  {id:'negociacion',name:'Demo / Negociación',color:'#ffb454'},
+  {id:'cerrado',name:'Cerrado',color:'#28d9b0'},
+];
+const KEY='lleyton.cc.v1';
+const seed=[
+  {id:'p1',biz:'Xelvia Store',con:'Marcos · dueño',ch:'WhatsApp',val:400,stage:'negociacion',fu:todayPlus(2),note:'Le pasé precio (USD 400) + follow-up. Quiere WhatsApp + CRM. Esperando respuesta.'},
+  {id:'p2',biz:'Axentra OS',con:'Reclutador · Agency Partnerships',ch:'LinkedIn',val:0,stage:'negociacion',fu:todayPlus(1),note:'Respondí sus 3 preguntas. Esperando que propongan llamada.'},
+  {id:'p3',biz:'_todo_digital_',con:'@_todo_digital_ · San Juan',ch:'Instagram',val:300,stage:'contactado',fu:todayPlus(2),note:'Contestó un bot. Mandé mensaje para que salte un humano.'},
+  {id:'p4',biz:'allbeauty.usa',con:'@allbeauty.usa',ch:'Instagram',val:300,stage:'contactado',fu:todayPlus(2),note:'Opener enviado. Sin respuesta aún.'},
+  {id:'p5',biz:'importedskincare',con:'@importedskincare',ch:'Instagram',val:300,stage:'contactado',fu:todayPlus(2),note:'Opener enviado.'},
+  {id:'p6',biz:'romaarg_',con:'@romaarg_ · indumentaria',ch:'Instagram',val:300,stage:'contactado',fu:todayPlus(2),note:'Opener enviado.'},
+  {id:'p7',biz:'MimaQueen',con:'makeup importado',ch:'Instagram',val:300,stage:'contactado',fu:todayPlus(2),note:'Opener enviado.'},
+];
+let data=load();
+
+function todayPlus(d){const t=new Date();t.setDate(t.getDate()+d);return t.toISOString().slice(0,10)}
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):seed.slice()}catch(e){return seed.slice()}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function resetSeed(){if(confirm('¿Restaurar los datos de ejemplo? Se pierde lo que tengas.')){data=seed.slice();save()}}
+
+function render(){
+  // stats
+  const total=data.length;
+  const cont=data.filter(p=>p.stage!=='nuevo').length;
+  const resp=data.filter(p=>['respondio','negociacion','cerrado'].includes(p.stage)).length;
+  const nego=data.filter(p=>p.stage==='negociacion').length;
+  const cerr=data.filter(p=>p.stage==='cerrado').length;
+  const pipeline=data.filter(p=>!['cerrado'].includes(p.stage)).reduce((s,p)=>s+(+p.val||0),0);
+  const ganado=data.filter(p=>p.stage==='cerrado').reduce((s,p)=>s+(+p.val||0),0);
+  const rr=cont? Math.round(resp/cont*100):0;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="v">${total}</div><div class="l">Prospectos</div></div>
+    <div class="stat"><div class="v">${resp}</div><div class="l">Respondieron</div></div>
+    <div class="stat"><div class="v">${rr}%</div><div class="l">Tasa respuesta</div></div>
+    <div class="stat"><div class="v">${nego}</div><div class="l">En negociación</div></div>
+    <div class="stat income"><div class="v">US$ ${pipeline}</div><div class="l">Pipeline abierto</div></div>
+    <div class="stat income"><div class="v">US$ ${ganado}</div><div class="l">Ganado</div></div>`;
+  // board
+  const b=document.getElementById('board');b.innerHTML='';
+  STAGES.forEach(st=>{
+    const col=document.createElement('div');col.className='col';col.dataset.stage=st.id;
+    const items=data.filter(p=>p.stage===st.id);
+    col.innerHTML=`<h3><span><span class="dot" style="background:${st.color}"></span>${st.name}</span><span class="cnt">${items.length}</span></h3>`;
+    items.forEach(p=>col.appendChild(cardEl(p,st.color)));
+    col.addEventListener('dragover',e=>{e.preventDefault();col.classList.add('drag')});
+    col.addEventListener('dragleave',()=>col.classList.remove('drag'));
+    col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('drag');
+      const id=e.dataTransfer.getData('id');const p=data.find(x=>x.id===id);
+      if(p&&p.stage!==st.id){p.stage=st.id;save()}});
+    b.appendChild(col);
+  });
+}
+function cardEl(p,color){
+  const d=document.createElement('div');d.className='card';d.draggable=true;d.style.borderLeftColor=color;
+  let fuCls='',fuTxt='';
+  if(p.fu){const diff=Math.ceil((new Date(p.fu)-new Date().setHours(0,0,0,0))/864e5);
+    fuCls=diff<0?'over':diff===0?'today':'';
+    fuTxt=diff<0?`⚠ Seguir (venció)`:diff===0?`🔔 Seguir hoy`:`📅 Seguir en ${diff}d`;}
+  d.innerHTML=`<div class="biz">${esc(p.biz)}</div><div class="con">${esc(p.con||'')}</div>
+    <div class="row"><span class="chip">${esc(p.ch)}</span>${p.val?`<span class="val">US$ ${p.val}</span>`:''}</div>
+    ${p.note?`<div class="note">${esc(p.note)}</div>`:''}
+    ${fuTxt?`<div class="fu ${fuCls}">${fuTxt}</div>`:''}
+    <div class="acts"><button class="mini" onclick="edit('${p.id}')">✎ Editar</button>
+    <button class="mini" onclick="del('${p.id}')">🗑</button></div>`;
+  d.addEventListener('dragstart',e=>e.dataTransfer.setData('id',p.id));
+  return d;
+}
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+
+// modal
+function fillStages(){const s=document.getElementById('f_stage');s.innerHTML=STAGES.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}
+function openModal(){document.getElementById('mtitle').textContent='Nuevo prospecto';fillStages();
+  ['f_id','f_biz','f_con','f_val','f_note'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('f_ch').value='Instagram';document.getElementById('f_stage').value='nuevo';
+  document.getElementById('f_fu').value=todayPlus(2);document.getElementById('ov').classList.add('on')}
+function edit(id){const p=data.find(x=>x.id===id);if(!p)return;fillStages();
+  document.getElementById('mtitle').textContent='Editar prospecto';
+  document.getElementById('f_id').value=p.id;document.getElementById('f_biz').value=p.biz;
+  document.getElementById('f_con').value=p.con||'';document.getElementById('f_ch').value=p.ch;
+  document.getElementById('f_val').value=p.val||'';document.getElementById('f_stage').value=p.stage;
+  document.getElementById('f_fu').value=p.fu||'';document.getElementById('f_note').value=p.note||'';
+  document.getElementById('ov').classList.add('on')}
+function closeModal(){document.getElementById('ov').classList.remove('on')}
+function saveP(){const id=document.getElementById('f_id').value;
+  const obj={biz:document.getElementById('f_biz').value.trim(),con:document.getElementById('f_con').value.trim(),
+    ch:document.getElementById('f_ch').value,val:+document.getElementById('f_val').value||0,
+    stage:document.getElementById('f_stage').value,fu:document.getElementById('f_fu').value,
+    note:document.getElementById('f_note').value.trim()};
+  if(!obj.biz){alert('Poné al menos el nombre del negocio');return}
+  if(id){Object.assign(data.find(x=>x.id===id),obj)}else{obj.id='p'+Date.now();data.push(obj)}
+  closeModal();save()}
+function del(id){if(confirm('¿Borrar este prospecto?')){data=data.filter(x=>x.id!==id);save()}}
+function cp(id,btn){navigator.clipboard.writeText(document.getElementById(id).textContent.trim());
+  const o=btn.textContent;btn.textContent='✓ Copiado';setTimeout(()=>btn.textContent=o,1400)}
+
+render();
+</script>
+</body>
+</html>
