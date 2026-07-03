@@ -1,59 +1,64 @@
 {
-  "name": "Cazador de Empleos Remotos - IA Automation + Data (por email)",
+  "name": "Cazador de Empleos Remotos PRO - IA Automation + Data + Partnerships",
   "nodes": [
     {
       "parameters": {
-        "rule": {
-          "interval": [
-            { "field": "cronExpression", "expression": "0 9 * * 2,5" }
-          ]
-        }
+        "rule": { "interval": [ { "field": "cronExpression", "expression": "0 9 * * 2,5" } ] }
       },
       "name": "Trigger - Martes y Viernes 9hs",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
-      "position": [220, 320]
+      "position": [200, 380]
     },
     {
-      "parameters": {
-        "url": "https://remotive.com/api/remote-jobs?search=automation&limit=25",
-        "options": {}
-      },
+      "parameters": { "url": "https://remotive.com/api/remote-jobs?search=automation&limit=30", "options": {} },
       "name": "Buscar - Automation / IA",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [460, 220]
+      "position": [440, 140]
     },
     {
-      "parameters": {
-        "url": "https://remotive.com/api/remote-jobs?search=data%20analyst&limit=25",
-        "options": {}
-      },
+      "parameters": { "url": "https://remotive.com/api/remote-jobs?search=data%20analyst&limit=30", "options": {} },
       "name": "Buscar - Data Analyst",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [460, 420]
+      "position": [440, 300]
     },
     {
-      "parameters": {},
-      "name": "Unir resultados",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 2.1,
-      "position": [700, 320]
+      "parameters": { "url": "https://remotive.com/api/remote-jobs?search=partnerships&limit=30", "options": {} },
+      "name": "Buscar - Partnerships",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 460]
+    },
+    {
+      "parameters": { "url": "https://remotive.com/api/remote-jobs?search=sales&limit=30", "options": {} },
+      "name": "Buscar - Sales / BD",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 620]
     },
     {
       "parameters": {
-        "functionCode": "// Junta los empleos de todas las búsquedas, deduplica y arma el email\nconst all = [];\nfor (const item of $input.all()) {\n  const jobs = (item.json && item.json.jobs) || [];\n  for (const j of jobs) all.push(j);\n}\n// Deduplicar por URL\nconst seen = new Set();\nconst uniq = [];\nfor (const j of all) {\n  if (j.url && !seen.has(j.url)) { seen.add(j.url); uniq.push(j); }\n}\n// Palabras clave que suman fit (partnerships, ventas, automatización, datos)\nconst KW = ['automation','automat','ai ','partnership','sales','account','growth','data','analyst','no-code','nocode','workflow'];\nuniq.forEach(j => {\n  const t = (j.title || '').toLowerCase();\n  j._score = KW.reduce((s,k)=> s + (t.includes(k) ? 1 : 0), 0);\n});\nuniq.sort((a,b) => (b._score - a._score) || (new Date(b.publication_date) - new Date(a.publication_date)));\nconst top = uniq.slice(0, 10);\n\nlet html = '<h2>🎯 Cazador de Empleos — roles remotos para vos</h2>';\nhtml += '<p>Encontré ' + top.length + ' roles que encajan con tu perfil (IA Automation / Data / Partnerships):</p><ul>';\nfor (const j of top) {\n  const loc = j.candidate_required_location || 'Remoto';\n  const sal = j.salary ? (' · ' + j.salary) : '';\n  html += `<li style=\"margin-bottom:8px\"><a href=\"${j.url}\"><b>${j.title}</b></a> — ${j.company_name} (${loc})${sal}</li>`;\n}\nhtml += '</ul><p style=\"color:#888;font-size:12px\">Automatizado con n8n · Lleyton IA Automation</p>';\n\nreturn [{ json: { html, count: top.length } }];"
+        "functionCode": "// Junta las 4 búsquedas, saca solo los NUEVOS, rankea y arma un email lindo.\nconst EXCL = ['clearance','principal','vice president',' vp ','head of engineering','staff engineer'];\nconst KW = ['automation','automat','ai ','artificial','partnership','sales','account','growth','data','analyst','no-code','nocode','zapier','make','workflow','crm','integration'];\n\n// 1) Juntar todos los empleos de las 4 búsquedas\nconst all = [];\nfor (const item of $input.all()) {\n  const jobs = (item.json && item.json.jobs) || [];\n  for (const j of jobs) all.push(j);\n}\n\n// 2) Memoria de lo ya avisado (persiste entre ejecuciones)\nconst sd = $getWorkflowStaticData('global');\nsd.seen = sd.seen || [];\nconst seen = new Set(sd.seen);\n\n// 3) Deduplicar, filtrar ruido, quedarse con los NUEVOS\nconst byUrl = new Set();\nconst fresh = [];\nfor (const j of all) {\n  if (!j.url || byUrl.has(j.url)) continue;\n  byUrl.add(j.url);\n  const t = (j.title || '').toLowerCase();\n  if (EXCL.some(e => t.includes(e))) continue;\n  if (seen.has(j.url)) continue;\n  j._score = KW.reduce((s, k) => s + (t.includes(k) ? 1 : 0), 0);\n  fresh.push(j);\n}\n\n// 4) Rankear por fit y fecha\nfresh.sort((a, b) => (b._score - a._score) || (new Date(b.publication_date) - new Date(a.publication_date)));\nconst top = fresh.slice(0, 12);\n\n// 5) Marcar como vistos (para no repetir la próxima)\nfor (const j of top) sd.seen.push(j.url);\nif (sd.seen.length > 800) sd.seen = sd.seen.slice(-800);\n\nif (!top.length) return [{ json: { count: 0, html: '' } }];\n\n// 6) Armar email HTML\nlet rows = '';\nfor (const j of top) {\n  const loc = j.candidate_required_location || 'Remoto';\n  const sal = j.salary ? ` · <span style=\\\"color:#28a06a\\\">${j.salary}</span>` : '';\n  const fire = j._score >= 3 ? '\\uD83D\\uDD25 ' : '';\n  rows += `<tr><td style=\\\"padding:11px 0;border-bottom:1px solid #eee\\\"><a href=\\\"${j.url}\\\" style=\\\"color:#7c5cff;font-weight:bold;text-decoration:none;font-size:15px\\\">${fire}${j.title}</a><br><span style=\\\"color:#555;font-size:13px\\\">${j.company_name} · ${loc}${sal}</span></td></tr>`;\n}\nconst html = `<div style=\\\"font-family:Arial,Helvetica,sans-serif;max-width:620px;margin:0 auto\\\"><h2 style=\\\"color:#7c5cff;margin-bottom:4px\\\">\\uD83C\\uDFAF Cazador de Empleos</h2><p style=\\\"color:#555;margin-top:0\\\">${top.length} roles remotos NUEVOS para tu perfil (IA Automation / Data / Partnerships / Sales). Toc\\u00e1 el t\\u00edtulo para aplicar:</p><table style=\\\"width:100%;border-collapse:collapse\\\">${rows}</table><p style=\\\"color:#aaa;font-size:12px;margin-top:18px\\\">Automatizado con n8n \\u00b7 Lleyton IA Automation</p></div>`;\n\nreturn [{ json: { count: top.length, html } }];"
       },
-      "name": "Armar resumen",
+      "name": "Filtrar nuevos y armar email",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [940, 320]
+      "position": [720, 380]
+    },
+    {
+      "parameters": {
+        "conditions": { "number": [ { "value1": "={{$json.count}}", "operation": "larger", "value2": 0 } ] }
+      },
+      "name": "Hay roles nuevos?",
+      "type": "n8n-nodes-base.if",
+      "position": [960, 380]
     },
     {
       "parameters": {
         "sendTo": "murphylleyton05@gmail.com",
-        "subject": "=Cazador de empleos — {{$json.count}} roles nuevos para aplicar",
+        "subject": "=Cazador de empleos: {{$json.count}} roles nuevos para aplicar",
         "emailType": "html",
         "message": "={{$json.html}}",
         "options": {}
@@ -61,28 +66,24 @@
       "name": "Enviar por Gmail",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [1180, 320]
+      "position": [1200, 280]
     }
   ],
   "connections": {
     "Trigger - Martes y Viernes 9hs": {
       "main": [[
         { "node": "Buscar - Automation / IA", "type": "main", "index": 0 },
-        { "node": "Buscar - Data Analyst", "type": "main", "index": 0 }
+        { "node": "Buscar - Data Analyst", "type": "main", "index": 0 },
+        { "node": "Buscar - Partnerships", "type": "main", "index": 0 },
+        { "node": "Buscar - Sales / BD", "type": "main", "index": 0 }
       ]]
     },
-    "Buscar - Automation / IA": {
-      "main": [[ { "node": "Unir resultados", "type": "main", "index": 0 } ]]
-    },
-    "Buscar - Data Analyst": {
-      "main": [[ { "node": "Unir resultados", "type": "main", "index": 1 } ]]
-    },
-    "Unir resultados": {
-      "main": [[ { "node": "Armar resumen", "type": "main", "index": 0 } ]]
-    },
-    "Armar resumen": {
-      "main": [[ { "node": "Enviar por Gmail", "type": "main", "index": 0 } ]]
-    }
+    "Buscar - Automation / IA": { "main": [[ { "node": "Filtrar nuevos y armar email", "type": "main", "index": 0 } ]] },
+    "Buscar - Data Analyst": { "main": [[ { "node": "Filtrar nuevos y armar email", "type": "main", "index": 0 } ]] },
+    "Buscar - Partnerships": { "main": [[ { "node": "Filtrar nuevos y armar email", "type": "main", "index": 0 } ]] },
+    "Buscar - Sales / BD": { "main": [[ { "node": "Filtrar nuevos y armar email", "type": "main", "index": 0 } ]] },
+    "Filtrar nuevos y armar email": { "main": [[ { "node": "Hay roles nuevos?", "type": "main", "index": 0 } ]] },
+    "Hay roles nuevos?": { "main": [[ { "node": "Enviar por Gmail", "type": "main", "index": 0 } ], []] }
   },
   "settings": {
     "saveDataErrorExecution": "all",
