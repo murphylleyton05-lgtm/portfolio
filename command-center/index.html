@@ -214,7 +214,7 @@ const STAGES=[
   {id:'cerrado',name:'Cerrado',color:'#28d9b0',prob:100},
   {id:'descartado',name:'Descartado',color:'#ff6b81',prob:0},
 ];
-const KEY='lleyton.cc.v2', SET='lleyton.cc.settings';
+const KEY='lleyton.cc.v3', SET='lleyton.cc.settings';
 function tp(d){const t=new Date();t.setDate(t.getDate()+d);return t.toISOString().slice(0,10)}
 const seed=[
   {id:'p1',biz:'Xelvia Store',con:'Marcos · dueño',ch:'WhatsApp',val:400,stage:'negociacion',fu:tp(0),note:'Le pasé precio (USD 400) + follow-up. Quiere WhatsApp + CRM.',link:'',hot:true,log:[{d:tp(-2),t:'Le pasé el presupuesto de USD 400'},{d:tp(0),t:'Mandé follow-up, sin respuesta aún'}]},
@@ -224,6 +224,12 @@ const seed=[
   {id:'p5',biz:'importedskincare',con:'@importedskincare',ch:'Instagram',val:300,stage:'contactado',fu:tp(2),note:'Opener enviado.',link:'https://instagram.com/importedskincare',hot:false,log:[]},
   {id:'p6',biz:'romaarg_',con:'@romaarg_ · indumentaria',ch:'Instagram',val:300,stage:'contactado',fu:tp(2),note:'Opener enviado.',link:'https://instagram.com/romaarg_',hot:false,log:[]},
   {id:'p7',biz:'MimaQueen',con:'makeup importado',ch:'Instagram',val:300,stage:'contactado',fu:tp(2),note:'Opener enviado.',link:'',hot:false,log:[]},
+  {id:'p8',biz:'Nutrishop',con:'suplementos + indumentaria',ch:'Email',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Todavía sin contactar. Email en /contacto.',link:'https://nutrishop.com.ar/contacto/',hot:false,log:[]},
+  {id:'p9',biz:'Stier Suplementos',con:'@stiersuplementos',ch:'Instagram',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Sin contactar.',link:'https://instagram.com/stiersuplementos',hot:false,log:[]},
+  {id:'p10',biz:'Goodfitness',con:'suplementos fitness',ch:'Email',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Sin contactar.',link:'https://goodfitness.com.ar/contacto/',hot:false,log:[]},
+  {id:'p11',biz:'Mixitup',con:'suplementos (CABA)',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). WhatsApp mayorista: +54 9 11 2801-3068.',link:'https://www.mixitup.com.ar/contacto/',hot:false,log:[]},
+  {id:'p12',biz:'Nutrición Muscular',con:'suplementos (Mendoza)',ch:'Email',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Sin contactar.',link:'https://nutricionmuscular.com.ar/',hot:false,log:[]},
+  {id:'p13',biz:'Anitel Indumentaria',con:'@la_plata_as_indumentaria · La Plata',ch:'Instagram',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 — local de tu zona (La Plata). Sin contactar.',link:'https://instagram.com/la_plata_as_indumentaria',hot:false,log:[]},
 ];
 let data=load(), settings=loadSet();
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):seed.slice()}catch(e){return seed.slice()}}
