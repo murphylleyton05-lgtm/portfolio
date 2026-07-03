@@ -106,6 +106,17 @@
   .hist .h b{color:var(--text)}
   .modal .foot{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
   .foot-note{text-align:center;color:var(--soft);font-size:12px;margin-top:20px}
+  .game{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,rgba(124,92,255,.12),rgba(40,217,176,.08));border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;margin-bottom:14px;flex-wrap:wrap}
+  .lvl{display:flex;align-items:center;gap:8px}
+  .lvl .badge{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-weight:850;border-radius:9px;padding:4px 10px;font-size:12.5px}
+  .lvl .nm{font-weight:800;font-size:14px}
+  .xpwrap{flex:1;min-width:160px}
+  .xpbar{height:10px;background:var(--card2);border-radius:20px;overflow:hidden}
+  .xpbar>div{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .5s}
+  .xptxt{font-size:11px;color:var(--soft);margin-top:3px}
+  .streak{font-weight:850;font-size:15px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--primary);border-radius:12px;padding:12px 22px;font-weight:800;font-size:14px;z-index:300;box-shadow:0 14px 34px rgba(0,0,0,.45);transition:opacity .4s}
+  @keyframes tin{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%)}}
   .conf{position:fixed;top:-10px;font-size:22px;z-index:200;pointer-events:none;animation:fall linear forwards}
   @keyframes fall{to{transform:translateY(105vh) rotate(360deg);opacity:.9}}
   @media(max-width:820px){.panels{grid-template-columns:1fr}}
@@ -149,6 +160,8 @@
     <div class="panel"><h2>📊 Embudo de ventas</h2><div id="funnel"></div></div>
     <div class="panel"><h2>🧠 Sugerencias de hoy</h2><div id="sug"></div></div>
   </div>
+
+  <div class="game" id="game"></div>
 
   <div class="stats" id="stats"></div>
 
@@ -214,7 +227,7 @@ const seed=[
 ];
 let data=load(), settings=loadSet();
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):seed.slice()}catch(e){return seed.slice()}}
-function loadSet(){try{return Object.assign({goal:1500,theme:'dark',currency:'USD',rate:1200},JSON.parse(localStorage.getItem(SET)))}catch(e){return{goal:1500,theme:'dark',currency:'USD',rate:1200}}}
+function loadSet(){const def={goal:1500,theme:'dark',currency:'USD',rate:1200,xp:0,ach:[],streak:0,lastActive:'',sound:true};try{return Object.assign(def,JSON.parse(localStorage.getItem(SET)))}catch(e){return def}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
 function saveSet(){localStorage.setItem(SET,JSON.stringify(settings))}
 function resetSeed(){if(confirm('¿Restaurar datos de ejemplo? Se pierde lo que tengas.')){data=seed.slice();save()}}
@@ -254,6 +267,7 @@ function render(){
   document.getElementById('fcast').textContent=money(Math.round(fcast));
   document.getElementById('goalInput').value=goal;
   document.getElementById('rate').value=settings.rate;
+  renderGame();checkAchievements();
   // funnel
   const fEl=document.getElementById('funnel');const funStages=STAGES.filter(s=>s.id!=='descartado');
   const maxC=Math.max(1,...funStages.map(s=>data.filter(p=>p.stage===s.id).length));
@@ -292,7 +306,7 @@ function render(){
     col.addEventListener('dragover',e=>{e.preventDefault();col.classList.add('drag')});
     col.addEventListener('dragleave',()=>col.classList.remove('drag'));
     col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('drag');const id=e.dataTransfer.getData('id');const p=data.find(x=>x.id===id);
-      if(p&&p.stage!==st.id){const was=p.stage;p.stage=st.id;p.log=p.log||[];p.log.unshift({d:tp(0),t:'Movido a '+st.name});if(st.id==='cerrado'&&was!=='cerrado')confetti();save()}});
+      if(p&&p.stage!==st.id){const was=p.stage;p.stage=st.id;p.log=p.log||[];p.log.unshift({d:tp(0),t:'Movido a '+st.name});const XPMAP={contactado:10,respondio:25,negociacion:40,cerrado:100};if(XPMAP[st.id])addXP(XPMAP[st.id]);if(st.id==='cerrado'&&was!=='cerrado'){confetti();beep(523,.14);setTimeout(()=>beep(659,.14),150);setTimeout(()=>beep(784,.32),300);toast('💰 ¡Venta cerrada! +100 XP')}save()}});
     b.appendChild(col);
   });
 }
@@ -312,7 +326,7 @@ function cardEl(p,color){
   return d;
 }
 function doneFu(id){const p=data.find(x=>x.id===id);if(p){p.fu=tp(3);p.log=p.log||[];p.log.unshift({d:tp(0),t:'Seguimiento hecho'});save()}}
-function addLog(id){const p=data.find(x=>x.id===id);if(!p)return;const t=prompt('Anotá la interacción (qué pasó):');if(t&&t.trim()){p.log=p.log||[];p.log.unshift({d:tp(0),t:t.trim()});save()}}
+function addLog(id){const p=data.find(x=>x.id===id);if(!p)return;const t=prompt('Anotá la interacción (qué pasó):');if(t&&t.trim()){p.log=p.log||[];p.log.unshift({d:tp(0),t:t.trim()});addXP(5);save()}}
 function confetti(){const em=['💰','🎉','✨','🤑','🏆'];for(let i=0;i<40;i++){const s=document.createElement('div');s.className='conf';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=(1.5+Math.random()*1.5)+'s';s.style.fontSize=(16+Math.random()*18)+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),3200)}}
 
 function fillStages(){document.getElementById('f_stage').innerHTML=STAGES.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}
@@ -339,7 +353,7 @@ function saveP(){const id=document.getElementById('f_id').value;
     note:document.getElementById('f_note').value.trim(),link:document.getElementById('f_link').value.trim(),
     hot:document.getElementById('f_hot').checked};
   if(!o.biz){alert('Poné al menos el nombre del negocio');return}
-  if(id){Object.assign(data.find(x=>x.id===id),o)}else{o.id='p'+Date.now();o.log=[];data.push(o)}
+  if(id){Object.assign(data.find(x=>x.id===id),o)}else{o.id='p'+Date.now();o.log=[];data.push(o);addXP(5)}
   closeModal();save()}
 function del(id){if(confirm('¿Borrar este prospecto?')){data=data.filter(x=>x.id!==id);save()}}
 function cp(id,btn){navigator.clipboard.writeText(document.getElementById(id).textContent.trim());const o=btn.textContent;btn.textContent='✓ Copiado';setTimeout(()=>btn.textContent=o,1400)}
@@ -355,7 +369,26 @@ function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileRe
   r.onload=()=>{try{const d=JSON.parse(r.result);if(Array.isArray(d)){data=d;save();alert('Datos importados ✓')}else alert('Archivo inválido')}catch(err){alert('No se pudo leer el archivo')}};r.readAsText(f)}
 function dl(txt,name,type){const b=new Blob([txt],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
 
-applyTheme();render();
+// ---------- Modo Arcade (gamificación) ----------
+const LEVELS=[{min:0,n:'Novato'},{min:120,n:'Prospector'},{min:350,n:'Vendedor'},{min:750,n:'Cerrador'},{min:1500,n:'Máquina de ventas'},{min:3000,n:'Leyenda'}];
+function levelOf(xp){let i=0;for(let k=0;k<LEVELS.length;k++){if(xp>=LEVELS[k].min)i=k}const next=LEVELS[i+1];return{name:LEVELS[i].n,idx:i,cur:LEVELS[i].min,next:next?next.min:LEVELS[i].min,isMax:!next}}
+function beep(freq,dur){if(!settings.sound)return;try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.12,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+dur);o.start();o.stop(a.currentTime+dur)}catch(e){}}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.style.animation='tin .35s';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),450)},2600)}
+function addXP(n){const before=levelOf(settings.xp||0);settings.xp=(settings.xp||0)+n;const after=levelOf(settings.xp);if(after.idx>before.idx){beep(660,.15);setTimeout(()=>beep(880,.28),170);toast('⭐ ¡Subiste a Nivel '+(after.idx+1)+' — '+after.name+'!')}saveSet()}
+const ACHS=[
+ {id:'first_close',n:'🏆 Primera venta',test:()=>data.some(p=>p.stage==='cerrado')},
+ {id:'ten_prospects',n:'📇 10 prospectos',test:()=>data.length>=10},
+ {id:'five_resp',n:'💬 5 respuestas',test:()=>data.filter(p=>['respondio','negociacion','cerrado'].includes(p.stage)).length>=5},
+ {id:'streak_3',n:'🔥 Racha de 3 días',test:()=>(settings.streak||0)>=3},
+ {id:'xp_500',n:'⚡ 500 XP',test:()=>(settings.xp||0)>=500},
+ {id:'closer3',n:'💰 3 ventas cerradas',test:()=>data.filter(p=>p.stage==='cerrado').length>=3}
+];
+function checkAchievements(){settings.ach=settings.ach||[];let changed=false;for(const a of ACHS){if(!settings.ach.includes(a.id)&&a.test()){settings.ach.push(a.id);changed=true;beep(720,.2);setTimeout(()=>toast('🎖️ Logro desbloqueado: '+a.n),300)}}if(changed)saveSet()}
+function updateStreak(){const today=new Date().toISOString().slice(0,10);if(settings.lastActive===today)return;const y=new Date(Date.now()-864e5).toISOString().slice(0,10);settings.streak=settings.lastActive===y?(settings.streak||0)+1:1;settings.lastActive=today;saveSet()}
+function renderGame(){const el=document.getElementById('game');if(!el)return;const l=levelOf(settings.xp||0);const prog=l.isMax?100:Math.round(((settings.xp||0)-l.cur)/(l.next-l.cur)*100);el.innerHTML=`<div class="lvl"><span class="badge">Nv ${l.idx+1}</span><span class="nm">${l.name}</span></div><div class="xpwrap"><div class="xpbar"><div style="width:${prog}%"></div></div><div class="xptxt">${settings.xp||0} XP${l.isMax?' · ¡MÁXIMO!':' · faltan '+(l.next-(settings.xp||0))+' para subir'}</div></div><span class="streak">🔥 ${settings.streak||0}d</span><span style="font-size:12px;color:var(--soft)">🎖️ ${(settings.ach||[]).length}/${ACHS.length}</span><button class="mini" onclick="toggleSound()">${settings.sound?'🔊':'🔇'}</button>`}
+function toggleSound(){settings.sound=!settings.sound;saveSet();renderGame()}
+
+applyTheme();updateStreak();render();
 </script>
 </body>
 </html>
