@@ -130,8 +130,6 @@
     <div class="panel"><h2>Embudo de conversión <span class="hint">hoy</span></h2><div class="funnel" id="funnel"></div></div>
   </div>
 
-  <div class="panel" style="margin-top:14px"><h2>🏆 Ranking de vendedores <span class="hint">este mes · datos del CRM</span></h2><div id="rank"></div></div>
-
   <p class="note">Datos de demostración · Centro de Control Ejecutivo por Lleyton IA Automation</p>
 </div>
 
@@ -239,24 +237,6 @@ document.getElementById('insights').innerHTML=buildInsights().map(x=>`<div class
 
 // ---- Embudo de conversión ----
 document.getElementById('funnel').innerHTML=FN.map(f=>`<div class="step" style="width:${f[2]}%;background:${f[3]}">${f[0]} · ${nf.format(f[1])}</div>`).join('')+`<div style="text-align:center;color:var(--ink2);font-size:12.5px;margin-top:10px">Conversión total: <b style="color:#fff">2,7%</b></div>`;
-
-// ---- Ranking de vendedores (fuente: Chatwoot + Tienda Nube vía n8n) ----
-const SELL=[
-  {n:'Sofía G.',v:4200000,p:52,r:'3 min',c:'#3987e5'},
-  {n:'Diego M.',v:3100000,p:41,r:'5 min',c:'#199e70'},
-  {n:'Martina L.',v:2400000,p:33,r:'8 min',c:'#9085e9'},
-  {n:'Lucas R.',v:1600000,p:22,r:'12 min',c:'#c98500'},
-];
-(function(){
-  const medals=['🥇','🥈','🥉'];const maxV=Math.max(...SELL.map(s=>s.v));
-  document.getElementById('rank').innerHTML=SELL.map((s,i)=>`<div class="rank-row ${i===0?'top':''}">
-    <span class="rank-pos">${medals[i]||('#'+(i+1))}</span>
-    <span class="rank-av" style="background:${s.c}">${s.n[0]}</span>
-    <div class="rank-info"><div class="n">${s.n}</div><div class="m">${s.p} pedidos · responde en ${s.r}</div></div>
-    <div class="rank-bar"><div data-w="${s.v/maxV*100}"></div></div>
-    <span class="rank-val">${money(s.v)}</span></div>`).join('');
-  setTimeout(()=>document.querySelectorAll('#rank .rank-bar>div').forEach(b=>b.style.width=b.dataset.w+'%'),150);
-})();
 
 // ---- Reloj + tick ----
 function clock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('es-AR')}clock();setInterval(clock,1000);
