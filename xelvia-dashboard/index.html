@@ -69,6 +69,14 @@
   .feed-item{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);animation:slidein .5s}
   @keyframes slidein{from{opacity:0;transform:translateY(-8px)}to{opacity:1}}
   .feed-item .em{font-size:17px}.feed-item .tx{font-size:13px}.feed-item .tx b{color:#fff}.feed-item .tx .t{color:var(--ink3);font-size:11px}
+  .badge-ia{font-size:10px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:2px 9px;border-radius:999px;font-weight:800;letter-spacing:.5px}
+  .ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .insight{display:flex;gap:10px;background:rgba(124,92,255,.06);border:1px solid rgba(124,92,255,.2);border-radius:11px;padding:12px}
+  .insight .em{font-size:18px;flex-shrink:0}
+  .insight .tx{font-size:12.5px;color:var(--ink2);line-height:1.45}
+  .insight .tx b{color:#fff}
+  .funnel .step{margin:9px auto;border-radius:9px;padding:11px;color:#fff;text-align:center;font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;box-shadow:0 6px 18px rgba(0,0,0,.3);transition:width .8s}
+  @media(max-width:600px){.ins-grid{grid-template-columns:1fr}}
   .note{text-align:center;color:var(--ink3);font-size:12px;margin-top:20px}
   @media(max-width:960px){.grid,.grid3,.grid-d{grid-template-columns:1fr}}
 </style>
@@ -104,6 +112,11 @@
   <div class="grid-d">
     <div class="panel"><h2>Ventas por provincia</h2><div id="prov"></div></div>
     <div class="panel"><h2>Actividad en vivo <span class="hint">tiempo real</span></h2><div class="feed" id="feed"></div></div>
+  </div>
+
+  <div class="grid" style="margin-top:14px">
+    <div class="panel"><h2>🤖 Insights de IA <span class="badge-ia">AUTOMÁTICO</span></h2><div class="ins-grid" id="insights"></div></div>
+    <div class="panel"><h2>Embudo de conversión <span class="hint">hoy</span></h2><div class="funnel" id="funnel"></div></div>
   </div>
 
   <p class="note">Datos de demostración · Centro de Control Ejecutivo por Lleyton IA Automation</p>
@@ -188,6 +201,19 @@ const feed=document.getElementById('feed');
 function hhmm(){return new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}
 function addEvent(){const e=EV[Math.floor(Math.random()*EV.length)];const d=document.createElement('div');d.className='feed-item';d.innerHTML=`<span class="em">${e[0]}</span><div class="tx">${e[1]}<div class="t">hace instantes · ${hhmm()}</div></div>`;feed.prepend(d);while(feed.children.length>6)feed.lastChild.remove()}
 for(let i=0;i<5;i++)addEvent();setInterval(addEvent,3800);
+
+// ---- Insights de IA ----
+const INS=[
+ ['📈','Tus ingresos <b>crecieron 18%</b> en 14 días. Sostené la reposición para no quedarte sin stock.'],
+ ['🕐','El <b>63% de las ventas</b> pasan entre las 19 y 23 hs. Reforzá la atención en ese horario.'],
+ ['📱','<b>Instagram creció 20%</b> como canal — conviene meterle más contenido ahí.'],
+ ['📦','iPhone 15 + AirPods son el <b>42% de tus ventas</b>. Que nunca falten en stock.'],
+];
+document.getElementById('insights').innerHTML=INS.map(x=>`<div class="insight"><span class="em">${x[0]}</span><div class="tx">${x[1]}</div></div>`).join('');
+
+// ---- Embudo de conversión ----
+const FN=[['Visitas',12400,100,'#3987e5'],['Carritos',890,54,'#199e70'],['Compras',340,30,'#28d9b0']];
+document.getElementById('funnel').innerHTML=FN.map(f=>`<div class="step" style="width:${f[2]}%;background:${f[3]}">${f[0]} · ${nf.format(f[1])}</div>`).join('')+`<div style="text-align:center;color:var(--ink2);font-size:12.5px;margin-top:10px">Conversión total: <b style="color:#fff">2,7%</b></div>`;
 
 // ---- Reloj + tick ----
 function clock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('es-AR')}clock();setInterval(clock,1000);
