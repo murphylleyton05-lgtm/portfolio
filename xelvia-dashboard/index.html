@@ -115,7 +115,7 @@
   </div>
 
   <div class="grid" style="margin-top:14px">
-    <div class="panel"><h2>🤖 Insights de IA <span class="badge-ia">AUTOMÁTICO</span></h2><div class="ins-grid" id="insights"></div></div>
+    <div class="panel"><h2>🤖 Insights de IA <span class="badge-ia">CALCULADO SOBRE TUS DATOS</span></h2><div class="ins-grid" id="insights"></div></div>
     <div class="panel"><h2>Embudo de conversión <span class="hint">hoy</span></h2><div class="funnel" id="funnel"></div></div>
   </div>
 
@@ -202,17 +202,29 @@ function hhmm(){return new Date().toLocaleTimeString('es-AR',{hour:'2-digit',min
 function addEvent(){const e=EV[Math.floor(Math.random()*EV.length)];const d=document.createElement('div');d.className='feed-item';d.innerHTML=`<span class="em">${e[0]}</span><div class="tx">${e[1]}<div class="t">hace instantes · ${hhmm()}</div></div>`;feed.prepend(d);while(feed.children.length>6)feed.lastChild.remove()}
 for(let i=0;i<5;i++)addEvent();setInterval(addEvent,3800);
 
-// ---- Insights de IA ----
-const INS=[
- ['📈','Tus ingresos <b>crecieron 18%</b> en 14 días. Sostené la reposición para no quedarte sin stock.'],
- ['🕐','El <b>63% de las ventas</b> pasan entre las 19 y 23 hs. Reforzá la atención en ese horario.'],
- ['📱','<b>Instagram creció 20%</b> como canal — conviene meterle más contenido ahí.'],
- ['📦','iPhone 15 + AirPods son el <b>42% de tus ventas</b>. Que nunca falten en stock.'],
-];
-document.getElementById('insights').innerHTML=INS.map(x=>`<div class="insight"><span class="em">${x[0]}</span><div class="tx">${x[1]}</div></div>`).join('');
+const FN=[['Visitas',12400,100,'#3987e5'],['Carritos',890,54,'#199e70'],['Compras',340,30,'#28d9b0']];
+// ---- Insights de IA (CALCULADOS a partir de los datos reales, no inventados) ----
+function buildInsights(){
+  const pct=(a,b)=>Math.round(a/b*100);
+  const rev=DATA[14];
+  const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+  const trend=Math.round((mean(rev.slice(7))-mean(rev.slice(0,7)))/mean(rev.slice(0,7))*100);
+  const totU=PROD.reduce((s,p)=>s+p.v,0);
+  const top2n=PROD[0].n+' + '+PROD[1].n, top2p=pct(PROD[0].v+PROD[1].v,totU);
+  const bestCh=[...CH].sort((a,b)=>b.v-a.v)[0];
+  const conv=(FN[2][1]/FN[0][1]*100).toFixed(1);
+  const lostCart=FN[1][1]-FN[2][1];
+  const topProv=[...PROV].sort((a,b)=>b.v-a.v)[0];
+  return [
+    ['📈',`La última semana facturó <b>${trend}% más</b> que la anterior. Sostené el ritmo de reposición.`],
+    ['📦',`<b>${top2n}</b> concentran el <b>${top2p}%</b> de las unidades vendidas. Que nunca falten en stock.`],
+    ['📊',`<b>${bestCh.n}</b> es tu canal principal (${bestCh.v}%), y <b>${topProv.n}</b> tu zona fuerte (${topProv.v}%).`],
+    ['🛒',`Conversión de <b>${conv}%</b> — <b>${lostCart}</b> carritos quedaron sin comprar. Recuperarlos suma ventas.`],
+  ];
+}
+document.getElementById('insights').innerHTML=buildInsights().map(x=>`<div class="insight"><span class="em">${x[0]}</span><div class="tx">${x[1]}</div></div>`).join('');
 
 // ---- Embudo de conversión ----
-const FN=[['Visitas',12400,100,'#3987e5'],['Carritos',890,54,'#199e70'],['Compras',340,30,'#28d9b0']];
 document.getElementById('funnel').innerHTML=FN.map(f=>`<div class="step" style="width:${f[2]}%;background:${f[3]}">${f[0]} · ${nf.format(f[1])}</div>`).join('')+`<div style="text-align:center;color:var(--ink2);font-size:12.5px;margin-top:10px">Conversión total: <b style="color:#fff">2,7%</b></div>`;
 
 // ---- Reloj + tick ----
