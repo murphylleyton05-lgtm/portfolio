@@ -46,6 +46,12 @@
   .seg button.on{background:var(--blue);color:#fff}
   .axis text{fill:var(--ink3);font-size:10px}
   .gridline{stroke:rgba(255,255,255,.05)}
+  .rev-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px;flex-wrap:wrap;gap:8px}
+  .rev-total{font-size:27px;font-weight:850;font-variant-numeric:tabular-nums;line-height:1}
+  .rev-sub{font-size:12.5px;color:var(--ink2);margin-top:5px}
+  .rev-legend{display:flex;gap:14px;font-size:11.5px;color:var(--ink2)}
+  .rev-legend i{display:inline-block;width:16px;height:0;border-top:2.5px solid var(--blue);vertical-align:middle;margin-right:4px}
+  .rev-legend .dp{border-top-style:dashed;border-color:#6b7085}
   #areaWrap{position:relative}
   .tip{position:absolute;pointer-events:none;background:#0c0d14;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;white-space:nowrap;transform:translate(-50%,-115%);opacity:0;transition:opacity .1s;z-index:5}
   .tip b{color:#fff}
@@ -106,6 +112,10 @@
   <div class="grid">
     <div class="panel">
       <h2>Ingresos <span class="seg" id="seg"><button data-k="7">7d</button><button data-k="14" class="on">14d</button><button data-k="30">30d</button></span></h2>
+      <div class="rev-head">
+        <div><div class="rev-total" id="revTotal">$ 0</div><div class="rev-sub" id="revSub"></div></div>
+        <div class="rev-legend"><span><i class="dc"></i> Este período</span><span><i class="dp"></i> Anterior</span></div>
+      </div>
       <div id="areaWrap"><div id="area"></div><div class="tip" id="tip"></div></div>
     </div>
     <div class="panel">
@@ -159,22 +169,37 @@ const DATA={
 DATA[30]=Array.from({length:30},(_,i)=>Math.round(600+i*36+Math.sin(i*1.3)*80)*1000);
 let pts=[];
 function drawArea(key){
-  const rev=DATA[key];const W=660,H=220,pad={l:46,r:14,t:14,b:22},iw=W-pad.l-pad.r,ih=H-pad.t-pad.b;
-  const max=Math.max(...rev)*1.1;
+  const rev=DATA[key];
+  const prev=rev.map((v,i)=>Math.round(v*(0.76+0.05*Math.sin(i*0.7))));
+  const W=680,H=232,pad={l:54,r:16,t:16,b:30},iw=W-pad.l-pad.r,ih=H-pad.t-pad.b;
+  const max=Math.max(...rev,...prev)*1.14;
   const x=i=>pad.l+i/(rev.length-1)*iw,y=v=>pad.t+ih-v/max*ih;
   pts=rev.map((v,i)=>({px:x(i),py:y(v),v,i}));
-  let line=pts.map((p,i)=>`${i?'L':'M'}${p.px.toFixed(1)} ${p.py.toFixed(1)}`).join(' ');
-  const area=line+` L${x(rev.length-1).toFixed(1)} ${pad.t+ih} L${pad.l} ${pad.t+ih} Z`;
-  let grid='',ax='';
-  for(let g=0;g<=4;g++){const gy=pad.t+ih-g/4*ih;grid+=`<line class="gridline" x1="${pad.l}" y1="${gy}" x2="${W-pad.r}" y2="${gy}"/>`;ax+=`<text x="${pad.l-6}" y="${gy+3}" text-anchor="end">${Math.round(max*g/4/1000)}k</text>`}
-  const dots=pts.map(p=>`<circle cx="${p.px.toFixed(1)}" cy="${p.py.toFixed(1)}" r="${rev.length>20?2:3}" fill="#3987e5" stroke="#16171f" stroke-width="2"/>`).join('');
+  const lineC=pts.map((p,i)=>`${i?'L':'M'}${p.px.toFixed(1)} ${p.py.toFixed(1)}`).join(' ');
+  const areaC=lineC+` L${x(rev.length-1).toFixed(1)} ${pad.t+ih} L${pad.l} ${pad.t+ih} Z`;
+  const lineP=prev.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+  const total=rev.reduce((a,b)=>a+b,0),ptot=prev.reduce((a,b)=>a+b,0);
+  const delta=Math.round((total-ptot)/ptot*100),avg=total/rev.length,ay=y(avg);
+  const bestI=rev.indexOf(Math.max(...rev)),last=pts[pts.length-1];
+  let grid='',yax='';
+  for(let g=0;g<=4;g++){const gy=pad.t+ih-g/4*ih;grid+=`<line class="gridline" x1="${pad.l}" y1="${gy}" x2="${W-pad.r}" y2="${gy}"/>`;yax+=`<text x="${pad.l-8}" y="${gy+3}" text-anchor="end">$${Math.round(max*g/4/1000)}k</text>`}
+  const today=new Date(),nlab=4;let xax='';
+  for(let j=0;j<nlab;j++){const i=Math.round(j*(rev.length-1)/(nlab-1));const d=new Date(today);d.setDate(d.getDate()-(rev.length-1-i));const lbl=i===rev.length-1?'hoy':`${d.getDate()}/${d.getMonth()+1}`;xax+=`<text x="${x(i).toFixed(1)}" y="${pad.t+ih+17}" text-anchor="middle">${lbl}</text>`}
+  const avgL=`<line x1="${pad.l}" y1="${ay.toFixed(1)}" x2="${W-pad.r}" y2="${ay.toFixed(1)}" stroke="#c98500" stroke-width="1" stroke-dasharray="4 4" opacity=".65"/><text x="${W-pad.r}" y="${(ay-5).toFixed(1)}" text-anchor="end" fill="#c98500" font-size="10">prom $${Math.round(avg/1000)}k</text>`;
+  const bestM=`<circle cx="${x(bestI).toFixed(1)}" cy="${y(rev[bestI]).toFixed(1)}" r="4" fill="#28d9b0" stroke="#16171f" stroke-width="2"/><text x="${x(bestI).toFixed(1)}" y="${(y(rev[bestI])-10).toFixed(1)}" text-anchor="middle" fill="#28d9b0" font-size="10" font-weight="700">pico</text>`;
+  const lastM=`<circle cx="${last.px.toFixed(1)}" cy="${last.py.toFixed(1)}" r="4.5" fill="#3987e5" stroke="#16171f" stroke-width="2"/>`;
   document.getElementById('area').innerHTML=`<svg id="asvg" viewBox="0 0 ${W} ${H}" width="100%" class="axis">
-    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3987e5" stop-opacity=".45"/><stop offset="1" stop-color="#3987e5" stop-opacity="0"/></linearGradient></defs>
-    ${grid}${ax}<path d="${area}" fill="url(#ag)"/>
-    <path d="${line}" fill="none" stroke="#3987e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3000" stroke-dashoffset="3000"><animate attributeName="stroke-dashoffset" from="3000" to="0" dur="1.2s" fill="freeze"/></path>
-    <line id="cross" x1="0" y1="${pad.t}" x2="0" y2="${pad.t+ih}" stroke="#7c5cff" stroke-width="1" opacity="0"/>${dots}</svg>`;
+    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3987e5" stop-opacity=".4"/><stop offset="1" stop-color="#3987e5" stop-opacity="0"/></linearGradient></defs>
+    ${grid}${yax}${xax}
+    <path d="${lineP}" fill="none" stroke="#6b7085" stroke-width="1.5" stroke-dasharray="5 4" opacity=".7"/>
+    <path d="${areaC}" fill="url(#ag)"/>
+    <path d="${lineC}" fill="none" stroke="#3987e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3200" stroke-dashoffset="3200"><animate attributeName="stroke-dashoffset" from="3200" to="0" dur="1.1s" fill="freeze"/></path>
+    ${avgL}${bestM}${lastM}
+    <line id="cross" x1="0" y1="${pad.t}" x2="0" y2="${pad.t+ih}" stroke="#7c5cff" stroke-width="1" opacity="0"/></svg>`;
+  document.getElementById('revTotal').textContent=money(total);
+  document.getElementById('revSub').innerHTML=`<b style="color:${delta>=0?'#4ade80':'#f87171'}">${delta>=0?'▲':'▼'} ${Math.abs(delta)}%</b> vs período anterior · prom ${money(avg)}/día`;
   const svg=document.getElementById('asvg'),tip=document.getElementById('tip'),cross=document.getElementById('cross');
-  svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect();const sx=(e.clientX-r.left)/r.width*W;let best=pts[0];for(const p of pts)if(Math.abs(p.px-sx)<Math.abs(best.px-sx))best=p;cross.setAttribute('x1',best.px);cross.setAttribute('x2',best.px);cross.setAttribute('opacity','.6');tip.style.opacity='1';tip.style.left=(best.px/W*r.width)+'px';tip.style.top=(best.py/H*r.height)+'px';tip.innerHTML=`Día ${best.i+1} · <b>${money(best.v)}</b>`});
+  svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect();const sx=(e.clientX-r.left)/r.width*W;let b=pts[0];for(const p of pts)if(Math.abs(p.px-sx)<Math.abs(b.px-sx))b=p;cross.setAttribute('x1',b.px);cross.setAttribute('x2',b.px);cross.setAttribute('opacity','.6');const d=new Date(today);d.setDate(d.getDate()-(rev.length-1-b.i));tip.style.opacity='1';tip.style.left=(b.px/W*r.width)+'px';tip.style.top=(b.py/H*r.height)+'px';tip.innerHTML=`${b.i===rev.length-1?'Hoy':d.getDate()+'/'+(d.getMonth()+1)} · <b>${money(b.v)}</b>`});
   svg.addEventListener('mouseleave',()=>{tip.style.opacity='0';cross.setAttribute('opacity','0')});
 }
 drawArea(14);
