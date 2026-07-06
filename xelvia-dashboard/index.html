@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Xelvia · Centro de Control Ejecutivo</title>
+<meta name="description" content="Panel ejecutivo en vivo del negocio — ventas, ingresos, canales y actividad en tiempo real." />
+<style>
+  :root{
+    --page:#0b0c12;--card:#16171f;--surface:#1a1a19;--border:rgba(255,255,255,.08);
+    --ink:#ffffff;--ink2:#9aa0b5;--ink3:#6b7085;
+    --blue:#3987e5;--aqua:#199e70;--yellow:#c98500;--violet:#9085e9;
+    --good:#0ca30c;--warn:#fab219;--primary:#7c5cff;--accent:#28d9b0;--radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);
+    background:radial-gradient(1200px 600px at 8% -10%,rgba(124,92,255,.16),transparent 55%),
+    radial-gradient(900px 500px at 100% 0,rgba(40,217,176,.10),transparent 50%),var(--page);
+    min-height:100vh;padding:20px}
+  .wrap{max-width:1300px;margin:0 auto}
+  /* top */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+  .brand{display:flex;align-items:center;gap:13px}
+  .brand .lg{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,var(--primary),var(--accent));font-weight:800}
+  .brand h1{font-size:20px;font-weight:850;letter-spacing:-.3px}
+  .brand span{font-size:12.5px;color:var(--ink2)}
+  .live{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .badge-live{display:flex;align-items:center;gap:8px;background:rgba(12,163,12,.12);border:1px solid rgba(12,163,12,.4);color:#4ade80;padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700}
+  .pulse{width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:pulse 1.6s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+  .clock{font-variant-numeric:tabular-nums;font-size:14px;color:var(--ink2)}
+  /* kpi */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:16px}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
+  .kpi .lbl{font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px}
+  .kpi .val{font-size:27px;font-weight:850;margin-top:6px;font-variant-numeric:tabular-nums}
+  .kpi .delta{font-size:12px;margin-top:4px;font-weight:700}
+  .kpi .delta.up{color:#4ade80}.kpi .delta.down{color:#f87171}
+  .kpi .spark{position:absolute;right:14px;bottom:12px;opacity:.5}
+  /* grid */
+  .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:14px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink2);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+  .panel h2 .hint{font-size:11px;color:var(--ink3);text-transform:none;letter-spacing:0}
+  /* area chart */
+  .axis text{fill:var(--ink3);font-size:10px}
+  .gridline{stroke:rgba(255,255,255,.05)}
+  /* bars */
+  .bar-row{display:flex;align-items:center;gap:10px;margin:11px 0}
+  .bar-row .nm{width:130px;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar-track{flex:1;height:22px;background:rgba(255,255,255,.04);border-radius:6px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+  .bar-val{width:64px;text-align:right;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+  /* donut legend */
+  .donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center}
+  .legend{display:flex;flex-direction:column;gap:9px}
+  .lg-row{display:flex;align-items:center;gap:9px;font-size:13px}
+  .sw{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+  .lg-row .pct{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+  /* gauge */
+  .gauge{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .gauge .big{font-size:30px;font-weight:850}
+  .gauge .sub{font-size:12.5px;color:var(--ink2)}
+  /* feed */
+  .feed{max-height:250px;overflow:hidden;position:relative}
+  .feed-item{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);animation:slidein .5s}
+  @keyframes slidein{from{opacity:0;transform:translateY(-8px)}to{opacity:1}}
+  .feed-item .em{font-size:17px}
+  .feed-item .tx{font-size:13px}
+  .feed-item .tx b{color:var(--ink)}
+  .feed-item .tx .t{color:var(--ink3);font-size:11px}
+  .note{text-align:center;color:var(--ink3);font-size:12px;margin-top:20px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><div class="lg">X</div>
+      <div><h1>Xelvia · Centro de Control</h1><span>Panel ejecutivo del negocio · en tiempo real</span></div>
+    </div>
+    <div class="live">
+      <span class="clock" id="clock">--:--:--</span>
+      <span class="badge-live"><span class="pulse"></span> EN VIVO</span>
+    </div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>Ingresos — últimos 14 días <span class="hint">ARS</span></h2>
+      <div id="area"></div>
+    </div>
+    <div class="panel">
+      <h2>Ventas por canal</h2>
+      <div class="donut-wrap">
+        <div id="donut"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Productos más vendidos <span class="hint">unidades</span></h2>
+      <div id="bars"></div>
+    </div>
+    <div class="panel">
+      <h2>Meta del mes</h2>
+      <div class="gauge"><div id="gauge"></div><div class="big" id="gaugeVal">0%</div><div class="sub" id="gaugeSub"></div></div>
+    </div>
+    <div class="panel">
+      <h2>Actividad en vivo <span class="hint">tiempo real</span></h2>
+      <div class="feed" id="feed"></div>
+    </div>
+  </div>
+
+  <p class="note">Datos de demostración · Centro de Control Ejecutivo por Lleyton IA Automation</p>
+</div>
+
+<script>
+const nf=new Intl.NumberFormat('es-AR');
+const money=n=>'$ '+nf.format(Math.round(n));
+
+// ---------- KPIs (con count-up) ----------
+const KPIS=[
+  {lbl:'Ventas hoy',val:842500,money:true,delta:'+12% vs ayer',up:true},
+  {lbl:'Ingresos del mes',val:18420000,money:true,delta:'+8% vs mes ant.',up:true},
+  {lbl:'Pedidos hoy',val:27,money:false,delta:'+5 vs ayer',up:true},
+  {lbl:'Ticket promedio',val:31200,money:true,delta:'+3%',up:true},
+  {lbl:'Consultas WhatsApp',val:143,money:false,delta:'+21 hoy',up:true},
+  {lbl:'Conversión',val:3.8,money:false,suf:'%',delta:'-0.2%',up:false},
+];
+const kEl=document.getElementById('kpis');
+KPIS.forEach((k,i)=>{
+  const d=document.createElement('div');d.className='kpi';
+  d.innerHTML=`<div class="lbl">${k.lbl}</div><div class="val" id="k${i}">0</div><div class="delta ${k.up?'up':'down'}">${k.up?'▲':'▼'} ${k.delta}</div>`;
+  kEl.appendChild(d);
+  countUp(document.getElementById('k'+i),k.val,k);
+});
+function countUp(el,target,k){let s=0;const steps=40,inc=target/steps;let n=0;const t=setInterval(()=>{n+=inc;if(++s>=steps){n=target;clearInterval(t)}el.textContent=(k.money?money(n):(k.suf?n.toFixed(1)+k.suf:nf.format(Math.round(n))))},22)}
+
+// ---------- Area chart (ingresos 14 días) ----------
+const rev=[720,680,910,850,1020,1180,1240,1100,1350,1290,1420,1380,1560,1610].map(v=>v*1000);
+(function(){
+  const W=640,H=210,pad={l:44,r:12,t:14,b:24},iw=W-pad.l-pad.r,ih=H-pad.t-pad.b;
+  const max=Math.max(...rev)*1.1,min=0;
+  const x=i=>pad.l+i/(rev.length-1)*iw, y=v=>pad.t+ih-(v-min)/(max-min)*ih;
+  let line=rev.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+  const areaP=line+` L${x(rev.length-1).toFixed(1)} ${(pad.t+ih)} L${pad.l} ${(pad.t+ih)} Z`;
+  let grid='',ax='';
+  for(let g=0;g<=4;g++){const gy=pad.t+ih-g/4*ih;const gv=min+(max-min)*g/4;grid+=`<line class="gridline" x1="${pad.l}" y1="${gy}" x2="${W-pad.r}" y2="${gy}"/>`;ax+=`<text x="${pad.l-6}" y="${gy+3}" text-anchor="end">${Math.round(gv/1000)}k</text>`}
+  const dots=rev.map((v,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" fill="#3987e5" stroke="#16171f" stroke-width="2"><title>Día ${i+1}: ${money(v)}</title></circle>`).join('');
+  document.getElementById('area').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" class="axis">
+    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3987e5" stop-opacity=".45"/><stop offset="1" stop-color="#3987e5" stop-opacity="0"/></linearGradient></defs>
+    ${grid}${ax}
+    <path d="${areaP}" fill="url(#ag)"/>
+    <path d="${line}" fill="none" stroke="#3987e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2000" stroke-dashoffset="2000"><animate attributeName="stroke-dashoffset" from="2000" to="0" dur="1.3s" fill="freeze"/></path>
+    ${dots}</svg>`;
+})();
+
+// ---------- Donut (ventas por canal) ----------
+const CH=[{n:'Web',v:42,c:'#3987e5'},{n:'WhatsApp',v:28,c:'#199e70'},{n:'Instagram',v:20,c:'#9085e9'},{n:'Local',v:10,c:'#c98500'}];
+(function(){
+  const R=52,C=2*Math.PI*R;let off=0;let segs='';
+  CH.forEach(s=>{const len=s.v/100*C;segs+=`<circle cx="70" cy="70" r="${R}" fill="none" stroke="${s.c}" stroke-width="18" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"><title>${s.n}: ${s.v}%</title></circle>`;off+=len});
+  document.getElementById('donut').innerHTML=`<svg viewBox="0 0 140 140" width="150" height="150"><circle cx="70" cy="70" r="52" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="18"/>${segs}<text x="70" y="66" text-anchor="middle" fill="#fff" font-size="15" font-weight="800">100%</text><text x="70" y="84" text-anchor="middle" fill="#9aa0b5" font-size="10">canales</text></svg>`;
+  document.getElementById('legend').innerHTML=CH.map(s=>`<div class="lg-row"><span class="sw" style="background:${s.c}"></span>${s.n}<span class="pct">${s.v}%</span></div>`).join('');
+})();
+
+// ---------- Bars (top productos) ----------
+const PROD=[{n:'iPhone 15',v:38},{n:'AirPods Pro',v:31},{n:'Galaxy S24',v:24},{n:'Apple Watch',v:19},{n:'iPad Air',v:14}];
+(function(){
+  const max=Math.max(...PROD.map(p=>p.v));
+  document.getElementById('bars').innerHTML=PROD.map((p,i)=>`<div class="bar-row"><span class="nm">${p.n}</span><div class="bar-track"><div class="bar-fill" style="width:0;background:#3987e5" data-w="${p.v/max*100}"></div></div><span class="bar-val">${p.v}</span></div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'),120);
+})();
+
+// ---------- Gauge (meta del mes) ----------
+(function(){
+  const pct=74,R=46,C=Math.PI*R; // semicircle
+  document.getElementById('gauge').innerHTML=`<svg viewBox="0 0 120 70" width="180"><path d="M14 62 A46 46 0 0 1 106 62" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="12" stroke-linecap="round"/><path d="M14 62 A46 46 0 0 1 106 62" fill="none" stroke="#28d9b0" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}"><animate attributeName="stroke-dashoffset" from="${C}" to="${C*(1-pct/100)}" dur="1.2s" fill="freeze"/></path></svg>`;
+  let n=0;const t=setInterval(()=>{if(++n>pct){clearInterval(t);n=pct}document.getElementById('gaugeVal').textContent=n+'%'},18);
+  document.getElementById('gaugeSub').innerHTML='$ 18,4M de $ 25M · faltan <b style="color:#fff">$ 6,6M</b>';
+})();
+
+// ---------- Feed en vivo ----------
+const EV=[
+  ['🛒','Nuevo pedido — <b>iPhone 15 Pro</b> · $ 1.150.000'],
+  ['💬','Consulta WhatsApp — stock <b>AirPods Pro</b>'],
+  ['⭐','Reseña 5★ — <b>Galaxy S24</b>'],
+  ['🛒','Nuevo pedido — <b>Apple Watch S9</b> · $ 720.000'],
+  ['📸','Consulta Instagram — <b>precio iPad Air</b>'],
+  ['💰','Pago acreditado — pedido #4821'],
+  ['🛒','Nuevo pedido — <b>MacBook Air M3</b> · $ 2.400.000'],
+  ['🔁','Recompra — cliente <b>frecuente</b>'],
+];
+const feed=document.getElementById('feed');
+function hhmm(){const d=new Date();return d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}
+function addEvent(){const e=EV[Math.floor(Math.random()*EV.length)];const d=document.createElement('div');d.className='feed-item';d.innerHTML=`<span class="em">${e[0]}</span><div class="tx">${e[1]}<div class="t">hace instantes · ${hhmm()}</div></div>`;feed.prepend(d);while(feed.children.length>6)feed.lastChild.remove()}
+for(let i=0;i<5;i++)addEvent();
+setInterval(addEvent,3800);
+
+// ---------- Reloj + tick de ventas ----------
+function clock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('es-AR')}
+clock();setInterval(clock,1000);
+let ventas=842500;setInterval(()=>{ventas+=Math.floor(Math.random()*9000);document.getElementById('k0').textContent=money(ventas)},4200);
+</script>
+</body>
+</html>
