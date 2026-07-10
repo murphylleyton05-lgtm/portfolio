@@ -214,10 +214,11 @@ const STAGES=[
   {id:'cerrado',name:'Cerrado',color:'#28d9b0',prob:100},
   {id:'descartado',name:'Descartado',color:'#ff6b81',prob:0},
 ];
-const KEY='lleyton.cc.v3', SET='lleyton.cc.settings';
+const KEY='lleyton.cc.v4', SET='lleyton.cc.settings';
 function tp(d){const t=new Date();t.setDate(t.getDate()+d);return t.toISOString().slice(0,10)}
 const seed=[
-  {id:'p1',biz:'Xelvia Store',con:'Marcos · dueño',ch:'WhatsApp',val:400,stage:'negociacion',fu:tp(0),note:'Le pasé precio (USD 400) + follow-up. Quiere WhatsApp + CRM.',link:'',hot:true,log:[{d:tp(-2),t:'Le pasé el presupuesto de USD 400'},{d:tp(0),t:'Mandé follow-up, sin respuesta aún'}]},
+  {id:'p1',biz:'Xelvia Store',con:'Marcos · dueño',ch:'WhatsApp',val:400,stage:'negociacion',fu:tp(4),note:'Dijo "esto te lo compro" (USD 400, WhatsApp+CRM). Le mandé el sistema+seña (3/7) y que ya arranqué (lunes) — sin respuesta (tiene visto desactivado). Le reabrí ofreciendo preview del dashboard, sin mencionar plata. Dashboard = upsell (USD 180/300).',link:'',hot:true,log:[{d:tp(-7),t:'Le expliqué el sistema y le pedí la seña'},{d:tp(-4),t:'Le avisé que ya empecé + recordé la seña'},{d:tp(0),t:'Reabrí con preview del dashboard (sin hablar de plata)'}]},
+  {id:'p14',biz:'Koala Consulting',con:'Franco · dueño',ch:'WhatsApp',val:300,stage:'negociacion',fu:tp(5),note:'Le armé un kanban para leads, le gustó ("bien logrado"). Quedó en escribirme, le hice follow-up. AHORA quedamos en hablar la semana que viene. Upsell: automatizar carga de leads.',link:'',hot:true,log:[{d:tp(-18),t:'Le mostré el kanban, le gustó'},{d:tp(-3),t:'Follow-up para retomar'},{d:tp(0),t:'Quedamos en hablar la semana que viene'}]},
   {id:'p2',biz:'Axentra OS',con:'Reclutador · Agency Partnerships',ch:'LinkedIn',val:0,stage:'negociacion',fu:tp(1),note:'Respondí sus 3 preguntas. Esperando llamada.',link:'',hot:true,log:[{d:tp(-1),t:'Respondí las 3 preguntas del reclutador'}]},
   {id:'p3',biz:'_todo_digital_',con:'@_todo_digital_ · San Juan',ch:'Instagram',val:300,stage:'contactado',fu:tp(1),note:'Contestó un bot. Mandé mensaje para que salte un humano.',link:'https://instagram.com/_todo_digital_',hot:false,log:[]},
   {id:'p4',biz:'allbeauty.usa',con:'@allbeauty.usa',ch:'Instagram',val:300,stage:'contactado',fu:tp(1),note:'Opener enviado.',link:'https://instagram.com/allbeauty.usa',hot:false,log:[]},
@@ -230,6 +231,11 @@ const seed=[
   {id:'p11',biz:'Mixitup',con:'suplementos (CABA)',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). WhatsApp mayorista: +54 9 11 2801-3068.',link:'https://www.mixitup.com.ar/contacto/',hot:false,log:[]},
   {id:'p12',biz:'Nutrición Muscular',con:'suplementos (Mendoza)',ch:'Email',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Sin contactar.',link:'https://nutricionmuscular.com.ar/',hot:false,log:[]},
   {id:'p13',biz:'Anitel Indumentaria',con:'@la_plata_as_indumentaria · La Plata',ch:'Instagram',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 — local de tu zona (La Plata). Sin contactar.',link:'https://instagram.com/la_plata_as_indumentaria',hot:false,log:[]},
+  {id:'p15',biz:'Fragos Indumentaria',con:'Ropa de hombre · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Sacar WhatsApp/IG de la tienda. Gancho: entregas en La Plata + atención al instante.',link:'https://fragosindumentaria2.mitiendanube.com/',hot:false,log:[]},
+  {id:'p16',biz:'Pipa & Nala',con:'Ropa cómoda hecha en La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Gancho: marca platense, "soy de acá".',link:'https://pipanala.mitiendanube.com/',hot:false,log:[]},
+  {id:'p17',biz:'Medusa Indumentaria',con:'Calle 12 #1143 · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Tienen local físico — ofrecer reunión en persona.',link:'https://medusaindumentaria.mitiendanube.com/',hot:false,log:[]},
+  {id:'p18',biz:'Punto Sur',con:'Remeras/apparel · envíos La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Gancho: envíos gratis a La Plata.',link:'https://puntosurlp.mitiendanube.com/',hot:false,log:[]},
+  {id:'p19',biz:'Indumentaria De Barrio',con:'Ropa · 6 cuotas MercadoPago',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Gancho: venden en cuotas, mucho volumen de consultas.',link:'https://indumentariadebarrio2.mitiendanube.com/',hot:false,log:[]},
 ];
 let data=load(), settings=loadSet();
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):seed.slice()}catch(e){return seed.slice()}}
