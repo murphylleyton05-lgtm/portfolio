@@ -214,7 +214,7 @@ const STAGES=[
   {id:'cerrado',name:'Cerrado',color:'#28d9b0',prob:100},
   {id:'descartado',name:'Descartado',color:'#ff6b81',prob:0},
 ];
-const KEY='lleyton.cc.v4', SET='lleyton.cc.settings';
+const KEY='lleyton.cc.v5', SET='lleyton.cc.settings';
 function tp(d){const t=new Date();t.setDate(t.getDate()+d);return t.toISOString().slice(0,10)}
 const seed=[
   {id:'p1',biz:'Xelvia Store',con:'Marcos · dueño',ch:'WhatsApp',val:400,stage:'negociacion',fu:tp(4),note:'Dijo "esto te lo compro" (USD 400, WhatsApp+CRM). Le mandé el sistema+seña (3/7) y que ya arranqué (lunes) — sin respuesta (tiene visto desactivado). Le reabrí ofreciendo preview del dashboard, sin mencionar plata. Dashboard = upsell (USD 180/300).',link:'',hot:true,log:[{d:tp(-7),t:'Le expliqué el sistema y le pedí la seña'},{d:tp(-4),t:'Le avisé que ya empecé + recordé la seña'},{d:tp(0),t:'Reabrí con preview del dashboard (sin hablar de plata)'}]},
@@ -236,6 +236,11 @@ const seed=[
   {id:'p17',biz:'Medusa Indumentaria',con:'Calle 12 #1143 · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Tienen local físico — ofrecer reunión en persona.',link:'https://medusaindumentaria.mitiendanube.com/',hot:false,log:[]},
   {id:'p18',biz:'Punto Sur',con:'Remeras/apparel · envíos La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Gancho: envíos gratis a La Plata.',link:'https://puntosurlp.mitiendanube.com/',hot:false,log:[]},
   {id:'p19',biz:'Indumentaria De Barrio',con:'Ropa · 6 cuotas MercadoPago',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Gancho: venden en cuotas, mucho volumen de consultas.',link:'https://indumentariadebarrio2.mitiendanube.com/',hot:false,log:[]},
+  {id:'p20',biz:'Nativo Delivery',con:'Casa de comidas · La Plata',ch:'Instagram',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). Toma pedidos por WhatsApp/tel todos los días. Gancho: asistente que toma pedidos solo sin que se te escape ninguno en hora pico.',link:'https://www.instagram.com/nativodeliverylp/',hot:false,log:[]},
+  {id:'p21',biz:'El Buen Gusto',con:'Casa de comidas desde 1989 · La Plata',ch:'Instagram',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). Piden por teléfono/WhatsApp. Gancho: modernizar la toma de pedidos sin perder el trato de siempre.',link:'https://www.instagram.com/elbuengustolp/',hot:false,log:[]},
+  {id:'p22',biz:"Alfre'dos Casa de Comidas",con:'Delivery propio · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). Ya tienen web de pedidos (alfredospedidos.com) = valoran la tecnología. Gancho: sumar asistente de WhatsApp que responde y ordena pedidos.',link:'https://alfredospedidos.com/',hot:false,log:[]},
+  {id:'p23',biz:'El Perla',con:'Casa de comidas · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). Abierto todos los días 8-23:30, piden por WhatsApp. Gancho: en 15hs de atención se escapan consultas — el asistente las cubre.',link:'https://www.facebook.com/ElPerla.Comidas/',hot:false,log:[]},
+  {id:'p24',biz:'Piatto Pronto',con:'Delivery · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). WhatsApp 221 673-5730. Gancho: automatizar la toma de pedidos por WhatsApp.',link:'https://www.facebook.com/PiattoprontoLP/',hot:false,log:[]},
 ];
 let data=load(), settings=loadSet();
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):seed.slice()}catch(e){return seed.slice()}}
