@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hormiga 🐜 — tus gastos chicos, visibles</title>
+<meta name="description" content="La app que hace visibles tus gastos hormiga. Registrá en 5 segundos, mantené la racha, mirá el espejo."/>
+<style>
+:root{
+  --bg:#0a0b13;--card:#12141f;--card2:#1a1d2e;--border:rgba(255,255,255,.09);
+  --text:#eef0fb;--soft:#9aa0c0;--mut:#6b7085;
+  --blue:#3987e5;--green:#199e70;--yellow:#c98500;--violet:#9085e9;
+  --good:#4ade80;--warn:#fab219;--radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;background:
+  radial-gradient(700px 400px at 90% -10%,rgba(57,135,229,.14),transparent 55%),
+  radial-gradient(500px 300px at 0% 0%,rgba(144,133,233,.10),transparent 50%),var(--bg);
+  color:var(--text);min-height:100vh;padding:18px;font-size:15px}
+.wrap{max-width:520px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{display:flex;gap:10px;align-items:center}
+.brand .lg{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--violet));display:grid;place-items:center;font-size:22px}
+.brand h1{font-size:19px;letter-spacing:-.3px}
+.brand span{font-size:11.5px;color:var(--soft);display:block}
+.streak{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px 14px;text-align:center}
+.streak .n{font-size:20px;font-weight:850;color:var(--warn)}
+.streak .l{font-size:10px;color:var(--soft);text-transform:uppercase;letter-spacing:.5px}
+.lvl{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px}
+.lvl .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.lvl .nm{font-weight:800;font-size:14px}
+.lvl .xp{font-size:12px;color:var(--soft)}
+.bar{height:9px;background:var(--card2);border-radius:20px;overflow:hidden}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--blue),var(--violet));border-radius:20px;transition:width .6s}
+.add{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.add h2{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--soft);margin-bottom:10px}
+.amt{display:flex;gap:8px;margin-bottom:10px}
+.amt input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);
+  padding:13px 14px;font-size:22px;font-weight:800;font-family:inherit;min-width:0}
+.amt input:focus{outline:none;border-color:var(--blue)}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:11px}
+.cat{background:var(--card2);border:1.5px solid var(--border);border-radius:11px;padding:9px 6px;text-align:center;
+  cursor:pointer;font-size:12.5px;font-weight:700;color:var(--soft);transition:all .15s;font-family:inherit}
+.cat .em{font-size:17px;display:block;margin-bottom:2px}
+.cat.sel{color:var(--text);transform:translateY(-2px)}
+.btn{width:100%;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:15px;cursor:pointer;
+  font-family:inherit;background:linear-gradient(135deg,var(--blue),var(--violet));color:#fff;transition:transform .15s}
+.btn:active{transform:scale(.98)}
+.proj{margin-top:10px;font-size:12.5px;color:var(--warn);text-align:center;min-height:17px;font-weight:600}
+.verd{background:linear-gradient(135deg,rgba(57,135,229,.14),rgba(144,133,233,.12));border:1px solid var(--border);
+  border-radius:var(--radius);padding:13px 16px;margin-bottom:12px;display:flex;gap:11px;align-items:flex-start}
+.verd .ant{font-size:22px}
+.verd p{font-size:13.5px;line-height:1.45}
+.verd b{color:var(--good)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px}
+.stat .v{font-size:21px;font-weight:850}
+.stat .l{font-size:10.5px;color:var(--soft);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.chart{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:15px;margin-bottom:12px;position:relative}
+.chart h2{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--soft);margin-bottom:12px}
+.tip{position:absolute;background:#232741;border:1px solid var(--border);border-radius:9px;padding:6px 11px;
+  font-size:12px;font-weight:700;pointer-events:none;opacity:0;transition:opacity .12s;white-space:nowrap;z-index:5}
+.list{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:15px;margin-bottom:12px}
+.list h2{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--soft);margin-bottom:8px}
+.g{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.g:last-child{border-bottom:none}
+.g .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.g .cn{color:var(--soft);font-size:12.5px;flex:1}
+.g .v{font-weight:800}
+.g .x{background:none;border:none;color:var(--mut);cursor:pointer;font-size:15px;padding:2px 6px}
+.empty{color:var(--mut);font-size:13.5px;padding:8px 0}
+.ach{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.badge{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 13px;font-size:12px;font-weight:700;color:var(--soft)}
+.badge.on{border-color:var(--warn);color:var(--text)}
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:24px;background:#232741;
+  border:1px solid var(--warn);border-radius:13px;padding:13px 20px;font-weight:700;font-size:14px;opacity:0;
+  transition:all .3s;z-index:20;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:14px 0}
+footer a{color:var(--violet);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="lg">🐜</div>
+      <div><h1>Hormiga</h1><span>tus gastos chicos, visibles</span></div>
+    </div>
+    <div class="streak"><div class="n" id="stk">0</div><div class="l">racha 🔥</div></div>
+  </header>
+
+  <div class="lvl">
+    <div class="row"><span class="nm" id="lvlName">🐜 Hormiga Ciega</span><span class="xp" id="xpTxt">0 XP</span></div>
+    <div class="bar"><div id="xpBar" style="width:0%"></div></div>
+  </div>
+
+  <div class="add">
+    <h2>¿Qué gastaste? (5 segundos)</h2>
+    <div class="amt"><input id="amt" type="number" inputmode="numeric" placeholder="$ 0"/></div>
+    <div class="cats" id="cats"></div>
+    <button class="btn" id="save">Anotar gasto 🐜</button>
+    <div class="proj" id="proj"></div>
+  </div>
+
+  <div class="verd" id="verd" style="display:none">
+    <div class="ant">🐜</div><p id="verdTxt"></p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="v" id="tHoy">$0</div><div class="l">Hoy</div></div>
+    <div class="stat"><div class="v" id="tSem">$0</div><div class="l">Últimos 7 días</div></div>
+  </div>
+
+  <div class="chart">
+    <h2>Tu semana hormiga</h2>
+    <svg id="svg" width="100%" height="150" role="img" aria-label="Gasto diario de los últimos 7 días"></svg>
+    <div class="tip" id="tip"></div>
+  </div>
+
+  <div class="list">
+    <h2>Gastos de hoy</h2>
+    <div id="hoy"><div class="empty">Todavía nada. Día en $0 🏆</div></div>
+  </div>
+
+  <div class="ach" id="ach"></div>
+  <footer>Hecho por <a href="../">Lleyton IA Automation</a> · tus datos viven solo en tu teléfono</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='hormiga.v1';
+const CATS=[
+  {id:'cafe',em:'☕',nm:'Café/antojo',c:'#c98500'},
+  {id:'deli',em:'🛵',nm:'Delivery',c:'#3987e5'},
+  {id:'kiosco',em:'🍫',nm:'Kiosco',c:'#199e70'},
+  {id:'trans',em:'🚕',nm:'Transporte',c:'#9085e9'},
+  {id:'salida',em:'🍻',nm:'Salidas',c:'#e5637d'},
+  {id:'otro',em:'💸',nm:'Otro',c:'#6b7085'},
+];
+const LVLS=[[0,'🐜 Hormiga Ciega'],[100,'🐜 Hormiga Curiosa'],[300,'🐜 Hormiga Despierta'],[700,'🐜 Hormiga Vigía'],[1500,'🧘 Hormiga Zen']];
+const ACHS=[
+  {id:'first',nm:'🥇 Primer gasto anotado',t:s=>s.gastos.length>=1},
+  {id:'r3',nm:'🔥 Racha de 3 días',t:s=>s.streak>=3},
+  {id:'r7',nm:'🔥🔥 Racha de 7 días',t:s=>s.streak>=7},
+  {id:'g20',nm:'📝 20 gastos registrados',t:s=>s.gastos.length>=20},
+  {id:'zen',nm:'🏆 Un día en $0',t:s=>s.zeroDay},
+];
+const $=id=>document.getElementById(id);
+const fmt=n=>'$'+Math.round(n).toLocaleString('es-AR');
+const today=()=>new Date().toISOString().slice(0,10);
+const dayKey=d=>d.toISOString().slice(0,10);
+
+let S=load();
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r)return r}catch(e){}
+  return {gastos:[],xp:0,streak:0,lastDay:'',zeroDay:false,ach:[]}}
+function save(){localStorage.setItem(KEY,JSON.stringify(S))}
+
+let selCat=null;
+CATS.forEach(c=>{
+  const b=document.createElement('button');b.className='cat';b.innerHTML=`<span class="em">${c.em}</span>${c.nm}`;
+  b.onclick=()=>{selCat=c.id;document.querySelectorAll('.cat').forEach(x=>{x.classList.remove('sel');x.style.borderColor=''});
+    b.classList.add('sel');b.style.borderColor=c.c};
+  $('cats').appendChild(b);
+});
+
+$('amt').addEventListener('input',()=>{
+  const v=parseFloat($('amt').value)||0;
+  $('proj').textContent=v>0?`Este gasto, todos los días, son ${fmt(v*365)} al año 👀`:'';
+});
+
+$('save').onclick=()=>{
+  const v=parseFloat($('amt').value)||0;
+  if(v<=0){toast('Poné un monto 🐜');return}
+  if(!selCat){toast('Elegí una categoría');return}
+  const t=today();
+  // streak: se alimenta al registrar
+  if(S.lastDay!==t){
+    const y=new Date();y.setDate(y.getDate()-1);
+    S.streak=(S.lastDay===dayKey(y))?S.streak+1:1;
+    S.lastDay=t;
+  }
+  S.gastos.push({d:t,v,c:selCat,ts:Date.now()});
+  S.xp+=10+(S.streak>=3?5:0);
+  checkAch();save();
+  $('amt').value='';$('proj').textContent='';
+  toast(`Anotado 🐜 +${10+(S.streak>=3?5:0)} XP`);
+  render();verdict();
+};
+
+function delG(ts){S.gastos=S.gastos.filter(g=>g.ts!==ts);save();render()}
+
+function sumDay(k){return S.gastos.filter(g=>g.d===k).reduce((a,g)=>a+g.v,0)}
+function last7(){const out=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);
+  out.push({k:dayKey(d),lbl:['dom','lun','mar','mié','jue','vie','sáb'][d.getDay()],v:sumDay(dayKey(d))})}return out}
+
+function verdict(){
+  const days=last7(),hoy=days[6].v,prev=days.slice(0,6).map(d=>d.v).filter(v=>v>0);
+  const avg=prev.length?prev.reduce((a,b)=>a+b,0)/prev.length:0;
+  let msg;
+  const noDeli=!S.gastos.filter(g=>g.d===today()&&g.c==='deli').length&&S.gastos.some(g=>g.c==='deli');
+  if(hoy===0)msg='Día en <b>$0</b>. La hormiga te hace una reverencia. 🏆';
+  else if(avg&&hoy<avg*0.7)msg=`Hoy vas <b>${Math.round((1-hoy/avg)*100)}% abajo</b> de tu promedio. Bien ahí.`;
+  else if(avg&&hoy>avg*1.4)msg=`Hoy ya vas <b>${Math.round((hoy/avg-1)*100)}% arriba</b> de tu promedio. La hormiga te mira. 👀`;
+  else if(noDeli)msg='Hoy <b>cero delivery</b>. Tu yo del futuro te lo agradece.';
+  else msg=`Llevás <b>${S.gastos.length} gastos</b> registrados. Verlos ya es la mitad del juego.`;
+  $('verdTxt').innerHTML=msg;$('verd').style.display='flex';
+}
+
+function checkAch(){
+  if(sumDay(today())===0&&S.gastos.length)S.zeroDay=true;
+  ACHS.forEach(a=>{if(!S.ach.includes(a.id)&&a.t(S)){S.ach.push(a.id);toast('Logro: '+a.nm)}});
+}
+
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200)}
+
+function render(){
+  $('stk').textContent=S.streak;
+  // nivel
+  let li=0;LVLS.forEach((l,i)=>{if(S.xp>=l[0])li=i});
+  $('lvlName').textContent=LVLS[li][1];
+  const next=LVLS[li+1];
+  $('xpTxt').textContent=next?`${S.xp} / ${next[0]} XP`:`${S.xp} XP · nivel máximo`;
+  $('xpBar').style.width=next?Math.min(100,(S.xp-LVLS[li][0])/(next[0]-LVLS[li][0])*100)+'%':'100%';
+  // stats
+  const days=last7();
+  $('tHoy').textContent=fmt(days[6].v);
+  $('tSem').textContent=fmt(days.reduce((a,d)=>a+d.v,0));
+  // chart
+  const svg=$('svg'),W=svg.clientWidth||440,H=150,padB=22,padT=14;
+  const max=Math.max(...days.map(d=>d.v),1);
+  const bw=Math.min(38,(W-20)/7-8);
+  let s='';
+  days.forEach((d,i)=>{
+    const x=10+i*((W-20)/7)+((W-20)/7-bw)/2;
+    const h=d.v>0?Math.max(4,(d.v/max)*(H-padB-padT)):0;
+    const y=H-padB-h;
+    if(d.v>0)s+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="4" fill="${i===6?'#9085e9':'#3987e5'}" data-i="${i}" style="cursor:pointer"/>`;
+    else s+=`<line x1="${x}" y1="${H-padB}" x2="${x+bw}" y2="${H-padB}" stroke="#2a2e42" stroke-width="2"/>`;
+    s+=`<text x="${x+bw/2}" y="${H-6}" text-anchor="middle" font-size="10.5" fill="${i===6?'#eef0fb':'#6b7085'}" font-weight="${i===6?'800':'400'}">${i===6?'hoy':d.lbl}</text>`;
+    s+=`<rect x="${x-4}" y="0" width="${bw+8}" height="${H-padB}" fill="transparent" data-i="${i}" style="cursor:pointer"/>`;
+  });
+  svg.innerHTML=s;
+  svg.querySelectorAll('[data-i]').forEach(r=>{
+    r.addEventListener('mousemove',e=>{
+      const i=+r.dataset.i,tip=$('tip');
+      tip.textContent=`${days[i].lbl} · ${fmt(days[i].v)}`;
+      const b=svg.getBoundingClientRect();
+      tip.style.left=Math.min(e.clientX-b.left+14,b.width-90)+'px';tip.style.top=(e.clientY-b.top-14)+'px';tip.style.opacity=1;
+    });
+    r.addEventListener('mouseleave',()=>$('tip').style.opacity=0);
+  });
+  // lista hoy
+  const hoyG=S.gastos.filter(g=>g.d===today()).sort((a,b)=>b.ts-a.ts);
+  $('hoy').innerHTML=hoyG.length?hoyG.map(g=>{
+    const c=CATS.find(x=>x.id===g.c);
+    return `<div class="g"><span class="dot" style="background:${c.c}"></span><span>${c.em} ${c.nm}</span><span class="cn"></span><span class="v">${fmt(g.v)}</span><button class="x" onclick="delG(${g.ts})">✕</button></div>`;
+  }).join(''):'<div class="empty">Todavía nada. Día en $0 🏆</div>';
+  // logros
+  $('ach').innerHTML=ACHS.map(a=>`<span class="badge ${S.ach.includes(a.id)?'on':''}">${a.nm}</span>`).join('');
+}
+render();if(S.gastos.length)verdict();
+window.addEventListener('resize',render);
+</script>
+</body>
+</html>
