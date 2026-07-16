@@ -162,6 +162,31 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
 .mcard canvas{width:100%;height:auto;border-radius:10px;box-shadow:0 20px 50px rgba(0,0,0,.5);display:block;margin-bottom:14px}
 .mcard .mbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
+/* animaciones */
+@keyframes inkin{0%{opacity:0;transform:translateX(-8px)}60%{opacity:1}100%{transform:none}}
+.g.fresh{animation:inkin .45s ease-out}
+@keyframes bump{0%{transform:rotate(2deg) scale(1)}40%{transform:rotate(2deg) scale(1.28)}100%{transform:rotate(2deg) scale(1)}}
+.streak.bump{animation:bump .5s ease-out}
+.streak.bump .n{color:var(--red)}
+@keyframes badgepop{0%{transform:rotate(-1.5deg) scale(.4);opacity:0}70%{transform:rotate(-1.5deg) scale(1.15)}100%{transform:rotate(-1.5deg) scale(1)}}
+.badge.justgot{animation:badgepop .5s ease-out}
+@keyframes lvlflash{0%,100%{background:var(--blue)}50%{background:var(--gold)}}
+.rail>div.lvlup{animation:lvlflash .7s 2}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:55;overflow:hidden}
+.cf{position:absolute;width:9px;height:13px;top:-20px;opacity:.95;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.7}}
+.sound{background:var(--card);border:1.5px solid var(--ink);border-radius:5px;width:34px;height:30px;cursor:pointer;font-size:13px;color:var(--ink)}
+.htop .row2{display:flex;gap:6px}
+/* mes vs mes */
+.mvm{display:flex;align-items:center;gap:10px;margin:2px 4px 14px;font-size:13.5px;color:var(--ink2);font-style:italic}
+.mvm b{font-style:normal}
+.mvm .up{color:var(--red)}.mvm .down{color:var(--green)}
+/* edit */
+.g .ed{background:none;border:none;color:var(--mut);cursor:pointer;font-size:13px;padding:0 3px}
+.g .ed:hover,.g .x:hover{color:var(--red)}
+/* cap categoria */
+.capline{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--ink2);flex-wrap:wrap}
+.capline input{width:90px;background:var(--paper2);border:1.5px solid var(--line);border-radius:5px;color:var(--ink);padding:4px 8px;font-family:inherit}
 .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(16px);bottom:22px;background:var(--ink);
   color:var(--paper);border-radius:5px;padding:12px 22px;font-weight:700;font-size:14.5px;opacity:0;
   transition:all .3s;z-index:60;max-width:88vw;text-align:center;box-shadow:4px 4px 0 var(--shadow)}
@@ -186,8 +211,11 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
       <div class="sub">la libreta de la plata que se te escurre</div>
     </div>
     <div class="htop">
-      <button class="theme" id="theme" title="Cambiar tema">🌙</button>
-      <div class="streak"><div class="n mono" id="stk">0</div><div class="l">racha</div></div>
+      <div class="row2">
+        <button class="sound" id="sound" title="Sonido">🔊</button>
+        <button class="theme" id="theme" title="Cambiar tema">🌙</button>
+      </div>
+      <div class="streak" id="streakBox"><div class="n mono" id="stk">0</div><div class="l">racha</div></div>
     </div>
   </header>
 
@@ -235,7 +263,9 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
 
   <div class="mes" id="mesBox" style="display:none">
     <h2>El mes, por categoría</h2>
+    <div class="mvm" id="mvm"></div>
     <div id="mesRows"></div>
+    <div class="capline" id="capline"></div>
     <div class="killer" id="killer"></div>
   </div>
 
@@ -268,6 +298,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
   </div>
 </div>
 
+<div class="confetti" id="confetti"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -281,8 +312,12 @@ const ACHS=[
   {id:'first',nm:'Primer renglón',t:s=>s.gastos.length>=1},
   {id:'r3',nm:'Racha de 3 días',t:s=>s.streak>=3},
   {id:'r7',nm:'Racha de 7 días',t:s=>s.streak>=7},
+  {id:'r14',nm:'Dos semanas de fierro 🔩',t:s=>s.streak>=14},
   {id:'g20',nm:'20 gastos anotados',t:s=>s.gastos.length>=20},
+  {id:'g50',nm:'50 renglones — sos escriba ✍️',t:s=>s.gastos.length>=50},
   {id:'zen',nm:'Un día en $ 0',t:s=>s.zeroDay},
+  {id:'finde',nm:'Sobreviviste a un finde',t:s=>s.weekendLogged},
+  {id:'nodeli',nm:'Semana sin delivery 🛵🚫',t:s=>s.noDeliWeek},
 ];
 const $=id=>document.getElementById(id);
 const fmt=n=>'$ '+Math.round(n).toLocaleString('es-AR');
@@ -302,8 +337,8 @@ $('coinLogo').innerHTML=coinSVG(36);$('wcoin').innerHTML=coinSVG(84);
 let S=load(), ST=loadSet();
 function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r)return r}catch(e){}
   return {gastos:[],xp:0,streak:0,lastDay:'',zeroDay:false,ach:[]}}
-function loadSet(){try{const r=JSON.parse(localStorage.getItem(SET));if(r)return r}catch(e){}
-  return {theme:'light',meta:0,remOn:false,remTime:'21:00'}}
+function loadSet(){try{const r=JSON.parse(localStorage.getItem(SET));if(r)return Object.assign({sound:true,caps:{}},r)}catch(e){}
+  return {theme:'light',meta:0,remOn:false,remTime:'21:00',sound:true,caps:{}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(S))}
 function saveSet(){localStorage.setItem(SET,JSON.stringify(ST))}
 
@@ -313,6 +348,36 @@ function applyTheme(){document.documentElement.setAttribute('data-theme',ST.them
   document.querySelector('meta[name=theme-color]').setAttribute('content',ST.theme==='dark'?'#181510':'#faf5ea')}
 $('theme').onclick=()=>{ST.theme=ST.theme==='dark'?'light':'dark';saveSet();applyTheme()};
 applyTheme();
+
+// sonido "cha-ching"
+let AC=null;
+function chaching(){
+  if(!ST.sound)return;
+  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+    const now=AC.currentTime;
+    [[880,0],[1320,.08]].forEach(([f,t])=>{
+      const o=AC.createOscillator(),g=AC.createGain();
+      o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(AC.destination);
+      g.gain.setValueAtTime(.0001,now+t);g.gain.exponentialRampToValueAtTime(.18,now+t+.02);
+      g.gain.exponentialRampToValueAtTime(.0001,now+t+.22);
+      o.start(now+t);o.stop(now+t+.24);
+    });
+  }catch(e){}
+}
+function updSound(){$('sound').textContent=ST.sound?'🔊':'🔇'}
+$('sound').onclick=()=>{ST.sound=!ST.sound;saveSet();updSound();if(ST.sound)chaching()};
+updSound();
+
+// confeti
+function confetti(){
+  const box=$('confetti'),cols=['#f6c34a','#c73e2e','#3d5ea3','#2e7d4f','#e8a92b'];
+  for(let i=0;i<44;i++){const d=document.createElement('div');d.className='cf';
+    d.style.left=Math.random()*100+'vw';d.style.background=cols[i%cols.length];
+    d.style.animationDuration=(1.6+Math.random()*1.4)+'s';d.style.animationDelay=(Math.random()*.3)+'s';
+    d.style.transform='rotate('+(Math.random()*360)+'deg)';box.appendChild(d);
+    setTimeout(()=>d.remove(),3400);
+  }
+}
 
 let selCat=null;
 CATS.forEach(c=>{
@@ -329,23 +394,32 @@ $('save').onclick=()=>{
   if(v<=0){toast('Poné un monto');return}
   if(!selCat){toast('Elegí una categoría');return}
   const d=($('otroDia').checked&&$('fecha').value)?$('fecha').value:today();
+  let streakUp=false;
   if(d===today()&&S.lastDay!==today()){
     const y=new Date();y.setDate(y.getDate()-1);
-    S.streak=(S.lastDay===dayKey(y))?S.streak+1:1;S.lastDay=today();
+    S.streak=(S.lastDay===dayKey(y))?S.streak+1:1;S.lastDay=today();streakUp=true;
   }
-  S.gastos.push({d,v,c:selCat,ts:Date.now()});
+  const ts=Date.now();freshTs=ts;
+  S.gastos.push({d,v,c:selCat,ts});
   S.xp+=10+(S.streak>=3?5:0);
   checkAch();save();
   $('amt').value='';$('proj').textContent='';$('otroDia').checked=false;$('fecha').style.display='none';
+  chaching();
   toast(`Anotado · +${10+(S.streak>=3?5:0)} XP`);
   render();verdict();
+  if(streakUp){const sb=$('streakBox');sb.classList.remove('bump');void sb.offsetWidth;sb.classList.add('bump')}
 };
 
 let showAll=false;
 $('toggleAll').onclick=()=>{showAll=!showAll;$('toggleAll').textContent=showAll?'ver solo hoy':'ver todos';render()};
 
+let freshTs=null;
 function delG(ts){S.gastos=S.gastos.filter(g=>g.ts!==ts);save();render()}
-window.delG=delG;
+function editG(ts){const g=S.gastos.find(x=>x.ts===ts);if(!g)return;
+  const nv=prompt('Nuevo monto para este gasto:',g.v);if(nv===null)return;
+  const v=parseFloat(nv);if(isNaN(v)||v<=0){toast('Monto inválido');return}
+  g.v=v;save();render();toast('Corregido ✓')}
+window.delG=delG;window.editG=editG;
 
 function sumDay(k){return S.gastos.filter(g=>g.d===k).reduce((a,g)=>a+g.v,0)}
 function last7(){const o=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);
@@ -397,16 +471,35 @@ function renderMeta(){
 function verdict(){
   const days=last7(),hoy=days[6].v,prev=days.slice(0,6).map(d=>d.v).filter(v=>v>0);
   const avg=prev.length?prev.reduce((a,b)=>a+b,0)/prev.length:0;
-  let msg;const noDeli=!S.gastos.filter(g=>g.d===today()&&g.c==='deli').length&&S.gastos.some(g=>g.c==='deli');
-  if(hoy===0)msg='Día en <b>$ 0</b>. Ni una moneda se escapó.';
-  else if(avg&&hoy<avg*0.7)msg=`Hoy vas <b>${Math.round((1-hoy/avg)*100)}% abajo</b> de tu promedio. Bien ahí.`;
-  else if(avg&&hoy>avg*1.4)msg=`Hoy ya vas <b>${Math.round((hoy/avg-1)*100)}% arriba</b> de tu promedio. La libreta te mira.`;
-  else if(noDeli)msg='Hoy <b>cero delivery</b>. Tu yo del futuro lo agradece.';
-  else msg=`Llevás <b>${S.gastos.length} gastos</b> en la libreta. Verlos ya es la mitad del juego.`;
+  const hoyG=S.gastos.filter(g=>g.d===today());
+  let msg;
+  const noDeli=!hoyG.some(g=>g.c==='deli')&&S.gastos.some(g=>g.c==='deli');
+  const soloCafe=hoyG.length>=2&&hoyG.every(g=>g.c==='cafe');
+  const min=hoyG.length?Math.min(...hoyG.map(g=>g.v)):0;
+  const pool=[];
+  if(hoy===0)pool.push('Día en <b>$ 0</b>. Ni una moneda se escapó.','Hoy no gastaste nada. La libreta está de fiesta. 🎉');
+  else{
+    if(avg&&hoy<avg*0.7)pool.push(`Hoy vas <b>${Math.round((1-hoy/avg)*100)}% abajo</b> de tu promedio. Bien ahí.`,`Día tranquilo: <b>${Math.round((1-hoy/avg)*100)}%</b> menos que tu promedio. 👏`);
+    if(avg&&hoy>avg*1.4)pool.push(`Hoy ya vas <b>${Math.round((hoy/avg-1)*100)}% arriba</b> de tu promedio. La libreta te mira. 👀`,`Uh, <b>${Math.round((hoy/avg-1)*100)}%</b> arriba de lo normal. ¿Día de antojos?`);
+    if(soloCafe)pool.push('Hoy fue todo <b>café</b>. Sos consistente, hay que reconocerlo. ☕');
+    if(noDeli)pool.push('Hoy <b>cero delivery</b>. Tu yo del futuro lo agradece.');
+    if(hoyG.length>=4)pool.push(`<b>${hoyG.length} gastos</b> hoy. Mano firme con la libreta. ✍️`);
+    if(min&&min<1500)pool.push(`Anotaste hasta un gasto de <b>${fmt(min)}</b>. Ahí se esconde la plata. 🔍`);
+  }
+  pool.push(`Llevás <b>${S.gastos.length} gastos</b> en la libreta. Verlos ya es la mitad del juego.`,
+            `Racha de <b>${S.streak}</b> ${S.streak===1?'día':'días'}. La constancia es el truco. 🔥`);
+  msg=pool[Math.floor((S.gastos.length+hoyG.length)%pool.length)];
   $('verdTxt').innerHTML=msg;$('verd').style.display='block';
 }
-function checkAch(){if(sumDay(today())===0&&S.gastos.length)S.zeroDay=true;
-  ACHS.forEach(a=>{if(!S.ach.includes(a.id)&&a.t(S)){S.ach.push(a.id);toast('Sello nuevo: '+a.nm)}})}
+function checkAch(){
+  if(sumDay(today())===0&&S.gastos.length)S.zeroDay=true;
+  // finde: anotó sábado y domingo de la misma semana
+  const wk=last7();
+  if(wk.some(d=>new Date(d.k+'T12:00').getDay()===6&&d.v>0)&&wk.some(d=>new Date(d.k+'T12:00').getDay()===0&&d.v>0))S.weekendLogged=true;
+  // semana sin delivery: 7+ días de racha y ningún delivery en los últimos 7 días (con al menos un gasto)
+  if(S.streak>=7&&wk.reduce((a,d)=>a+d.v,0)>0&&!S.gastos.some(g=>g.c==='deli'&&g.d>=wk[0].k))S.noDeliWeek=true;
+  ACHS.forEach(a=>{if(!S.ach.includes(a.id)&&a.t(S)){S.ach.push(a.id);S.newAch=a.id;toast('🏅 Sello nuevo: '+a.nm);confetti()}})
+}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200)}
 
 function monthData(){
@@ -446,18 +539,37 @@ function render(){
   const items=showAll?[...S.gastos].sort((a,b)=>b.ts-a.ts).slice(0,50):S.gastos.filter(g=>g.d===today()).sort((a,b)=>b.ts-a.ts);
   $('hoy').innerHTML=items.length?items.map(g=>{const c=CATS.find(x=>x.id===g.c);
     const dt=showAll?`<span class="dt">${g.d.slice(8,10)}/${g.d.slice(5,7)}</span>`:'';
-    return `<div class="g"><span class="nm">${c.em} ${c.nm}</span> ${dt}<span class="dots"></span><span class="v mono">${fmt(g.v)}</span><button class="x" onclick="delG(${g.ts})">✕</button></div>`}).join('')
+    const fresh=g.ts===freshTs?' fresh':'';
+    return `<div class="g${fresh}"><span class="nm">${c.em} ${c.nm}</span> ${dt}<span class="dots"></span><span class="v mono">${fmt(g.v)}</span><button class="ed" onclick="editG(${g.ts})">✎</button><button class="x" onclick="delG(${g.ts})">✕</button></div>`}).join('')
     :'<div class="empty">Nada anotado. Día en $ 0 — la libreta te aplaude.</div>';
-  $('ach').innerHTML=ACHS.map(a=>`<span class="badge ${S.ach.includes(a.id)?'on':''}">${a.nm}</span>`).join('');
+  freshTs=null;
+  $('ach').innerHTML=ACHS.map(a=>`<span class="badge ${S.ach.includes(a.id)?'on':''}${a.id===S.newAch?' justgot':''}">${a.nm}</span>`).join('');
+  S.newAch=null;
   // mes
   const md=monthData();
   if(!md.del.length){$('mesBox').style.display='none'}
   else{$('mesBox').style.display='block';const mx=md.rank[0][1];
+    // mes vs mes
+    const lm=lastMonthTotal();
+    if(lm>0){const diff=(md.total/lm-1)*100,up=diff>=0;
+      $('mvm').innerHTML=`Vs. el mes pasado (${fmt(lm)}): <b class="${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(Math.round(diff))}%</b>`;
+    }else $('mvm').innerHTML='';
+    // filas con tope opcional
     $('mesRows').innerHTML=md.rank.map(([id,v],i)=>{const c=CATS.find(x=>x.id===id);
-      return `<div class="mrow ${i===0?'top':''}"><span class="nm">${c.em} ${c.nm}</span><div class="track"><div style="width:${Math.max(4,v/mx*100)}%"></div></div><span class="v mono">${fmt(v)}</span></div>`}).join('');
+      const cap=ST.caps[id]||0,over=cap&&v>cap;
+      const warn=over?` <span style="color:var(--red)">⚠ +${fmt(v-cap)}</span>`:'';
+      return `<div class="mrow ${i===0?'top':''}"><span class="nm">${c.em} ${c.nm}</span><div class="track"><div style="width:${Math.max(4,v/mx*100)}%;${over?'background:var(--red)':''}"></div></div><span class="v mono">${fmt(v)}${warn}</span></div>`}).join('');
+    // ponerle tope a la categoría asesina
     const [kid,kv]=md.rank[0],kc=CATS.find(x=>x.id===kid),dia=new Date().getDate(),anual=kv/dia*365;
+    $('capline').innerHTML=`Ponele un tope mensual a <b>${kc.em} ${kc.nm}</b>: $ <input id="capIn" type="number" inputmode="numeric" placeholder="sin tope" value="${ST.caps[kid]||''}">`;
+    const ci=$('capIn');if(ci)ci.addEventListener('change',()=>{const val=parseFloat(ci.value)||0;if(val)ST.caps[kid]=val;else delete ST.caps[kid];saveSet();render()});
     $('killer').innerHTML=`Tu categoría asesina es <b>${kc.nm}</b>: a este ritmo son <b>${fmt(anual)}</b> en un año. La libreta no juzga. Solo anota.`;
   }
+}
+function lastMonthTotal(){
+  const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-1);
+  const lm=d.toISOString().slice(0,7);
+  return S.gastos.filter(g=>g.d.startsWith(lm)).reduce((a,g)=>a+g.v,0);
 }
 
 $('share').onclick=async()=>{
