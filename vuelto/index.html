@@ -297,6 +297,16 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
     <div class="msg" id="remMsg">Te avisamos todos los días a esta hora para que no pierdas la racha. Nada sale de tu teléfono.</div>
   </div>
 
+  <div class="card-b rem">
+    <h2 class="sec">Respaldo de tus datos</h2>
+    <div class="rrow">
+      <button class="btn ghost" id="exportBtn" style="width:auto;padding:10px 16px">Exportar 📤</button>
+      <button class="btn ghost" id="importBtn" style="width:auto;padding:10px 16px">Importar 📥</button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none"/>
+    </div>
+    <div class="msg">Como tus datos viven solo acá, hacé una copia por las dudas. Exportá un archivito y guardalo (mail, Drive, WhatsApp a vos mismo). Si cambiás de teléfono, lo importás y vuelve todo.</div>
+  </div>
+
   <footer>🪙 Vuelto · tus números viven solo en tu teléfono — nada sale de acá</footer>
 </div>
 
@@ -751,6 +761,34 @@ function showAscend(i){
   setTimeout(confetti,400);
 }
 $('ascendBtn').onclick=()=>$('ascend').classList.remove('show');
+
+// respaldo: exportar / importar
+$('exportBtn').onclick=()=>{
+  const data={v:1,fecha:new Date().toISOString(),gastos:S,ajustes:ST};
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='vuelto-respaldo-'+today()+'.json';a.click();
+  toast('Respaldo descargado 📤');
+};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d.gastos||!Array.isArray(d.gastos.gastos))throw new Error('formato');
+      if(!confirm('Esto reemplaza tus datos actuales por los del respaldo. ¿Seguir?')){$('importFile').value='';return}
+      S=Object.assign({gastos:[],xp:0,streak:0,lastDay:'',zeroDay:false,ach:[]},d.gastos);
+      if(d.ajustes)ST=Object.assign(ST,d.ajustes);
+      save();saveSet();applyTheme();updSound();$('metaInput').value=ST.meta||'';
+      render();verdict();
+      toast('Datos restaurados ✓ 🪙');
+    }catch(err){toast('Archivo inválido')}
+    $('importFile').value='';
+  };
+  r.readAsText(f);
+};
 
 // welcome
 if(S.gastos.length||localStorage.getItem('vuelto.seen')){$('welcome').style.display='none'}
