@@ -312,7 +312,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
 
 <div class="modal" id="modal">
   <div class="mcard">
-    <canvas id="cardCanvas" width="540" height="675"></canvas>
+    <canvas id="cardCanvas" width="540" height="740"></canvas>
     <div class="mbtns">
       <button class="btn" id="cardShare">Compartir 📤</button>
       <button class="btn ghost" id="cardClose">Cerrar</button>
@@ -646,47 +646,67 @@ $('share').onclick=async()=>{
 };
 
 /* ===== TARJETA DEL MES (canvas) ===== */
+// precargar medallas como imagen para dibujarlas en el canvas
+const medalImgs=MEDALS.map((m,i)=>{const im=new Image();
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="120" height="120">'+MEDALS[i].draw+'</svg>';
+  im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);return im});
 function drawCard(){
-  const c=$('cardCanvas'),x=c.getContext('2d'),W=540,H=675;
+  const c=$('cardCanvas'),x=c.getContext('2d'),W=540,H=740;
   const md=monthData();
   const mesNom=new Date().toLocaleDateString('es-AR',{month:'long'});
-  // fondo papel
   x.fillStyle='#faf5ea';x.fillRect(0,0,W,H);
-  // renglones
   x.strokeStyle='rgba(61,94,163,.07)';x.lineWidth=1;
   for(let y=70;y<H;y+=30){x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke()}
-  // borde doble
   x.strokeStyle='#26221a';x.lineWidth=3;x.strokeRect(20,20,W-40,H-40);
   x.lineWidth=1;x.strokeRect(28,28,W-56,H-56);
-  // moneda
-  drawCoin(x,W/2,120,52);
+  // moneda logo
+  drawCoin(x,W/2,98,42);
   // titulo
   x.fillStyle='#26221a';x.textAlign='center';
-  x.font='italic 900 34px Georgia';x.fillText('Mi mes en Vuelto',W/2,205);
-  x.font='italic 17px Georgia';x.fillStyle='#8f8776';x.fillText(mesNom.charAt(0).toUpperCase()+mesNom.slice(1),W/2,232);
+  x.font='italic 900 33px Georgia';x.fillText('Mi mes en Vuelto',W/2,168);
+  x.font='italic 16px Georgia';x.fillStyle='#8f8776';x.fillText(mesNom.charAt(0).toUpperCase()+mesNom.slice(1),W/2,193);
   // total
-  x.fillStyle='#c73e2e';x.font='900 56px Georgia';x.fillText(fmt(md.total),W/2,300);
-  x.fillStyle='#5c554a';x.font='italic 16px Georgia';x.fillText('en gastos chicos',W/2,326);
-  // linea
-  x.strokeStyle='#d9d0bc';x.setLineDash([3,4]);x.beginPath();x.moveTo(70,360);x.lineTo(W-70,360);x.stroke();x.setLineDash([]);
-  // categoria asesina
+  x.fillStyle='#c73e2e';x.font='900 54px Georgia';x.fillText(fmt(md.total),W/2,258);
+  x.fillStyle='#5c554a';x.font='italic 15px Georgia';x.fillText('en gastos chicos este mes',W/2,283);
+  x.strokeStyle='#d9d0bc';x.setLineDash([3,4]);x.beginPath();x.moveTo(60,312);x.lineTo(W-60,312);x.stroke();x.setLineDash([]);
+  // en qué se te fue (top 3)
+  x.fillStyle='#8f8776';x.font='12px Georgia';x.textAlign='left';
+  x.save();x.translate(60,340);x.scale(1,1);
+  ctxSpaced(x,'E N   Q U É   S E   T E   F U E',0,0);x.restore();
+  const top=md.rank.slice(0,3),mx=top.length?top[0][1]:1;
+  top.forEach(([id,v],i)=>{
+    const cc=CATS.find(z=>z.id===id),y=372+i*34;
+    x.fillStyle='#26221a';x.font='16px Georgia';x.textAlign='left';x.fillText(cc.em+' '+cc.nm,60,y+4);
+    // barra
+    x.fillStyle='#efe7d5';x.fillRect(210,y-9,200,13);
+    x.fillStyle=i===0?'#c73e2e':'#3d5ea3';x.fillRect(210,y-9,Math.max(6,200*v/mx),13);
+    x.fillStyle='#26221a';x.font='700 14px "Courier New",monospace';x.textAlign='right';x.fillText(fmt(v),W-58,y+3);
+  });
+  x.strokeStyle='#d9d0bc';x.setLineDash([3,4]);x.beginPath();x.moveTo(60,492);x.lineTo(W-60,492);x.stroke();x.setLineDash([]);
+  // categoria asesina + proyeccion
   if(md.rank.length){const [kid,kv]=md.rank[0],kc=CATS.find(z=>z.id===kid),dia=new Date().getDate(),anual=kv/dia*365;
-    x.fillStyle='#5c554a';x.font='italic 16px Georgia';x.fillText('Tu categoría asesina',W/2,400);
-    x.fillStyle='#26221a';x.font='900 30px Georgia';x.fillText(kc.em+' '+kc.nm,W/2,438);
-    x.fillStyle='#c73e2e';x.font='italic 17px Georgia';x.fillText('a este ritmo, '+fmt(anual)+'/año',W/2,468);
+    x.textAlign='center';x.fillStyle='#5c554a';x.font='italic 15px Georgia';x.fillText('Tu categoría asesina es '+kc.em+' '+kc.nm,W/2,522);
+    x.fillStyle='#c73e2e';x.font='italic 900 20px Georgia';x.fillText('a este ritmo, '+fmt(anual)+' al año 😳',W/2,550);
   }
-  // racha + nivel
+  // racha + nivel (con medalla)
   let li=0;LVLS.forEach((l,i)=>{if(S.xp>=l[0])li=i});
   x.strokeStyle='#26221a';x.lineWidth=2;
-  x.strokeRect(70,505,180,90);x.strokeRect(W-250,505,180,90);
-  x.fillStyle='#26221a';x.font='900 40px Georgia';x.fillText(S.streak,70+90,555);
-  x.font='italic 14px Georgia';x.fillStyle='#8f8776';x.fillText('días de racha',70+90,580);
-  x.fillStyle='#26221a';x.font='italic 900 20px Georgia';x.fillText(LVLS[li][1],W-160,548);
-  x.font='italic 13px Georgia';x.fillStyle='#8f8776';x.fillText('tu nivel',W-160,578);
+  const by=578,bh=96;
+  x.strokeRect(60,by,190,bh);x.strokeRect(W-250,by,190,bh);
+  // racha
+  x.textAlign='center';x.fillStyle='#26221a';x.font='900 42px Georgia';x.fillText(S.streak,60+95,by+52);
+  x.font='italic 14px Georgia';x.fillStyle='#8f8776';x.fillText('días de racha 🔥',60+95,by+78);
+  // nivel con medalla
+  const mi=medalImgs[li];if(mi&&mi.complete&&mi.naturalWidth){try{x.drawImage(mi,W-250+18,by+8,54,54)}catch(e){}}
+  x.fillStyle='#26221a';x.font='italic 900 15px Georgia';x.textAlign='left';
+  x.fillText(LVLS[li][1],W-250+78,by+34);
+  x.fillStyle='#8f8776';x.font='italic 12px Georgia';x.fillText('rango '+MEDALS[li].rk,W-250+78,by+54);
   // footer
-  x.fillStyle='#7a5200';x.font='900 20px Georgia';x.fillText('🪙 Vuelto',W/2,635);
-  x.fillStyle='#8f8776';x.font='italic 13px Georgia';x.fillText('la libreta de la plata que se te escurre',W/2,656);
+  drawCoin(x,W/2-92,706,13);
+  x.textAlign='left';x.fillStyle='#7a5200';x.font='900 20px Georgia';x.fillText('Vuelto',W/2-72,712);
+  x.textAlign='center';x.fillStyle='#8f8776';x.font='italic 12.5px Georgia';x.fillText('¿vos sabés dónde está tu vuelto?',W/2,732);
 }
+function ctxSpaced(x,t,px,py){x.fillText(t,px,py)}
 function drawCoin(x,cx,cy,r){
   x.save();x.translate(cx,cy);x.rotate(-6*Math.PI/180);
   x.beginPath();x.arc(0,0,r,0,7);x.fillStyle='#e8a92b';x.fill();
