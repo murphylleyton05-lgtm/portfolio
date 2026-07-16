@@ -46,8 +46,18 @@ header{padding:22px 0 14px;border-bottom:3px double var(--ink);margin-bottom:18p
   background:var(--card);box-shadow:3px 3px 0 var(--shadow);transform:rotate(2deg)}
 .streak .n{font-size:22px;line-height:1}.streak .l{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-top:3px}
 
-.lvl{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:13.5px;color:var(--ink2)}
+.lvl{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:13.5px;color:var(--ink2)}
+.lvl .medal{flex-shrink:0;display:inline-flex}
 .lvl .nm{font-weight:700;color:var(--ink);white-space:nowrap;font-style:italic}
+/* overlay de ascenso */
+.ascend{position:fixed;inset:0;z-index:58;background:rgba(20,17,12,.8);display:none;place-items:center;padding:26px;text-align:center}
+.ascend.show{display:grid;animation:fade .3s}
+.ascend .amedal{margin:0 auto 8px;animation:medalin .6s ease-out}
+@keyframes medalin{0%{transform:scale(.3) rotate(-30deg);opacity:0}70%{transform:scale(1.12) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+.ascend .up{color:var(--gold);font-size:13px;letter-spacing:3px;text-transform:uppercase;font-family:Georgia,serif}
+.ascend .atit{color:#fffdf6;font-size:30px;font-weight:900;font-style:italic;margin:6px 0 4px}
+.ascend .ark{color:#c3b9a3;font-size:14px;font-style:italic;margin-bottom:24px}
+.ascend .btn{max-width:280px;margin:0 auto;background:var(--gold);color:#4a3300;border-color:#8a5e00}
 .rail{flex:1;height:8px;border:1.5px solid var(--ink);border-radius:99px;background:var(--card);overflow:hidden}
 .rail>div{height:100%;background:var(--blue);transition:width .6s}
 .lvl .xp{white-space:nowrap;font-size:12px}
@@ -220,6 +230,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
   </header>
 
   <div class="lvl">
+    <span class="medal" id="lvlMedal"></span>
     <span class="nm" id="lvlName">Manos de colador</span>
     <div class="rail"><div id="xpBar" style="width:0%"></div></div>
     <span class="xp mono" id="xpTxt">0 XP</span>
@@ -299,6 +310,15 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
   </div>
 </div>
 
+<div class="ascend" id="ascend">
+  <div>
+    <div class="amedal" id="ascendMedal"></div>
+    <div class="up">Ascendiste de rango</div>
+    <div class="atit" id="ascendName">—</div>
+    <div class="ark" id="ascendRk">—</div>
+    <button class="btn" id="ascendBtn">¡A seguir cazando! 🐜</button>
+  </div>
+</div>
 <div class="confetti" id="confetti"></div>
 <div class="toast" id="toast"></div>
 
@@ -334,6 +354,18 @@ function coinSVG(size){
   return `<svg viewBox="0 0 60 60" width="${size}" height="${size}"><circle cx="30" cy="30" r="30" fill="#e8a92b"/>${ticks}<circle cx="30" cy="30" r="28" fill="#f6c34a" stroke="#8a5e00" stroke-width="1.4"/><circle cx="30" cy="30" r="24" fill="none" stroke="#c98500" stroke-width="1.2" stroke-dasharray="2.4 2.6"/><text x="15" y="36" font-family="Georgia,serif" font-weight="900" font-size="20" fill="#7a5200">$</text>${ant}</svg>`;
 }
 $('coinLogo').innerHTML=coinSVG(36);$('wcoin').innerHTML=coinSVG(84);
+
+// ===== MEDALLAS DE RANGO (hormiga como mascota en todas) =====
+function antShape(cx,cy,s,col){return `<g transform="translate(${cx},${cy}) scale(${s})"><g fill="${col}"><ellipse cx="9" cy="0" rx="6" ry="4.6"/><ellipse cx="1" cy="0" rx="3" ry="2.5"/><circle cx="-4.5" cy="-0.8" r="3.2"/></g><g stroke="${col}" stroke-width="1.2" fill="none" stroke-linecap="round"><path d="M-6 -2.6 Q-9.5 -7 -11.5 -6"/><path d="M-4 -3 Q-6.5 -7.5 -8.5 -7"/><path d="M0 2.4 L-2.5 7"/><path d="M2 2.6 L2 7.6"/><path d="M4 2.4 L6.5 7"/></g></g>`}
+function reed(r,col){let t='';for(let i=0;i<40;i++){const a=2*Math.PI*i/40;t+=`<line x1="${(Math.cos(a)*r).toFixed(1)}" y1="${(Math.sin(a)*r).toFixed(1)}" x2="${(Math.cos(a)*(r+2.5)).toFixed(1)}" y2="${(Math.sin(a)*(r+2.5)).toFixed(1)}" stroke="${col}" stroke-width="1.1"/>`}return t}
+const MEDALS=[
+  {rk:'Bronce',draw:`<g transform="translate(50,54)"><circle r="34" fill="#cd7f4d"/>${reed(34,'#8a5e00')}<circle r="31" fill="#e0955f" stroke="#8a4b25" stroke-width="1.6"/><g fill="#7a3d1c"><circle cx="-8" cy="6" r="3"/><circle cx="7" cy="9" r="2.4"/><circle cx="11" cy="-4" r="2.2"/></g>${antShape(0,-2,1.15,'#5a2f16')}</g>`},
+  {rk:'Plata',draw:`<g transform="translate(50,54)"><circle r="34" fill="#b9bcc4"/>${reed(34,'#7d818a')}<circle r="31" fill="#d6d9df" stroke="#7d818a" stroke-width="1.6"/>${antShape(-3,-3,1.05,'#4a4d55')}<g transform="translate(9,8)"><circle r="7" fill="none" stroke="#4a4d55" stroke-width="2"/><line x1="5" y1="5" x2="11" y2="11" stroke="#4a4d55" stroke-width="2.4" stroke-linecap="round"/><circle r="3.2" fill="#8fb7e0"/></g></g>`},
+  {rk:'Oro',draw:`<g transform="translate(50,54)"><path d="M0 -34 L30 -22 L30 6 Q30 28 0 36 Q-30 28 -30 6 L-30 -22 Z" fill="#f6c34a" stroke="#8a5e00" stroke-width="2"/><path d="M0 -27 L23 -17 L23 4 Q23 21 0 28 Q-23 21 -23 4 L-23 -17 Z" fill="none" stroke="#c98500" stroke-width="1.4" stroke-dasharray="2.5 2.5"/>${antShape(0,-2,1.2,'#7a5200')}</g>`},
+  {rk:'Platino',draw:`<g transform="translate(50,58)"><g fill="#dfe3ea" stroke="#9aa0ac" stroke-width="1.4"><ellipse cx="0" cy="24" rx="26" ry="7"/><ellipse cx="0" cy="17" rx="24" ry="6.5"/><ellipse cx="0" cy="10" rx="21" ry="6"/></g><circle cx="0" cy="-8" r="20" fill="#f6c34a" stroke="#8a5e00" stroke-width="1.6"/>${antShape(0,-8,0.85,'#7a5200')}</g>`},
+  {rk:'Diamante',draw:`<g transform="translate(50,56)"><circle r="32" fill="#f6c34a"/>${reed(32,'#8a5e00')}<circle r="29" fill="#ffd968" stroke="#8a5e00" stroke-width="1.6"/><circle r="24" fill="none" stroke="#c98500" stroke-width="1" stroke-dasharray="2 2.4"/>${antShape(0,2,1.1,'#7a5200')}<g transform="translate(0,-20)" fill="#e0b23a" stroke="#8a5e00" stroke-width="1.2"><path d="M-13 6 L-13 -4 L-6 3 L0 -8 L6 3 L13 -4 L13 6 Z"/></g></g>`},
+];
+function medalSVG(i,size){return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">${MEDALS[i].draw}</svg>`}
 
 let S=load(), ST=loadSet();
 function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r)return r}catch(e){}
@@ -528,6 +560,10 @@ function monthData(){
 function render(){
   $('stk').textContent=S.streak;
   let li=0;LVLS.forEach((l,i)=>{if(S.xp>=l[0])li=i});
+  // ascenso de rango
+  if(S.lastLevel===undefined)S.lastLevel=li;
+  else if(li>S.lastLevel){const prev=S.lastLevel;S.lastLevel=li;save();showAscend(li)}
+  $('lvlMedal').innerHTML=medalSVG(li,32);
   $('lvlName').textContent=LVLS[li][1];
   const next=LVLS[li+1];
   $('xpTxt').textContent=next?`${S.xp}/${next[0]} XP`:`${S.xp} XP`;
@@ -699,6 +735,17 @@ function scheduleRem(){
   }, t-now);
 }
 updateRemUI();if(ST.remOn)scheduleRem();
+
+// ascenso de rango
+function showAscend(i){
+  $('ascendMedal').innerHTML=medalSVG(i,140);
+  $('ascendName').textContent=LVLS[i][1];
+  $('ascendRk').textContent='Rango '+MEDALS[i].rk;
+  $('ascend').classList.add('show');
+  confetti();chaching();
+  setTimeout(confetti,400);
+}
+$('ascendBtn').onclick=()=>$('ascend').classList.remove('show');
 
 // welcome
 if(S.gastos.length||localStorage.getItem('vuelto.seen')){$('welcome').style.display='none'}
