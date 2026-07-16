@@ -38,8 +38,8 @@ jobs:
           cp -r command-center/* site/crm/
           mkdir -p site/xelvia
           cp -r xelvia-dashboard/* site/xelvia/
-          mkdir -p site/hormiga
-          cp -r hormiga/* site/hormiga/
+          mkdir -p site/vuelto
+          cp -r vuelto/* site/vuelto/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

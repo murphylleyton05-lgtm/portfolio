@@ -1,0 +1,16 @@
+{
+  "name": "Vuelto — la libreta de la plata que se te escurre",
+  "short_name": "Vuelto",
+  "description": "Anotá tus gastos chicos en 5 segundos. Racha, niveles y tu categoría asesina del mes.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#faf5ea",
+  "theme_color": "#faf5ea",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

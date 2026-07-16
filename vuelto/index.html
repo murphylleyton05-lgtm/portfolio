@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Hormiga 🐜 — ¿sabés cuánto se te va en gastos chicos?</title>
-<meta name="description" content="La libreta que hace visibles tus gastos hormiga. Anotá en 5 segundos, sostené la racha, descubrí tu categoría asesina. Gratis, sin registro, tus datos no salen de tu teléfono."/>
-<meta property="og:title" content="Hormiga 🐜 — ¿sabés cuánto se te va en gastos chicos?"/>
-<meta property="og:description" content="Anotá tus gastos hormiga en 5 segundos. Racha, niveles y tu categoría asesina del mes. Gratis y sin registro."/>
+<title>Vuelto 🪙 — ¿dónde está tu vuelto?</title>
+<meta name="description" content="La libreta de la plata que se te escurre. Anotá tus gastos chicos en 5 segundos, sostené la racha, descubrí tu categoría asesina. Gratis, sin registro, tus datos no salen de tu teléfono."/>
+<meta property="og:title" content="Vuelto 🪙 — ¿dónde está tu vuelto?"/>
+<meta property="og:description" content="Anotá tus gastos chicos en 5 segundos. Racha, niveles y tu categoría asesina del mes. Gratis y sin registro."/>
 <meta property="og:type" content="website"/>
 <meta property="og:locale" content="es_AR"/>
 <meta name="theme-color" content="#faf5ea"/>
@@ -140,14 +140,14 @@ footer a{color:var(--blue)}
 <div class="wrap">
   <header>
     <div class="brand">
-      <h1><span class="ant">🐜</span> Hormiga</h1>
-      <div class="sub">libreta de gastos chicos — desde hoy, visibles</div>
+      <h1><span class="ant">🪙</span> Vuelto</h1>
+      <div class="sub">la libreta de la plata que se te escurre</div>
     </div>
     <div class="streak"><div class="n mono" id="stk">0</div><div class="l">racha</div></div>
   </header>
 
   <div class="lvl">
-    <span class="nm" id="lvlName">Hormiga Ciega</span>
+    <span class="nm" id="lvlName">Manos de colador</span>
     <div class="rail"><div id="xpBar" style="width:0%"></div></div>
     <span class="xp mono" id="xpTxt">0 XP</span>
   </div>
@@ -162,7 +162,7 @@ footer a{color:var(--blue)}
 
   <div class="verd" id="verd">
     <p id="verdTxt"></p>
-    <div class="firma">— la hormiga, sobre tus propios números</div>
+    <div class="firma">— tu libreta, sobre tus propios números</div>
   </div>
 
   <div class="tot">
@@ -187,16 +187,16 @@ footer a{color:var(--blue)}
     <div class="killer" id="killer"></div>
   </div>
 
-  <button class="btn share" id="share">Compartir mi semana 🐜</button>
+  <button class="btn share" id="share">Compartir mi semana 🪙</button>
 
   <div class="ach" id="ach"></div>
 
-  <footer>🐜 Hormiga · tus números viven solo en tu teléfono — nada sale de acá</footer>
+  <footer>🪙 Vuelto · tus números viven solo en tu teléfono — nada sale de acá</footer>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY='hormiga.v1';
+const KEY='vuelto.v1';
 const CATS=[
   {id:'cafe',em:'☕',nm:'Café'},
   {id:'deli',em:'🛵',nm:'Delivery'},
@@ -205,7 +205,7 @@ const CATS=[
   {id:'salida',em:'🍻',nm:'Salidas'},
   {id:'otro',em:'✏️',nm:'Otro'},
 ];
-const LVLS=[[0,'Hormiga Ciega'],[100,'Hormiga Curiosa'],[300,'Hormiga Despierta'],[700,'Hormiga Vigía'],[1500,'Hormiga Zen']];
+const LVLS=[[0,'Manos de colador'],[100,'Ojito despierto'],[300,'Guardián del vuelto'],[700,'Contador de chirolas'],[1500,'Vuelto Zen']];
 const ACHS=[
   {id:'first',nm:'Primer renglón',t:s=>s.gastos.length>=1},
   {id:'r3',nm:'Racha de 3 días',t:s=>s.streak>=3},
@@ -264,9 +264,9 @@ function verdict(){
   const avg=prev.length?prev.reduce((a,b)=>a+b,0)/prev.length:0;
   let msg;
   const noDeli=!S.gastos.filter(g=>g.d===today()&&g.c==='deli').length&&S.gastos.some(g=>g.c==='deli');
-  if(hoy===0)msg='Día en <b>$ 0</b>. Reverencia de la hormiga.';
+  if(hoy===0)msg='Día en <b>$ 0</b>. Ni una moneda se escapó.';
   else if(avg&&hoy<avg*0.7)msg=`Hoy vas <b>${Math.round((1-hoy/avg)*100)}% abajo</b> de tu promedio. Bien ahí.`;
-  else if(avg&&hoy>avg*1.4)msg=`Hoy ya vas <b>${Math.round((hoy/avg-1)*100)}% arriba</b> de tu promedio. La hormiga te mira.`;
+  else if(avg&&hoy>avg*1.4)msg=`Hoy ya vas <b>${Math.round((hoy/avg-1)*100)}% arriba</b> de tu promedio. La libreta te mira.`;
   else if(noDeli)msg='Hoy <b>cero delivery</b>. Tu yo del futuro lo agradece.';
   else msg=`Llevás <b>${S.gastos.length} gastos</b> en la libreta. Verlos ya es la mitad del juego.`;
   $('verdTxt').innerHTML=msg;$('verd').style.display='block';
@@ -341,12 +341,12 @@ function renderMes(){
   const [kid,kv]=rank[0];const kc=CATS.find(x=>x.id===kid);
   const dia=new Date().getDate();
   const anual=kv/dia*365;
-  $('killer').innerHTML=`Tu categoría asesina es <b>${kc.nm}</b>: a este ritmo son <b>${fmt(anual)}</b> en un año. La hormiga no juzga. Solo anota.`;
+  $('killer').innerHTML=`Tu categoría asesina es <b>${kc.nm}</b>: a este ritmo son <b>${fmt(anual)}</b> en un año. La libreta no juzga. Solo anota.`;
 }
 
 $('share').onclick=async()=>{
   const days=last7(),sem=days.reduce((a,d)=>a+d.v,0);
-  const txt=`🐜 Mi semana en Hormiga: ${fmt(sem)} en gastos chicos, racha de ${S.streak} días anotando. Vos también, ¿sabés cuánto se te va sin darte cuenta? 👉 https://murphylleyton05-lgtm.github.io/portfolio/hormiga/`;
+  const txt=`🪙 Mi semana en Vuelto: ${fmt(sem)} en gastos chicos, racha de ${S.streak} días anotando. ¿Vos sabés dónde está TU vuelto? 👉 https://murphylleyton05-lgtm.github.io/portfolio/vuelto/`;
   if(navigator.share){try{await navigator.share({text:txt})}catch(e){}}
   else{await navigator.clipboard.writeText(txt);toast('Copiado — pegalo donde quieras')}
 };
