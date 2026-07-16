@@ -686,7 +686,7 @@ function drawCard(){
   // categoria asesina + proyeccion
   if(md.rank.length){const [kid,kv]=md.rank[0],kc=CATS.find(z=>z.id===kid),dia=new Date().getDate(),anual=kv/dia*365;
     x.textAlign='center';x.fillStyle='#5c554a';x.font='italic 15px Georgia';x.fillText('Tu categoría asesina es '+kc.em+' '+kc.nm,W/2,522);
-    x.fillStyle='#c73e2e';x.font='italic 900 20px Georgia';x.fillText('a este ritmo, '+fmt(anual)+' al año 😳',W/2,550);
+    x.fillStyle='#c73e2e';x.font='italic 900 20px Georgia';x.fillText('a este ritmo, '+fmt(anual)+' al año',W/2,550);
   }
   // racha + nivel (con medalla)
   let li=0;LVLS.forEach((l,i)=>{if(S.xp>=l[0])li=i});
