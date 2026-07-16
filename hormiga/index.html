@@ -98,6 +98,29 @@ header{padding:26px 0 14px;border-bottom:3px double var(--ink);margin-bottom:18p
   font-style:italic;background:transparent}
 .badge.on{border:2px solid var(--red);color:var(--red);font-weight:700;font-style:normal;transform:rotate(-1.5deg);
   background:var(--card)}
+/* mes por categoría */
+.mes{margin-bottom:22px}
+.mes h2{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink2);font-weight:400;
+  margin-bottom:10px;border-bottom:1px dashed var(--line);padding-bottom:7px}
+.mrow{display:flex;align-items:center;gap:10px;padding:7px 2px;font-size:14.5px}
+.mrow .nm{width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .track{flex:1;height:13px;background:var(--paper2);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.mrow .track>div{height:100%;background:var(--blue);border-radius:2px}
+.mrow.top .track>div{background:var(--red)}
+.mrow .v{width:88px;text-align:right;font-size:14px}
+.killer{border:1.5px dashed var(--red);border-radius:5px;padding:11px 14px;margin-top:12px;
+  font-size:14px;font-style:italic;color:var(--ink2);background:var(--card)}
+.killer b{color:var(--red);font-style:normal}
+/* compartir + cta */
+.btn.share{background:var(--card);color:var(--ink);margin-bottom:22px}
+.cta{border:2px solid var(--ink);border-radius:6px;background:var(--card);padding:18px;margin:6px 0 4px;
+  box-shadow:4px 4px 0 rgba(38,34,26,.16);position:relative;text-align:center}
+.cta-stamp{position:absolute;top:-13px;left:50%;transform:translateX(-50%) rotate(-2deg);background:var(--red);
+  color:var(--paper);font-size:11.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:5px 14px;border-radius:3px}
+.cta p{font-size:14.5px;color:var(--ink2);margin:8px 0 13px;font-style:italic}
+.cta p b{color:var(--ink);font-style:normal}
+.cta-btn{display:block;text-decoration:none;background:var(--green);border-color:var(--green)}
 .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(16px);bottom:22px;background:var(--ink);
   color:var(--paper);border-radius:5px;padding:12px 22px;font-weight:700;font-size:14.5px;opacity:0;
   transition:all .3s;z-index:20;max-width:88vw;text-align:center;box-shadow:4px 4px 0 rgba(38,34,26,.25)}
@@ -151,7 +174,22 @@ footer a{color:var(--blue)}
     <div id="hoy"><div class="empty">Nada anotado. Día en $ 0 — la libreta te aplaude.</div></div>
   </div>
 
+  <div class="mes" id="mesBox" style="display:none">
+    <h2>El mes, por categoría</h2>
+    <div id="mesRows"></div>
+    <div class="killer" id="killer"></div>
+  </div>
+
+  <button class="btn share" id="share">Compartir mi semana 🐜</button>
+
   <div class="ach" id="ach"></div>
+
+  <div class="cta">
+    <div class="cta-stamp">¿Tenés un negocio?</div>
+    <p>Esta libreta la hice yo. También armo <b>asistentes de WhatsApp, paneles de control y automatizaciones</b> para comercios.</p>
+    <a class="btn cta-btn" href="https://wa.me/5492214972160?text=Hola%20Lleyton!%20Vi%20Hormiga%20y%20quiero%20algo%20as%C3%AD%20para%20mi%20negocio" target="_blank">Escribime por WhatsApp</a>
+  </div>
+
   <footer>Hecho por <a href="../">Lleyton IA Automation</a> · tus números viven solo en tu teléfono</footer>
 </div>
 <div class="toast" id="toast"></div>
@@ -283,7 +321,35 @@ function render(){
     return `<div class="g"><span class="nm">${c.em} ${c.nm}</span><span class="dots"></span><span class="v mono">${fmt(g.v)}</span><button class="x" onclick="delG(${g.ts})">✕</button></div>`;
   }).join(''):'<div class="empty">Nada anotado. Día en $ 0 — la libreta te aplaude.</div>';
   $('ach').innerHTML=ACHS.map(a=>`<span class="badge ${S.ach.includes(a.id)?'on':''}">${a.nm}</span>`).join('');
+  renderMes();
 }
+
+function renderMes(){
+  const m=today().slice(0,7);
+  const delMes=S.gastos.filter(g=>g.d.startsWith(m));
+  if(!delMes.length){$('mesBox').style.display='none';return}
+  $('mesBox').style.display='block';
+  const por={};delMes.forEach(g=>por[g.c]=(por[g.c]||0)+g.v);
+  const rank=Object.entries(por).sort((a,b)=>b[1]-a[1]);
+  const max=rank[0][1];
+  $('mesRows').innerHTML=rank.map(([id,v],i)=>{
+    const c=CATS.find(x=>x.id===id);
+    return `<div class="mrow ${i===0?'top':''}"><span class="nm">${c.em} ${c.nm}</span><div class="track"><div style="width:${Math.max(4,v/max*100)}%"></div></div><span class="v mono">${fmt(v)}</span></div>`;
+  }).join('');
+  // categoría asesina: proyección anual
+  const [kid,kv]=rank[0];const kc=CATS.find(x=>x.id===kid);
+  const dia=new Date().getDate();
+  const anual=kv/dia*365;
+  $('killer').innerHTML=`Tu categoría asesina es <b>${kc.nm}</b>: a este ritmo son <b>${fmt(anual)}</b> en un año. La hormiga no juzga. Solo anota.`;
+}
+
+$('share').onclick=async()=>{
+  const days=last7(),sem=days.reduce((a,d)=>a+d.v,0);
+  const txt=`🐜 Mi semana en Hormiga: ${fmt(sem)} en gastos chicos, racha de ${S.streak} días anotando. Vos también, ¿sabés cuánto se te va sin darte cuenta? 👉 https://murphylleyton05-lgtm.github.io/portfolio/hormiga/`;
+  if(navigator.share){try{await navigator.share({text:txt})}catch(e){}}
+  else{await navigator.clipboard.writeText(txt);toast('Copiado — pegalo donde quieras')}
+};
+
 render();if(S.gastos.length)verdict();
 window.addEventListener('resize',render);
 </script>
