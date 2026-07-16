@@ -88,6 +88,9 @@ h2.sec{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--
 .meta .mfoot{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-top:8px}
 .meta .mfoot input{width:96px;background:var(--paper2);border:1.5px solid var(--line);border-radius:5px;color:var(--ink);padding:4px 8px;font-family:inherit}
 .meta .msg{font-size:12.5px;font-style:italic;margin-top:8px;color:var(--ink2)}
+.meta .joke{font-size:13.5px;margin-top:10px;padding:9px 12px;border:1.5px dashed var(--gold);border-radius:5px;background:var(--paper2);color:var(--ink);display:none}
+.meta .joke.show{display:block}
+.meta .joke .lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:3px}
 
 .verd{border-left:3px solid var(--red);padding:4px 2px 4px 14px;margin:0 4px 20px;display:none}
 .verd p{font-size:15.5px;font-style:italic;color:var(--ink2)}.verd b{color:var(--ink);font-style:normal}
@@ -209,6 +212,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
     <div class="mrail"><div id="metaBar" style="width:0%"></div></div>
     <div class="mfoot"><span>Tope semanal:</span><span>$ <input id="metaInput" type="number" inputmode="numeric" placeholder="poné un tope"/></span></div>
     <div class="msg" id="metaMsg"></div>
+    <div class="joke" id="metaJoke"></div>
   </div>
 
   <div class="verd" id="verd"><p id="verdTxt"></p><div class="firma">— tu libreta, sobre tus propios números</div></div>
@@ -348,6 +352,25 @@ function last7(){const o=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d
   o.push({k:dayKey(d),lbl:['dom','lun','mar','mié','jue','vie','sáb'][d.getDay()],v:sumDay(dayKey(d))})}return o}
 function weekSum(){return last7().reduce((a,d)=>a+d.v,0)}
 
+// frases cómplices al pasarse del tope (humor CON el usuario, no contra)
+const JOKES=[
+  'Bueno, el país tampoco ayuda. 🇦🇷',
+  'La plata es como el verano: se va cuando más la necesitás.',
+  'Tranqui, Messi también arrancó de abajo. ⚽',
+  'Estadísticamente, no estás solo en esto. 🤝',
+  'El vuelto se rió último. 🪙',
+  'Somos gastadores, no perfectos.',
+  'Mañana empezamos la dieta financiera. Como siempre.',
+  'La inflación aplaude de fondo. 👏',
+  'Ese "último gustito" tenía trampa, ¿no?',
+  'Ya está. Fue. Anotalo y seguimos. ✍️',
+  'Al menos lo estás mirando. Eso ya es de valientes.',
+  'El sueldo llora en un rincón. Consolálo el día 10.',
+  'Los gastos chicos: 1 — Vos: 0. Revancha la semana que viene.',
+  'Nadie se hizo pobre por un café. Por 47, capaz. ☕',
+  'Respirá. La chirola perdida no define tu año.',
+];
+
 // meta
 $('metaInput').value=ST.meta||'';
 $('metaInput').addEventListener('input',()=>{ST.meta=parseFloat($('metaInput').value)||0;saveSet();renderMeta()});
@@ -357,9 +380,18 @@ function renderMeta(){
   const p=Math.min(100,g/m*100);
   $('metaTxt').textContent=`${fmt(g)} / ${fmt(m)}`;
   const bar=$('metaBar');bar.style.width=p+'%';bar.className=g>m?'over':(p>=80?'warn':'');
-  if(g>m)$('metaMsg').innerHTML=`Te pasaste <b style="color:var(--red)">${fmt(g-m)}</b> del tope. La libreta no juzga, avisa.`;
-  else if(p>=80)$('metaMsg').textContent=`Te queda ${fmt(m-g)}. Cuidá los últimos días.`;
-  else $('metaMsg').textContent=`Vas bien: te queda ${fmt(m-g)} para la semana.`;
+  const joke=$('metaJoke');
+  if(g>m){
+    $('metaMsg').innerHTML=`Te pasaste <b style="color:var(--red)">${fmt(g-m)}</b> del tope. La libreta no juzga, avisa.`;
+    // frase estable por estado: cambia a medida que sumás gastos en la semana
+    const idx=(last7().filter(d=>d.v>0).length + S.gastos.filter(x=>x.d>=last7()[0].k).length) % JOKES.length;
+    joke.innerHTML=`<span class="lbl">🐜 la libreta opina</span>${JOKES[idx]}`;
+    joke.classList.add('show');
+  } else {
+    joke.classList.remove('show');
+    if(p>=80)$('metaMsg').textContent=`Te queda ${fmt(m-g)}. Cuidá los últimos días.`;
+    else $('metaMsg').textContent=`Vas bien: te queda ${fmt(m-g)} para la semana.`;
+  }
 }
 
 function verdict(){
