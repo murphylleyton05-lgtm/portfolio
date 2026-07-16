@@ -351,9 +351,16 @@ applyTheme();
 
 // sonido "cha-ching"
 let AC=null;
+function ensureAC(){
+  if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}
+  if(AC&&AC.state==='suspended')AC.resume();
+  return AC;
+}
+// desbloquear audio en el primer toque (política de navegadores)
+['pointerdown','touchstart','keydown'].forEach(ev=>window.addEventListener(ev,()=>ensureAC(),{once:true}));
 function chaching(){
   if(!ST.sound)return;
-  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  try{AC=ensureAC();if(!AC)return;
     const now=AC.currentTime;
     [[880,0],[1320,.08]].forEach(([f,t])=>{
       const o=AC.createOscillator(),g=AC.createGain();
