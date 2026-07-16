@@ -229,6 +229,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
     <h2 class="sec">Anotar un gasto — 5 segundos</h2>
     <div class="amt"><span class="sign mono">$</span><input id="amt" type="number" inputmode="numeric" placeholder="0"/></div>
     <div class="cats" id="cats"></div>
+    <input id="otroTxt" type="text" maxlength="24" placeholder="¿En qué? (opcional)" style="display:none;width:100%;background:var(--paper2);border:1.5px solid var(--line);border-radius:5px;color:var(--ink);padding:9px 12px;font-family:inherit;font-size:14px;margin-bottom:12px"/>
     <div class="daterow"><label><input type="checkbox" id="otroDia"/> ¿Fue otro día?</label> <input type="date" id="fecha" style="display:none"/></div>
     <button class="btn" id="save">Anotar en la libreta</button>
     <div class="proj" id="proj"></div>
@@ -389,7 +390,8 @@ function confetti(){
 let selCat=null;
 CATS.forEach(c=>{
   const b=document.createElement('button');b.className='cat';b.innerHTML=`<span class="em">${c.em}</span>${c.nm}`;
-  b.onclick=()=>{selCat=c.id;document.querySelectorAll('.cat').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')};
+  b.onclick=()=>{selCat=c.id;document.querySelectorAll('.cat').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');
+    $('otroTxt').style.display=c.id==='otro'?'block':'none'};
   $('cats').appendChild(b);
 });
 $('otroDia').onchange=e=>{$('fecha').style.display=e.target.checked?'inline-block':'none';if(e.target.checked&&!$('fecha').value)$('fecha').value=today()};
@@ -407,12 +409,20 @@ $('save').onclick=()=>{
     S.streak=(S.lastDay===dayKey(y))?S.streak+1:1;S.lastDay=today();streakUp=true;
   }
   const ts=Date.now();freshTs=ts;
-  S.gastos.push({d,v,c:selCat,ts});
-  S.xp+=10+(S.streak>=3?5:0);
+  const nota=(selCat==='otro'&&$('otroTxt').value.trim())?$('otroTxt').value.trim():'';
+  const g={d,v,c:selCat,ts};if(nota)g.nota=nota;
+  S.gastos.push(g);
+  // XP: base + racha + BONUS por cazar gasto chico (la hormiga de verdad)
+  let xp=10+(S.streak>=3?5:0);
+  let bonus=0;
+  if(v<800)bonus=8;else if(v<2000)bonus=5;else if(v<5000)bonus=2;
+  xp+=bonus;
+  S.xp+=xp;
   checkAch();save();
   $('amt').value='';$('proj').textContent='';$('otroDia').checked=false;$('fecha').style.display='none';
+  $('otroTxt').value='';$('otroTxt').style.display='none';
   chaching();
-  toast(`Anotado · +${10+(S.streak>=3?5:0)} XP`);
+  toast(bonus?`Anotado · +${xp} XP 🐜 (¡cazaste una hormiga!)`:`Anotado · +${xp} XP`);
   render();verdict();
   if(streakUp){const sb=$('streakBox');sb.classList.remove('bump');void sb.offsetWidth;sb.classList.add('bump')}
 };
@@ -547,7 +557,8 @@ function render(){
   $('hoy').innerHTML=items.length?items.map(g=>{const c=CATS.find(x=>x.id===g.c);
     const dt=showAll?`<span class="dt">${g.d.slice(8,10)}/${g.d.slice(5,7)}</span>`:'';
     const fresh=g.ts===freshTs?' fresh':'';
-    return `<div class="g${fresh}"><span class="nm">${c.em} ${c.nm}</span> ${dt}<span class="dots"></span><span class="v mono">${fmt(g.v)}</span><button class="ed" onclick="editG(${g.ts})">✎</button><button class="x" onclick="delG(${g.ts})">✕</button></div>`}).join('')
+    const nm=g.nota?`${c.em} ${g.nota}`:`${c.em} ${c.nm}`;
+    return `<div class="g${fresh}"><span class="nm">${nm}</span> ${dt}<span class="dots"></span><span class="v mono">${fmt(g.v)}</span><button class="ed" onclick="editG(${g.ts})">✎</button><button class="x" onclick="delG(${g.ts})">✕</button></div>`}).join('')
     :'<div class="empty">Nada anotado. Día en $ 0 — la libreta te aplaude.</div>';
   freshTs=null;
   $('ach').innerHTML=ACHS.map(a=>`<span class="badge ${S.ach.includes(a.id)?'on':''}${a.id===S.newAch?' justgot':''}">${a.nm}</span>`).join('');
