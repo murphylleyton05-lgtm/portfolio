@@ -1,0 +1,10 @@
+{
+  "name": "Hormiga — libreta de gastos chicos",
+  "short_name": "Hormiga",
+  "description": "Anotá tus gastos hormiga en 5 segundos. Racha, niveles y tu categoría asesina del mes.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#faf5ea",
+  "theme_color": "#faf5ea",
+  "icons": [{ "src": "./icon.png", "sizes": "512x512", "type": "image/png" }]
+}
