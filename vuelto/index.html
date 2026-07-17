@@ -152,6 +152,13 @@ h2.sec{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--
 .badge.on{border:2px solid var(--red);color:var(--red);font-weight:700;font-style:normal;transform:rotate(-1.5deg);background:var(--card)}
 
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.settings{border:1.5px solid var(--line);border-radius:8px;margin-bottom:16px;background:var(--card)}
+.settings summary{cursor:pointer;padding:13px 18px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink2);list-style:none;display:flex;align-items:center;gap:8px}
+.settings summary::-webkit-details-marker{display:none}
+.settings summary::before{content:'⚙';font-size:15px}
+.settings summary::after{content:'▾';margin-left:auto;transition:transform .2s}
+.settings[open] summary::after{transform:rotate(180deg)}
+.settings>div{padding:0 18px 18px}
 
 /* recordatorio */
 .rem .rrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -290,30 +297,32 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
   <div class="ach" id="ach"></div>
 
   <div class="actions">
-    <button class="btn" id="cardBtn">🃏 Tarjeta del mes</button>
-    <button class="btn ghost" id="share">Compartir 🪙</button>
+    <button class="btn" id="cardBtn">Tarjeta del mes</button>
+    <button class="btn ghost" id="share">Compartir</button>
   </div>
 
-  <div class="card-b rem">
-    <h2 class="sec">Recordatorio de racha</h2>
-    <div class="rrow">
-      <button class="btn ghost" id="remBtn" style="width:auto;padding:10px 16px">Activar recordatorio</button>
-      <input type="time" id="remTime" value="21:00"/>
+  <details class="settings">
+    <summary>Ajustes de la libreta</summary>
+    <div class="rem" style="margin-top:14px">
+      <h2 class="sec">Recordatorio de racha</h2>
+      <div class="rrow">
+        <button class="btn ghost" id="remBtn" style="width:auto;padding:10px 16px">Activar recordatorio</button>
+        <input type="time" id="remTime" value="21:00"/>
+      </div>
+      <div class="msg" id="remMsg">Te avisamos todos los días a esta hora para que no pierdas la racha. Nada sale de tu teléfono.</div>
     </div>
-    <div class="msg" id="remMsg">Te avisamos todos los días a esta hora para que no pierdas la racha. Nada sale de tu teléfono.</div>
-  </div>
-
-  <div class="card-b rem">
-    <h2 class="sec">Respaldo de tus datos</h2>
-    <div class="rrow">
-      <button class="btn ghost" id="exportBtn" style="width:auto;padding:10px 16px">Exportar 📤</button>
-      <button class="btn ghost" id="importBtn" style="width:auto;padding:10px 16px">Importar 📥</button>
-      <input type="file" id="importFile" accept="application/json,.json" style="display:none"/>
+    <div class="rem" style="margin-top:18px;border-top:1px dashed var(--line);padding-top:16px">
+      <h2 class="sec">Respaldo de tus datos</h2>
+      <div class="rrow">
+        <button class="btn ghost" id="exportBtn" style="width:auto;padding:10px 16px">Exportar</button>
+        <button class="btn ghost" id="importBtn" style="width:auto;padding:10px 16px">Importar</button>
+        <input type="file" id="importFile" accept="application/json,.json" style="display:none"/>
+      </div>
+      <div class="msg">Como tus datos viven solo acá, hacé una copia por las dudas. Exportá un archivito y guardalo (mail, Drive, WhatsApp a vos mismo). Si cambiás de teléfono, lo importás y vuelve todo.</div>
     </div>
-    <div class="msg">Como tus datos viven solo acá, hacé una copia por las dudas. Exportá un archivito y guardalo (mail, Drive, WhatsApp a vos mismo). Si cambiás de teléfono, lo importás y vuelve todo.</div>
-  </div>
+  </details>
 
-  <footer>🪙 Vuelto · tus números viven solo en tu teléfono — nada sale de acá</footer>
+  <footer>Vuelto · tus números viven solo en tu teléfono — nada sale de acá</footer>
 </div>
 
 <div class="modal" id="modal">
@@ -630,7 +639,12 @@ function render(){
     return `<div class="g${fresh}"><span class="nm">${nm}</span> ${dt}<span class="dots"></span><span class="v mono">${fmt(g.v)}</span><button class="ed" onclick="editG(${g.ts})">✎</button><button class="x" onclick="delG(${g.ts})">✕</button></div>`}).join('')
     :'<div class="empty">Nada anotado. Día en $ 0 — la libreta te aplaude.</div>';
   freshTs=null;
-  $('ach').innerHTML=ACHS.map(a=>`<span class="badge ${S.ach.includes(a.id)?'on':''}${a.id===S.newAch?' justgot':''}">${a.nm}</span>`).join('');
+  // mostrar solo ganados + el próximo (el resto, misterio)
+  const earned=ACHS.filter(a=>S.ach.includes(a.id));
+  const nextAch=ACHS.find(a=>!S.ach.includes(a.id));
+  const showA=nextAch?[...earned,nextAch]:earned;
+  $('ach').innerHTML=showA.map(a=>{const got=S.ach.includes(a.id);
+    return `<span class="badge ${got?'on':''}${a.id===S.newAch?' justgot':''}">${got?a.nm:'🔒 '+a.nm}</span>`}).join('');
   S.newAch=null;
   // mes
   const md=monthData();
