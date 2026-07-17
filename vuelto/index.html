@@ -9,13 +9,13 @@
 <meta property="og:description" content="Anotá tus gastos chicos en 5 segundos. Racha, niveles y tu categoría asesina del mes. Gratis y sin registro."/>
 <meta property="og:type" content="website"/>
 <meta property="og:locale" content="es_AR"/>
-<meta property="og:image" content="https://vuelto.netlify.app/og.png"/>
+<meta property="og:image" content="https://vuelto-ar.netlify.app/og.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Vuelto 🪙 — ¿dónde está tu vuelto?"/>
 <meta name="twitter:description" content="Anotá tus gastos chicos en 5 segundos. Racha, niveles y tu categoría asesina del mes. Gratis y sin registro."/>
-<meta name="twitter:image" content="https://vuelto.netlify.app/og.png"/>
+<meta name="twitter:image" content="https://vuelto-ar.netlify.app/og.png"/>
 <meta name="theme-color" content="#faf5ea"/>
 <link rel="manifest" href="./manifest.json"/>
 <link rel="apple-touch-icon" href="./icon.png"/>
@@ -681,7 +681,7 @@ function lastMonthTotal(){
 }
 
 $('share').onclick=async()=>{
-  const txt=`🪙 Mi semana en Vuelto: ${fmt(weekSum())} en gastos chicos, racha de ${S.streak} días anotando. ¿Vos sabés dónde está TU vuelto? 👉 https://vuelto.netlify.app/`;
+  const txt=`🪙 Mi semana en Vuelto: ${fmt(weekSum())} en gastos chicos, racha de ${S.streak} días anotando. ¿Vos sabés dónde está TU vuelto? 👉 https://vuelto-ar.netlify.app/`;
   if(navigator.share){try{await navigator.share({text:txt})}catch(e){}}else{await navigator.clipboard.writeText(txt);toast('Copiado — pegalo donde quieras')}
 };
 
@@ -777,7 +777,7 @@ $('cardShare').onclick=async()=>{
   const c=$('cardCanvas');
   c.toBlob(async(blob)=>{
     const file=new File([blob],'mi-mes-en-vuelto.png',{type:'image/png'});
-    const data={files:[file],text:'Mi mes en Vuelto 🪙 ¿Vos sabés dónde está tu vuelto? 👉 https://vuelto.netlify.app/'};
+    const data={files:[file],text:'Mi mes en Vuelto 🪙 ¿Vos sabés dónde está tu vuelto? 👉 https://vuelto-ar.netlify.app/'};
     if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share(data)}catch(e){}}
     else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mi-mes-en-vuelto.png';a.click();toast('Tarjeta descargada 🪙')}
   },'image/png');
