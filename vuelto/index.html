@@ -76,7 +76,9 @@ h2.sec{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--
 .cats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .cat{background:var(--card);border:1.5px solid var(--line);border-radius:5px;padding:9px 4px;text-align:center;
   cursor:pointer;font-size:13px;color:var(--ink2);font-family:Georgia,serif;transition:all .12s}
-.cat .em{display:block;font-size:16px;margin-bottom:2px}
+.cat .em{display:block;margin-bottom:3px;line-height:0}
+.cat .em svg{vertical-align:middle}
+.g .nm svg,.mrow .nm svg{vertical-align:-3px}
 .cat.sel{border-color:var(--ink);color:var(--ink);font-weight:700;background:var(--paper2);
   box-shadow:2px 2px 0 var(--shadow);transform:translateY(-1px)}
 .daterow{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:var(--ink2)}
@@ -338,6 +340,16 @@ const CATS=[
   {id:'cafe',em:'☕',nm:'Café'},{id:'deli',em:'🛵',nm:'Delivery'},{id:'kiosco',em:'🍫',nm:'Kiosco'},
   {id:'trans',em:'🚕',nm:'Transporte'},{id:'salida',em:'🍻',nm:'Salidas'},{id:'otro',em:'✏️',nm:'Otro'},
 ];
+// iconos de tinta propios (mismo trazo que la hormiga) — reemplazan a los emojis
+const ICON={
+  cafe:'<path d="M7 13 h13 v5 a5 5 0 0 1 -5 5 h-3 a5 5 0 0 1 -5 -5 z"/><path d="M20 14 h3 a2.5 2.5 0 0 1 0 5 h-3"/><path d="M10 8 q1 1.5 0 3"/><path d="M14 8 q1 1.5 0 3"/><path d="M6 26 h16"/>',
+  deli:'<circle cx="9.5" cy="22" r="3.2"/><circle cx="22.5" cy="22" r="3.2"/><path d="M9.5 22 l3 -8 h5.5 l3 6"/><path d="M11 14 h6.5"/><path d="M18 14 l1.2 -3.5 h3"/>',
+  kiosco:'<path d="M9 8 h11 l2 4.5 v12.5 a1.4 1.4 0 0 1 -1.4 1.4 h-12.2 a1.4 1.4 0 0 1 -1.4 -1.4 v-12.5 z"/><path d="M7 12.5 h18"/><path d="M15 12.5 v13.9"/>',
+  trans:'<path d="M8 20 l1.3 -6 a2 2 0 0 1 1.9 -1.5 h7.6 a2 2 0 0 1 1.9 1.5 l1.3 6"/><path d="M7 20 h18 v3.5 h-2 v2 h-2.6 v-2 h-6.8 v2 h-2.6 v-2 h-2 z"/><path d="M12 9 h8"/>',
+  salida:'<path d="M8.5 8 l1.5 8.5 h4.5 l1.5 -8.5 z"/><path d="M12.2 16.5 v7.5"/><path d="M9.5 25 h5.5"/><path d="M19 9 h5 v7 a2.5 2.5 0 0 1 -5 0 z"/><path d="M21.5 18.5 v5.5"/><path d="M19 25 h5"/>',
+  otro:'<path d="M19 6.5 l6.5 6.5 l-13 13 l-7.5 1 l1 -7.5 z"/><path d="M17 8.5 l6.5 6.5"/><path d="M7 25 l1.5 -1.5"/>',
+};
+function icon(id,size,col){return `<svg viewBox="0 0 32 32" width="${size}" height="${size}" style="vertical-align:-3px"><g fill="none" stroke="${col||'currentColor'}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICON[id]||ICON.otro}</g></svg>`}
 const LVLS=[[0,'Manos de colador'],[100,'Ojito despierto'],[300,'Guardián del vuelto'],[700,'Contador de chirolas'],[1500,'Vuelto Zen']];
 const ACHS=[
   {id:'first',nm:'Primer renglón',t:s=>s.gastos.length>=1},
@@ -435,7 +447,7 @@ function confetti(){
 
 let selCat=null;
 CATS.forEach(c=>{
-  const b=document.createElement('button');b.className='cat';b.innerHTML=`<span class="em">${c.em}</span>${c.nm}`;
+  const b=document.createElement('button');b.className='cat';b.innerHTML=`<span class="em">${icon(c.id,22)}</span>${c.nm}`;
   b.onclick=()=>{selCat=c.id;document.querySelectorAll('.cat').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');
     $('otroTxt').style.display=c.id==='otro'?'block':'none'};
   $('cats').appendChild(b);
@@ -607,7 +619,7 @@ function render(){
   $('hoy').innerHTML=items.length?items.map(g=>{const c=CATS.find(x=>x.id===g.c);
     const dt=showAll?`<span class="dt">${g.d.slice(8,10)}/${g.d.slice(5,7)}</span>`:'';
     const fresh=g.ts===freshTs?' fresh':'';
-    const nm=g.nota?`${c.em} ${g.nota}`:`${c.em} ${c.nm}`;
+    const nm=g.nota?`${icon(c.id,17)} ${g.nota}`:`${icon(c.id,17)} ${c.nm}`;
     return `<div class="g${fresh}"><span class="nm">${nm}</span> ${dt}<span class="dots"></span><span class="v mono">${fmt(g.v)}</span><button class="ed" onclick="editG(${g.ts})">✎</button><button class="x" onclick="delG(${g.ts})">✕</button></div>`}).join('')
     :'<div class="empty">Nada anotado. Día en $ 0 — la libreta te aplaude.</div>';
   freshTs=null;
@@ -626,10 +638,10 @@ function render(){
     $('mesRows').innerHTML=md.rank.map(([id,v],i)=>{const c=CATS.find(x=>x.id===id);
       const cap=ST.caps[id]||0,over=cap&&v>cap;
       const warn=over?` <span style="color:var(--red)">⚠ +${fmt(v-cap)}</span>`:'';
-      return `<div class="mrow ${i===0?'top':''}"><span class="nm">${c.em} ${c.nm}</span><div class="track"><div style="width:${Math.max(4,v/mx*100)}%;${over?'background:var(--red)':''}"></div></div><span class="v mono">${fmt(v)}${warn}</span></div>`}).join('');
+      return `<div class="mrow ${i===0?'top':''}"><span class="nm">${icon(c.id,17)} ${c.nm}</span><div class="track"><div style="width:${Math.max(4,v/mx*100)}%;${over?'background:var(--red)':''}"></div></div><span class="v mono">${fmt(v)}${warn}</span></div>`}).join('');
     // ponerle tope a la categoría asesina
     const [kid,kv]=md.rank[0],kc=CATS.find(x=>x.id===kid),dia=new Date().getDate(),anual=kv/dia*365;
-    $('capline').innerHTML=`Ponele un tope mensual a <b>${kc.em} ${kc.nm}</b>: $ <input id="capIn" type="number" inputmode="numeric" placeholder="sin tope" value="${ST.caps[kid]||''}">`;
+    $('capline').innerHTML=`Ponele un tope mensual a <b>${icon(kid,16)} ${kc.nm}</b>: $ <input id="capIn" type="number" inputmode="numeric" placeholder="sin tope" value="${ST.caps[kid]||''}">`;
     const ci=$('capIn');if(ci)ci.addEventListener('change',()=>{const val=parseFloat(ci.value)||0;if(val)ST.caps[kid]=val;else delete ST.caps[kid];saveSet();render()});
     $('killer').innerHTML=`Tu categoría asesina es <b>${kc.nm}</b>: a este ritmo son <b>${fmt(anual)}</b> en un año. La libreta no juzga. Solo anota.`;
   }
@@ -650,6 +662,10 @@ $('share').onclick=async()=>{
 const medalImgs=MEDALS.map((m,i)=>{const im=new Image();
   const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="120" height="120">'+MEDALS[i].draw+'</svg>';
   im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);return im});
+// iconos de categoría como imagen (para dibujar en el canvas de la tarjeta)
+const iconImgs={};CATS.forEach(c=>{const im=new Image();
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><g fill="none" stroke="#26221a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+ICON[c.id]+'</g></svg>';
+  im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);iconImgs[c.id]=im});
 function drawCard(){
   const c=$('cardCanvas'),x=c.getContext('2d'),W=540,H=772;
   const md=monthData();
@@ -676,7 +692,8 @@ function drawCard(){
   const top=md.rank.slice(0,3),mx=top.length?top[0][1]:1;
   top.forEach(([id,v],i)=>{
     const cc=CATS.find(z=>z.id===id),y=372+i*34;
-    x.fillStyle='#26221a';x.font='16px Georgia';x.textAlign='left';x.fillText(cc.em+' '+cc.nm,60,y+4);
+    const ii=iconImgs[id];if(ii&&ii.complete&&ii.naturalWidth){try{x.drawImage(ii,58,y-13,20,20)}catch(e){}}
+    x.fillStyle='#26221a';x.font='16px Georgia';x.textAlign='left';x.fillText(cc.nm,84,y+3);
     // barra
     x.fillStyle='#efe7d5';x.fillRect(210,y-9,200,13);
     x.fillStyle=i===0?'#c73e2e':'#3d5ea3';x.fillRect(210,y-9,Math.max(6,200*v/mx),13);
@@ -685,7 +702,7 @@ function drawCard(){
   x.strokeStyle='#d9d0bc';x.setLineDash([3,4]);x.beginPath();x.moveTo(60,492);x.lineTo(W-60,492);x.stroke();x.setLineDash([]);
   // categoria asesina + proyeccion
   if(md.rank.length){const [kid,kv]=md.rank[0],kc=CATS.find(z=>z.id===kid),dia=new Date().getDate(),anual=kv/dia*365;
-    x.textAlign='center';x.fillStyle='#5c554a';x.font='italic 15px Georgia';x.fillText('Tu categoría asesina es '+kc.em+' '+kc.nm,W/2,522);
+    x.textAlign='center';x.fillStyle='#5c554a';x.font='italic 15px Georgia';x.fillText('Tu categoría asesina es '+kc.nm,W/2,522);
     x.fillStyle='#c73e2e';x.font='italic 900 20px Georgia';x.fillText('a este ritmo, '+fmt(anual)+' al año',W/2,550);
   }
   // racha + nivel (dos cuadros simétricos, contenido centrado)
