@@ -104,9 +104,14 @@ h2.sec{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--
 .meta .joke.show{display:block}
 .meta .joke .lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:3px}
 
-.verd{border-left:3px solid var(--red);padding:4px 2px 4px 14px;margin:0 4px 20px;display:none}
-.verd p{font-size:15.5px;font-style:italic;color:var(--ink2)}.verd b{color:var(--ink);font-style:normal}
-.verd .firma{font-size:12px;color:var(--mut);margin-top:4px}
+/* cabecera emocional */
+.hero{background:var(--card);border:2px solid var(--ink);border-radius:6px;padding:15px 18px 16px;margin-bottom:16px;box-shadow:4px 4px 0 var(--shadow)}
+.hero .hl{font-size:11.5px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)}
+.hero .hv{font-size:40px;font-weight:900;color:var(--ink);line-height:1.05;margin:1px 0 12px}
+.hero-verd{display:flex;gap:11px;align-items:center;border-top:1px dashed var(--line);padding-top:12px}
+.hero-verd .ant{flex-shrink:0;width:38px;line-height:0}
+.hero-verd p{font-size:15px;color:var(--ink);line-height:1.4}
+.hero-verd b{color:var(--red);font-weight:700}
 
 .tot{margin-bottom:20px;border-top:1px solid var(--line)}
 .trow{display:flex;justify-content:space-between;align-items:baseline;padding:10px 4px;border-bottom:1px solid var(--line)}
@@ -248,6 +253,12 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
     <div class="proj" id="proj"></div>
   </div>
 
+  <div class="hero" id="hero">
+    <div class="hl">Hoy llevás gastado</div>
+    <div class="hv mono" id="heroHoy">$ 0</div>
+    <div class="hero-verd"><span class="ant" id="verdAnt"></span><p id="verdTxt2"></p></div>
+  </div>
+
   <div class="card-b meta">
     <h2 class="sec">Meta de la semana</h2>
     <div class="mhead"><span class="k" style="font-style:italic;color:var(--ink2)">Gastado / tope</span><span class="big mono" id="metaTxt">$ 0 / —</span></div>
@@ -255,13 +266,6 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
     <div class="mfoot"><span>Tope semanal:</span><span>$ <input id="metaInput" type="number" inputmode="numeric" placeholder="poné un tope"/></span></div>
     <div class="msg" id="metaMsg"></div>
     <div class="joke" id="metaJoke"></div>
-  </div>
-
-  <div class="verd" id="verd"><p id="verdTxt"></p><div class="firma">— tu libreta, sobre tus propios números</div></div>
-
-  <div class="tot">
-    <div class="trow big"><span class="k">Hoy</span><span class="v mono" id="tHoy">$ 0</span></div>
-    <div class="trow"><span class="k">Últimos 7 días</span><span class="v mono" id="tSem">$ 0</span></div>
   </div>
 
   <div class="chart">
@@ -377,6 +381,9 @@ function coinSVG(size){
   return `<svg viewBox="0 0 60 60" width="${size}" height="${size}"><circle cx="30" cy="30" r="30" fill="#e8a92b"/>${ticks}<circle cx="30" cy="30" r="28" fill="#f6c34a" stroke="#8a5e00" stroke-width="1.4"/><circle cx="30" cy="30" r="24" fill="none" stroke="#c98500" stroke-width="1.2" stroke-dasharray="2.4 2.6"/>${ant}</svg>`;
 }
 $('coinLogo').innerHTML=coinSVG(36);$('wcoin').innerHTML=coinSVG(84);
+// hormiga mascota (habla en la cabecera)
+function antMascot(size){return `<svg viewBox="0 0 34 26" width="${size}" height="${(size*26/34).toFixed(0)}"><g transform="translate(16,13)"><g stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"><path d="M-2 3 L-4.5 8"/><path d="M2 3.2 L2 8.6"/><path d="M6 3 L8.5 8"/><path d="M-6 -2.6 Q-9.5 -7 -11.5 -6"/><path d="M-4 -3 Q-6.5 -7.5 -8.5 -7"/></g><g fill="currentColor"><ellipse cx="6" cy="1" rx="6.2" ry="4.8"/><ellipse cx="-1" cy="1" rx="3" ry="2.5"/><circle cx="-6.5" cy="0.2" r="3.2"/></g></g></svg>`}
+$('verdAnt').innerHTML=antMascot(38);
 
 // ===== MEDALLAS DE RANGO (hormiga mascota USANDO el objeto, integrado) =====
 function reed(r,col){let t='';for(let i=0;i<40;i++){const a=2*Math.PI*i/40;t+=`<line x1="${(Math.cos(a)*r).toFixed(1)}" y1="${(Math.sin(a)*r).toFixed(1)}" x2="${(Math.cos(a)*(r+2.5)).toFixed(1)}" y2="${(Math.sin(a)*(r+2.5)).toFixed(1)}" stroke="${col}" stroke-width="1.1"/>`}return t}
@@ -564,7 +571,7 @@ function verdict(){
   pool.push(`Llevás <b>${S.gastos.length} gastos</b> en la libreta. Verlos ya es la mitad del juego.`,
             `Racha de <b>${S.streak}</b> ${S.streak===1?'día':'días'}. La constancia es el truco. 🔥`);
   msg=pool[Math.floor((S.gastos.length+hoyG.length)%pool.length)];
-  $('verdTxt').innerHTML=msg;$('verd').style.display='block';
+  $('verdTxt2').innerHTML=msg;
 }
 function checkAch(){
   if(sumDay(today())===0&&S.gastos.length)S.zeroDay=true;
@@ -595,7 +602,7 @@ function render(){
   $('xpTxt').textContent=next?`${S.xp}/${next[0]} XP`:`${S.xp} XP`;
   $('xpBar').style.width=next?Math.min(100,(S.xp-LVLS[li][0])/(next[0]-LVLS[li][0])*100)+'%':'100%';
   const days=last7();
-  $('tHoy').textContent=fmt(days[6].v);$('tSem').textContent=fmt(weekSum());
+  $('heroHoy').textContent=fmt(days[6].v);
   renderMeta();
   // chart
   const svg=$('svg'),W=svg.clientWidth||420,H=150,padB=24,padT=12,max=Math.max(...days.map(d=>d.v),1),bw=Math.min(36,(W-16)/7-9);
@@ -836,7 +843,7 @@ $('wstart').onclick=()=>{localStorage.setItem('vuelto.seen','1');$('welcome').cl
 // service worker (offline + PWA)
 if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 
-render();if(S.gastos.length)verdict();
+render();verdict();
 window.addEventListener('resize',render);
 </script>
 </body>
