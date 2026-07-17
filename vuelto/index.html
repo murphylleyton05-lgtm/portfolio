@@ -312,7 +312,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
 
 <div class="modal" id="modal">
   <div class="mcard">
-    <canvas id="cardCanvas" width="540" height="740"></canvas>
+    <canvas id="cardCanvas" width="540" height="772"></canvas>
     <div class="mbtns">
       <button class="btn" id="cardShare">Compartir 📤</button>
       <button class="btn ghost" id="cardClose">Cerrar</button>
@@ -651,7 +651,7 @@ const medalImgs=MEDALS.map((m,i)=>{const im=new Image();
   const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="120" height="120">'+MEDALS[i].draw+'</svg>';
   im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);return im});
 function drawCard(){
-  const c=$('cardCanvas'),x=c.getContext('2d'),W=540,H=740;
+  const c=$('cardCanvas'),x=c.getContext('2d'),W=540,H=772;
   const md=monthData();
   const mesNom=new Date().toLocaleDateString('es-AR',{month:'long'});
   x.fillStyle='#faf5ea';x.fillRect(0,0,W,H);
@@ -688,23 +688,24 @@ function drawCard(){
     x.textAlign='center';x.fillStyle='#5c554a';x.font='italic 15px Georgia';x.fillText('Tu categoría asesina es '+kc.em+' '+kc.nm,W/2,522);
     x.fillStyle='#c73e2e';x.font='italic 900 20px Georgia';x.fillText('a este ritmo, '+fmt(anual)+' al año',W/2,550);
   }
-  // racha + nivel (con medalla)
+  // racha + nivel (dos cuadros simétricos, contenido centrado)
   let li=0;LVLS.forEach((l,i)=>{if(S.xp>=l[0])li=i});
   x.strokeStyle='#26221a';x.lineWidth=2;
-  const by=578,bh=96;
-  x.strokeRect(60,by,190,bh);x.strokeRect(W-250,by,190,bh);
-  // racha
-  x.textAlign='center';x.fillStyle='#26221a';x.font='900 42px Georgia';x.fillText(S.streak,60+95,by+52);
-  x.font='italic 14px Georgia';x.fillStyle='#8f8776';x.fillText('días de racha 🔥',60+95,by+78);
-  // nivel con medalla
-  const mi=medalImgs[li];if(mi&&mi.complete&&mi.naturalWidth){try{x.drawImage(mi,W-250+18,by+8,54,54)}catch(e){}}
-  x.fillStyle='#26221a';x.font='italic 900 15px Georgia';x.textAlign='left';
-  x.fillText(LVLS[li][1],W-250+78,by+34);
-  x.fillStyle='#8f8776';x.font='italic 12px Georgia';x.fillText('rango '+MEDALS[li].rk,W-250+78,by+54);
-  // footer
-  drawCoin(x,W/2-92,706,13);
-  x.textAlign='left';x.fillStyle='#7a5200';x.font='900 20px Georgia';x.fillText('Vuelto',W/2-72,712);
-  x.textAlign='center';x.fillStyle='#8f8776';x.font='italic 12.5px Georgia';x.fillText('¿vos sabés dónde está tu vuelto?',W/2,732);
+  const bw=192,bh=110,by=582,lx=58,rx=W-58-bw,lc=lx+bw/2,rc=rx+bw/2;
+  x.strokeRect(lx,by,bw,bh);x.strokeRect(rx,by,bw,bh);
+  x.textAlign='center';
+  // izq: racha
+  x.fillStyle='#26221a';x.font='900 44px Georgia';x.fillText(S.streak,lc,by+56);
+  x.font='italic 14px Georgia';x.fillStyle='#8f8776';x.fillText('días de racha',lc,by+84);
+  // der: medalla arriba + nombre + rango, todo centrado
+  const mi=medalImgs[li];if(mi&&mi.complete&&mi.naturalWidth){try{x.drawImage(mi,rc-25,by+10,50,50)}catch(e){}}
+  x.fillStyle='#26221a';x.font='italic 900 15px Georgia';x.fillText(LVLS[li][1],rc,by+78);
+  x.fillStyle='#8f8776';x.font='italic 12px Georgia';x.fillText('rango '+MEDALS[li].rk,rc,by+96);
+  // footer (dentro del marco interno)
+  const fy=712;
+  drawCoin(x,W/2-88,fy-6,13);
+  x.textAlign='left';x.fillStyle='#7a5200';x.font='900 21px Georgia';x.fillText('Vuelto',W/2-68,fy);
+  x.textAlign='center';x.fillStyle='#8f8776';x.font='italic 12.5px Georgia';x.fillText('¿vos sabés dónde está tu vuelto?',W/2,fy+22);
 }
 function ctxSpaced(x,t,px,py){x.fillText(t,px,py)}
 function drawCoin(x,cx,cy,r){
