@@ -397,6 +397,8 @@ const ACHS=[
   {id:'nodeli',nm:'Semana sin delivery 🛵🚫',t:s=>s.noDeliWeek},
 ];
 const $=id=>document.getElementById(id);
+// tracking de eventos (GoatCounter) — anónimo, sin datos personales, solo la acción
+function track(evento){try{if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'evento/'+evento,title:'evento: '+evento,event:true})}catch(e){}}
 const fmt=n=>'$ '+Math.round(n).toLocaleString('es-AR');
 const today=()=>new Date().toISOString().slice(0,10);
 const dayKey=d=>d.toISOString().slice(0,10);
@@ -435,8 +437,13 @@ function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r)return r}
   return {gastos:[],xp:0,streak:0,lastDay:'',zeroDay:false,ach:[]}}
 function loadSet(){try{const r=JSON.parse(localStorage.getItem(SET));if(r)return Object.assign({sound:true,caps:{}},r)}catch(e){}
   return {theme:'light',meta:0,remOn:false,remTime:'21:00',sound:true,caps:{}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(S))}
-function saveSet(){localStorage.setItem(SET,JSON.stringify(ST))}
+let storageWarned=false;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){warnStorage()}}
+function saveSet(){try{localStorage.setItem(SET,JSON.stringify(ST))}catch(e){warnStorage()}}
+function warnStorage(){if(storageWarned)return;storageWarned=true;
+  toast('⚠ Tu navegador no guarda datos (¿incógnito?). Anda igual, pero se pierde al cerrar.')}
+function safeGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function safeSet(k,v){try{localStorage.setItem(k,v)}catch(e){warnStorage()}}
 
 // theme
 function applyTheme(){document.documentElement.setAttribute('data-theme',ST.theme);
@@ -517,6 +524,7 @@ $('save').onclick=()=>{
   $('amt').value='';$('proj').textContent='';$('otroDia').checked=false;$('fecha').style.display='none';
   $('otroTxt').value='';$('otroTxt').style.display='none';
   chaching();
+  track('gasto_anotado');
   toast(bonus?`Anotado · +${xp} XP 🐜 (¡cazaste una hormiga!)`:`Anotado · +${xp} XP`);
   render();verdict();
   if(streakUp){const sb=$('streakBox');sb.classList.remove('bump');void sb.offsetWidth;sb.classList.add('bump')}
@@ -696,6 +704,7 @@ function lastMonthTotal(){
 
 $('share').onclick=async()=>{
   const txt=`🪙 Mi semana en Vuelto: ${fmt(weekSum())} en gastos chicos, racha de ${S.streak} días anotando. ¿Vos sabés dónde está TU vuelto? 👉 https://vuelto-ar.netlify.app/`;
+  track('semana_compartida');
   if(navigator.share){try{await navigator.share({text:txt})}catch(e){}}else{await navigator.clipboard.writeText(txt);toast('Copiado — pegalo donde quieras')}
 };
 
@@ -785,13 +794,14 @@ function drawCoin(x,cx,cy,r){
   x.fillStyle='#7a5200';x.font=`900 ${9*s}px Georgia`;x.textAlign='center';x.fillText('$',6*s,-3.4*s);
   x.restore();
 }
-$('cardBtn').onclick=()=>{drawCard();$('modal').classList.add('show')};
+$('cardBtn').onclick=()=>{drawCard();$('modal').classList.add('show');track('tarjeta_abierta')};
 $('cardClose').onclick=()=>$('modal').classList.remove('show');
 $('cardShare').onclick=async()=>{
   const c=$('cardCanvas');
   c.toBlob(async(blob)=>{
     const file=new File([blob],'mi-mes-en-vuelto.png',{type:'image/png'});
     const data={files:[file],text:'Mi mes en Vuelto 🪙 ¿Vos sabés dónde está tu vuelto? 👉 https://vuelto-ar.netlify.app/'};
+    track('tarjeta_compartida');
     if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share(data)}catch(e){}}
     else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mi-mes-en-vuelto.png';a.click();toast('Tarjeta descargada 🪙')}
   },'image/png');
@@ -837,6 +847,7 @@ function showAscend(i){
   $('ascendName').textContent=LVLS[i][1];
   $('ascendRk').textContent='Rango '+MEDALS[i].rk;
   $('ascend').classList.add('show');
+  track('ascenso_rango');
   confetti();chaching();
   setTimeout(confetti,400);
 }
@@ -849,6 +860,7 @@ function doExport(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='vuelto-respaldo-'+today()+'.json';a.click();
   ST.lastBackup=Date.now();saveSet();
+  track('backup_exportado');
   toast('Respaldo descargado 📤');
   $('backupNudge').style.display='none';
 }
@@ -856,7 +868,7 @@ $('exportBtn').onclick=doExport;
 
 // recordatorio de backup: si hay datos y hace >14 días (o nunca) que no respalda
 function checkBackupNudge(){
-  if(sessionStorage.getItem('bnHidden'))return;
+  try{if(sessionStorage.getItem('bnHidden'))return}catch(e){}
   const n=S.gastos.length;if(n<12)return;
   const last=ST.lastBackup||0, dias=last?Math.floor((Date.now()-last)/86400000):null;
   if(last&&dias<14)return;
@@ -866,7 +878,7 @@ function checkBackupNudge(){
   $('backupNudge').style.display='flex';
 }
 $('bnExport').onclick=doExport;
-$('bnClose').onclick=()=>{$('backupNudge').style.display='none';sessionStorage.setItem('bnHidden','1')};
+$('bnClose').onclick=()=>{$('backupNudge').style.display='none';try{sessionStorage.setItem('bnHidden','1')}catch(e){}};
 $('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
@@ -888,8 +900,8 @@ $('importFile').onchange=e=>{
 };
 
 // welcome
-if(S.gastos.length||localStorage.getItem('vuelto.seen')){$('welcome').style.display='none'}
-$('wstart').onclick=()=>{localStorage.setItem('vuelto.seen','1');$('welcome').classList.add('hide');
+if(S.gastos.length||safeGet('vuelto.seen')){$('welcome').style.display='none'}
+$('wstart').onclick=()=>{safeSet('vuelto.seen','1');track('onboarding_completado');$('welcome').classList.add('hide');
   setTimeout(()=>{$('welcome').style.display='none';$('amt').focus()},400)};
 
 // service worker (offline + PWA) con auto-update
