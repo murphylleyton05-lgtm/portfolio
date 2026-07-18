@@ -111,6 +111,13 @@ h2.sec{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--
 .meta .joke.show{display:block}
 .meta .joke .lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:3px}
 
+/* recordatorio de backup */
+.bnudge{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1.5px dashed var(--warn);
+  border-radius:8px;padding:11px 14px;margin-bottom:16px;font-size:13.5px;color:var(--ink2)}
+.bnudge .bnbtns{margin-left:auto;display:flex;gap:6px;align-items:center}
+.bnudge button{border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:6px;
+  padding:6px 12px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.bnudge button#bnClose{background:transparent;color:var(--mut);border-color:transparent;padding:4px 6px;font-weight:400}
 /* cabecera emocional */
 .hero{background:var(--card);border:2px solid var(--ink);border-radius:6px;padding:15px 18px 16px;margin-bottom:16px;box-shadow:4px 4px 0 var(--shadow)}
 .hero .hl{font-size:11.5px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)}
@@ -271,6 +278,11 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:22px 0 0;font
     <div class="hl">Hoy llevás gastado</div>
     <div class="hv mono" id="heroHoy">$ 0</div>
     <div class="hero-verd"><span class="ant" id="verdAnt"></span><p id="verdTxt2"></p></div>
+  </div>
+
+  <div class="bnudge" id="backupNudge" style="display:none">
+    <span id="bnTxt">Tenés gastos sin respaldar. Si perdés el teléfono, se pierden.</span>
+    <div class="bnbtns"><button id="bnExport">Respaldar ahora</button><button id="bnClose" aria-label="cerrar">✕</button></div>
   </div>
 
   <div class="card-b meta">
@@ -829,13 +841,30 @@ function showAscend(i){
 $('ascendBtn').onclick=()=>$('ascend').classList.remove('show');
 
 // respaldo: exportar / importar
-$('exportBtn').onclick=()=>{
+function doExport(){
   const data={v:1,fecha:new Date().toISOString(),gastos:S,ajustes:ST};
   const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='vuelto-respaldo-'+today()+'.json';a.click();
+  ST.lastBackup=Date.now();saveSet();
   toast('Respaldo descargado 📤');
-};
+  $('backupNudge').style.display='none';
+}
+$('exportBtn').onclick=doExport;
+
+// recordatorio de backup: si hay datos y hace >14 días (o nunca) que no respalda
+function checkBackupNudge(){
+  if(sessionStorage.getItem('bnHidden'))return;
+  const n=S.gastos.length;if(n<12)return;
+  const last=ST.lastBackup||0, dias=last?Math.floor((Date.now()-last)/86400000):null;
+  if(last&&dias<14)return;
+  $('bnTxt').textContent=last
+    ? `Hace ${dias} días que no respaldás tus ${n} gastos. Si perdés el teléfono, se pierden.`
+    : `Tenés ${n} gastos y nunca los respaldaste. Si perdés el teléfono, se pierden.`;
+  $('backupNudge').style.display='flex';
+}
+$('bnExport').onclick=doExport;
+$('bnClose').onclick=()=>{$('backupNudge').style.display='none';sessionStorage.setItem('bnHidden','1')};
 $('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
@@ -861,10 +890,20 @@ if(S.gastos.length||localStorage.getItem('vuelto.seen')){$('welcome').style.disp
 $('wstart').onclick=()=>{localStorage.setItem('vuelto.seen','1');$('welcome').classList.add('hide');
   setTimeout(()=>{$('welcome').style.display='none';$('amt').focus()},400)};
 
-// service worker (offline + PWA)
-if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
+// service worker (offline + PWA) con auto-update
+if('serviceWorker'in navigator){
+  navigator.serviceWorker.register('./sw.js').then(reg=>{
+    // buscar actualizaciones al abrir
+    reg.update&&reg.update();
+    setInterval(()=>reg.update&&reg.update(),60*60*1000); // y cada hora si queda abierta
+  }).catch(()=>{});
+  let reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(reloaded)return;reloaded=true;location.reload();
+  });
+}
 
-render();verdict();
+render();verdict();checkBackupNudge();
 window.addEventListener('resize',render);
 </script>
 </body>
