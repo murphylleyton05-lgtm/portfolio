@@ -11,11 +11,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Lleyton IA Automation — Tu negocio, en piloto automático" />
-<meta property="og:description" content="Sistemas de IA que atienden, ordenan y venden por vos. 24/7. Probá el asistente en vivo." />
+<meta property="og:title" content="¿Cuántas ventas perdés por no contestar a tiempo?" />
+<meta property="og:description" content="Un asistente de IA que responde a tus clientes al instante, 24/7. Hacé tu diagnóstico gratis y descubrí cuánto estás dejando en la mesa." />
 <meta property="og:locale" content="es_AR" />
-<meta property="og:url" content="https://portfolio-lleyton.netlify.app/" />
+<meta property="og:url" content="https://murphylleyton05-lgtm.github.io/portfolio/" />
+<meta property="og:image" content="https://murphylleyton05-lgtm.github.io/portfolio/img/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://murphylleyton05-lgtm.github.io/portfolio/img/og.png" />
 
 <style>
   :root{
@@ -208,13 +210,14 @@
 <section class="hero">
   <canvas id="scene"></canvas>
   <div class="wrap hero-in">
-    <div class="kick reveal"><span class="p"></span> Sistemas de IA · La Plata, Argentina</div>
-    <h1 class="reveal">Tu negocio,<br><em>en piloto automático</em></h1>
-    <p class="lead reveal">Diseño la infraestructura de IA que atiende a tus clientes, ordena cada lead y te muestra los números — mientras vos hacés otra cosa. Respuesta al instante, 24/7.</p>
+    <div class="kick reveal"><span class="p"></span> Diagnóstico gratis · La Plata, Argentina</div>
+    <h1 class="reveal">¿Cuántas ventas perdés por <em>no contestar a tiempo?</em></h1>
+    <p class="lead reveal">Diseño el asistente de IA que responde a tus clientes al instante, ordena cada lead y no te deja perder una venta — 24/7, mientras vos hacés otra cosa. Hacé el diagnóstico y descubrí cuánto estás dejando en la mesa.</p>
     <div class="hero-cta reveal">
-      <a href="#demo" class="btn btn-p">⚡ Probá el asistente</a>
-      <a href="#diagnostico" class="btn btn-g">Hacé tu diagnóstico gratis</a>
+      <a href="#diagnostico" class="btn btn-p">⚡ Hacé tu diagnóstico gratis</a>
+      <a href="#demo" class="btn btn-g">Probá el asistente en vivo</a>
     </div>
+    <p class="reveal" style="margin-top:16px;font-size:13.5px;color:var(--dim)">1 minuto · sin costo · sin compromiso · te respondo en el día</p>
     <div class="hero-strip reveal">
       <div><b>24/7</b><small>Atención sin frenar</small></div>
       <div><b>+40%</b><small>Menos trabajo manual</small></div>
@@ -290,9 +293,9 @@
 
 <section id="diagnostico" style="background:linear-gradient(180deg,transparent,rgba(109,92,255,.05),transparent)">
   <div class="wrap h-center">
-    <p class="eyebrow reveal">Gratis · 1 minuto</p>
-    <h2 class="reveal">Descubrí cuánto podés automatizar</h2>
-    <p class="sub reveal">4 preguntas rápidas y te digo, al instante, cuánto tiempo podrías recuperar y por dónde empezar.</p>
+    <p class="eyebrow reveal">Gratis · 1 minuto · sin compromiso</p>
+    <h2 class="reveal">Descubrí cuánta plata estás perdiendo</h2>
+    <p class="sub reveal">4 preguntas rápidas y te digo, al instante, cuántas horas y cuántas ventas estás dejando escapar — y te mando tu plan por WhatsApp.</p>
     <div class="diag reveal" id="diag">
       <div class="diag-bar"><i id="diagBar"></i></div>
       <div id="diagStage"></div>
@@ -522,9 +525,9 @@
     const tags=[answers.rubro,answers.canal,'Bot 24/7'].filter(Boolean);
     const wa=encodeURIComponent('Hola Lleyton! Hice el diagnóstico en tu web.\n• Rubro: '+(answers.rubro||'-')+'\n• Mensajes/día: '+(answers.msgs||'-')+'\n• Mi mayor dolor: '+(answers.dolor||'-')+'\n• Canal: '+(answers.canal||'-')+'\nQuiero ver cómo automatizarlo.');
     stage.innerHTML='<div class="diag-result"><div class="diag-step-lbl">Tu diagnóstico</div><div class="big">~'+hrs()+' hs</div>'+
-      '<p>Es el tiempo semanal que podrías recuperar automatizando la atención de tu '+(answers.rubro?answers.rubro.toLowerCase():'negocio')+'. Con un bot que responde solo y un CRM que ordena cada lead, dejás de perder ventas por no contestar a tiempo.</p>'+
+      '<p>Es el tiempo semanal que estás perdiendo respondiendo a mano en tu '+(answers.rubro?answers.rubro.toLowerCase():'negocio')+'. Y cada consulta que no contestás a tiempo es una venta que se va a la competencia. Te armo el plan para recuperarlas — gratis y sin compromiso.</p>'+
       '<div class="diag-tags">'+tags.map(t=>'<span>'+t+'</span>').join('')+'</div>'+
-      '<a class="btn btn-p" href="'+WA+wa+'" target="_blank" rel="noopener">💬 Recibir mi plan por WhatsApp</a>'+
+      '<a class="btn btn-p" href="'+WA+wa+'" target="_blank" rel="noopener">💬 Recibir mi plan gratis por WhatsApp</a>'+
       '<div style="margin-top:16px"><button class="diag-opt" id="dr" style="justify-content:center;max-width:210px;margin:0 auto">↺ Empezar de nuevo</button></div></div>';
     document.getElementById('dr').onclick=()=>{i=0;for(const k in answers)delete answers[k];render();};
   }
