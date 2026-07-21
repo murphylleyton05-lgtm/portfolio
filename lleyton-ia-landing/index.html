@@ -65,7 +65,10 @@
 
   /* HERO */
   .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:110px 0 70px;overflow:hidden}
-  #scene{position:absolute;inset:0;z-index:0}
+  #scene{position:fixed;inset:0;z-index:0;pointer-events:none}
+  /* velo global para legibilidad sobre el fondo 3D */
+  body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;background:rgba(5,6,10,.42)}
+  .marquee,section,footer{position:relative;z-index:2}
   .hero::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
     background:radial-gradient(120% 90% at 50% 0%,transparent 40%,rgba(5,6,10,.55) 82%,var(--bg) 100%)}
   .hero-in{position:relative;z-index:2;max-width:720px}
@@ -88,7 +91,7 @@
   @keyframes fade{0%,100%{opacity:.4}50%{opacity:.9}}
 
   /* MARQUEE */
-  .marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;overflow:hidden;background:var(--bg2)}
+  .marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;overflow:hidden;background:rgba(10,12,20,.66);backdrop-filter:blur(3px)}
   .mq-track{display:flex;gap:44px;white-space:nowrap;animation:scrollx 26s linear infinite;width:max-content}
   .mq-track span{font-family:'Space Grotesk';font-size:15px;color:var(--soft);display:flex;align-items:center;gap:44px}
   .mq-track span::after{content:"●";color:var(--cy);font-size:8px}
@@ -192,6 +195,7 @@
 </style>
 </head>
 <body>
+<canvas id="scene"></canvas>
 
 <nav id="nav">
   <div class="wrap nav-in">
@@ -208,7 +212,6 @@
 </nav>
 
 <section class="hero">
-  <canvas id="scene"></canvas>
   <div class="wrap hero-in">
     <div class="kick reveal"><span class="p"></span> Diagnóstico gratis · La Plata, Argentina</div>
     <h1 class="reveal">¿Cuántas ventas perdés por <em>no contestar a tiempo?</em></h1>
@@ -343,7 +346,7 @@
   </div>
 </section>
 
-<section id="proceso" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+<section id="proceso" style="background:rgba(10,12,20,.5);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
   <div class="wrap">
     <p class="eyebrow reveal">Cómo trabajo</p>
     <h2 class="reveal">Del primer mensaje al sistema andando</h2>
