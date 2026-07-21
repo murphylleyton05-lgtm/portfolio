@@ -18,6 +18,28 @@
 <meta property="og:image" content="https://murphylleyton05-lgtm.github.io/portfolio/img/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://murphylleyton05-lgtm.github.io/portfolio/img/og.png" />
+<meta name="keywords" content="automatización WhatsApp, chatbot IA, asistente virtual, CRM, atención al cliente automática, La Plata, Argentina, análisis de datos, dashboard, n8n, inteligencia artificial para negocios" />
+<meta name="author" content="Lleyton Murphy" />
+<link rel="canonical" href="https://murphylleyton05-lgtm.github.io/portfolio/" />
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"ProfessionalService",
+  "name":"Lleyton IA Automation",
+  "description":"Automatización de atención por WhatsApp con IA, CRM y análisis de datos para negocios y e-commerce.",
+  "areaServed":"Argentina",
+  "url":"https://murphylleyton05-lgtm.github.io/portfolio/",
+  "email":"murphylleyton05@gmail.com",
+  "founder":{"@type":"Person","name":"Lleyton Murphy"},
+  "address":{"@type":"PostalAddress","addressLocality":"La Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},
+  "sameAs":["https://linkedin.com/in/lleyton-murphy-3716093a3"],
+  "makesOffer":[
+    {"@type":"Offer","name":"Asistente WhatsApp con IA","priceCurrency":"USD","price":"300"},
+    {"@type":"Offer","name":"Sistema completo WhatsApp + CRM + IA","priceCurrency":"USD","price":"550"},
+    {"@type":"Offer","name":"Dashboard de datos","priceCurrency":"USD","price":"250"}
+  ]
+}
+</script>
 
 <style>
   :root{
@@ -192,6 +214,62 @@
   .fab{position:fixed;right:22px;bottom:22px;z-index:70;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:grid;place-items:center;font-size:27px;box-shadow:0 12px 30px rgba(37,211,102,.45);transition:transform .2s var(--e);animation:fabIn .5s var(--e) 1s both}
   .fab:hover{transform:scale(1.1)}
   @keyframes fabIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+
+  /* PARA QUIEN ES */
+  .fit{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:760px){.fit{grid-template-columns:1fr}}
+  .fit-col{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:28px}
+  .fit-col.yes{border-color:rgba(34,230,200,.35)}
+  .fit-col.no{border-color:rgba(255,92,200,.22)}
+  .fit-col h3{font-size:19px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .fit-col ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .fit-col li{color:var(--soft);font-size:15px;display:flex;gap:11px;align-items:flex-start}
+  .fit-col li::before{content:"";flex:none;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;margin-top:1px}
+  .fit-col.yes li::before{content:"✓";background:rgba(34,230,200,.15);color:var(--cy2)}
+  .fit-col.no li::before{content:"✕";background:rgba(255,92,200,.12);color:var(--pink)}
+
+  /* PRECIOS */
+  .pricing{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;align-items:stretch}
+  .price{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:32px 28px;display:flex;flex-direction:column;transition:transform .24s var(--e),border-color .24s}
+  .price:hover{transform:translateY(-6px);border-color:var(--line2)}
+  .price.feat{border-color:var(--cy);background:linear-gradient(180deg,rgba(34,230,200,.08),var(--panel))}
+  .price .badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(120deg,var(--cy),var(--vi));color:#04121a;font-family:'Space Grotesk';font-weight:700;font-size:12px;padding:6px 16px;border-radius:999px;white-space:nowrap}
+  .price h3{font-size:20px;margin-bottom:6px}
+  .price .desc{color:var(--dim);font-size:14px;margin-bottom:18px;min-height:38px}
+  .price .amt{font-family:'Space Grotesk';font-weight:700;font-size:38px;line-height:1;margin-bottom:4px}
+  .price .amt small{font-size:15px;color:var(--soft);font-weight:500}
+  .price .from{font-size:12px;color:var(--dim);margin-bottom:22px}
+  .price ul{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:26px;flex:1}
+  .price li{color:var(--soft);font-size:14.5px;display:flex;gap:10px}
+  .price li::before{content:"✓";color:var(--cy2);font-weight:700}
+  .price .btn{width:100%;justify-content:center}
+  .price-note{text-align:center;color:var(--dim);font-size:13.5px;margin-top:26px}
+
+  /* FAQ */
+  .faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+  .faq-item{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .2s}
+  .faq-item.open{border-color:var(--line2)}
+  .faq-q{width:100%;text-align:left;background:none;border:none;color:var(--ink);font-family:'Space Grotesk';font-weight:600;font-size:16.5px;padding:20px 22px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .faq-q .ar{flex:none;width:24px;height:24px;border-radius:7px;background:var(--panel2);display:grid;place-items:center;transition:transform .25s var(--e);color:var(--cy2)}
+  .faq-item.open .faq-q .ar{transform:rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s var(--e)}
+  .faq-a p{color:var(--soft);font-size:15px;padding:0 22px 20px;line-height:1.6}
+
+  /* GARANTIA */
+  .guarantee{display:flex;align-items:center;gap:22px;background:linear-gradient(120deg,rgba(34,230,200,.1),rgba(109,92,255,.1));border:1px solid var(--line2);border-radius:22px;padding:30px 32px}
+  @media(max-width:640px){.guarantee{flex-direction:column;text-align:center}}
+  .guarantee .em{font-size:44px;flex:none}
+  .guarantee h3{font-size:21px;margin-bottom:6px}
+  .guarantee p{color:var(--soft);font-size:15px}
+
+  /* BARRA CTA MOBILE */
+  .mobar{position:fixed;left:0;right:0;bottom:0;z-index:65;background:rgba(5,6,10,.92);backdrop-filter:blur(14px);border-top:1px solid var(--line2);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:none;gap:10px;align-items:center;transform:translateY(120%);transition:transform .3s var(--e)}
+  .mobar.show{transform:translateY(0)}
+  .mobar .txt{flex:1;font-size:13px;color:var(--soft);line-height:1.3}
+  .mobar .txt b{color:var(--ink);font-family:'Space Grotesk';display:block;font-size:14.5px}
+  .mobar .btn{flex:none}
+  @media(max-width:760px){.mobar{display:flex} .fab{bottom:86px}}
 </style>
 </head>
 <body>
@@ -203,9 +281,9 @@
     <div class="nav-links">
       <a href="#servicios">Servicios</a>
       <a href="#demo">Demo</a>
-      <a href="#diagnostico">Diagnóstico</a>
       <a href="#casos">Casos</a>
-      <a href="#proceso">Cómo trabajo</a>
+      <a href="#precios">Precios</a>
+      <a href="#faq">FAQ</a>
     </div>
     <a href="#contacto" class="btn btn-p btn-sm">Hablemos</a>
   </div>
@@ -346,6 +424,116 @@
   </div>
 </section>
 
+<section id="para-quien">
+  <div class="wrap">
+    <p class="eyebrow reveal">Seamos claros</p>
+    <h2 class="reveal">¿Es para vos?</h2>
+    <p class="sub reveal">Prefiero trabajar con quien de verdad le saca provecho. Fijate de qué lado estás.</p>
+    <div class="fit">
+      <div class="fit-col yes reveal">
+        <h3>✅ Sí, si...</h3>
+        <ul>
+          <li>Recibís muchas consultas por WhatsApp o Instagram y no llegás a todo.</li>
+          <li>Perdés ventas de noche o los findes por no contestar a tiempo.</li>
+          <li>Repetís siempre las mismas respuestas (precio, stock, envíos).</li>
+          <li>Querés dejar de vivir pegado al celular atendiendo.</li>
+          <li>Tenés un negocio que vende y querés ordenarlo con datos.</li>
+        </ul>
+      </div>
+      <div class="fit-col no reveal">
+        <h3>🚫 Todavía no, si...</h3>
+        <ul>
+          <li>Recién arrancás y aún no tenés flujo de consultas.</li>
+          <li>Buscás lo más barato sin importar el resultado.</li>
+          <li>No estás dispuesto a mostrarme cómo funciona tu negocio.</li>
+          <li>Querés un "robot" que reemplace todo el trato humano (no es la idea).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="precios" style="background:rgba(10,12,20,.42);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <p class="eyebrow reveal">Inversión</p>
+    <h2 class="reveal">Precios claros, sin sorpresas</h2>
+    <p class="sub reveal">Pago único por el sistema — es tuyo, sin mensualidades de software obligatorias. El diagnóstico para saber qué te conviene es gratis.</p>
+    <div class="pricing">
+      <div class="price reveal">
+        <h3>Asistente WhatsApp</h3>
+        <p class="desc">El bot con IA que contesta solo, 24/7.</p>
+        <div class="amt">USD 300<small></small></div>
+        <div class="from">pago único · desde</div>
+        <ul>
+          <li>Responde precio, stock, envíos y pagos</li>
+          <li>IA que conversa (no un menú fijo)</li>
+          <li>Deriva a humano cuando hace falta</li>
+          <li>Puesta en marcha y capacitación</li>
+        </ul>
+        <a class="btn btn-g" href="#diagnostico">Empezar</a>
+      </div>
+      <div class="price feat reveal">
+        <div class="badge">★ Más elegido</div>
+        <h3>Sistema completo</h3>
+        <p class="desc">Atención + CRM + seguimiento, todo integrado.</p>
+        <div class="amt">USD 550<small></small></div>
+        <div class="from">pago único · desde</div>
+        <ul>
+          <li>Todo lo del Asistente WhatsApp</li>
+          <li>CRM: cada lead ordenado por etapa</li>
+          <li>Seguimiento y recordatorios automáticos</li>
+          <li>Panel de control de tu negocio</li>
+          <li>Soporte los primeros 30 días</li>
+        </ul>
+        <a class="btn btn-p" href="#diagnostico">Quiero este</a>
+      </div>
+      <div class="price reveal">
+        <h3>Dashboard de datos</h3>
+        <p class="desc">Tus números en una pantalla, en tiempo real.</p>
+        <div class="amt">USD 250<small></small></div>
+        <div class="from">pago único · desde</div>
+        <ul>
+          <li>Ventas, canales y consultas en vivo</li>
+          <li>Productos top y alertas accionables</li>
+          <li>Se conecta a lo que ya usás</li>
+          <li>Diseño a medida de tu negocio</li>
+        </ul>
+        <a class="btn btn-g" href="#diagnostico">Empezar</a>
+      </div>
+    </div>
+    <p class="price-note reveal">¿Necesitás algo a medida? También armo soluciones personalizadas. Contame en el diagnóstico y lo cotizamos juntos.</p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap h-center">
+    <p class="eyebrow reveal">Dudas frecuentes</p>
+    <h2 class="reveal">Lo que todos me preguntan</h2>
+    <p class="sub reveal">Si te queda otra duda, escribime y te la respondo sin vueltas.</p>
+    <div class="faq">
+      <div class="faq-item reveal"><button class="faq-q">¿Es complicado? No sé nada de tecnología <span class="ar">+</span></button><div class="faq-a"><p>Para nada. Vos no tocás nada técnico: yo armo todo, lo dejo funcionando y te enseño a usarlo en simple. Si sabés usar WhatsApp, sabés usar esto.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">¿Mis datos y los de mis clientes están seguros? <span class="ar">+</span></button><div class="faq-a"><p>Sí. Uso herramientas serias y la información queda bajo tu control, no la vendo ni la comparto. La privacidad es una prioridad, no un detalle.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">¿Cuánto tarda en estar andando? <span class="ar">+</span></button><div class="faq-a"><p>Entre 5 y 7 días hábiles desde que arrancamos, según la complejidad. Te muestro todo antes de activarlo.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">¿El bot reemplaza a mi equipo? <span class="ar">+</span></button><div class="faq-a"><p>No. Se encarga de lo repetitivo y de las consultas fuera de horario, y te pasa a vos (o a tu equipo) las charlas importantes. Potencia el trato humano, no lo elimina.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">¿Tengo que pagar una mensualidad? <span class="ar">+</span></button><div class="faq-a"><p>El sistema es pago único: es tuyo. Solo pagás el servidor donde corre (unos pocos dólares al mes) y, si querés, un mantenimiento opcional para mejoras continuas.</p></div></div>
+      <div class="faq-item reveal"><button class="faq-q">¿Y si no me sirve? <span class="ar">+</span></button><div class="faq-a"><p>El diagnóstico es gratis y sin compromiso. Recién avanzamos si a los dos nos cierra. No te vendo algo que no vayas a aprovechar.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="garantia">
+  <div class="wrap">
+    <div class="guarantee reveal">
+      <div class="em">🛡️</div>
+      <div>
+        <h3>El diagnóstico es gratis. Sin riesgo.</h3>
+        <p>Analizamos tu negocio sin costo y sin compromiso. Solo avanzás si ves claro cómo te va a ayudar. Cero letra chica.</p>
+      </div>
+      <a class="btn btn-p" href="#diagnostico" style="flex:none">Hacer mi diagnóstico</a>
+    </div>
+  </div>
+</section>
+
 <section id="proceso" style="background:rgba(10,12,20,.5);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
   <div class="wrap">
     <p class="eyebrow reveal">Cómo trabajo</p>
@@ -387,6 +575,11 @@
 </footer>
 
 <a class="fab" href="https://wa.me/5492214972160?text=Hola%20Lleyton!%20Vi%20tu%20web%20y%20quiero%20automatizar%20mi%20negocio" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a>
+
+<div class="mobar" id="mobar">
+  <div class="txt"><b>Diagnóstico gratis</b>Descubrí cuánto estás perdiendo</div>
+  <a class="btn btn-p btn-sm" href="#diagnostico">Empezar →</a>
+</div>
 
 <script src="./three.min.js"></script>
 <script>
@@ -544,6 +737,31 @@
   document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(Math.min(i,4)*70)+'ms';io.observe(el);});
   const nav=document.getElementById('nav');addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>10),{passive:true});
   document.querySelectorAll('.card').forEach(c=>c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');}));
+})();
+
+/* ============ FAQ ACORDEON ============ */
+(function(){
+  document.querySelectorAll('.faq-item').forEach(item=>{
+    const q=item.querySelector('.faq-q'),a=item.querySelector('.faq-a');
+    q.addEventListener('click',()=>{
+      const open=item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(o=>{o.classList.remove('open');o.querySelector('.faq-a').style.maxHeight=null;});
+      if(!open){item.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+    });
+  });
+})();
+
+/* ============ BARRA CTA MOBILE ============ */
+(function(){
+  const bar=document.getElementById('mobar');if(!bar)return;
+  const diag=document.getElementById('diagnostico'),contacto=document.getElementById('contacto');
+  addEventListener('scroll',()=>{
+    const show=scrollY>640;
+    // ocultar cuando el usuario ya esta en diagnostico o contacto
+    let over=false;
+    [diag,contacto].forEach(s=>{if(s){const r=s.getBoundingClientRect();if(r.top<innerHeight*.7&&r.bottom>0)over=true;}});
+    bar.classList.toggle('show', show && !over);
+  },{passive:true});
 })();
 </script>
 </body>
