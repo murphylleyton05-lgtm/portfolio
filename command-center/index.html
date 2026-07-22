@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lleyton · Command Center — Cockpit de ventas</title>
+<title>Velion · Command Center — Cockpit de ventas</title>
 <meta name="description" content="CRM personal de ventas: pipeline, embudo, seguimiento, objetivo mensual y proyección de ingresos." />
 <style>
   :root{
@@ -126,7 +126,7 @@
 <div class="wrap">
   <div class="top">
     <div class="brand"><div class="lg">🎯</div>
-      <div><h1>Command Center</h1><span>Tu cockpit de ventas · Lleyton IA Automation</span></div>
+      <div><h1>Command Center</h1><span>Tu cockpit de ventas · Velion</span></div>
     </div>
     <div class="acts-top">
       <button class="icon" title="Moneda" onclick="toggleCur()" id="curBtn">US$</button>
@@ -177,19 +177,19 @@
   <details>
     <summary>💬 Mis plantillas de mensajes</summary>
     <div class="tpl"><h4>Opener — Instagram / WhatsApp</h4><p id="t1">Hola! Una consulta rápida: las de precios y stock por DM, ¿las contestás vos o tenés a alguien?</p><button onclick="cp('t1',this)">Copiar</button></div>
-    <div class="tpl"><h4>Follow-up — pidió precio (ej. Marcos)</h4><p id="t2">Cómo andás. Quedó picando lo del sistema con el CRM. Cualquier duda del presupuesto o de cómo funciona, me decís y lo vemos. Si querés, en una llamada corta te muestro cómo quedaría andando. Sin apuro.</p><button onclick="cp('t2',this)">Copiar</button></div>
+    <div class="tpl"><h4>Follow-up — pidió precio</h4><p id="t2">Cómo andás. Quedó picando lo del sistema con el CRM. Cualquier duda del presupuesto o de cómo funciona, me decís y lo vemos. Si querés, en una llamada corta te muestro cómo quedaría andando. Sin apuro.</p><button onclick="cp('t2',this)">Copiar</button></div>
     <div class="tpl"><h4>Cierre suave — lead dormido</h4><p id="t3">¿Seguís con la idea de armarlo o lo pausamos por ahora? Cualquier respuesta está bien, es solo para saber cómo seguir.</p><button onclick="cp('t3',this)">Copiar</button></div>
-    <div class="tpl"><h4>Email en frío — tiendas</h4><p id="t4">Hola [nombre]! Vi que en [tienda] manejan un montón de consultas por WhatsApp e Instagram. Ayudo a tiendas como la tuya a que un asistente con IA responda todo eso al instante y 24/7, así no se pierden ventas. Si te interesa te muestro un ejemplo hecho para tu tienda, sin compromiso. ¿Te lo paso? — Lleyton</p><button onclick="cp('t4',this)">Copiar</button></div>
+    <div class="tpl"><h4>Email en frío — tiendas</h4><p id="t4">Hola [nombre]! Vi que en [tienda] manejan un montón de consultas por WhatsApp e Instagram. Ayudo a tiendas como la tuya a que un asistente con IA responda todo eso al instante y 24/7, así no se pierden ventas. Si te interesa te muestro un ejemplo hecho para tu tienda, sin compromiso. ¿Te lo paso? — Velion</p><button onclick="cp('t4',this)">Copiar</button></div>
   </details>
 
-  <p class="foot-note">Se guarda en tu navegador. Arrastrá tarjetas entre columnas. Hacé "Backup" seguido para no perder datos. · Lleyton IA Automation</p>
+  <p class="foot-note">Se guarda en tu navegador. Arrastrá tarjetas entre columnas. Hacé "Backup" seguido para no perder datos. · Velion</p>
 </div>
 
 <div class="ov" id="ov"><div class="modal">
   <h2 id="mtitle">Nuevo prospecto</h2>
   <input type="hidden" id="f_id">
-  <label>Negocio</label><input id="f_biz" placeholder="Ej. Xelvia Store">
-  <label>Contacto / handle</label><input id="f_con" placeholder="Ej. Marcos · @xelviastore">
+  <label>Negocio</label><input id="f_biz" placeholder="Ej. Boutique Aurora">
+  <label>Contacto / handle</label><input id="f_con" placeholder="Ej. Camila · @boutiqueaurora">
   <div class="rowg">
     <div><label>Canal</label><select id="f_ch"><option>Instagram</option><option>WhatsApp</option><option>Email</option><option>LinkedIn</option><option>Referido</option></select></div>
     <div><label>Valor (USD)</label><input id="f_val" type="number" placeholder="400"></div>
@@ -217,34 +217,18 @@ const STAGES=[
 const KEY='lleyton.cc.v6', SET='lleyton.cc.settings';
 function tp(d){const t=new Date();t.setDate(t.getDate()+d);return t.toISOString().slice(0,10)}
 const seed=[
-  {id:'p1',biz:'Xelvia Store',con:'Marcos · dueño',ch:'WhatsApp',val:400,stage:'negociacion',fu:tp(4),note:'Dijo "esto te lo compro" (USD 400, WhatsApp+CRM). Le mandé el sistema+seña (3/7) y que ya arranqué (lunes) — sin respuesta (tiene visto desactivado). Le reabrí ofreciendo preview del dashboard, sin mencionar plata. Dashboard = upsell (USD 180/300).',link:'',hot:true,log:[{d:tp(-7),t:'Le expliqué el sistema y le pedí la seña'},{d:tp(-4),t:'Le avisé que ya empecé + recordé la seña'},{d:tp(0),t:'Reabrí con preview del dashboard (sin hablar de plata)'}]},
-  {id:'p14',biz:'Koala Consulting',con:'Franco · dueño',ch:'WhatsApp',val:300,stage:'negociacion',fu:tp(5),note:'Le armé un kanban para leads, le gustó ("bien logrado"). Quedó en escribirme, le hice follow-up. AHORA quedamos en hablar la semana que viene. Upsell: automatizar carga de leads.',link:'',hot:true,log:[{d:tp(-18),t:'Le mostré el kanban, le gustó'},{d:tp(-3),t:'Follow-up para retomar'},{d:tp(0),t:'Quedamos en hablar la semana que viene'}]},
-  {id:'p2',biz:'Axentra OS',con:'Reclutador · Agency Partnerships',ch:'LinkedIn',val:0,stage:'negociacion',fu:tp(1),note:'Respondí sus 3 preguntas. Esperando llamada.',link:'',hot:true,log:[{d:tp(-1),t:'Respondí las 3 preguntas del reclutador'}]},
-  {id:'p3',biz:'_todo_digital_',con:'@_todo_digital_ · San Juan',ch:'Instagram',val:300,stage:'contactado',fu:tp(1),note:'Contestó un bot. Mandé mensaje para que salte un humano.',link:'https://instagram.com/_todo_digital_',hot:false,log:[]},
-  {id:'p4',biz:'allbeauty.usa',con:'@allbeauty.usa',ch:'Instagram',val:300,stage:'contactado',fu:tp(1),note:'Opener enviado.',link:'https://instagram.com/allbeauty.usa',hot:false,log:[]},
-  {id:'p5',biz:'importedskincare',con:'@importedskincare',ch:'Instagram',val:300,stage:'contactado',fu:tp(2),note:'Opener enviado.',link:'https://instagram.com/importedskincare',hot:false,log:[]},
-  {id:'p6',biz:'romaarg_',con:'@romaarg_ · indumentaria',ch:'Instagram',val:300,stage:'contactado',fu:tp(2),note:'Opener enviado.',link:'https://instagram.com/romaarg_',hot:false,log:[]},
-  {id:'p7',biz:'MimaQueen',con:'makeup importado',ch:'Instagram',val:300,stage:'contactado',fu:tp(2),note:'Opener enviado.',link:'',hot:false,log:[]},
-  {id:'p8',biz:'Nutrishop',con:'suplementos + indumentaria',ch:'Email',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Todavía sin contactar. Email en /contacto.',link:'https://nutrishop.com.ar/contacto/',hot:false,log:[]},
-  {id:'p9',biz:'Stier Suplementos',con:'@stiersuplementos',ch:'Instagram',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Sin contactar.',link:'https://instagram.com/stiersuplementos',hot:false,log:[]},
-  {id:'p10',biz:'Goodfitness',con:'suplementos fitness',ch:'Email',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Sin contactar.',link:'https://goodfitness.com.ar/contacto/',hot:false,log:[]},
-  {id:'p11',biz:'Mixitup',con:'suplementos (CABA)',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). WhatsApp mayorista: +54 9 11 2801-3068.',link:'https://www.mixitup.com.ar/contacto/',hot:false,log:[]},
-  {id:'p12',biz:'Nutrición Muscular',con:'suplementos (Mendoza)',ch:'Email',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 (fitness). Sin contactar.',link:'https://nutricionmuscular.com.ar/',hot:false,log:[]},
-  {id:'p13',biz:'Anitel Indumentaria',con:'@la_plata_as_indumentaria · La Plata',ch:'Instagram',val:300,stage:'nuevo',fu:tp(1),note:'Tanda 2 — local de tu zona (La Plata). Sin contactar.',link:'https://instagram.com/la_plata_as_indumentaria',hot:false,log:[]},
-  {id:'p15',biz:'Fragos Indumentaria',con:'Ropa de hombre · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Sacar WhatsApp/IG de la tienda. Gancho: entregas en La Plata + atención al instante.',link:'https://fragosindumentaria2.mitiendanube.com/',hot:false,log:[]},
-  {id:'p16',biz:'Pipa & Nala',con:'Ropa cómoda hecha en La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Gancho: marca platense, "soy de acá".',link:'https://pipanala.mitiendanube.com/',hot:false,log:[]},
-  {id:'p17',biz:'Medusa Indumentaria',con:'Calle 12 #1143 · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Tienen local físico — ofrecer reunión en persona.',link:'https://medusaindumentaria.mitiendanube.com/',hot:false,log:[]},
-  {id:'p18',biz:'Punto Sur',con:'Remeras/apparel · envíos La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Gancho: envíos gratis a La Plata.',link:'https://puntosurlp.mitiendanube.com/',hot:false,log:[]},
-  {id:'p19',biz:'Indumentaria De Barrio',con:'Ropa · 6 cuotas MercadoPago',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 3 (Tienda Nube La Plata). Gancho: venden en cuotas, mucho volumen de consultas.',link:'https://indumentariadebarrio2.mitiendanube.com/',hot:false,log:[]},
-  {id:'p20',biz:'Nativo Delivery',con:'Casa de comidas · La Plata',ch:'Instagram',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). Toma pedidos por WhatsApp/tel todos los días. Gancho: asistente que toma pedidos solo sin que se te escape ninguno en hora pico.',link:'https://www.instagram.com/nativodeliverylp/',hot:false,log:[]},
-  {id:'p21',biz:'El Buen Gusto',con:'Casa de comidas desde 1989 · La Plata',ch:'Instagram',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). Piden por teléfono/WhatsApp. Gancho: modernizar la toma de pedidos sin perder el trato de siempre.',link:'https://www.instagram.com/elbuengustolp/',hot:false,log:[]},
-  {id:'p22',biz:"Alfre'dos Casa de Comidas",con:'Delivery propio · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). Ya tienen web de pedidos (alfredospedidos.com) = valoran la tecnología. Gancho: sumar asistente de WhatsApp que responde y ordena pedidos.',link:'https://alfredospedidos.com/',hot:false,log:[]},
-  {id:'p23',biz:'El Perla',con:'Casa de comidas · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). Abierto todos los días 8-23:30, piden por WhatsApp. Gancho: en 15hs de atención se escapan consultas — el asistente las cubre.',link:'https://www.facebook.com/ElPerla.Comidas/',hot:false,log:[]},
-  {id:'p24',biz:'Piatto Pronto',con:'Delivery · La Plata',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Tanda 4 (gastronomía LP). WhatsApp 221 673-5730. Gancho: automatizar la toma de pedidos por WhatsApp.',link:'https://www.facebook.com/PiattoprontoLP/',hot:false,log:[]},
-  {id:'s1',biz:'[SOCIO] Directorio Especialistas Tiendanube',con:'Freelancers que arman tiendas',ch:'Web',val:0,stage:'nuevo',fu:tp(0),note:'PARTNERSHIP. Elegir 5 freelancers chicos del directorio y ofrecer sociedad (comisión por cliente). Ellos arman la tienda, yo la automatización.',link:'https://www.tiendanube.com/especialistas',hot:true,log:[]},
-  {id:'s2',biz:'[SOCIO] TradeWeb',con:'Agencia diseño Tiendanube',ch:'Web',val:0,stage:'nuevo',fu:tp(0),note:'PARTNERSHIP. Agencia argentina. Proponer sumar automatización WhatsApp+CRM a sus entregas.',link:'https://tradeweb.com.ar/diseno-tiendanube/',hot:false,log:[]},
-  {id:'s3',biz:'[SOCIO] Bloop',con:'Partner oficial Tiendanube',ch:'Web',val:0,stage:'nuevo',fu:tp(0),note:'PARTNERSHIP. Proponer alianza: yo pongo la capa de automatización que no ofrecen.',link:'https://bloop.agency/partners-tiendanube.php',hot:false,log:[]},
-  {id:'s4',biz:'[SOCIO] Imactions',con:'Diseño tiendas Tiendanube',ch:'Web',val:0,stage:'nuevo',fu:tp(0),note:'PARTNERSHIP. Misma propuesta de sociedad por comisión.',link:'https://imactions.agency/tiendanube/',hot:false,log:[]},
+  {id:'p1',biz:'Boutique Aurora',con:'Camila · dueña',ch:'WhatsApp',val:550,stage:'negociacion',fu:tp(2),note:'Le mostré el demo del asistente y quedó muy interesada. Pidió presupuesto del sistema completo. Cerrar esta semana.',link:'',hot:true,log:[{d:tp(-5),t:'Demo del asistente enviado'},{d:tp(-1),t:'Pidió presupuesto completo'}]},
+  {id:'p2',biz:'Café Central',con:'Martín · encargado',ch:'Instagram',val:300,stage:'negociacion',fu:tp(3),note:'Reciben muchos pedidos por DM y se les escapan en hora pico. Interesados en el asistente de WhatsApp.',link:'',hot:true,log:[{d:tp(-3),t:'Primera charla, detectamos el dolor'}]},
+  {id:'p3',biz:'Pet Store Luna',con:'@petstoreluna',ch:'Instagram',val:300,stage:'contactado',fu:tp(1),note:'Opener enviado, esperando respuesta.',link:'',hot:false,log:[]},
+  {id:'p4',biz:'Deco Hogar',con:'Sofía',ch:'WhatsApp',val:250,stage:'contactado',fu:tp(2),note:'Interesada en un dashboard de ventas. Coordinar demo.',link:'',hot:false,log:[]},
+  {id:'p5',biz:'Indumentaria Norte',con:'@indunorte',ch:'Instagram',val:300,stage:'contactado',fu:tp(1),note:'Contestó, agendar llamada corta.',link:'',hot:false,log:[]},
+  {id:'p6',biz:'Farmacia del Pueblo',con:'Diego',ch:'Email',val:550,stage:'nuevo',fu:tp(0),note:'Prospecto nuevo. Ofrecer sistema de turnos + WhatsApp.',link:'',hot:false,log:[]},
+  {id:'p7',biz:'Estética Bella',con:'@esteticabella',ch:'Instagram',val:300,stage:'nuevo',fu:tp(0),note:'Toman turnos por DM. Gancho: asistente que agenda solo.',link:'',hot:false,log:[]},
+  {id:'p8',biz:'Rotisería El Sabor',con:'Rodrigo',ch:'WhatsApp',val:300,stage:'nuevo',fu:tp(0),note:'Delivery con muchos pedidos. Automatizar la toma de pedidos.',link:'',hot:false,log:[]},
+  {id:'p9',biz:'Kiosco 24hs',con:'@kiosco24',ch:'Instagram',val:250,stage:'nuevo',fu:tp(1),note:'Consultas de stock constantes. Bot de respuestas automáticas.',link:'',hot:false,log:[]},
+  {id:'p10',biz:'Gimnasio Force',con:'Lucía · recepción',ch:'WhatsApp',val:550,stage:'nuevo',fu:tp(1),note:'Muchas consultas de precios y horarios. Sistema completo.',link:'',hot:false,log:[]},
+  {id:'p11',biz:'Óptica Visión',con:'Pablo',ch:'Email',val:300,stage:'nuevo',fu:tp(2),note:'Prospecto nuevo. Ofrecer CRM + recordatorios de turnos.',link:'',hot:false,log:[]},
+  {id:'p12',biz:'Vivero Verde',con:'@viveroverde',ch:'Instagram',val:250,stage:'nuevo',fu:tp(2),note:'Consultas de disponibilidad. Bot de stock.',link:'',hot:false,log:[]},
 ];
 let data=load(), settings=loadSet();
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):seed.slice()}catch(e){return seed.slice()}}
@@ -385,7 +369,7 @@ function exportCSV(){const h=['Negocio','Contacto','Canal','Valor','Etapa','Segu
   dl([h.join(','),...rows].join('\n'),'prospectos.csv','text/csv')}
 function exportICS(){let ev='';data.filter(p=>p.fu&&!['cerrado','descartado'].includes(p.stage)).forEach(p=>{const d=p.fu.replace(/-/g,'');
   ev+=`BEGIN:VEVENT\nUID:${p.id}@lleyton\nDTSTART;VALUE=DATE:${d}\nSUMMARY:Seguir: ${p.biz}\nDESCRIPTION:${(p.note||'').replace(/\n/g,' ')}\nEND:VEVENT\n`});
-  dl(`BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Lleyton//CommandCenter//ES\n${ev}END:VCALENDAR`,'seguimientos.ics','text/calendar')}
+  dl(`BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Velion//CommandCenter//ES\n${ev}END:VCALENDAR`,'seguimientos.ics','text/calendar')}
 function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();
   r.onload=()=>{try{const d=JSON.parse(r.result);if(Array.isArray(d)){data=d;save();alert('Datos importados ✓')}else alert('Archivo inválido')}catch(err){alert('No se pudo leer el archivo')}};r.readAsText(f)}
 function dl(txt,name,type){const b=new Blob([txt],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
