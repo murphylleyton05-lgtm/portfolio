@@ -7,14 +7,14 @@
 <meta name="description" content="CRM personal de ventas: pipeline, embudo, seguimiento, objetivo mensual y proyección de ingresos." />
 <style>
   :root{
-    --bg:#0a0b13;--bg2:#12141f;--card:#171a29;--card2:#1d2131;--border:rgba(255,255,255,.08);
-    --text:#eef0fb;--soft:#9aa0c0;--primary:#7c5cff;--primary2:#9d84ff;--accent:#28d9b0;
+    --bg:#000000;--bg2:#0a0d0c;--card:#0f1311;--card2:#141a17;--border:rgba(255,255,255,.08);
+    --text:#ffffff;--soft:#9aa39f;--primary:#17c79a;--primary2:#3ee7bd;--accent:#28d9b0;
     --warn:#ffb454;--danger:#ff6b81;--radius:14px;
   }
   :root[data-theme="light"]{--bg:#eef0f7;--bg2:#fff;--card:#fff;--card2:#f1f2f8;--border:rgba(20,22,45,.1);--text:#161829;--soft:#5c6180}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--text);
-    background:radial-gradient(1000px 500px at 5% -10%,rgba(124,92,255,.20),transparent 55%),
+    background:radial-gradient(1000px 500px at 5% -10%,rgba(23,199,154,.20),transparent 55%),
     radial-gradient(800px 400px at 100% 0,rgba(40,217,176,.12),transparent 50%),var(--bg);
     min-height:100vh;padding:20px;font-size:15px;transition:background .3s,color .3s}
   .wrap{max-width:1280px;margin:0 auto}
@@ -69,7 +69,7 @@
   .rate{width:80px}
   .board{display:grid;grid-template-columns:repeat(6,minmax(210px,1fr));gap:12px;overflow-x:auto;padding-bottom:12px}
   .col{background:rgba(127,127,160,.05);border:1px solid var(--border);border-radius:var(--radius);padding:11px;min-height:200px;transition:background .15s}
-  .col.drag{background:rgba(124,92,255,.12);border-color:var(--primary)}
+  .col.drag{background:rgba(23,199,154,.12);border-color:var(--primary)}
   .col h3{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--soft);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
   .col h3 .cnt{background:var(--card2);border-radius:20px;padding:1px 9px;font-size:11px;color:var(--text)}
   .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
@@ -106,7 +106,7 @@
   .hist .h b{color:var(--text)}
   .modal .foot{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
   .foot-note{text-align:center;color:var(--soft);font-size:12px;margin-top:20px}
-  .game{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,rgba(124,92,255,.12),rgba(40,217,176,.08));border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;margin-bottom:14px;flex-wrap:wrap}
+  .game{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,rgba(23,199,154,.12),rgba(40,217,176,.08));border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;margin-bottom:14px;flex-wrap:wrap}
   .lvl{display:flex;align-items:center;gap:8px}
   .lvl .badge{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-weight:850;border-radius:9px;padding:4px 10px;font-size:12.5px}
   .lvl .nm{font-weight:800;font-size:14px}
@@ -208,7 +208,7 @@
 <script>
 const STAGES=[
   {id:'nuevo',name:'Nuevo',color:'#9aa0c0',prob:5},
-  {id:'contactado',name:'Contactado',color:'#7c5cff',prob:15},
+  {id:'contactado',name:'Contactado',color:'#17c79a',prob:15},
   {id:'respondio',name:'Respondió',color:'#4d9dff',prob:35},
   {id:'negociacion',name:'Demo / Negociación',color:'#ffb454',prob:60},
   {id:'cerrado',name:'Cerrado',color:'#28d9b0',prob:100},
