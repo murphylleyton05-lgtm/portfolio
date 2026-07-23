@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://murphylleyton05-lgtm.github.io/portfolio/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://murphylleyton05-lgtm.github.io/portfolio/xelvia/</loc><priority>0.7</priority></url>
-  <url><loc>https://murphylleyton05-lgtm.github.io/portfolio/crm/</loc><priority>0.6</priority></url>
-  <url><loc>https://murphylleyton05-lgtm.github.io/portfolio/echonotes/</loc><priority>0.6</priority></url>
-  <url><loc>https://murphylleyton05-lgtm.github.io/portfolio/vuelto/</loc><priority>0.6</priority></url>
+  <url><loc>https://velionstudio.netlify.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://velionstudio.netlify.app/xelvia/</loc><priority>0.7</priority></url>
+  <url><loc>https://velionstudio.netlify.app/crm/</loc><priority>0.6</priority></url>
+  <url><loc>https://velionstudio.netlify.app/echonotes/</loc><priority>0.6</priority></url>
+  <url><loc>https://velionstudio.netlify.app/vuelto/</loc><priority>0.6</priority></url>
 </urlset>
