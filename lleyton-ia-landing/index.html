@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Velion — Tu negocio, siempre encendido</title>
 <meta name="description" content="Asistentes de IA que responden a tus clientes al instante por WhatsApp, ordenan tus leads y te muestran los números. Probá el asistente en vivo, gratis." />
-<meta name="theme-color" content="#05060a" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236d5cff'/%3E%3Cstop offset='1' stop-color='%2322e6c8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='%23070912'/%3E%3Cpath d='M50 22 L78 50 L50 78 L22 50 Z' fill='url(%23g)'/%3E%3C/svg%3E" />
+<meta name="theme-color" content="#000000" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%23000'/%3E%3Cpath d='M22 30 L44 30 L64 84 L54 96 Z' fill='%23fff'/%3E%3Cpath d='M64 84 L82 40 L98 40 L74 96 Z' fill='%23fff'/%3E%3Cpath d='M84 22 L104 22 L98 38 L78 38 Z' fill='%2317c79a'/%3E%3Cpath d='M88 8 L108 8 L104 18 L84 18 Z' fill='%2317c79a'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -43,10 +43,10 @@
 
 <style>
   :root{
-    --bg:#05060a; --bg2:#0a0c14; --panel:rgba(255,255,255,.035); --panel2:rgba(255,255,255,.06);
-    --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.15);
-    --ink:#f3f5ff; --soft:#9aa0c0; --dim:#6b7196;
-    --cy:#22e6c8; --cy2:#5cffe4; --vi:#6d5cff; --vi2:#9c8dff; --pink:#ff5cc8;
+    --bg:#000000; --bg2:#0a0d0c; --panel:rgba(255,255,255,.04); --panel2:rgba(255,255,255,.07);
+    --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+    --ink:#ffffff; --soft:#9aa39f; --dim:#6b746f;
+    --cy:#17c79a; --cy2:#3ee7bd; --vi:#0fae84; --vi2:#2ad2a6; --pink:#17c79a;
     --r:18px; --e:cubic-bezier(.22,.61,.36,1);
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -68,8 +68,7 @@
   nav.scrolled{background:rgba(5,6,10,.75);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
   .nav-in{display:flex;align-items:center;justify-content:space-between;height:70px}
   .logo{display:flex;align-items:center;gap:11px;font-family:'Space Grotesk';font-weight:700;font-size:18px}
-  .logo .mk{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:17px;
-    background:conic-gradient(from 210deg,var(--vi),var(--cy),var(--vi));box-shadow:0 0 22px rgba(109,92,255,.5)}
+  .logo .mk{width:34px;height:34px;display:block;filter:drop-shadow(0 0 14px rgba(23,199,154,.4))}
   .logo b{background:linear-gradient(100deg,var(--cy2),var(--vi2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   .nav-links{display:flex;gap:30px;font-size:14.5px;color:var(--soft)}
   .nav-links a{position:relative;transition:color .2s}
@@ -292,7 +291,7 @@
 
 <nav id="nav">
   <div class="wrap nav-in">
-    <div class="logo"><span class="mk">◆</span> <b>Velion</b></div>
+    <div class="logo"><svg class="mk" viewBox="0 0 120 120" fill="none" aria-hidden="true"><path d="M22 30 L44 30 L64 84 L54 96 Z" fill="#fff"/><path d="M64 84 L82 40 L98 40 L74 96 Z" fill="#fff"/><path d="M84 22 L104 22 L98 38 L78 38 Z" fill="#17c79a"/><path d="M88 8 L108 8 L104 18 L84 18 Z" fill="#17c79a"/></svg> <b>Velion</b></div>
     <div class="nav-links">
       <a href="#servicios">Servicios</a>
       <a href="#demo">Demo</a>
@@ -663,13 +662,13 @@
     g.fillStyle=grd;g.beginPath();g.arc(32,32,32,0,7);g.fill();
     const tx=new THREE.Texture(c);tx.needsUpdate=true;return tx;
   }
-  const mat = new THREE.PointsMaterial({size:.55,map:dot(1,'rgba(120,255,235,1)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.95});
+  const mat = new THREE.PointsMaterial({size:.55,map:dot(1,'rgba(62,231,189,1)'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.95});
   const points = new THREE.Points(geo,mat);
   scene.add(points);
 
   // ---- líneas (conexiones cercanas)
   const lgeo = new THREE.BufferGeometry();
-  const lmat = new THREE.LineBasicMaterial({color:0x6d5cff,transparent:true,opacity:.22,blending:THREE.AdditiveBlending});
+  const lmat = new THREE.LineBasicMaterial({color:0x0fae84,transparent:true,opacity:.24,blending:THREE.AdditiveBlending});
   const lines = new THREE.LineSegments(lgeo,lmat);
   scene.add(lines);
   const LINK = 4.6;
