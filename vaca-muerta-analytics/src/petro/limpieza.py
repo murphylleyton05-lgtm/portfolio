@@ -114,7 +114,8 @@ def _unificar_duplicadas(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(salida, index=df.index)
 
 
-def normalizar(df_crudo: pd.DataFrame, dias_minimos: float = 1.0) -> pd.DataFrame:
+def normalizar(df_crudo: pd.DataFrame, dias_minimos: float = 1.0,
+               mostrar_columnas: bool = False) -> pd.DataFrame:
     """
     Convierte el CSV oficial al esquema normalizado.
 
@@ -142,6 +143,16 @@ def normalizar(df_crudo: pd.DataFrame, dias_minimos: float = 1.0) -> pd.DataFram
 
     presentes = {k: v for k, v in COLUMNAS_OFICIALES.items() if k in df.columns}
     df = df.rename(columns=presentes)
+
+    # El renombrado tambien puede generar duplicados: si el CSV trae la columna
+    # `formprod` Y una `formacion`, ambas terminan llamandose `formacion`.
+    # Con un solo archivo de entrada este fue el caso real que rompio el
+    # pipeline, asi que unificamos de nuevo despues de renombrar.
+    df = _unificar_duplicadas(df)
+
+    if mostrar_columnas:
+        print(f"   columnas del archivo ({len(df.columns)}): "
+              f"{', '.join(sorted(df.columns))}")
 
     faltantes = {"id_pozo", "prod_petroleo_m3"} - set(df.columns)
     if faltantes:

@@ -42,7 +42,9 @@ def main() -> None:
         print(ingesta.buscar_datasets(args.buscar).to_string(index=False))
         return
 
-    slug = ingesta.DATASETS[args.dataset]
+    # resolver_slug() prueba el slug configurado y, si el portal lo renombro,
+    # lo busca. Usar DATASETS[...] directo hace que un renombre tire todo abajo.
+    slug = ingesta.resolver_slug(args.dataset)
     print(f"Dataset: {args.dataset}  ({slug})\n")
 
     recursos = ingesta.listar_recursos(slug)

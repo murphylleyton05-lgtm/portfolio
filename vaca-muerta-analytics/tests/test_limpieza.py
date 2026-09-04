@@ -169,3 +169,22 @@ def test_el_cruce_produccion_fractura_matchea():
     }))
 
     assert set(prod["id_pozo"]) == set(frac["id_pozo"]), "los id no matchean"
+
+
+def test_el_renombrado_no_puede_crear_columnas_duplicadas():
+    """
+    Segundo caso real, con UN SOLO archivo de entrada: el CSV trae `formprod`
+    y tambien `formacion`. El mapeo manda formprod -> formacion, y quedan dos
+    columnas `formacion`. El error resultante ('DataFrame' object has no
+    attribute 'str') no dice nada sobre la causa.
+    """
+    crudo = pd.DataFrame({
+        "idpozo": [1], "anio": [2024], "mes": [3],
+        "prod_pet": [3000.0], "tef": [10.0],
+        "formprod": ["VMUT"], "formacion": [None],
+    })
+    df = limpieza.normalizar(crudo)
+
+    assert list(df.columns).count("formacion") == 1
+    assert df["formacion"].iloc[0] == "VMUT"
+    assert df["caudal_petroleo_m3d"].iloc[0] == pytest.approx(300.0)

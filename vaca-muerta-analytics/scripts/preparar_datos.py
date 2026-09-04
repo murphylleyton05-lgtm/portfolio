@@ -109,7 +109,7 @@ def main() -> None:
 
     # --- 2. Normalizar ---
     print("\n2) Normalizando esquema y calculando caudales diarios")
-    df = limpieza.normalizar(crudo)
+    df = limpieza.normalizar(crudo, mostrar_columnas=True)
     print(f"   {len(df):,} filas pozo-mes | {df['id_pozo'].nunique():,} pozos")
     print(f"   periodo: {df['fecha'].min():%Y-%m} a {df['fecha'].max():%Y-%m}")
 
