@@ -101,19 +101,19 @@ Este bloque lo reescribe el workflow en cada actualización, así el README nunc
 queda con números viejos.
 
 <!-- RESULTADOS:INICIO -->
-> Última actualización: **2026-09-04** · datos de demostración (sintéticos) · período **2018-09 a 2026-07** · **150 pozos**, 150 con curva ajustada.
+> Última actualización: **2026-09-04** · datos oficiales de la Secretaría de Energía · período **2006-01 a 2026-07** · **2,613 pozos**, 2,463 con curva ajustada.
 
 | Horizonte | Error en **un pozo** | Sesgo | Dentro de ±20% | Error en el **total** | Pozos |
 |---|---:|---:|---:|---:|---:|
-| 12 meses | 6.4% | -0.3% | 94% | +0.7% | 84 |
-| 24 meses | 7.3% | +1.8% | 88% | +1.4% | 59 |
-| 36 meses | 8.6% | -0.1% | 85% | +0.6% | 34 |
+| 12 meses | 23.3% | -8.9% | 44% | -5.9% | 1,424 |
+| 24 meses | 27.3% | -11.3% | 38% | -5.9% | 1,225 |
+| 36 meses | 30.1% | -14.5% | 35% | -8.6% | 978 |
 
-**En una línea:** a 36 meses el modelo se equivoca **9% en un pozo individual** pero solo **1% en el total** de 34 pozos — los errores se compensan. Y subestima de forma sistemática, lo que es corregible.
+**En una línea:** a 36 meses el modelo se equivoca **30% en un pozo individual** pero solo **9% en el total** de 978 pozos — los errores se compensan. Y subestima de forma sistemática, lo que es corregible.
 
-**Economía de pozo**: precio de equilibrio mediano de **US$ 48/bbl** (P10 31 · P90 99), sobre 143 pozos. A US$ 65/bbl cierra el **71%**, con un repago mediano de 29 meses. Supuestos: pozo US$ 12.0M · opex US$ 12.0/bbl · regalías 12.0% · descuento 10.0% anual. **Son supuestos, no datos medidos.**
+**Economía de pozo**: precio de equilibrio mediano de **US$ 48/bbl** (P10 30 · P90 355), sobre 1,775 pozos. A US$ 65/bbl cierra el **64%**, con un repago mediano de 16 meses. Supuestos: pozo US$ 12.0M · opex US$ 12.0/bbl · regalías 12.0% · descuento 10.0% anual. **Son supuestos, no datos medidos.**
 
-**Normalización por rama lateral** (143 pozos con longitud declarada, mediana 2,159 m): la longitud explica el **8%** de la diferencia de EUR entre pozos, pero al normalizar el ranking se mueve **6 puestos** en la mediana y del top 10 por EUR crudo sobreviven solo **8**.
+**Normalización por rama lateral** (1,302 pozos con longitud declarada, mediana 2,514 m): la longitud explica el **6%** de la diferencia de EUR entre pozos, pero al normalizar el ranking se mueve **95 puestos** en la mediana y del top 10 por EUR crudo sobreviven solo **3**.
 <!-- RESULTADOS:FIN -->
 
 ---
