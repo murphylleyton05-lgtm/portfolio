@@ -6,6 +6,15 @@ de datos públicos de la Secretaría de Energía de la Nación.
 > ⚠️ **Estado: MVP funcional.** Corre end-to-end con datos sintéticos incluidos y
 > está listo para conectarse a los datos oficiales. Ver [Limitaciones](#limitaciones).
 
+**Dos formas de verlo:**
+
+| | Qué es | Cómo se abre |
+|---|---|---|
+| **`web/index.html`** | App web estática, sin instalar nada. Los 150 pozos y sus curvas ya calculadas van embebidos en el archivo. | Doble clic, o publicarla en Netlify |
+| **`app/dashboard.py`** | Dashboard Streamlit, conectado al pipeline en vivo. Recalcula sobre los datos que descargues. | `streamlit run app/dashboard.py` |
+
+La versión web es para mostrar; la de Streamlit es para trabajar.
+
 ---
 
 ## Qué preguntas responde
@@ -114,6 +123,7 @@ vaca-muerta-analytics/
 │   ├── preparar_datos.py         Pipeline: crudo → procesado
 │   └── detectar_anomalias.py     Pozos fuera de su curva esperada
 ├── app/dashboard.py              Dashboard Streamlit (5 pestañas)
+├── web/index.html                App web autocontenida (abrir y listo)
 ├── automatizacion/               Workflow de n8n para correrlo solo
 ├── tests/                        23 tests
 └── docs/                         Fuentes, metodología, plan, portfolio
