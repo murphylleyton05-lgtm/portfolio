@@ -362,15 +362,25 @@ def ajustar_muchos_pozos(
     col_id: str = "id_pozo",
     col_caudal: str = "caudal_petroleo_m3d",
     col_fecha: str = "fecha",
+    mostrar_progreso: bool = False,
     **kwargs,
 ) -> pd.DataFrame:
     """
     Aplica `ajustar_pozo` a todos los pozos de un DataFrame y devuelve una
     tabla con un renglon por pozo. Esta es la tabla que alimenta los rankings
     del dashboard (mejores pozos, comparacion entre operadoras, etc.).
+
+    Con los datos oficiales esto son miles de ajustes no lineales y puede
+    tardar varios minutos, asi que `mostrar_progreso=True` imprime avance para
+    que no parezca que el programa se colgo.
     """
     resultados = []
-    for id_pozo, grupo in df.groupby(col_id):
+    grupos = df.groupby(col_id)
+    total = len(grupos)
+
+    for i, (id_pozo, grupo) in enumerate(grupos, start=1):
+        if mostrar_progreso and (i % 250 == 0 or i == total):
+            print(f"      {i:,}/{total:,} pozos ({i / total:.0%})", flush=True)
         ajuste = ajustar_pozo(
             grupo,
             id_pozo=id_pozo,

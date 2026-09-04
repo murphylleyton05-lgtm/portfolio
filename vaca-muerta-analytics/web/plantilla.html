@@ -1,0 +1,749 @@
+<title>Vaca Muerta Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --bg:          #E9E7E2;
+    --surface:     #FAF9F7;
+    --surface-2:   #F2F0EC;
+    --surface-3:   #E4E1DA;
+    --ink:         #16181A;
+    --ink-2:       #57554F;
+    --ink-3:       #8A867D;
+    --rule:        #D6D2C9;
+    --rule-strong: #BDB8AD;
+    --accent:      #1F4D3D;
+    --accent-soft: #DCE7E1;
+    --s1: #2a78d6;  --s2: #eb6834;  --s3: #1baf7a;  --s4: #eda100;
+    --s5: #e87ba4;  --s6: #008300;  --s7: #4a3aa7;  --s8: #e34948;
+    --grid: #E0DCD3;
+    --shadow: 0 1px 2px rgba(22,24,26,.06), 0 8px 24px -12px rgba(22,24,26,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg:          #131312;
+      --surface:     #212020;
+      --surface-2:   #292827;
+      --surface-3:   #333130;
+      --ink:         #F1EFEA;
+      --ink-2:       #B2AEA5;
+      --ink-3:       #86827A;
+      --rule:        #383634;
+      --rule-strong: #4A4744;
+      --accent:      #5FB394;
+      --accent-soft: #23332D;
+      --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;  --s4: #c98500;
+      --s5: #d55181;  --s6: #008300;  --s7: #9085e9;  --s8: #e66767;
+      --grid: #302E2C;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:          #131312;
+    --surface:     #212020;
+    --surface-2:   #292827;
+    --surface-3:   #333130;
+    --ink:         #F1EFEA;
+    --ink-2:       #B2AEA5;
+    --ink-3:       #86827A;
+    --rule:        #383634;
+    --rule-strong: #4A4744;
+    --accent:      #5FB394;
+    --accent-soft: #23332D;
+    --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;  --s4: #c98500;
+    --s5: #d55181;  --s6: #008300;  --s7: #9085e9;  --s8: #e66767;
+    --grid: #302E2C;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 72px; }
+
+  /* ---------- encabezado ---------- */
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  h1 {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+    font-weight: 700; font-size: clamp(34px, 6vw, 52px);
+    letter-spacing: -.015em; line-height: 1.02;
+    margin: 6px 0 0; text-wrap: balance;
+  }
+  .lede { color: var(--ink-2); max-width: 62ch; margin: 10px 0 0; }
+
+  .head-top { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; justify-content: space-between; }
+
+  .chip-demo {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--rule-strong);
+    border-left: 3px solid var(--s4);
+    border-radius: 3px; padding: 9px 13px; max-width: 330px;
+    font-size: 12.5px; line-height: 1.4; color: var(--ink-2);
+  }
+  .chip-demo b { color: var(--ink); font-weight: 600; }
+  .chip-real { border-left-color: var(--accent); }
+
+  /* ---------- tira de indicadores ---------- */
+  .kpis {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 1px; background: var(--rule);
+    border: 1px solid var(--rule); border-radius: 4px;
+    margin: 30px 0 0; overflow: hidden;
+  }
+  .kpi { background: var(--surface); padding: 15px 16px 14px; }
+  .kpi-label {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; font-weight: 500;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .kpi-val {
+    font-family: "IBM Plex Sans Condensed", sans-serif; font-weight: 600;
+    font-size: 27px; line-height: 1.15; margin-top: 5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-unit { font-size: 13px; color: var(--ink-2); font-weight: 500; margin-left: 3px; }
+
+  /* ---------- paneles ---------- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 4px; margin-top: 26px; box-shadow: var(--shadow);
+  }
+  .panel-head {
+    padding: 16px 20px 14px; border-bottom: 1px solid var(--rule);
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between;
+  }
+  .panel-head h2 {
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-size: 21px; font-weight: 600; margin: 0; letter-spacing: -.005em;
+  }
+  .panel-head p { margin: 4px 0 0; font-size: 13px; color: var(--ink-2); max-width: 68ch; }
+
+  /* ---------- filtros ---------- */
+  .filters { display: flex; flex-wrap: wrap; gap: 7px; padding: 14px 20px; border-bottom: 1px solid var(--rule); align-items: center; }
+  .filters .flabel {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-3); margin-right: 4px;
+  }
+  .chip {
+    font: inherit; font-size: 12.5px; cursor: pointer;
+    background: var(--surface-2); color: var(--ink-2);
+    border: 1px solid var(--rule); border-radius: 999px; padding: 4px 11px;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background .12s, border-color .12s, color .12s;
+  }
+  .chip:hover { border-color: var(--rule-strong); color: var(--ink); }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); font-weight: 500; }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .chip-ghost { background: transparent; }
+  :is(.chip, .toggle, .well-item, .link):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- panel principal ---------- */
+  .split { display: grid; grid-template-columns: 268px 1fr; }
+  .well-list { border-right: 1px solid var(--rule); max-height: 520px; overflow-y: auto; }
+  .well-item {
+    display: block; width: 100%; text-align: left; font: inherit; cursor: pointer;
+    background: none; border: 0; border-bottom: 1px solid var(--rule);
+    border-left: 3px solid transparent; padding: 9px 14px;
+  }
+  .well-item:hover { background: var(--surface-2); }
+  .well-item[aria-current="true"] { background: var(--accent-soft); border-left-color: var(--accent); }
+  .well-name { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; font-weight: 500; }
+  .well-meta { font-size: 11.5px; color: var(--ink-3); display: flex; justify-content: space-between; gap: 8px; }
+  .well-meta b { color: var(--ink-2); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  .chart-area { padding: 14px 18px 18px; min-width: 0; }
+  .chart-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 13px; height: 3px; border-radius: 2px; flex: none; }
+  .swatch.dot { width: 9px; height: 9px; border-radius: 50%; }
+
+  .toggle {
+    font: inherit; font-size: 12px; cursor: pointer; color: var(--ink-2);
+    background: var(--surface-2); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 4px 10px;
+  }
+  .toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+
+  svg.chart { display: block; width: 100%; height: auto; }
+  .chart-wrap { position: relative; }
+
+  .tip {
+    position: absolute; pointer-events: none; opacity: 0;
+    transition: opacity .1s; z-index: 5;
+    background: var(--surface); border: 1px solid var(--rule-strong);
+    border-radius: 3px; box-shadow: var(--shadow);
+    padding: 8px 10px; font-size: 12px; min-width: 130px;
+  }
+  .tip .tip-t { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .tip .tip-r { display: flex; justify-content: space-between; gap: 14px; margin-top: 3px; }
+  .tip .tip-r b { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  /* ---------- lectura de parametros ---------- */
+  .params {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 1px; background: var(--rule); border-top: 1px solid var(--rule);
+  }
+  .param { background: var(--surface); padding: 12px 16px; }
+  .param-l { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); }
+  .param-v { font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 3px; }
+  .param-v small { font-size: 12px; color: var(--ink-2); font-weight: 500; margin-left: 2px; }
+  .param-h { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; line-height: 1.35; }
+
+  /* ---------- tabla ---------- */
+  .table-scroll { overflow-x: auto; max-height: 460px; overflow-y: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  thead th {
+    position: sticky; top: 0; z-index: 1; background: var(--surface-2);
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; font-weight: 500;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+    text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule-strong);
+    white-space: nowrap;
+  }
+  tbody td { padding: 7px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  tbody tr:hover { background: var(--surface-2); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .mono { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  .bar-cell { width: 130px; }
+  .bar-track { background: var(--surface-3); border-radius: 2px; height: 9px; width: 100%; }
+  .bar-fill { background: var(--s1); border-radius: 2px; height: 9px; }
+  .rank-n { color: var(--ink-3); font-family: "IBM Plex Mono", monospace; font-size: 11.5px; }
+
+  .panel-foot { padding: 12px 20px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+  .link { color: var(--accent); font-weight: 500; background: none; border: 0; font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+  /* ---------- metodo / pie ---------- */
+  .method { margin-top: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .method h3 {
+    font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 16px; font-weight: 600;
+    margin: 0 0 5px; padding-top: 11px; border-top: 2px solid var(--ink);
+  }
+  .method p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+  .method code { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--ink); }
+
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-3); }
+
+  @media (max-width: 900px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .params { grid-template-columns: repeat(2, 1fr); }
+    .split { grid-template-columns: 1fr; }
+    .well-list { border-right: 0; border-bottom: 1px solid var(--rule); max-height: 240px; }
+    .method { grid-template-columns: 1fr; gap: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="head-top">
+      <div>
+        <div class="eyebrow">Cuenca Neuquina · Formación Vaca Muerta</div>
+        <h1>Vaca Muerta Analytics</h1>
+        <p class="lede">
+          Cada pozo de shale cae muy rápido y después se aplana. Ajustando una curva de
+          Arps a su historia se puede estimar cuánto va a producir en toda su vida —el
+          <strong>EUR</strong>—, que es el número del que depende si perforarlo cierra o no.
+        </p>
+      </div>
+      <div id="fuente"></div>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <!-- ============ POZO ============ -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Curva de declinación</h2>
+        <p>
+          Los puntos son la producción real de cada mes. La línea es el modelo ajustado a
+          ese pozo y su extrapolación a futuro. Elegí un pozo de la lista.
+        </p>
+      </div>
+    </div>
+
+    <div class="filters">
+      <span class="flabel">Operadora</span>
+      <div id="opChips" style="display:contents"></div>
+      <button class="chip chip-ghost" id="opAll" type="button">Todas</button>
+    </div>
+
+    <div class="split">
+      <div class="well-list" id="wellList" role="listbox" aria-label="Pozos"></div>
+
+      <div class="chart-area">
+        <div class="chart-top">
+          <div class="legend">
+            <span><i class="swatch dot" style="background:var(--s1)"></i> Producción real</span>
+            <span><i class="swatch" style="background:var(--s2)"></i> Modelo Arps</span>
+            <span><i class="swatch" style="background:var(--s2);opacity:.45"></i> Pronóstico</span>
+          </div>
+          <div style="display:flex;gap:7px">
+            <button class="toggle" id="logBtn" type="button" aria-pressed="false">Escala log</button>
+            <button class="toggle" id="horBtn" type="button" aria-pressed="false">Ver 30 años</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg class="chart" id="declineChart" viewBox="0 0 780 400" role="img" aria-label="Curva de declinación del pozo seleccionado"></svg>
+          <div class="tip" id="declineTip"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="params" id="params"></div>
+  </section>
+
+  <!-- ============ CURVAS TIPO ============ -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Curvas tipo por operadora</h2>
+        <p>
+          Alinea todos los pozos por su <em>mes de vida</em>, no por fecha de calendario, y
+          muestra la mediana de cada grupo. Así se compara la calidad de los pozos sin que
+          el resultado dependa de quién perforó más recientemente. Cada línea está suavizada
+          con una mediana móvil de 3 meses; solo se dibujan los meses con al menos 4 pozos.
+        </p>
+      </div>
+    </div>
+    <div class="chart-area" style="padding:16px 18px 6px">
+      <div class="legend" id="tcLegend" style="margin-bottom:8px"></div>
+      <div class="chart-wrap">
+        <svg class="chart" id="typeChart" viewBox="0 0 780 380" role="img" aria-label="Curvas tipo medianas por operadora"></svg>
+        <div class="tip" id="typeTip"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RANKING ============ -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Ranking de pozos por EUR estimado</h2>
+        <p>El volumen total que se espera producir en 30 años, en miles de barriles (Mbbl).</p>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Pozo</th><th>Operadora</th><th>Bloque</th>
+            <th class="num">qi</th><th class="num">Di</th><th class="num">b</th>
+            <th class="num">R²</th><th class="num">EUR</th><th class="bar-cell"></th>
+          </tr>
+        </thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+    </div>
+    <div class="panel-foot">
+      <span id="rankCount"></span>
+      <button class="link" id="rankMore" type="button">Mostrar los 150 pozos</button>
+    </div>
+  </section>
+
+  <!-- ============ METODO ============ -->
+  <section class="method">
+    <div>
+      <h3>Por qué se corta la hipérbola</h3>
+      <p>
+        En shale es normal encontrar <code>b &gt; 1</code>, y ahí la integral de Arps diverge:
+        el modelo predice reservas infinitas. Por eso se sigue la hipérbola solo hasta que la
+        declinación cae al 6% anual, y de ahí en adelante se continúa con una exponencial.
+      </p>
+    </div>
+    <div>
+      <h3>El caudal es por día producido</h3>
+      <p>
+        El caudal se calcula sobre los días en que el pozo <em>efectivamente</em> produjo
+        (<code>tef</code>), no sobre los días del mes. Dividir por 30 convierte una parada de
+        mantenimiento en declinación aparente, y ensucia toda la curva.
+      </p>
+    </div>
+    <div>
+      <h3>Qué no hace este modelo</h3>
+      <p>
+        No corrige por longitud de rama lateral ni por etapas de fractura: un pozo más largo
+        produce más aunque la roca sea idéntica. Tampoco describe pozos con paradas largas o
+        intervenciones — esos quedan con R² bajo.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    Lleyton Murphy · La Plata, Argentina — Metodología: Arps hiperbólica modificada,
+    horizonte 30 años, declinación terminal 6% anual.
+  </footer>
+</div>
+
+<script>
+const DATA = __DATOS__;
+
+/* ===================== modelo de Arps (mismo que el Python) ===================== */
+const D_TERM = 0.06 / 12;          // declinación terminal, 1/mes
+const DIAS_MES = 30.4375;
+
+function qArps(t, qi, di, b) {
+  if (b < 1e-6) return qi * Math.exp(-di * t);
+  return qi / Math.pow(Math.max(1 + b * di * t, 1e-9), 1 / b);
+}
+function mesDeCambio(di, b) {
+  if (b < 1e-6 || di <= D_TERM) return Infinity;
+  return (di / D_TERM - 1) / (b * di);
+}
+function qModelo(t, qi, di, b) {
+  const tSw = mesDeCambio(di, b);
+  if (t <= tSw) return qArps(t, qi, di, b);
+  return qArps(tSw, qi, di, b) * Math.exp(-D_TERM * (t - tSw));
+}
+
+/* ===================== utilidades ===================== */
+const fmt = (n, d = 0) => n.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const dec = (n, d) => n.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const B_TOPE = 1.98;                 // el ajuste acota b en 2.0; pegado al tope, el EUR queda inflado
+const mediana = a => { const s = [...a].sort((x, y) => x - y); const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+const SERIES_VARS = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
+const cssVar = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+const OPERADORAS = [...new Set(DATA.wells.map(w => w.op))].sort();
+const colorOp = op => SERIES_VARS[OPERADORAS.indexOf(op) % 8];
+
+let opsActivas = new Set(OPERADORAS);
+let pozoSel = null;
+let escalaLog = false;
+let horizonteLargo = false;
+let rankCompleto = false;
+
+const visibles = () => DATA.wells.filter(w => opsActivas.has(w.op));
+
+/* ===================== cartel de procedencia de los datos ===================== */
+function pintarFuente() {
+  const m = DATA.meta, n = DATA.wells.length;
+  const el = document.getElementById('fuente');
+  el.className = m.es_demo ? 'chip-demo' : 'chip-demo chip-real';
+  el.innerHTML = m.es_demo
+    ? `<span><b>Datos de demostración.</b> Estos ${n} pozos no existen: se simularon con
+       curvas de Arps y ruido operativo. La matemática es la misma que se aplica a los
+       datos oficiales de la Secretaría de Energía.</span>`
+    : `<span><b>Datos oficiales.</b> ${fmt(n)} pozos no convencionales declarados a la
+       Secretaría de Energía de la Nación, ${esc(m.periodo)}. Los últimos meses pueden
+       estar incompletos.</span>`;
+}
+
+/* ===================== indicadores ===================== */
+function pintarKpis() {
+  const v = visibles();
+  const tiles = v.length ? [
+    ['Pozos', fmt(v.length), ''],
+    ['Operadoras', fmt(new Set(v.map(w => w.op)).size), ''],
+    ['EUR mediano', fmt(mediana(v.map(w => w.eur))), 'Mbbl'],
+    ['Declinación inicial', fmt(mediana(v.map(w => w.di * 12)) * 100), '% /año'],
+    ['Acumulado', fmt(v.reduce((s, w) => s + w.acum, 0) / 1000, 1), 'MMbbl'],
+  ] : [['Pozos', '0', '']];
+  document.getElementById('kpis').innerHTML = tiles.map(([l, val, u]) =>
+    `<div class="kpi"><div class="kpi-label">${l}</div>
+     <div class="kpi-val">${val}<span class="kpi-unit">${u}</span></div></div>`).join('');
+}
+
+/* ===================== filtros ===================== */
+function pintarChips() {
+  document.getElementById('opChips').innerHTML = OPERADORAS.map(op =>
+    `<button class="chip" type="button" data-op="${op}" aria-pressed="${opsActivas.has(op)}">
+       <i class="dot" style="background:var(${colorOp(op)})"></i>${op.replace(' S.A.','').replace(' ARGENTINA','')}
+     </button>`).join('');
+  document.querySelectorAll('[data-op]').forEach(b => b.onclick = () => {
+    const op = b.dataset.op;
+    opsActivas.has(op) ? opsActivas.delete(op) : opsActivas.add(op);
+    if (!opsActivas.size) opsActivas = new Set(OPERADORAS);
+    redibujar();
+  });
+}
+document.getElementById('opAll').onclick = () => { opsActivas = new Set(OPERADORAS); redibujar(); };
+
+/* ===================== lista de pozos ===================== */
+function pintarLista() {
+  const v = [...visibles()].sort((a, b) => b.eur - a.eur);
+  if (!v.some(w => w.id === pozoSel)) pozoSel = v.length ? v[0].id : null;
+  document.getElementById('wellList').innerHTML = v.map(w =>
+    `<button class="well-item" type="button" role="option" data-id="${w.id}" aria-current="${w.id === pozoSel}">
+       <div class="well-name">${w.sigla}</div>
+       <div class="well-meta"><span>${w.op.replace(' S.A.','').replace(' ARGENTINA','')}</span>
+       <b>${fmt(w.eur)} Mbbl</b></div>
+     </button>`).join('');
+  document.querySelectorAll('.well-item').forEach(b => b.onclick = () => {
+    pozoSel = +b.dataset.id; pintarLista(); dibujarDeclinacion(); pintarParams();
+  });
+}
+
+/* ===================== ejes ===================== */
+function ticks(max, n = 5) {
+  const bruto = max / n;
+  const mag = Math.pow(10, Math.floor(Math.log10(bruto)));
+  const paso = [1, 2, 2.5, 5, 10].find(m => m * mag >= bruto) * mag;
+  const out = [];
+  for (let v = 0; v <= max * 1.0001; v += paso) out.push(v);
+  return out;
+}
+function ticksLog(min, max) {
+  const out = [];
+  for (let e = Math.floor(Math.log10(min)); e <= Math.ceil(Math.log10(max)); e++)
+    for (const m of [1, 2, 5]) { const v = m * Math.pow(10, e); if (v >= min && v <= max) out.push(v); }
+  return out;
+}
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ===================== curva de declinación ===================== */
+const M = { t: 18, r: 22, b: 46, l: 62 };
+const W = 780, H = 400;
+
+function dibujarDeclinacion() {
+  const svg = document.getElementById('declineChart');
+  const w = DATA.wells.find(x => x.id === pozoSel);
+  if (!w) { svg.innerHTML = ''; return; }
+
+  const real = DATA.series[w.id];
+  const nHist = real.length;
+  const horizonte = horizonteLargo ? 360 : Math.max(120, nHist + 24);
+
+  const modelo = [];
+  for (let t = 0; t <= horizonte; t++) modelo.push([t, qModelo(t, w.qi, w.di, w.b)]);
+
+  const iw = W - M.l - M.r, ih = H - M.t - M.b;
+  const maxX = horizonte;
+  const maxY = Math.max(...real, ...modelo.map(p => p[1])) * 1.08;
+  const minYlog = Math.max(1, Math.min(...real.filter(v => v > 0), modelo[modelo.length - 1][1]) * 0.7);
+
+  const sx = t => M.l + (t / maxX) * iw;
+  const sy = q => escalaLog
+    ? M.t + ih - (Math.log10(Math.max(q, minYlog)) - Math.log10(minYlog)) /
+        (Math.log10(maxY) - Math.log10(minYlog)) * ih
+    : M.t + ih - (q / maxY) * ih;
+
+  const yT = escalaLog ? ticksLog(minYlog, maxY) : ticks(maxY);
+  const xT = ticks(maxX, 6);
+  const p = [];
+
+  // grilla + eje Y
+  yT.forEach(v => {
+    p.push(`<line x1="${M.l}" y1="${sy(v).toFixed(1)}" x2="${M.l + iw}" y2="${sy(v).toFixed(1)}" stroke="${cssVar('--grid')}" stroke-width="1"/>`);
+    p.push(`<text x="${M.l - 9}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+  });
+  // eje X
+  xT.forEach(v => p.push(
+    `<text x="${sx(v).toFixed(1)}" y="${M.t + ih + 20}" text-anchor="middle" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`));
+  p.push(`<line x1="${M.l}" y1="${M.t + ih}" x2="${M.l + iw}" y2="${M.t + ih}" stroke="${cssVar('--rule-strong')}" stroke-width="1"/>`);
+  p.push(`<text x="${M.l + iw / 2}" y="${H - 8}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12">Meses desde el pico de producción</text>`);
+  p.push(`<text x="14" y="${M.t + ih / 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12" transform="rotate(-90 14 ${M.t + ih / 2})">Caudal (bbl/día)</text>`);
+
+  // fin de la historia
+  const xFin = sx(nHist - 1);
+  p.push(`<line x1="${xFin.toFixed(1)}" y1="${M.t}" x2="${xFin.toFixed(1)}" y2="${M.t + ih}" stroke="${cssVar('--ink-3')}" stroke-width="1" stroke-dasharray="3 4"/>`);
+  p.push(`<text x="${(xFin + 6).toFixed(1)}" y="${M.t + 13}" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="10.5">fin de datos</text>`);
+
+  // modelo: tramo ajustado (sólido) y pronóstico (translúcido)
+  const linea = pts => pts.map((q, i) => `${i ? 'L' : 'M'}${sx(q[0]).toFixed(1)},${sy(q[1]).toFixed(1)}`).join('');
+  p.push(`<path d="${linea(modelo.slice(nHist - 1))}" fill="none" stroke="${cssVar('--s2')}" stroke-width="2" opacity=".45"/>`);
+  p.push(`<path d="${linea(modelo.slice(0, nHist))}" fill="none" stroke="${cssVar('--s2')}" stroke-width="2"/>`);
+
+  // puntos reales, con anillo de superficie para que no se peguen entre sí
+  real.forEach((q, t) => p.push(
+    `<circle cx="${sx(t).toFixed(1)}" cy="${sy(q).toFixed(1)}" r="4" fill="${cssVar('--s1')}" stroke="${cssVar('--surface')}" stroke-width="2"/>`));
+
+  p.push(`<line class="cross" x1="0" y1="${M.t}" x2="0" y2="${M.t + ih}" stroke="${cssVar('--ink-3')}" stroke-width="1" opacity="0"/>`);
+  svg.innerHTML = p.join('');
+
+  // ---- hover ----
+  const tip = document.getElementById('declineTip');
+  const cross = svg.querySelector('.cross');
+  const wrap = svg.parentElement;
+  svg.onpointermove = e => {
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    if (loc.x < M.l || loc.x > M.l + iw) { tip.style.opacity = 0; cross.setAttribute('opacity', 0); return; }
+    const t = Math.round(((loc.x - M.l) / iw) * maxX);
+    cross.setAttribute('x1', sx(t)); cross.setAttribute('x2', sx(t)); cross.setAttribute('opacity', .5);
+    const qm = qModelo(t, w.qi, w.di, w.b);
+    const qr = t < real.length ? real[t] : null;
+    tip.innerHTML = `<div class="tip-t">Mes ${t}</div>` +
+      (qr !== null ? `<div class="tip-r"><span>Real</span><b>${fmt(qr)} bbl/d</b></div>` : '') +
+      `<div class="tip-r"><span>Modelo</span><b>${fmt(qm)} bbl/d</b></div>`;
+    const rb = wrap.getBoundingClientRect();
+    const px = (sx(t) / W) * rb.width;
+    tip.style.left = Math.min(Math.max(px + 14, 4), rb.width - 168) + 'px';
+    tip.style.top = Math.max((e.clientY - rb.top) - 46, 4) + 'px';
+    tip.style.opacity = 1;
+  };
+  svg.onpointerleave = () => { tip.style.opacity = 0; cross.setAttribute('opacity', 0); };
+}
+
+/* ===================== lectura de parámetros ===================== */
+function pintarParams() {
+  const w = DATA.wells.find(x => x.id === pozoSel);
+  if (!w) return;
+  const items = [
+    ['qi', fmt(w.qi), 'bbl/d', 'Caudal al que arrancó'],
+    ['Di', fmt(w.di * 12 * 100), '% /año', 'Qué tan rápido cae'],
+    ['b', dec(w.b, 2), '', w.b >= B_TOPE ? '⚠ En el tope del modelo' : 'Curvatura de la caída'],
+    ['R²', dec(w.r2, 3), '', w.r2 >= 0.9 ? 'Ajuste muy bueno' : w.r2 >= 0.7 ? 'Ajuste aceptable' : 'Ajuste dudoso'],
+    ['EUR', fmt(w.eur), 'Mbbl', w.b >= B_TOPE ? 'Probablemente sobreestimado' : 'Total esperado en 30 años'],
+  ];
+  document.getElementById('params').innerHTML = items.map(([l, v, u, h]) =>
+    `<div class="param"><div class="param-l">${l}</div>
+     <div class="param-v">${v}<small>${u}</small></div>
+     <div class="param-h">${h}</div></div>`).join('');
+}
+
+/* ===================== curvas tipo ===================== */
+function dibujarCurvasTipo() {
+  const svg = document.getElementById('typeChart');
+  const RT = 104;                       // margen derecho para los rotulos de cada linea
+  const HT = 380, ih = HT - M.t - M.b, iw = W - M.l - RT;
+
+  const grupos = [];
+  for (const op of OPERADORAS) {
+    if (!opsActivas.has(op)) continue;
+    const ids = DATA.wells.filter(w => w.op === op).map(w => w.id);
+    const porMes = [];
+    ids.forEach(id => DATA.series[id].forEach((q, t) => { (porMes[t] ||= []).push(q); }));
+    const crudo = [];
+    porMes.forEach((arr, t) => { if (arr.length >= 4) crudo.push([t, mediana(arr)]); });
+    // Mediana movil de 3 meses: sin esto las ocho lineas se cruzan tanto que no se lee ninguna.
+    const pts = crudo.map(([t], i) =>
+      [t, mediana(crudo.slice(Math.max(0, i - 1), i + 2).map(q => q[1]))]);
+    if (pts.length > 2) grupos.push({ op, pts, n: ids.length });
+  }
+  if (!grupos.length) { svg.innerHTML = ''; document.getElementById('tcLegend').innerHTML = ''; return; }
+
+  const maxX = Math.max(...grupos.flatMap(g => g.pts.map(p => p[0])));
+  const maxY = Math.max(...grupos.flatMap(g => g.pts.map(p => p[1]))) * 1.1;
+  const sx = t => M.l + (t / maxX) * iw;
+  const sy = q => M.t + ih - (q / maxY) * ih;
+  const p = [];
+
+  ticks(maxY).forEach(v => {
+    p.push(`<line x1="${M.l}" y1="${sy(v).toFixed(1)}" x2="${M.l + iw}" y2="${sy(v).toFixed(1)}" stroke="${cssVar('--grid')}" stroke-width="1"/>`);
+    p.push(`<text x="${M.l - 9}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+  });
+  ticks(maxX, 6).forEach(v => p.push(
+    `<text x="${sx(v).toFixed(1)}" y="${M.t + ih + 20}" text-anchor="middle" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`));
+  p.push(`<line x1="${M.l}" y1="${M.t + ih}" x2="${M.l + iw}" y2="${M.t + ih}" stroke="${cssVar('--rule-strong')}" stroke-width="1"/>`);
+  p.push(`<text x="${M.l + iw / 2}" y="${HT - 8}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12">Mes de vida del pozo</text>`);
+  p.push(`<text x="14" y="${M.t + ih / 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12" transform="rotate(-90 14 ${M.t + ih / 2})">Caudal mediano (bbl/día)</text>`);
+
+  grupos.forEach(g => {
+    const c = cssVar(colorOp(g.op));
+    p.push(`<path d="${g.pts.map((q, i) => `${i ? 'L' : 'M'}${sx(q[0]).toFixed(1)},${sy(q[1]).toFixed(1)}`).join('')}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`);
+  });
+
+  // Rotulo directo al final de cada linea, empujado hacia abajo para que no se pisen.
+  const finales = grupos.map(g => {
+    const last = g.pts[g.pts.length - 1];
+    return { op: g.op, x: sx(last[0]), yReal: sy(last[1]), y: sy(last[1]) };
+  }).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < finales.length; i++)
+    finales[i].y = Math.max(finales[i].y, finales[i - 1].y + 13);
+  const desborde = finales.length ? finales[finales.length - 1].y - (M.t + ih) : 0;
+  if (desborde > 0) finales.forEach(f => f.y -= desborde);
+
+  finales.forEach(f => {
+    const c = cssVar(colorOp(f.op));
+    const xl = M.l + iw + 8;
+    p.push(`<circle cx="${f.x.toFixed(1)}" cy="${f.yReal.toFixed(1)}" r="3.5" fill="${c}" stroke="${cssVar('--surface')}" stroke-width="1.5"/>`);
+    p.push(`<path d="M${(f.x + 4).toFixed(1)},${f.yReal.toFixed(1)} L${(xl - 4).toFixed(1)},${f.y.toFixed(1)}" fill="none" stroke="${c}" stroke-width="1" opacity=".5"/>`);
+    p.push(`<text x="${xl}" y="${(f.y + 3.5).toFixed(1)}" fill="${c}" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="500">${esc(f.op.split(' ')[0])}</text>`);
+  });
+  svg.innerHTML = p.join('');
+
+  document.getElementById('tcLegend').innerHTML = grupos.map(g =>
+    `<span><i class="swatch" style="background:var(${colorOp(g.op)})"></i>${esc(g.op.replace(' S.A.','').replace(' ARGENTINA',''))} <span style="color:var(--ink-3)">n=${g.n}</span></span>`).join('');
+
+  const tip = document.getElementById('typeTip'), wrap = svg.parentElement;
+  svg.onpointermove = e => {
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    if (loc.x < M.l || loc.x > M.l + iw) { tip.style.opacity = 0; return; }
+    const t = Math.round(((loc.x - M.l) / iw) * maxX);
+    const filas = grupos.map(g => {
+      const hit = g.pts.find(q => q[0] === t);
+      return hit ? `<div class="tip-r"><span><i class="swatch" style="background:var(${colorOp(g.op)});display:inline-block;margin-right:5px"></i>${esc(g.op.replace(' S.A.','').replace(' ARGENTINA',''))}</span><b>${fmt(hit[1])}</b></div>` : '';
+    }).join('');
+    if (!filas) { tip.style.opacity = 0; return; }
+    tip.innerHTML = `<div class="tip-t">Mes de vida ${t} · bbl/d</div>${filas}`;
+    const rb = wrap.getBoundingClientRect();
+    const px = (sx(t) / W) * rb.width;
+    tip.style.left = Math.min(Math.max(px + 14, 4), Math.max(rb.width - 210, 4)) + 'px';
+    tip.style.top = Math.max((e.clientY - rb.top) - 40, 4) + 'px';
+    tip.style.opacity = 1;
+  };
+  svg.onpointerleave = () => { tip.style.opacity = 0; };
+}
+
+/* ===================== ranking ===================== */
+function pintarRanking() {
+  const v = [...visibles()].sort((a, b) => b.eur - a.eur);
+  const max = v.length ? v[0].eur : 1;
+  const filas = rankCompleto ? v : v.slice(0, 25);
+  document.getElementById('rankBody').innerHTML = filas.map((w, i) => `
+    <tr>
+      <td class="rank-n">${i + 1}</td>
+      <td class="mono">${esc(w.sigla)}</td>
+      <td>${esc(w.op.replace(' S.A.','').replace(' ARGENTINA',''))}</td>
+      <td style="color:var(--ink-2)">${esc(w.area)}</td>
+      <td class="num mono">${fmt(w.qi)}</td>
+      <td class="num mono">${fmt(w.di * 12 * 100)}%</td>
+      <td class="num mono">${dec(w.b, 2)}${w.b >= B_TOPE ? '<span title="b tocó el tope del modelo: el EUR de este pozo queda sobreestimado" style="color:var(--s4);margin-left:3px">▲</span>' : ''}</td>
+      <td class="num mono">${dec(w.r2, 3)}</td>
+      <td class="num mono"><b>${fmt(w.eur)}</b></td>
+      <td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${(w.eur / max * 100).toFixed(1)}%"></div></div></td>
+    </tr>`).join('');
+  document.getElementById('rankCount').textContent =
+    `Mostrando ${filas.length} de ${v.length} pozos · qi en bbl/d · Di en % nominal anual · EUR en Mbbl · ▲ = b en el tope del modelo (EUR sobreestimado)`;
+  const btn = document.getElementById('rankMore');
+  btn.textContent = rankCompleto ? 'Mostrar solo los 25 mejores' : `Mostrar los ${v.length} pozos`;
+  btn.hidden = v.length <= 25;
+}
+document.getElementById('rankMore').onclick = () => { rankCompleto = !rankCompleto; pintarRanking(); };
+
+/* ===================== controles ===================== */
+document.getElementById('logBtn').onclick = e => {
+  escalaLog = !escalaLog; e.currentTarget.setAttribute('aria-pressed', escalaLog); dibujarDeclinacion();
+};
+document.getElementById('horBtn').onclick = e => {
+  horizonteLargo = !horizonteLargo; e.currentTarget.setAttribute('aria-pressed', horizonteLargo);
+  e.currentTarget.textContent = horizonteLargo ? 'Ver 10 años' : 'Ver 30 años';
+  dibujarDeclinacion();
+};
+
+/* ===================== orquestación ===================== */
+function redibujar() {
+  pintarFuente(); pintarChips(); pintarKpis(); pintarLista();
+  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); pintarRanking();
+}
+redibujar();
+
+// Los colores salen de variables CSS, así que hay que redibujar al cambiar de tema.
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  dibujarDeclinacion(); dibujarCurvasTipo();
+});
+new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); })
+  .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+</script>
+

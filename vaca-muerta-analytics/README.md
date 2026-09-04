@@ -10,7 +10,7 @@ de datos públicos de la Secretaría de Energía de la Nación.
 
 | | Qué es | Cómo se abre |
 |---|---|---|
-| **`web/index.html`** | App web estática, sin instalar nada. Los 150 pozos y sus curvas ya calculadas van embebidos en el archivo. | Doble clic, o publicarla en Netlify |
+| **`web/index.html`** | App web estática, sin instalar nada. Los pozos y sus curvas ya calculadas van embebidos en el archivo. Se regenera con `scripts/generar_web.py`. | Doble clic, o publicarla |
 | **`app/dashboard.py`** | Dashboard Streamlit, conectado al pipeline en vivo. Recalcula sobre los datos que descargues. | `streamlit run app/dashboard.py` |
 
 La versión web es para mostrar; la de Streamlit es para trabajar.
@@ -75,22 +75,34 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-**Opción A — con datos sintéticos** (sin descargar nada, funciona al instante):
+**Un solo comando**, que descarga, procesa y regenera la app:
 
 ```bash
-python scripts/generar_demo.py
-python scripts/preparar_datos.py
-streamlit run app/dashboard.py
+python scripts/actualizar.py            # datos REALES de la Secretaría de Energía
+python scripts/actualizar.py --demo     # datos sintéticos, para probar sin descargar
 ```
 
-**Opción B — con datos reales** de la Secretaría de Energía:
+Cuando termina, `web/index.html` queda actualizado — abrilo con doble clic.
+Para el dashboard interactivo: `streamlit run app/dashboard.py`.
+
+<details>
+<summary>Los pasos por separado, si algo falla y querés mirarlo de a uno</summary>
 
 ```bash
 python scripts/descargar_datos.py --buscar "no convencional"   # verificar el slug
 python scripts/descargar_datos.py --dataset no_convencional    # descargar (cientos de MB)
-python scripts/preparar_datos.py
-streamlit run app/dashboard.py
+python scripts/preparar_datos.py                               # limpiar y ajustar curvas
+python scripts/generar_web.py                                  # regenerar web/index.html
 ```
+
+**Los dos errores que aparecen con datos reales:**
+
+| Síntoma | Dónde se arregla |
+|---|---|
+| El dataset no aparece o cambió de nombre | `DATASETS` en `src/petro/ingesta.py` — buscá el slug nuevo con `--buscar` |
+| "El CSV no trae las columnas esperadas" | `COLUMNAS_OFICIALES` en `src/petro/limpieza.py` |
+
+</details>
 
 **Detección de anomalías:**
 
@@ -118,12 +130,16 @@ vaca-muerta-analytics/
 │   ├── declinacion.py            ⭐ Arps, EUR, curvas tipo
 │   └── demo_data.py              Generador sintético (para correr sin descargar)
 ├── scripts/
+│   ├── actualizar.py             ⭐ Todo el pipeline en un comando
 │   ├── descargar_datos.py        Descarga desde el portal oficial
 │   ├── generar_demo.py           Genera el dataset sintético
 │   ├── preparar_datos.py         Pipeline: crudo → procesado
+│   ├── generar_web.py            Incrusta los datos en la app web
 │   └── detectar_anomalias.py     Pozos fuera de su curva esperada
 ├── app/dashboard.py              Dashboard Streamlit (5 pestañas)
-├── web/index.html                App web autocontenida (abrir y listo)
+├── web/
+│   ├── plantilla.html            La app, sin datos (se edita acá)
+│   └── index.html                La app con los datos incrustados (generado)
 ├── automatizacion/               Workflow de n8n para correrlo solo
 ├── tests/                        23 tests
 └── docs/                         Fuentes, metodología, plan, portfolio

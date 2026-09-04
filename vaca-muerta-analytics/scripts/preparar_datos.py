@@ -123,6 +123,7 @@ def main() -> None:
         col_id="id_pozo",
         col_caudal="caudal_petroleo_m3d",
         col_fecha="fecha",
+        mostrar_progreso=True,
         meses_minimos=args.meses_minimos,
         horizonte_meses=config.HORIZONTE_EUR_MESES,
         d_terminal_anual=config.D_TERMINAL_ANUAL,
