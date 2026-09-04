@@ -40,6 +40,8 @@ jobs:
           cp -r xelvia-dashboard/* site/xelvia/
           mkdir -p site/vuelto
           cp -r vuelto/* site/vuelto/
+          mkdir -p site/vaca-muerta
+          cp vaca-muerta-analytics/web/index.html site/vaca-muerta/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
