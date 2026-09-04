@@ -247,6 +247,25 @@
   }
   .movio { color: var(--s2); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
   .op-norm { border-top: 1px solid var(--rule); }
+
+  /* Controles de los supuestos económicos. Van arriba de los números para que
+     quede claro que los números dependen de ellos. */
+  .controles {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px;
+    padding: 16px 20px; border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule); background: var(--surface-2);
+  }
+  .ctrl label {
+    display: block; font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: 5px;
+  }
+  .ctrl .valor {
+    font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 17px;
+    font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink);
+  }
+  .ctrl input[type=range] { width: 100%; margin-top: 3px; accent-color: var(--accent); }
+  @media (max-width: 900px) { .controles { grid-template-columns: repeat(2, 1fr); } }
   .sube { color: var(--s3); font-family: "IBM Plex Mono", monospace; }
   .baja { color: var(--s2); font-family: "IBM Plex Mono", monospace; }
   .igual { color: var(--ink-3); font-family: "IBM Plex Mono", monospace; }
@@ -504,6 +523,56 @@
           </thead>
           <tbody id="opNormBody"></tbody>
         </table>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ ECONOMIA ============ -->
+  <section class="panel" id="secEco">
+    <div class="panel-head">
+      <div>
+        <h2>¿A qué precio del barril cierra?</h2>
+        <p>
+          Saber cuánto produce un pozo todavía no es la pregunta del negocio. La
+          pregunta es si conviene perforarlo, y eso depende de cuánto cuesta, cuánto
+          produce y a cuánto se vende. El indicador que resume las tres cosas es el
+          <strong>precio de equilibrio</strong>: el valor del barril al que el pozo
+          apenas devuelve la inversión.
+        </p>
+      </div>
+    </div>
+
+    <div class="controles" id="ecoControles"></div>
+
+    <div class="hallazgo hallazgo-5" id="ecoStats"></div>
+
+    <div class="split-rama">
+      <div class="chart-area">
+        <div class="chart-top">
+          <div class="legend">
+            <span><i class="swatch" style="background:var(--s3)"></i> Cierra al precio elegido</span>
+            <span><i class="swatch" style="background:var(--s2)"></i> No cierra</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg class="chart" id="ecoChart" viewBox="0 0 760 340" role="img"
+               aria-label="Distribución del precio de equilibrio de los pozos"></svg>
+        </div>
+      </div>
+
+      <div class="tabla-rama">
+        <div class="tabla-rama-head">Por operadora</div>
+        <div class="table-scroll" style="max-height:300px">
+          <table>
+            <thead>
+              <tr><th>Operadora</th><th class="num">Pozos</th>
+                  <th class="num">Equilibrio</th><th class="num">Cierran</th></tr>
+            </thead>
+            <tbody id="ecoBody"></tbody>
+          </table>
+        </div>
+        <p class="nota-rama" id="ecoNota"></p>
       </div>
     </div>
   </section>
@@ -873,6 +942,168 @@ function dibujarCurvasTipo() {
   svg.onpointerleave = () => { tip.style.opacity = 0; };
 }
 
+/* ===================== economía: ¿a qué precio cierra? ===================== */
+/*
+ * Todo esto se calcula en el navegador, así que mover un control recalcula los
+ * 400 pozos al instante. Es a propósito: los supuestos económicos hay que
+ * poder discutirlos, y un número que no se puede mover no se discute.
+ *
+ * VAN = (precio - opex) * (1 - regalías) * Vd - costo_del_pozo
+ * y el precio de equilibrio sale de igualar VAN a cero y despejar.
+ */
+const ECO = {
+  costo: 12,      // millones de USD por pozo
+  opex: 12,       // USD por barril
+  regalias: 12,   // %
+  descuento: 10,  // % anual
+  precio: 65,     // USD por barril
+};
+const HORIZONTE_ECO = 240;   // 20 años de vida económica
+
+// Barriles del pozo traídos a valor presente. `qi` ya viene en bbl/día.
+function volumenDescontado(qi, di, b, descuentoPct) {
+  const tasa = Math.pow(1 + descuentoPct / 100, 1 / 12) - 1;
+  let total = 0;
+  for (let t = 0; t < HORIZONTE_ECO; t++) {
+    total += qModelo(t, qi, di, b) * DIAS_MES / Math.pow(1 + tasa, t);
+  }
+  return total;
+}
+
+function precioEquilibrio(w) {
+  const vd = volumenDescontado(w.qi, w.di, w.b, ECO.descuento);
+  if (!(vd > 0)) return Infinity;
+  return ECO.costo * 1e6 / ((1 - ECO.regalias / 100) * vd) + ECO.opex;
+}
+
+function dibujarEconomia() {
+  const pozos = visibles();
+  if (!pozos.length) return;
+
+  // --- controles ---
+  const defs = [
+    ['costo', 'Costo del pozo', 6, 22, 0.5, v => `US$ ${dec(v, 1)}M`],
+    ['opex', 'Opex', 4, 30, 1, v => `US$ ${v}/bbl`],
+    ['regalias', 'Regalías', 0, 30, 1, v => `${v}%`],
+    ['descuento', 'Descuento', 0, 20, 1, v => `${v}% /año`],
+    ['precio', 'Precio del crudo', 25, 130, 1, v => `US$ ${v}/bbl`],
+  ];
+  const cont = document.getElementById('ecoControles');
+  if (!cont.dataset.listo) {
+    cont.innerHTML = defs.map(([k, etiqueta, min, max, paso]) =>
+      `<div class="ctrl">
+         <label for="eco-${k}">${etiqueta}</label>
+         <div class="valor" id="eco-${k}-v"></div>
+         <input type="range" id="eco-${k}" min="${min}" max="${max}" step="${paso}"
+                value="${ECO[k]}" aria-label="${etiqueta}">
+       </div>`).join('');
+    defs.forEach(([k]) => {
+      document.getElementById(`eco-${k}`).addEventListener('input', e => {
+        ECO[k] = +e.target.value;
+        dibujarEconomia();
+      });
+    });
+    cont.dataset.listo = '1';
+  }
+  defs.forEach(([k, , , , , fmtv]) => {
+    document.getElementById(`eco-${k}-v`).textContent = fmtv(ECO[k]);
+  });
+
+  // --- cálculo ---
+  const conBe = pozos.map(w => ({ ...w, be: precioEquilibrio(w) }))
+                     .filter(w => isFinite(w.be));
+  if (!conBe.length) return;
+
+  const bes = conBe.map(w => w.be).sort((a, b) => a - b);
+  const med = mediana(bes);
+  const p10 = bes[Math.floor(bes.length * 0.10)];
+  const p90 = bes[Math.floor(bes.length * 0.90)];
+  const cierran = conBe.filter(w => w.be <= ECO.precio).length;
+  const margen = ECO.precio - med;
+
+  document.getElementById('ecoStats').innerHTML = [
+    ['Equilibrio mediano', `US$ ${dec(med, 0)}`, 'por barril, el pozo típico'],
+    ['Los mejores (P10)', `US$ ${dec(p10, 0)}`, 'el 10% que cierra más barato'],
+    ['Los peores (P90)', `US$ ${dec(p90, 0)}`, 'el 10% que necesita más precio'],
+    ['Cierran hoy', `${dec(cierran / conBe.length * 100, 0)}%`,
+     `de ${fmt(conBe.length)} pozos, a US$ ${ECO.precio}`],
+    ['Margen sobre el típico', `${margen > 0 ? '+' : ''}US$ ${dec(margen, 0)}`,
+     margen > 0 ? 'de aire por barril' : 'por debajo del equilibrio'],
+  ].map(([l, v, h]) =>
+    `<div><div class="h-l">${l}</div><div class="h-v">${v}</div><div class="h-h">${h}</div></div>`
+  ).join('');
+
+  // --- histograma con la línea del precio ---
+  const svg = document.getElementById('ecoChart');
+  const W2 = 760, H2 = 340, m = { t: 18, r: 20, b: 46, l: 54 };
+  const iw = W2 - m.l - m.r, ih = H2 - m.t - m.b;
+  const tope = Math.min(Math.max(p90 * 1.25, ECO.precio * 1.2), 220);
+  const nCubos = 34, ancho = tope / nCubos;
+  const cubos = Array.from({ length: nCubos }, (_, i) => ({
+    lo: i * ancho, hi: (i + 1) * ancho,
+    n: conBe.filter(w => w.be >= i * ancho && w.be < (i + 1) * ancho).length,
+  }));
+  const maxN = Math.max(...cubos.map(c => c.n), 1);
+  const sx = v => m.l + (v / tope) * iw;
+  const sy = n => m.t + ih - (n / maxN) * ih;
+  const p = [];
+
+  ticks(maxN, 4).forEach(v => {
+    p.push(`<line x1="${m.l}" y1="${sy(v).toFixed(1)}" x2="${m.l + iw}" y2="${sy(v).toFixed(1)}" stroke="${cssVar('--grid')}" stroke-width="1"/>`);
+    p.push(`<text x="${m.l - 9}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+  });
+  cubos.forEach(c => {
+    if (!c.n) return;
+    const cierra = c.hi <= ECO.precio;
+    const alto = m.t + ih - sy(c.n);
+    p.push(`<rect x="${(sx(c.lo) + 1).toFixed(1)}" y="${sy(c.n).toFixed(1)}" width="${Math.max(sx(c.hi) - sx(c.lo) - 2, 1).toFixed(1)}" height="${alto.toFixed(1)}" rx="2" fill="${cierra ? cssVar('--s3') : cssVar('--s2')}" fill-opacity="${cierra ? 1 : .55}"/>`);
+  });
+  for (let v = 0; v <= tope; v += 25) {
+    p.push(`<text x="${sx(v).toFixed(1)}" y="${m.t + ih + 20}" text-anchor="middle" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${v}</text>`);
+  }
+  p.push(`<line x1="${m.l}" y1="${m.t + ih}" x2="${m.l + iw}" y2="${m.t + ih}" stroke="${cssVar('--rule-strong')}" stroke-width="1"/>`);
+
+  // La línea del precio: todo lo que queda a su izquierda cierra.
+  const xp = sx(Math.min(ECO.precio, tope));
+  p.push(`<line x1="${xp.toFixed(1)}" y1="${m.t}" x2="${xp.toFixed(1)}" y2="${m.t + ih}" stroke="${cssVar('--ink')}" stroke-width="2"/>`);
+  p.push(`<text x="${(xp + 6).toFixed(1)}" y="${(m.t + 12).toFixed(1)}" fill="${cssVar('--ink')}" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="500">precio US$ ${ECO.precio}</text>`);
+  p.push(`<text x="${m.l + iw / 2}" y="${H2 - 8}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12">Precio de equilibrio del pozo (US$/bbl)</text>`);
+  p.push(`<text x="14" y="${m.t + ih / 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12" transform="rotate(-90 14 ${m.t + ih / 2})">Pozos</text>`);
+  svg.innerHTML = p.join('');
+
+  // --- por operadora ---
+  const porOp = new Map();
+  conBe.forEach(w => {
+    if (!porOp.has(w.op)) porOp.set(w.op, []);
+    porOp.get(w.op).push(w);
+  });
+  const filas = [...porOp.entries()]
+    .filter(([, ws]) => ws.length >= 4)
+    .map(([op, ws]) => ({
+      op, n: ws.length,
+      be: mediana(ws.map(w => w.be)),
+      cierran: ws.filter(w => w.be <= ECO.precio).length / ws.length * 100,
+    }))
+    .sort((a, b) => a.be - b.be);
+
+  document.getElementById('ecoBody').innerHTML = filas.map(f => `
+    <tr>
+      <td class="pozo" title="${esc(f.op)}">${esc(f.op)}</td>
+      <td class="num mono">${fmt(f.n)}</td>
+      <td class="num mono"><b>${dec(f.be, 0)}</b></td>
+      <td class="num mono" style="color:${f.cierran >= 50 ? 'var(--s3)' : 'var(--s2)'}">${dec(f.cierran, 0)}%</td>
+    </tr>`).join('');
+
+  document.getElementById('ecoNota').innerHTML =
+    `<b>Estos números salen de supuestos, no de datos medidos.</b> El costo del pozo, ` +
+    `el opex y la tasa de descuento son los controles de arriba: movelos y todo se ` +
+    `recalcula. El modelo no tiene impuestos, ni inflación, ni variación del precio ` +
+    `en el tiempo, así que sirve para <b>comparar pozos entre sí con la misma regla</b>, ` +
+    `no para decidir una inversión.<br><br>` +
+    `Además, el backtest muestra que el modelo de declinación <b>subestima</b> la ` +
+    `producción, así que estos precios de equilibrio probablemente sean algo pesimistas.`;
+}
+
 /* ===================== validación: ¿se le puede creer? ===================== */
 /*
  * Grafica producción PREDICHA contra producción REAL de cada pozo, para un
@@ -1227,15 +1458,15 @@ document.getElementById('horBtn').onclick = e => {
 /* ===================== orquestación ===================== */
 function redibujar() {
   pintarFuente(); pintarChips(); pintarKpis(); pintarLista();
-  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); pintarRanking();
+  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); dibujarEconomia(); dibujarEconomia(); pintarRanking();
 }
 redibujar();
 
 // Los colores salen de variables CSS, así que hay que redibujar al cambiar de tema.
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-  dibujarDeclinacion(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama();
+  dibujarDeclinacion(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); dibujarEconomia();
 });
-new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); })
+new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); dibujarEconomia(); })
   .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 </script>
 

@@ -27,6 +27,11 @@ HORIZONTE_EUR_MESES = 360     # 30 años de vida util asumida
 D_TERMINAL_ANUAL = 0.06       # declinacion terminal 6% anual
 R2_MINIMO_CONFIABLE = 0.70    # abajo de esto el ajuste se marca como dudoso
 
+# Precio de referencia del crudo para la evaluacion economica, USD/bbl. Es solo
+# el valor con el que se reportan los numeros por defecto: en la app se cambia
+# con un control, y el precio de equilibrio de cada pozo no depende de el.
+PRECIO_REFERENCIA = 65.0
+
 
 def asegurar_carpetas() -> None:
     """Crea las carpetas de datos si no existen."""

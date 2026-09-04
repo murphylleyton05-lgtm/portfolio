@@ -67,6 +67,23 @@ def main() -> None:
                       f"{d['error_mediano']:+.1f}% | {d['dentro_20']:.0f}% | "
                       f"{d['pozos']:,} |")
 
+    # --- economia ---
+    eco = meta.get("economia", {})
+    if eco.get("suficientes_datos"):
+        s = eco["supuestos"]
+        print("\n### Economía de pozo\n")
+        print(f"| | |")
+        print(f"|---|---|")
+        print(f"| Precio de equilibrio mediano | **US$ {eco['equilibrio_mediano']:.1f}/bbl** |")
+        print(f"| P10 / P90 | US$ {eco['equilibrio_p10']:.0f} / {eco['equilibrio_p90']:.0f} |")
+        print(f"| Cierran a US$ {eco['precio_evaluado']:.0f}/bbl | {eco['rentables_pct']:.0f}% "
+              f"de {eco['pozos']:,} pozos |")
+        if eco.get("repago_mediano_meses"):
+            print(f"| Repago mediano | {eco['repago_mediano_meses']} meses |")
+        print(f"\n_Supuestos (no datos medidos): pozo US$ {s['costo_pozo_musd']}M · "
+              f"opex US$ {s['opex_usd_bbl']}/bbl · regalías {s['regalias_pct']}% · "
+              f"descuento {s['descuento_anual_pct']}% anual._")
+
     # --- normalizacion por rama lateral ---
     rama = meta.get("normalizacion_rama", {})
     if rama.get("suficientes_datos"):

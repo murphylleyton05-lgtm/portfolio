@@ -28,8 +28,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from petro import (config, declinacion, fractura as mod_fractura,  # noqa: E402
-                   limpieza, validacion)
+from petro import (config, declinacion, economia,  # noqa: E402
+                   fractura as mod_fractura, limpieza, validacion)
 
 
 def cargar_crudo(patron: str = "*no_convencional*.csv") -> tuple[pd.DataFrame, bool]:
@@ -245,6 +245,36 @@ def main() -> None:
     else:
         print("   (no hay pozos con historia suficiente para validar)")
 
+    # --- 6d. Economia: ¿a que precio cierra cada pozo? ---
+    print("\n6d) Economia de pozo (precio de equilibrio)")
+    supuestos = economia.Supuestos()
+    print(f"   supuestos: pozo USD {supuestos.costo_pozo_musd}M · "
+          f"opex USD {supuestos.opex_usd_bbl}/bbl · "
+          f"regalias {supuestos.regalias_pct}% · "
+          f"descuento {supuestos.descuento_anual_pct}%/año")
+    print("   (son SUPUESTOS, no datos medidos: cambiarlos cambia el resultado)")
+
+    confiables_ec = ajustes[
+        (ajustes["r2"] >= config.R2_MINIMO_CONFIABLE)
+        & ajustes["convergio"]
+        & (ajustes["b"] < 1.98)
+    ]
+    if len(confiables_ec) >= 10:
+        evaluados = economia.evaluar(confiables_ec, precio_usd_bbl=config.PRECIO_REFERENCIA,
+                                     supuestos=supuestos)
+        resumen_economia = economia.resumen(evaluados, config.PRECIO_REFERENCIA, supuestos)
+        print(f"   precio de equilibrio mediano: "
+              f"USD {resumen_economia['equilibrio_mediano']:.1f}/bbl "
+              f"(P10 {resumen_economia['equilibrio_p10']:.0f} · "
+              f"P90 {resumen_economia['equilibrio_p90']:.0f})")
+        print(f"   a USD {config.PRECIO_REFERENCIA}/bbl, "
+              f"{resumen_economia['rentables_pct']:.0f}% de los pozos son rentables")
+        if resumen_economia.get("repago_mediano_meses"):
+            print(f"   repago mediano: {resumen_economia['repago_mediano_meses']} meses")
+    else:
+        resumen_economia = {"suficientes_datos": False}
+        print("   (pocos ajustes confiables para evaluar economia)")
+
     # --- 7. Guardar ---
     print("\n7) Guardando en data/procesado/")
     df.to_parquet(config.PRODUCCION, index=False)
@@ -271,6 +301,7 @@ def main() -> None:
         "d_terminal_anual": config.D_TERMINAL_ANUAL,
         "normalizacion_rama": diagnostico_rama,
         "backtest": resumen_backtest,
+        "economia": resumen_economia,
     }
     config.METADATOS.write_text(json.dumps(metadatos, indent=2, ensure_ascii=False))
 

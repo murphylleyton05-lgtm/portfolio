@@ -68,6 +68,23 @@ def bloque(meta: dict) -> str:
                 f"sistemática, lo que es corregible."
             )
 
+    eco = meta.get("economia", {})
+    if eco.get("suficientes_datos"):
+        s = eco["supuestos"]
+        lineas.append("")
+        lineas.append(
+            f"**Economía de pozo**: precio de equilibrio mediano de "
+            f"**US$ {eco['equilibrio_mediano']:.0f}/bbl** "
+            f"(P10 {eco['equilibrio_p10']:.0f} · P90 {eco['equilibrio_p90']:.0f}), sobre "
+            f"{eco['pozos']:,} pozos. A US$ {eco['precio_evaluado']:.0f}/bbl cierra el "
+            f"**{eco['rentables_pct']:.0f}%**"
+            + (f", con un repago mediano de {eco['repago_mediano_meses']} meses"
+               if eco.get("repago_mediano_meses") else "")
+            + f". Supuestos: pozo US$ {s['costo_pozo_musd']}M · opex US$ "
+            f"{s['opex_usd_bbl']}/bbl · regalías {s['regalias_pct']}% · descuento "
+            f"{s['descuento_anual_pct']}% anual. **Son supuestos, no datos medidos.**"
+        )
+
     rama = meta.get("normalizacion_rama", {})
     if rama.get("suficientes_datos"):
         lineas.append("")
