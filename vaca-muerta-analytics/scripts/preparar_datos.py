@@ -28,7 +28,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from petro import config, declinacion, fractura as mod_fractura, limpieza  # noqa: E402
+from petro import (config, declinacion, fractura as mod_fractura,  # noqa: E402
+                   limpieza, validacion)
 
 
 def cargar_crudo(patron: str = "*no_convencional*.csv") -> tuple[pd.DataFrame, bool]:
@@ -217,11 +218,40 @@ def main() -> None:
     print(f"   EUR mediano: {ajustes['eur'].median():,.0f} m3 "
           f"({ajustes['eur'].median() * limpieza.BARRILES_POR_M3 / 1000:,.0f} Mbbl)")
 
+    # --- 6c. Backtest: validar el modelo contra datos que no vio ---
+    print("\n6c) Backtest: ajustando con los primeros "
+          f"{validacion.MESES_ENTRENAMIENTO} meses y prediciendo el resto")
+    print("   (es la validacion del EUR: el pozo ya produjo, el modelo no lo vio)")
+
+    backtest = validacion.backtest_muchos(
+        df,
+        col_id="id_pozo",
+        col_caudal="caudal_petroleo_m3d",
+        col_fecha="fecha",
+        mostrar_progreso=True,
+    )
+    resumen_backtest = validacion.resumen(backtest)
+
+    if resumen_backtest.get("suficientes_datos"):
+        print(f"   {resumen_backtest['pozos_totales']:,} pozos con historia "
+              "suficiente para validar")
+        for h in validacion.HORIZONTES:
+            d = resumen_backtest.get(f"h{h}")
+            if d:
+                print(f"   a {h:>2} meses: error absoluto mediano "
+                      f"{d['error_absoluto']:>5.1f}%  |  sesgo {d['error_mediano']:+6.1f}%  "
+                      f"|  {d['dentro_20']:.0f}% dentro de +/-20%  ({d['pozos']:,} pozos)")
+        print(f"\n   >> {validacion.frase_del_resultado(resumen_backtest)}")
+    else:
+        print("   (no hay pozos con historia suficiente para validar)")
+
     # --- 7. Guardar ---
     print("\n7) Guardando en data/procesado/")
     df.to_parquet(config.PRODUCCION, index=False)
     pozos.to_parquet(config.POZOS, index=False)
     ajustes.to_parquet(config.AJUSTES, index=False)
+    if not backtest.empty:
+        backtest.to_parquet(config.DIR_PROCESADO / "backtest.parquet", index=False)
 
     precios = cargar_precios()
     if not precios.empty:
@@ -240,6 +270,7 @@ def main() -> None:
         "horizonte_eur_meses": config.HORIZONTE_EUR_MESES,
         "d_terminal_anual": config.D_TERMINAL_ANUAL,
         "normalizacion_rama": diagnostico_rama,
+        "backtest": resumen_backtest,
     }
     config.METADATOS.write_text(json.dumps(metadatos, indent=2, ensure_ascii=False))
 

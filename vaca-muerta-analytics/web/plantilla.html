@@ -377,6 +377,52 @@
   </section>
 
 
+
+  <!-- ============ VALIDACION ============ -->
+  <section class="panel" id="secVal" hidden>
+    <div class="panel-head">
+      <div>
+        <h2>¿Se le puede creer al modelo?</h2>
+        <p>
+          Un EUR es una predicción a 30 años, y cualquiera puede ajustar una curva y
+          tirar un número grande. Para saber si el número significa algo hay que
+          esconderle datos al modelo: se ajusta la curva con los
+          <strong>primeros 24 meses</strong> de cada pozo y se le pide que prediga
+          los siguientes. El pozo ya produjo ese período — el modelo no lo vio.
+        </p>
+      </div>
+      <div style="display:flex;gap:6px" id="valBotones"></div>
+    </div>
+
+    <div class="hallazgo" id="valStats"></div>
+
+    <div class="split-rama">
+      <div class="chart-area">
+        <div class="chart-top">
+          <div class="legend">
+            <span><i class="swatch dot" style="background:var(--s1)"></i> Un pozo</span>
+            <span><i class="swatch" style="background:var(--ink-3)"></i> Predicción perfecta</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg class="chart" id="valChart" viewBox="0 0 760 400" role="img"
+               aria-label="Producción predicha contra producción real de cada pozo"></svg>
+          <div class="tip" id="valTip"></div>
+        </div>
+      </div>
+
+      <div class="tabla-rama">
+        <div class="tabla-rama-head">Cómo leerlo</div>
+        <p class="nota-rama" id="valNota" style="border-top:0"></p>
+        <div class="tabla-rama-head" style="padding-top:4px">Distribución del error</div>
+        <div class="chart-wrap" style="padding:0 12px 12px">
+          <svg class="chart" id="valHist" viewBox="0 0 360 190" role="img"
+               aria-label="Distribución del error de predicción"></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ ROCA O LARGO ============ -->
   <section class="panel" id="secRama" hidden>
     <div class="panel-head">
@@ -795,6 +841,137 @@ function dibujarCurvasTipo() {
   svg.onpointerleave = () => { tip.style.opacity = 0; };
 }
 
+/* ===================== validación: ¿se le puede creer? ===================== */
+/*
+ * Grafica producción PREDICHA contra producción REAL de cada pozo, para un
+ * período que el modelo no vio. La diagonal es la predicción perfecta: cuanto
+ * más pegados a ella están los puntos, mejor predice el modelo.
+ */
+let horizonteVal = 36;
+
+function dibujarValidacion() {
+  const seccion = document.getElementById('secVal');
+  const bt = DATA.backtest || [];
+  const meta = (DATA.meta.backtest) || {};
+
+  const disponibles = [12, 24, 36].filter(h => meta[`h${h}`]);
+  if (!bt.length || !disponibles.length) { seccion.hidden = true; return; }
+  seccion.hidden = false;
+
+  if (!disponibles.includes(horizonteVal)) horizonteVal = disponibles[disponibles.length - 1];
+
+  // --- botones de horizonte ---
+  document.getElementById('valBotones').innerHTML = disponibles.map(h =>
+    `<button class="toggle" type="button" data-h="${h}" aria-pressed="${h === horizonteVal}">${h} meses</button>`
+  ).join('');
+  document.querySelectorAll('[data-h]').forEach(b => b.onclick = () => {
+    horizonteVal = +b.dataset.h; dibujarValidacion();
+  });
+
+  const d = meta[`h${horizonteVal}`];
+  const puntos = bt.filter(x => x[`r${horizonteVal}`] != null && x[`p${horizonteVal}`] != null);
+  if (!puntos.length) { seccion.hidden = true; return; }
+
+  // --- los números ---
+  const sesgo = d.error_mediano;
+  document.getElementById('valStats').innerHTML = [
+    ['Error típico', `${dec(d.error_absoluto, 1)}%`,
+     `mediana del |error| a ${horizonteVal} meses`],
+    ['Dentro de ±20%', `${dec(d.dentro_20, 0)}%`, 'de los pozos evaluados'],
+    ['Sesgo', `${sesgo > 0 ? '+' : ''}${dec(sesgo, 1)}%`,
+     sesgo > 0 ? 'el modelo sobreestima' : 'el modelo subestima'],
+    ['Pozos validados', fmt(d.pozos), `ya produjeron los ${horizonteVal} meses`],
+  ].map(([l, v, h]) =>
+    `<div><div class="h-l">${l}</div><div class="h-v">${v}</div><div class="h-h">${h}</div></div>`
+  ).join('');
+
+  // --- predicho vs real ---
+  const svg = document.getElementById('valChart');
+  const W2 = 760, H2 = 400, m = { t: 20, r: 24, b: 48, l: 70 };
+  const iw = W2 - m.l - m.r, ih = H2 - m.t - m.b;
+  const maxV = Math.max(...puntos.flatMap(x => [x[`r${horizonteVal}`], x[`p${horizonteVal}`]])) * 1.06;
+  const sx = v => m.l + (v / maxV) * iw;
+  const sy = v => m.t + ih - (v / maxV) * ih;
+  const p = [];
+
+  ticks(maxV, 5).forEach(v => {
+    p.push(`<line x1="${m.l}" y1="${sy(v).toFixed(1)}" x2="${m.l + iw}" y2="${sy(v).toFixed(1)}" stroke="${cssVar('--grid')}" stroke-width="1"/>`);
+    p.push(`<text x="${m.l - 9}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+    p.push(`<text x="${sx(v).toFixed(1)}" y="${m.t + ih + 20}" text-anchor="middle" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+  });
+  p.push(`<line x1="${m.l}" y1="${m.t + ih}" x2="${m.l + iw}" y2="${m.t + ih}" stroke="${cssVar('--rule-strong')}" stroke-width="1"/>`);
+  p.push(`<text x="${m.l + iw / 2}" y="${H2 - 8}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12">Producción real en ${horizonteVal} meses (Mbbl)</text>`);
+  p.push(`<text x="16" y="${m.t + ih / 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12" transform="rotate(-90 16 ${m.t + ih / 2})">Producción predicha (Mbbl)</text>`);
+
+  // La diagonal: dónde caerían los puntos si el modelo acertara exacto.
+  p.push(`<path d="M${m.l},${(m.t + ih).toFixed(1)} L${(m.l + iw).toFixed(1)},${m.t}" stroke="${cssVar('--ink-3')}" stroke-width="1.5" stroke-dasharray="5 4" fill="none"/>`);
+  p.push(`<text x="${(m.l + iw - 8).toFixed(1)}" y="${(m.t + 16).toFixed(1)}" text-anchor="end" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="10.5">predicción perfecta</text>`);
+
+  puntos.forEach(x => p.push(
+    `<circle cx="${sx(x[`r${horizonteVal}`]).toFixed(1)}" cy="${sy(x[`p${horizonteVal}`]).toFixed(1)}" r="4" fill="${cssVar('--s1')}" fill-opacity=".6" stroke="${cssVar('--surface')}" stroke-width="1.5"/>`));
+  svg.innerHTML = p.join('');
+
+  const tip = document.getElementById('valTip'), wrap = svg.parentElement;
+  svg.onpointermove = e => {
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    let cerca = null, dmin = 1e9;
+    puntos.forEach(x => {
+      const dd = Math.hypot(sx(x[`r${horizonteVal}`]) - loc.x, sy(x[`p${horizonteVal}`]) - loc.y);
+      if (dd < dmin) { dmin = dd; cerca = x; }
+    });
+    if (!cerca || dmin > 18) { tip.style.opacity = 0; return; }
+    const real = cerca[`r${horizonteVal}`], pred = cerca[`p${horizonteVal}`];
+    const err = (pred - real) / real * 100;
+    tip.innerHTML = `<div class="tip-t">${esc(cerca.sigla)}</div>` +
+      `<div class="tip-r"><span>Real</span><b>${fmt(real)} Mbbl</b></div>` +
+      `<div class="tip-r"><span>Predicho</span><b>${fmt(pred)} Mbbl</b></div>` +
+      `<div class="tip-r"><span>Error</span><b>${err > 0 ? '+' : ''}${dec(err, 1)}%</b></div>`;
+    const rb = wrap.getBoundingClientRect();
+    tip.style.left = Math.min(Math.max((sx(real) / W2) * rb.width + 14, 4), Math.max(rb.width - 180, 4)) + 'px';
+    tip.style.top = Math.max((sy(pred) / H2) * rb.height - 56, 4) + 'px';
+    tip.style.opacity = 1;
+  };
+  svg.onpointerleave = () => { tip.style.opacity = 0; };
+
+  // --- histograma del error ---
+  const errores = puntos.map(x =>
+    (x[`p${horizonteVal}`] - x[`r${horizonteVal}`]) / x[`r${horizonteVal}`] * 100);
+  const bordes = [-100, -50, -30, -20, -10, 0, 10, 20, 30, 50, 100];
+  const cubos = bordes.slice(0, -1).map((lo, i) => ({
+    lo, hi: bordes[i + 1],
+    n: errores.filter(e => e >= lo && e < bordes[i + 1]).length,
+  }));
+  const maxN = Math.max(...cubos.map(c => c.n), 1);
+
+  const hs = document.getElementById('valHist');
+  const HW = 360, HH = 190, hm = { t: 10, r: 8, b: 34, l: 26 };
+  const hiw = HW - hm.l - hm.r, hih = HH - hm.t - hm.b;
+  const ancho = hiw / cubos.length;
+  const q = [];
+  cubos.forEach((c, i) => {
+    const alto = (c.n / maxN) * hih;
+    // Los cubos de |error| <= 20% son los "buenos": se destacan.
+    const bueno = c.lo >= -20 && c.hi <= 20;
+    q.push(`<rect x="${(hm.l + i * ancho + 1).toFixed(1)}" y="${(hm.t + hih - alto).toFixed(1)}" width="${(ancho - 2).toFixed(1)}" height="${alto.toFixed(1)}" rx="2" fill="${bueno ? cssVar('--s1') : cssVar('--s2')}" fill-opacity="${bueno ? 1 : .5}"/>`);
+  });
+  [-50, 0, 50].forEach(v => {
+    const i = bordes.findIndex(b => b >= v);
+    q.push(`<text x="${(hm.l + i * ancho).toFixed(1)}" y="${HH - 16}" text-anchor="middle" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="10">${v > 0 ? '+' : ''}${v}%</text>`);
+  });
+  q.push(`<line x1="${hm.l}" y1="${hm.t + hih}" x2="${hm.l + hiw}" y2="${hm.t + hih}" stroke="${cssVar('--rule-strong')}" stroke-width="1"/>`);
+  q.push(`<text x="${hm.l + hiw / 2}" y="${HH - 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="10.5">error de predicción · azul = dentro de ±20%</text>`);
+  hs.innerHTML = q.join('');
+
+  document.getElementById('valNota').innerHTML =
+    `Cada punto es un pozo. El eje horizontal es lo que <b>realmente</b> produjo en ` +
+    `${horizonteVal} meses; el vertical, lo que el modelo <b>predijo</b> sin haber visto ` +
+    `esos meses. Los puntos sobre la diagonal son aciertos; arriba, sobreestimaciones; ` +
+    `abajo, subestimaciones.<br><br>` +
+    `El sesgo importa tanto como el error: un modelo que se equivoca siempre para el ` +
+    `mismo lado se puede corregir; uno que se equivoca al azar, no.`;
+}
+
 /* ===================== ¿roca o largo? ===================== */
 /*
  * Esta sección responde la pregunta que hace válido (o no) todo el ranking:
@@ -961,15 +1138,15 @@ document.getElementById('horBtn').onclick = e => {
 /* ===================== orquestación ===================== */
 function redibujar() {
   pintarFuente(); pintarChips(); pintarKpis(); pintarLista();
-  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); dibujarRama(); pintarRanking();
+  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); pintarRanking();
 }
 redibujar();
 
 // Los colores salen de variables CSS, así que hay que redibujar al cambiar de tema.
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-  dibujarDeclinacion(); dibujarCurvasTipo(); dibujarRama();
+  dibujarDeclinacion(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama();
 });
-new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); dibujarRama(); })
+new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); })
   .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 </script>
 

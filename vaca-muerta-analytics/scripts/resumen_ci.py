@@ -52,6 +52,33 @@ def main() -> None:
         print(f"| Pozos con b en el tope del modelo | {en_tope:,} "
               f"({en_tope / len(aj):.0%}) — su EUR está sobreestimado |")
 
+    # --- validacion: lo que hace creible al EUR ---
+    bt = meta.get("backtest", {})
+    if bt.get("suficientes_datos"):
+        print("\n### Validación del modelo (backtest)\n")
+        print("Ajustado con los primeros 24 meses de cada pozo, prediciendo el resto. "
+              "El pozo ya produjo ese período; el modelo no lo vio.\n")
+        print("| Horizonte | Error típico | Sesgo | Dentro de ±20% | Pozos |")
+        print("|---|---:|---:|---:|---:|")
+        for h in (12, 24, 36):
+            d = bt.get(f"h{h}")
+            if d:
+                print(f"| {h} meses | {d['error_absoluto']:.1f}% | "
+                      f"{d['error_mediano']:+.1f}% | {d['dentro_20']:.0f}% | "
+                      f"{d['pozos']:,} |")
+
+    # --- normalizacion por rama lateral ---
+    rama = meta.get("normalizacion_rama", {})
+    if rama.get("suficientes_datos"):
+        print("\n### Normalización por longitud de rama lateral\n")
+        print(f"- La rama explica el **{rama['varianza_explicada']:.0%}** de la "
+              f"diferencia de EUR entre pozos ({rama['pozos']:,} con dato declarado)")
+        print(f"- Rama mediana: **{rama['rama_mediana_m']:,} m**")
+        print(f"- Al normalizar, el ranking se mueve **{rama['cambio_de_puesto_mediano']} "
+              f"puestos** (mediana), hasta {rama['cambio_de_puesto_maximo']:,}")
+        print(f"- Del top 10 por EUR crudo sobreviven **{rama['top10_que_sobrevive']} "
+              "pozos** al pasar a EUR por metro")
+
     if "empresa" in aj.columns and aj["empresa"].notna().any():
         print("\n### Operadoras con más pozos analizados\n")
         print("| Operadora | Pozos | EUR mediano (Mbbl) |")

@@ -70,6 +70,10 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
     ajustes = pd.read_parquet(config.AJUSTES)
     metadatos = json.loads(config.METADATOS.read_text())
 
+    # Backtest: predicho vs real para los pozos que se pudieron validar.
+    ruta_bt = config.DIR_PROCESADO / "backtest.parquet"
+    backtest = pd.read_parquet(ruta_bt) if ruta_bt.exists() else pd.DataFrame()
+
     total = len(ajustes)
 
     # ---------------------------------------------------------------
@@ -142,9 +146,29 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
     if not pozos:
         raise SystemExit("Ningun pozo quedo con historia suficiente para la app.")
 
+    # --- backtest para el grafico de predicho vs real ---
+    puntos_bt = []
+    if not backtest.empty:
+        siglas = dict(zip(ajustes["id_pozo"].astype(str), ajustes["sigla"].astype(str)))
+        for f in backtest.itertuples():
+            fila = {"id": str(f.id_pozo),
+                    "sigla": siglas.get(str(f.id_pozo), str(f.id_pozo))}
+            hay = False
+            for h in (12, 24, 36):
+                real = getattr(f, f"real_{h}", None)
+                pred = getattr(f, f"pred_{h}", None)
+                if real is not None and pd.notna(real) and pd.notna(pred):
+                    # A miles de barriles, que es como se habla de estos volumenes.
+                    fila[f"r{h}"] = round(float(real) * BARRILES_POR_M3 / 1000, 1)
+                    fila[f"p{h}"] = round(float(pred) * BARRILES_POR_M3 / 1000, 1)
+                    hay = True
+            if hay:
+                puntos_bt.append(fila)
+
     return {
         "wells": pozos,
         "series": series,
+        "backtest": puntos_bt,
         "meta": {
             "periodo": f"{metadatos['primer_mes']} a {metadatos['ultimo_mes']}",
             "es_demo": metadatos["es_demo"],
@@ -154,6 +178,7 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
             "horizonte": metadatos["horizonte_eur_meses"],
             # Diagnostico de cuanto de la diferencia de EUR explica la rama.
             "rama": metadatos.get("normalizacion_rama", {}),
+            "backtest": metadatos.get("backtest", {}),
         },
     }
 
@@ -197,6 +222,7 @@ def main() -> None:
     print(f"  periodo: {datos['meta']['periodo']}")
     con_rama = sum(1 for w in datos["wells"] if w.get("rama"))
     print(f"  {con_rama:,} con longitud de rama declarada")
+    print(f"  {len(datos['backtest']):,} pozos validados con backtest")
     print(f"  web/index.html  ({tam:.1f} MB)  <- abrilo con doble clic")
 
 
