@@ -539,6 +539,8 @@
           produce y a cuánto se vende. El indicador que resume las tres cosas es el
           <strong>precio de equilibrio</strong>: el valor del barril al que el pozo
           apenas devuelve la inversión.
+          <br><br>
+          <span id="ecoUniverso" style="color:var(--ink-3)"></span>
         </p>
       </div>
     </div>
@@ -977,7 +979,13 @@ function precioEquilibrio(w) {
 }
 
 function dibujarEconomia() {
-  const pozos = visibles();
+  // La economía se calcula sobre TODOS los pozos con ajuste confiable, no sobre
+  // los que se muestran en los gráficos. Esos son los de mayor EUR: usarlos acá
+  // daría que el 100% cierra a cualquier precio, que es falso para el conjunto.
+  const poblacion = DATA.poblacion || [];
+  const pozos = poblacion.length
+    ? poblacion.filter(w => opsActivas.has(w.op))
+    : visibles();
   if (!pozos.length) return;
 
   // --- controles ---
@@ -1093,6 +1101,15 @@ function dibujarEconomia() {
       <td class="num mono"><b>${dec(f.be, 0)}</b></td>
       <td class="num mono" style="color:${f.cierran >= 50 ? 'var(--s3)' : 'var(--s2)'}">${dec(f.cierran, 0)}%</td>
     </tr>`).join('');
+
+  const universo = document.getElementById('ecoUniverso');
+  if (universo) {
+    universo.innerHTML = (DATA.poblacion || []).length
+      ? `Calculado sobre los <b>${fmt(conBe.length)} pozos con ajuste confiable</b> del ` +
+        `período, no solo sobre los que aparecen en los gráficos de arriba: esos son ` +
+        `los de mayor EUR, y usarlos acá daría que casi todos cierran.`
+      : '';
+  }
 
   document.getElementById('ecoNota').innerHTML =
     `<b>Estos números salen de supuestos, no de datos medidos.</b> El costo del pozo, ` +

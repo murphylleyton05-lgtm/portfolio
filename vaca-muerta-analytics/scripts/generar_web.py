@@ -108,6 +108,10 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
               f"{config.R2_MINIMO_CONFIABLE}, sin converger, o b en el tope")
         ajustes = confiables
 
+    # Guardamos la poblacion completa de ajustes confiables ANTES de recortar a
+    # los mejores: la economia se calcula sobre todos, no sobre los elegidos.
+    confiables_para_poblacion = ajustes.copy()
+
     ajustes = ajustes.sort_values("eur", ascending=False).head(max_pozos)
 
     pozos, series = [], {}
@@ -165,10 +169,31 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
             if hay:
                 puntos_bt.append(fila)
 
+    # --- poblacion completa para la economia ---
+    #
+    # La app incrusta solo los `max_pozos` de mayor EUR, y eso esta bien para los
+    # graficos de curvas: son los que interesa mirar. Pero para la economia es un
+    # SESGO grave: si solo mostras los mejores pozos, el 100% cierra a cualquier
+    # precio razonable y el resultado miente sobre el conjunto.
+    #
+    # Por eso va aparte la poblacion completa de ajustes confiables, con lo
+    # minimo para recalcular el precio de equilibrio: qi, Di, b y la operadora.
+    # Son tres numeros por pozo, asi que entran miles sin engordar el archivo.
+    poblacion = [
+        {
+            "qi": round(f.qi * BARRILES_POR_M3, 1),
+            "di": round(f.di_mensual, 5),
+            "b": round(f.b, 3),
+            "op": str(f.empresa) if pd.notna(f.empresa) else "S/D",
+        }
+        for f in confiables_para_poblacion.itertuples()
+    ]
+
     return {
         "wells": pozos,
         "series": series,
         "backtest": puntos_bt,
+        "poblacion": poblacion,
         "meta": {
             "periodo": f"{metadatos['primer_mes']} a {metadatos['ultimo_mes']}",
             "es_demo": metadatos["es_demo"],
@@ -223,6 +248,7 @@ def main() -> None:
     con_rama = sum(1 for w in datos["wells"] if w.get("rama"))
     print(f"  {con_rama:,} con longitud de rama declarada")
     print(f"  {len(datos['backtest']):,} pozos validados con backtest")
+    print(f"  {len(datos['poblacion']):,} pozos en la población para economía")
     print(f"  web/index.html  ({tam:.1f} MB)  <- abrilo con doble clic")
 
 
