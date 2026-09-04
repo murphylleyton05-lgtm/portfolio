@@ -144,12 +144,20 @@ def descargar_dataset(
     carpeta_destino: Path,
     solo_csv: bool = True,
     forzar: bool = False,
+    max_archivos: int | None = None,
+    max_mb: float | None = None,
 ) -> list[Path]:
     """
-    Descarga todos los recursos de un dataset de DATASETS a `carpeta_destino`.
+    Descarga los recursos de un dataset de DATASETS a `carpeta_destino`.
 
     Ejemplo:
         descargar_dataset("no_convencional", Path("data/crudo"))
+
+    Los limites `max_archivos` y `max_mb` existen para correr esto en un
+    servidor de integracion continua, donde el disco es finito: un dataset del
+    portal puede traer un CSV por año y sumar varios GB. Cuando hay limite se
+    priorizan los recursos MAS RECIENTES, que son los que interesan para
+    analizar produccion actual.
     """
     if clave not in DATASETS:
         raise ValueError(
@@ -165,6 +173,26 @@ def descargar_dataset(
             f"El dataset {clave!r} no devolvio recursos CSV. "
             "Revisa con listar_recursos() si cambio el formato."
         )
+
+    if max_archivos or max_mb:
+        # Mas nuevo primero. `modificado` puede venir vacio: esos van al final.
+        recursos = recursos.sort_values("modificado", ascending=False, na_position="last")
+
+        if max_mb:
+            bytes_acumulados, quedan = 0, []
+            for _, fila in recursos.iterrows():
+                tam = float(fila["bytes"]) if pd.notna(fila["bytes"]) else 0.0
+                if quedan and (bytes_acumulados + tam) / 1e6 > max_mb:
+                    break
+                bytes_acumulados += tam
+                quedan.append(fila)
+            recursos = pd.DataFrame(quedan)
+
+        if max_archivos:
+            recursos = recursos.head(max_archivos)
+
+        print(f"[limite] se descargan {len(recursos)} recurso(s) "
+              f"(max_archivos={max_archivos}, max_mb={max_mb})")
 
     archivos = []
     for _, fila in recursos.iterrows():

@@ -64,6 +64,8 @@ def main() -> None:
                         help="cuantos pozos incrustar en la app web (default: 400)")
     parser.add_argument("--sin-descargar", action="store_true",
                         help="saltear la descarga y usar los CSV que ya tenes en data/crudo/")
+    parser.add_argument("--max-mb", type=float, default=None,
+                        help="tope de descarga en MB (util en un servidor de CI)")
     args = parser.parse_args()
 
     pasos = []
@@ -72,7 +74,8 @@ def main() -> None:
     elif not args.sin_descargar:
         pasos.append((
             "Descargando datos de la Secretaria de Energia",
-            ["scripts/descargar_datos.py", "--dataset", "no_convencional", "--forzar"],
+            ["scripts/descargar_datos.py", "--dataset", "no_convencional", "--forzar"]
+            + (["--max-mb", str(args.max_mb)] if args.max_mb else []),
         ))
 
     pasos.append(("Procesando y ajustando curvas de declinacion", ["scripts/preparar_datos.py"]))

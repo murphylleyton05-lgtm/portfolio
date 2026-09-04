@@ -75,7 +75,12 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-**Un solo comando**, que descarga, procesa y regenera la app:
+**Sin instalar nada:** pestaña **Actions** del repo → *Actualizar Vaca Muerta* →
+**Run workflow**. GitHub descarga los datos oficiales, ajusta las curvas, regenera
+la app y commitea el resultado. También corre solo el día 20 de cada mes, que es
+cuando la Secretaría publica.
+
+**En tu máquina**, un solo comando que hace lo mismo:
 
 ```bash
 python scripts/actualizar.py            # datos REALES de la Secretaría de Energía

@@ -29,6 +29,10 @@ def main() -> None:
     )
     parser.add_argument("--listar", action="store_true", help="listar recursos sin descargar")
     parser.add_argument("--forzar", action="store_true", help="volver a descargar aunque exista")
+    parser.add_argument("--max-archivos", type=int, default=None,
+                        help="descargar a lo sumo N recursos, los mas recientes")
+    parser.add_argument("--max-mb", type=float, default=None,
+                        help="tope aproximado de descarga en MB (para correr en CI)")
     parser.add_argument("--buscar", help="buscar datasets por texto en el portal")
     args = parser.parse_args()
 
@@ -50,7 +54,8 @@ def main() -> None:
 
     print()
     archivos = ingesta.descargar_dataset(
-        args.dataset, config.DIR_CRUDO, forzar=args.forzar
+        args.dataset, config.DIR_CRUDO, forzar=args.forzar,
+        max_archivos=args.max_archivos, max_mb=args.max_mb,
     )
     print(f"\n{len(archivos)} archivo(s) en {config.DIR_CRUDO}")
     print("Ahora corre:  python scripts/preparar_datos.py")
