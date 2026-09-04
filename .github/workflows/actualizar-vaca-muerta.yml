@@ -9,6 +9,13 @@
 name: Actualizar Vaca Muerta
 
 on:
+  # El botón "Run workflow" de la pestaña Actions solo aparece cuando el archivo
+  # ya está en la rama principal: es una regla de GitHub. Mientras tanto, este
+  # trigger por push permite correrlo desde la rama de trabajo.
+  # QUITAR este bloque `push` cuando esto se mergee a main.
+  push:
+    branches: [claude/oil-data-analytics-app-gszaq8]
+
   workflow_dispatch:
     inputs:
       fuente:
@@ -57,7 +64,7 @@ jobs:
 
       - name: Ver que publica el portal
         id: sondeo
-        if: inputs.fuente != 'demo'
+        if: (inputs.fuente || 'oficiales') != 'demo'
         continue-on-error: true
         run: |
           python scripts/descargar_datos.py --dataset no_convencional --listar
@@ -65,7 +72,7 @@ jobs:
       # Si el paso anterior falló, lo más probable es que el dataset haya
       # cambiado de nombre. Buscamos candidatos para que el log diga cuál es.
       - name: Buscar el dataset (si cambió de nombre)
-        if: inputs.fuente != 'demo' && steps.sondeo.outcome == 'failure'
+        if: (inputs.fuente || 'oficiales') != 'demo' && steps.sondeo.outcome == 'failure'
         run: |
           echo "El slug configurado no respondió. Candidatos en el portal:"
           python scripts/descargar_datos.py --buscar "no convencional" || true
@@ -75,7 +82,8 @@ jobs:
 
       - name: Descargar, procesar y regenerar la app
         run: |
-          if [ "${{ inputs.fuente }}" = "demo" ]; then
+          FUENTE="${{ inputs.fuente || 'oficiales' }}"
+          if [ "$FUENTE" = "demo" ]; then
             python scripts/actualizar.py --demo --max-pozos "${{ inputs.max_pozos || 400 }}"
           else
             python scripts/actualizar.py \
