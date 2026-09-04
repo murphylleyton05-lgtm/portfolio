@@ -305,6 +305,10 @@
 
   @media (max-width: 900px) {
     .kpis { grid-template-columns: repeat(2, 1fr); }
+    /* Con 5 tarjetas en 2 columnas la última queda sola y deja un hueco gris
+       que parece un error de carga. Que ocupe el ancho completo. */
+    .kpis > .kpi:last-child:nth-child(odd),
+    .hallazgo > div:last-child:nth-child(odd) { grid-column: 1 / -1; }
     .params { grid-template-columns: repeat(2, 1fr); }
     .split { grid-template-columns: 1fr; }
     .split-rama { grid-template-columns: minmax(0, 1fr); }
@@ -592,6 +596,7 @@
         <thead>
           <tr>
             <th>#</th><th>Pozo</th><th>Operadora</th><th>Bloque</th>
+            <th class="num">Meses</th>
             <th class="num">qi</th><th class="num">Di</th><th class="num">b</th>
             <th class="num">R²</th><th class="num">EUR</th><th class="bar-cell"></th>
           </tr>
@@ -664,6 +669,9 @@ function qModelo(t, qi, di, b) {
 const fmt = (n, d = 0) => n.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const dec = (n, d) => n.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const B_TOPE = 1.98;                 // el ajuste acota b en 2.0; pegado al tope, el EUR queda inflado
+// Debajo de estos meses de historia el EUR es una extrapolación muy larga:
+// se marca para que no se lea igual que el de un pozo con cinco años.
+const MESES_HISTORIA_FINA = 18;
 const mediana = a => percentil([...a].sort((x, y) => x - y), 0.5);
 
 // Percentil con interpolación lineal, igual que el default de numpy/pandas.
@@ -720,7 +728,11 @@ function pintarKpis() {
     ['Pozos', fmt(v.length), ''],
     ['Operadoras', fmt(new Set(v.map(w => w.op)).size), ''],
     ['EUR mediano', fmt(mediana(v.map(w => w.eur))), 'Mbbl'],
-    ['Declinación inicial', fmt(mediana(v.map(w => w.di * 12)) * 100), '% /año'],
+    // La declinación NOMINAL anualizada (Di × 12) puede pasar el 100% y se lee
+    // como un error. La EFECTIVA del primer año —cuánto caudal pierde el pozo
+    // entre el mes 0 y el 12— es la que usa la industria y la que se entiende.
+    ['Cae el primer año',
+     fmt(mediana(v.map(w => (1 - qModelo(12, w.qi, w.di, w.b) / w.qi) * 100))), '%'],
     ['Acumulado', fmt(v.reduce((s, w) => s + w.acum, 0) / 1000, 1), 'MMbbl'],
   ] : [['Pozos', '0', '']];
   document.getElementById('kpis').innerHTML = tiles.map(([l, val, u]) =>
@@ -752,6 +764,8 @@ function pintarLista() {
        <div class="well-name">${w.sigla}</div>
        <div class="well-meta"><span>${w.op.replace(' S.A.','').replace(' ARGENTINA','')}</span>
        <b>${fmt(w.eur)} Mbbl</b></div>
+       <div class="well-meta"><span>${fmt(w.n)} meses de historia</span>
+       ${w.n < MESES_HISTORIA_FINA ? '<span style="color:var(--s4)">▲</span>' : ''}</div>
      </button>`).join('');
   document.querySelectorAll('.well-item').forEach(b => b.onclick = () => {
     pozoSel = +b.dataset.id; pintarLista(); dibujarDeclinacion(); pintarParams();
@@ -1480,6 +1494,7 @@ function pintarRanking() {
       <td class="mono">${esc(w.sigla)}</td>
       <td>${esc(w.op.replace(' S.A.','').replace(' ARGENTINA',''))}</td>
       <td style="color:var(--ink-2)">${esc(w.area)}</td>
+      <td class="num mono">${fmt(w.n)}${w.n < MESES_HISTORIA_FINA ? '<span title="Pocos meses de historia: el EUR es una extrapolación larga" style="color:var(--s4);margin-left:3px">▲</span>' : ''}</td>
       <td class="num mono">${fmt(w.qi)}</td>
       <td class="num mono">${fmt(w.di * 12 * 100)}%</td>
       <td class="num mono">${dec(w.b, 2)}${w.b >= B_TOPE ? '<span title="b tocó el tope del modelo: el EUR de este pozo queda sobreestimado" style="color:var(--s4);margin-left:3px">▲</span>' : ''}</td>
@@ -1488,7 +1503,9 @@ function pintarRanking() {
       <td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${(w.eur / max * 100).toFixed(1)}%"></div></div></td>
     </tr>`).join('');
   document.getElementById('rankCount').textContent =
-    `Mostrando ${filas.length} de ${v.length} pozos · qi en bbl/d · Di en % nominal anual · EUR en Mbbl · ▲ = b en el tope del modelo (EUR sobreestimado)`;
+    `Mostrando ${filas.length} de ${v.length} pozos · qi en bbl/d · Di en % nominal anual · ` +
+    `EUR en Mbbl · ▲ en Meses = menos de ${MESES_HISTORIA_FINA} meses de historia, el EUR ` +
+    `es una extrapolación larga · ▲ en b = ajuste en el tope del modelo`;
   const btn = document.getElementById('rankMore');
   btn.textContent = rankCompleto ? 'Mostrar solo los 25 mejores' : `Mostrar los ${v.length} pozos`;
   btn.hidden = v.length <= 25;
