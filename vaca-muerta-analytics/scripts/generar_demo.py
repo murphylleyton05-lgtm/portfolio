@@ -29,11 +29,15 @@ def main() -> None:
     config.asegurar_carpetas()
 
     print(f"Generando {args.pozos} pozos sinteticos (semilla={args.semilla})...")
-    df = demo_data.generar_pozos(n_pozos=args.pozos, semilla=args.semilla)
+    df, fractura = demo_data.generar_pozos(n_pozos=args.pozos, semilla=args.semilla)
 
     salida = config.DIR_CRUDO / "DEMO__no_convencional.csv"
     df.to_csv(salida, index=False)
     print(f"  {len(df):,} filas pozo-mes -> {salida}")
+
+    salida_frac = config.DIR_CRUDO / "DEMO__fractura.csv"
+    fractura.to_csv(salida_frac, index=False)
+    print(f"  {len(fractura):,} pozos con datos de fractura -> {salida_frac}")
 
     precios = demo_data.generar_precios(semilla=args.semilla)
     salida_precios = config.DIR_CRUDO / "DEMO__precios_crudo.csv"

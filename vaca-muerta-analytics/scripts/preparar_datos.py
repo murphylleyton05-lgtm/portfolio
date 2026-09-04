@@ -28,7 +28,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from petro import config, declinacion, limpieza  # noqa: E402
+from petro import config, declinacion, fractura as mod_fractura, limpieza  # noqa: E402
 
 
 def cargar_crudo(patron: str = "*no_convencional*.csv") -> tuple[pd.DataFrame, bool]:
@@ -58,6 +58,27 @@ def cargar_crudo(patron: str = "*no_convencional*.csv") -> tuple[pd.DataFrame, b
         partes.append(df)
 
     return pd.concat(partes, ignore_index=True), es_demo
+
+
+def cargar_fractura() -> pd.DataFrame:
+    """
+    Lee los CSV de fractura si estan. Devuelve vacio si no hay ninguno.
+
+    No es obligatorio: sin fractura el proyecto funciona igual, solo que los
+    rankings quedan sin normalizar por longitud de rama. Por eso esto degrada
+    en vez de fallar.
+    """
+    archivos = sorted(config.DIR_CRUDO.glob("*fractura*.csv"))
+    if not archivos:
+        return pd.DataFrame()
+
+    partes = []
+    for archivo in archivos:
+        print(f"  leyendo {archivo.name} ...", end=" ", flush=True)
+        df = pd.read_csv(archivo, low_memory=False)
+        print(f"{len(df):,} filas")
+        partes.append(df)
+    return pd.concat(partes, ignore_index=True)
 
 
 def cargar_precios() -> pd.DataFrame:
@@ -137,6 +158,47 @@ def main() -> None:
     ajustes = ajustes.merge(pozos, on="id_pozo", how="left")
     ajustes["ajuste_confiable"] = ajustes["r2"] >= config.R2_MINIMO_CONFIABLE
 
+    # --- 6b. Normalizacion por longitud de rama lateral ---
+    print("\n6b) Cruzando con datos de fractura (longitud de rama, etapas)")
+    crudo_fractura = cargar_fractura()
+    diagnostico_rama = {}
+
+    if crudo_fractura.empty:
+        print("   (no hay archivos de fractura: los rankings quedan sin normalizar)")
+        ajustes["rama_m"] = pd.NA
+        ajustes["eur_por_metro"] = pd.NA
+        ajustes["eur_por_etapa"] = pd.NA
+        ajustes["tiene_fractura"] = False
+    else:
+        try:
+            frac = mod_fractura.normalizar(crudo_fractura)
+            print(f"   {len(frac):,} pozos con datos de completacion")
+            ajustes = mod_fractura.unir_con_ajustes(ajustes, frac)
+            con_datos = int(ajustes["tiene_fractura"].sum())
+            print(f"   {con_datos:,} de {len(ajustes):,} pozos ajustados "
+                  f"tienen rama declarada ({con_datos / len(ajustes):.0%})")
+
+            diagnostico_rama = mod_fractura.cuanto_explica_la_rama(ajustes)
+            if diagnostico_rama.get("suficientes_datos"):
+                d = diagnostico_rama
+                print(f"   rama mediana: {d['rama_mediana_m']:,} m")
+                print(f"   correlacion rama-EUR: {d['correlacion_rama_eur']:.3f} "
+                      f"-> la longitud explica el {d['varianza_explicada']:.0%} "
+                      f"de la diferencia de EUR entre pozos")
+                print(f"   al normalizar, el ranking se mueve "
+                      f"{d['cambio_de_puesto_mediano']} puestos (mediana), "
+                      f"hasta {d['cambio_de_puesto_maximo']}")
+                print(f"   del top 10 crudo sobreviven "
+                      f"{d['top10_que_sobrevive']} pozos al normalizar")
+        except ValueError as e:
+            # El esquema de fractura no matcheo. No tiramos todo el pipeline
+            # por eso: seguimos sin normalizar y avisamos fuerte.
+            print(f"   [!] no pude usar los datos de fractura: {e}")
+            ajustes["rama_m"] = pd.NA
+            ajustes["eur_por_metro"] = pd.NA
+            ajustes["eur_por_etapa"] = pd.NA
+            ajustes["tiene_fractura"] = False
+
     confiables = int(ajustes["ajuste_confiable"].sum())
     print(f"   {len(ajustes):,} pozos ajustados | "
           f"{confiables:,} con R2 >= {config.R2_MINIMO_CONFIABLE}")
@@ -167,6 +229,7 @@ def main() -> None:
         "meses_minimos_ajuste": args.meses_minimos,
         "horizonte_eur_meses": config.HORIZONTE_EUR_MESES,
         "d_terminal_anual": config.D_TERMINAL_ANUAL,
+        "normalizacion_rama": diagnostico_rama,
     }
     config.METADATOS.write_text(json.dumps(metadatos, indent=2, ensure_ascii=False))
 

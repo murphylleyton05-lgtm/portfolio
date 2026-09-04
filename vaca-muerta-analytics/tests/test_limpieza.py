@@ -20,7 +20,8 @@ from petro import demo_data, limpieza  # noqa: E402
 @pytest.fixture
 def crudo():
     """Un dataset chico en el esquema crudo oficial."""
-    return demo_data.generar_pozos(n_pozos=5, semilla=1)
+    produccion, _fractura = demo_data.generar_pozos(n_pozos=5, semilla=1)
+    return produccion
 
 
 def test_normalizar_produce_las_columnas_minimas(crudo):
@@ -98,3 +99,73 @@ def test_resumen_por_pozo_una_fila_por_pozo(crudo):
     resumen = limpieza.resumen_por_pozo(df)
     assert len(resumen) == df["id_pozo"].nunique()
     assert (resumen["acum_petroleo_m3"] > 0).all()
+
+
+def test_columnas_duplicadas_se_unifican():
+    """
+    Caso real que rompio el pipeline con datos oficiales: al concatenar CSV de
+    distintos años, uno traia "IDPOZO" y otro "idpozo". Al pasar todo a
+    minusculas quedaban dos columnas con el mismo nombre, y entonces
+    df["idpozo"] devolvia un DataFrame en vez de una Serie.
+    """
+    a = pd.DataFrame({
+        "IDPOZO": [1], "ANIO": [2024], "MES": [3], "PROD_PET": [3000.0],
+        "TEF": [10.0], "EMPRESA": ["X"], "FORMPROD": ["VMUT"],
+    })
+    b = pd.DataFrame({
+        "idpozo": [2], "anio": [2024], "mes": [4], "prod_pet": [1500.0],
+        "tef": [10.0], "empresa": ["Y"], "formprod": ["VMUT"],
+    })
+    crudo = pd.concat([a, b], ignore_index=True)
+    assert len(crudo.columns) == 14, "el caso de prueba debe tener columnas duplicadas"
+
+    df = limpieza.normalizar(crudo)
+
+    assert len(df) == 2
+    assert list(df["id_pozo"]) == ["1", "2"]
+    assert df["caudal_petroleo_m3d"].tolist() == [300.0, 150.0]
+
+
+def test_unificar_duplicadas_toma_el_primer_valor_no_nulo():
+    from petro.limpieza import _unificar_duplicadas
+    d = pd.DataFrame([[1.0, None], [None, 2.0]], columns=["idpozo", "idpozo"])
+    r = _unificar_duplicadas(d)
+    assert list(r.columns) == ["idpozo"]
+    assert r["idpozo"].tolist() == [1.0, 2.0]
+
+
+def test_los_id_de_pozo_no_quedan_con_punto_cero():
+    """
+    Bug real y silencioso: si una columna de id tiene algun nulo, pandas la
+    pasa a float y el id queda como "100147.0". Ese id no matchea con el
+    "100147" del dataset de fractura, el cruce da vacio y el analisis de
+    normalizacion desaparece sin ningun error.
+    """
+    assert limpieza.a_id(pd.Series([100147.0, 100148.0])).tolist() == ["100147", "100148"]
+    assert limpieza.a_id(pd.Series(["100147.0", " 100148 "])).tolist() == ["100147", "100148"]
+    assert limpieza.a_id(pd.Series([1, 2])).tolist() == ["1", "2"]
+
+
+def test_el_cruce_produccion_fractura_matchea():
+    """
+    El test que protege el analisis entero: los id que salen de produccion
+    tienen que ser iguales a los que salen de fractura, para que el merge una
+    las filas de verdad.
+    """
+    from petro import fractura as mod_fractura
+
+    crudo_prod = pd.concat([
+        pd.DataFrame({"IDPOZO": [100147], "ANIO": [2024], "MES": [3],
+                      "PROD_PET": [3000.0], "TEF": [10.0], "FORMPROD": ["VMUT"]}),
+        pd.DataFrame({"idpozo": [100148], "anio": [2024], "mes": [3],
+                      "prod_pet": [1500.0], "tef": [10.0], "formprod": ["VMUT"]}),
+    ], ignore_index=True)
+    prod = limpieza.normalizar(crudo_prod)
+
+    frac = mod_fractura.normalizar(pd.DataFrame({
+        "idpozo": [100147, 100148],
+        "longitud_rama_horizontal_m": [2500.0, 1500.0],
+        "cantidad_fracturas": [40, 25],
+    }))
+
+    assert set(prod["id_pozo"]) == set(frac["id_pozo"]), "los id no matchean"

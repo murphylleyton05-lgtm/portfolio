@@ -32,6 +32,8 @@ import re
 import numpy as np
 import pandas as pd
 
+from . import limpieza
+
 # Cada campo del esquema normalizado, con los patrones que lo identifican.
 # Se prueba en orden: el primero que matchee gana. Todos los patrones se
 # evaluan sobre el nombre de columna en minusculas y sin acentos.
@@ -120,7 +122,9 @@ def normalizar(df_crudo: pd.DataFrame) -> pd.DataFrame:
             f"Columnas recibidas: {sorted(df.columns)[:30]}"
         )
 
-    salida = pd.DataFrame({"id_pozo": df[mapa["id_pozo"]].astype("string")})
+    # Mismo tratamiento de id que en produccion: sin esto el cruce entre los
+    # dos datasets no matchea y el analisis queda vacio sin avisar.
+    salida = pd.DataFrame({"id_pozo": limpieza.a_id(df[mapa["id_pozo"]])})
 
     for campo in ("rama_m", "etapas", "arena_tn", "agua_m3"):
         if campo in mapa:

@@ -206,6 +206,40 @@
   .param-v small { font-size: 12px; color: var(--ink-2); font-weight: 500; margin-left: 2px; }
   .param-h { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; line-height: 1.35; }
 
+  /* ---------- roca o largo ---------- */
+  .hallazgo {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--rule);
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  }
+  .hallazgo > div { background: var(--surface); padding: 13px 18px; }
+  .hallazgo .h-l {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--ink-3);
+  }
+  .hallazgo .h-v {
+    font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 25px;
+    font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 3px;
+  }
+  .hallazgo .h-h { font-size: 11.5px; color: var(--ink-3); line-height: 1.35; margin-top: 2px; }
+
+  .split-rama { display: grid; grid-template-columns: minmax(0, 1fr) 400px; }
+  /* Esta tabla mete cinco columnas en un panel angosto: apretamos el padding y
+     achicamos la tipografía para que entre entera sin scroll horizontal. */
+  .tabla-rama table th, .tabla-rama table td { padding: 6px 9px; }
+  .tabla-rama table { font-size: 12px; }
+  .tabla-rama .mono { font-size: 11px; }
+  .tabla-rama { border-left: 1px solid var(--rule); display: flex; flex-direction: column; }
+  .tabla-rama-head {
+    padding: 14px 16px 10px; font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-size: 15px; font-weight: 600;
+  }
+  .nota-rama {
+    margin: 0; padding: 11px 16px; border-top: 1px solid var(--rule);
+    font-size: 12px; color: var(--ink-2); line-height: 1.45;
+  }
+  .movio { color: var(--s2); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+
   /* ---------- tabla ---------- */
   .table-scroll { overflow-x: auto; max-height: 460px; overflow-y: auto; }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
@@ -243,6 +277,9 @@
     .kpis { grid-template-columns: repeat(2, 1fr); }
     .params { grid-template-columns: repeat(2, 1fr); }
     .split { grid-template-columns: 1fr; }
+    .split-rama { grid-template-columns: minmax(0, 1fr); }
+    .tabla-rama { border-left: 0; border-top: 1px solid var(--rule); }
+    .hallazgo { grid-template-columns: repeat(2, 1fr); }
     .well-list { border-right: 0; border-bottom: 1px solid var(--rule); max-height: 240px; }
     .method { grid-template-columns: 1fr; gap: 16px; }
   }
@@ -329,6 +366,60 @@
       <div class="chart-wrap">
         <svg class="chart" id="typeChart" viewBox="0 0 780 380" role="img" aria-label="Curvas tipo medianas por operadora"></svg>
         <div class="tip" id="typeTip"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ ROCA O LARGO ============ -->
+  <section class="panel" id="secRama" hidden>
+    <div class="panel-head">
+      <div>
+        <h2>¿Es la roca, o el pozo es más largo?</h2>
+        <p>
+          Un pozo de 3.000 m de rama lateral produce más que uno de 1.500 m aunque la
+          roca sea idéntica: atraviesa el doble de reservorio. Por eso comparar EUR
+          crudo entre bloques u operadoras puede decir más sobre ingeniería de
+          perforación que sobre calidad de roca. La corrección estándar es dividir por
+          la longitud: <strong>EUR por metro de rama</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="hallazgo" id="hallazgo"></div>
+
+    <div class="split-rama">
+      <div class="chart-area">
+        <div class="chart-top">
+          <div class="legend">
+            <span><i class="swatch dot" style="background:var(--s1)"></i> Un pozo</span>
+            <span><i class="swatch" style="background:var(--s2)"></i> Tendencia</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg class="chart" id="ramaChart" viewBox="0 0 760 380" role="img"
+               aria-label="Relación entre longitud de rama lateral y EUR estimado"></svg>
+          <div class="tip" id="ramaTip"></div>
+        </div>
+      </div>
+
+      <div class="tabla-rama">
+        <div class="tabla-rama-head">Top 10: antes y después de normalizar</div>
+        <div class="table-scroll" style="max-height:340px">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Por EUR crudo</th>
+                <th class="num">m</th>
+                <th>Por EUR/metro</th>
+                <th class="num">m</th>
+              </tr>
+            </thead>
+            <tbody id="ramaBody"></tbody>
+          </table>
+        </div>
+        <p class="nota-rama" id="notaRama"></p>
       </div>
     </div>
   </section>
@@ -696,6 +787,133 @@ function dibujarCurvasTipo() {
   svg.onpointerleave = () => { tip.style.opacity = 0; };
 }
 
+/* ===================== ¿roca o largo? ===================== */
+/*
+ * Esta sección responde la pregunta que hace válido (o no) todo el ranking:
+ * cuando un pozo produce más, ¿es porque la roca es mejor o porque el pozo es
+ * más largo? Se mide con la regresión de EUR contra longitud de rama.
+ */
+function dibujarRama() {
+  const seccion = document.getElementById('secRama');
+  const conRama = visibles().filter(w => w.rama && w.eur);
+
+  // Sin datos de fractura no hay nada honesto que mostrar: se oculta la sección
+  // entera en vez de dibujar un gráfico vacío.
+  if (conRama.length < 10) { seccion.hidden = true; return; }
+  seccion.hidden = false;
+
+  // --- regresión lineal simple: EUR = a + b·rama ---
+  const n = conRama.length;
+  const mx = conRama.reduce((s, w) => s + w.rama, 0) / n;
+  const my = conRama.reduce((s, w) => s + w.eur, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  conRama.forEach(w => {
+    const dx = w.rama - mx, dy = w.eur - my;
+    sxy += dx * dy; sxx += dx * dx; syy += dy * dy;
+  });
+  const pendiente = sxy / sxx;
+  const ordenada = my - pendiente * mx;
+  const r = sxy / Math.sqrt(sxx * syy);
+  const r2 = r * r;
+
+  // --- el titular ---
+  const porEur = [...conRama].sort((a, b) => b.eur - a.eur);
+  const porMetro = [...conRama].sort((a, b) => (b.eur / b.rama) - (a.eur / a.rama));
+  const top10Eur = new Set(porEur.slice(0, 10).map(w => w.id));
+  const sobreviven = porMetro.slice(0, 10).filter(w => top10Eur.has(w.id)).length;
+  const ramaMediana = mediana(conRama.map(w => w.rama));
+
+  document.getElementById('hallazgo').innerHTML = [
+    ['La rama explica', `${(r2 * 100).toFixed(0)}%`,
+     'de la diferencia de EUR entre pozos'],
+    ['Cada 100 m de rama', `+${fmt(pendiente * 100)}`,
+     'Mbbl de EUR, en promedio'],
+    ['Rama mediana', `${fmt(ramaMediana)} m`,
+     `en ${fmt(n)} pozos con dato declarado`],
+    ['Top 10 que sobrevive', `${sobreviven} de 10`,
+     'al pasar a EUR por metro'],
+  ].map(([l, v, h]) =>
+    `<div><div class="h-l">${l}</div><div class="h-v">${v}</div><div class="h-h">${h}</div></div>`
+  ).join('');
+
+  // --- dispersión ---
+  const svg = document.getElementById('ramaChart');
+  const W2 = 760, H2 = 380, m = { t: 18, r: 24, b: 48, l: 66 };
+  const iw = W2 - m.l - m.r, ih = H2 - m.t - m.b;
+  const maxX = Math.max(...conRama.map(w => w.rama)) * 1.04;
+  const minX = Math.min(...conRama.map(w => w.rama)) * 0.96;
+  const maxY = Math.max(...conRama.map(w => w.eur)) * 1.06;
+  const sx = v => m.l + ((v - minX) / (maxX - minX)) * iw;
+  const sy = v => m.t + ih - (v / maxY) * ih;
+  const p = [];
+
+  ticks(maxY).forEach(v => {
+    p.push(`<line x1="${m.l}" y1="${sy(v).toFixed(1)}" x2="${m.l + iw}" y2="${sy(v).toFixed(1)}" stroke="${cssVar('--grid')}" stroke-width="1"/>`);
+    p.push(`<text x="${m.l - 9}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+  });
+  const pasoX = 500;
+  for (let v = Math.ceil(minX / pasoX) * pasoX; v <= maxX; v += pasoX) {
+    p.push(`<text x="${sx(v).toFixed(1)}" y="${m.t + ih + 20}" text-anchor="middle" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+  }
+  p.push(`<line x1="${m.l}" y1="${m.t + ih}" x2="${m.l + iw}" y2="${m.t + ih}" stroke="${cssVar('--rule-strong')}" stroke-width="1"/>`);
+  p.push(`<text x="${m.l + iw / 2}" y="${H2 - 8}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12">Longitud de rama lateral (m)</text>`);
+  p.push(`<text x="15" y="${m.t + ih / 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12" transform="rotate(-90 15 ${m.t + ih / 2})">EUR estimado (Mbbl)</text>`);
+
+  conRama.forEach(w => p.push(
+    `<circle cx="${sx(w.rama).toFixed(1)}" cy="${sy(w.eur).toFixed(1)}" r="4" fill="${cssVar('--s1')}" fill-opacity=".62" stroke="${cssVar('--surface')}" stroke-width="1.5"><title>${esc(w.sigla)}</title></circle>`));
+
+  const y1 = Math.max(ordenada + pendiente * minX, 0);
+  const y2 = Math.max(ordenada + pendiente * maxX, 0);
+  p.push(`<path d="M${sx(minX).toFixed(1)},${sy(y1).toFixed(1)} L${sx(maxX).toFixed(1)},${sy(y2).toFixed(1)}" stroke="${cssVar('--s2')}" stroke-width="2.5" fill="none"/>`);
+  p.push(`<text x="${m.l + iw - 6}" y="${(sy(y2) - 9).toFixed(1)}" text-anchor="end" fill="${cssVar('--s2')}" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="500">r² = ${dec(r2, 2)}</text>`);
+  svg.innerHTML = p.join('');
+
+  // --- hover ---
+  const tip = document.getElementById('ramaTip'), wrap = svg.parentElement;
+  svg.onpointermove = e => {
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    let cerca = null, dmin = 1e9;
+    conRama.forEach(w => {
+      const d = Math.hypot(sx(w.rama) - loc.x, sy(w.eur) - loc.y);
+      if (d < dmin) { dmin = d; cerca = w; }
+    });
+    if (!cerca || dmin > 18) { tip.style.opacity = 0; return; }
+    tip.innerHTML = `<div class="tip-t">${esc(cerca.sigla)}</div>` +
+      `<div class="tip-r"><span>Rama</span><b>${fmt(cerca.rama)} m</b></div>` +
+      `<div class="tip-r"><span>EUR</span><b>${fmt(cerca.eur)} Mbbl</b></div>` +
+      `<div class="tip-r"><span>EUR/m</span><b>${dec(cerca.eur / cerca.rama, 2)}</b></div>`;
+    const rb = wrap.getBoundingClientRect();
+    tip.style.left = Math.min(Math.max((sx(cerca.rama) / W2) * rb.width + 14, 4), Math.max(rb.width - 175, 4)) + 'px';
+    tip.style.top = Math.max((sy(cerca.eur) / H2) * rb.height - 52, 4) + 'px';
+    tip.style.opacity = 1;
+  };
+  svg.onpointerleave = () => { tip.style.opacity = 0; };
+
+  // --- tabla comparativa ---
+  const puestoEur = new Map(porEur.map((w, i) => [w.id, i + 1]));
+  document.getElementById('ramaBody').innerHTML = porMetro.slice(0, 10).map((wn, i) => {
+    const we = porEur[i];
+    const movio = puestoEur.get(wn.id) - (i + 1);
+    return `<tr>
+      <td class="rank-n">${i + 1}</td>
+      <td class="mono">${esc(we.sigla)}</td>
+      <td class="num mono">${fmt(we.rama)}</td>
+      <td class="mono">${esc(wn.sigla)}
+        ${movio > 0 ? `<span class="movio">↑${movio}</span>` : ''}</td>
+      <td class="num mono">${fmt(wn.rama)}</td>
+    </tr>`;
+  }).join('');
+
+  const ramaTop = mediana(porEur.slice(0, 10).map(w => w.rama));
+  document.getElementById('notaRama').innerHTML =
+    `Los 10 mejores por EUR crudo tienen una rama mediana de <b>${fmt(ramaTop)} m</b>, ` +
+    `contra <b>${fmt(ramaMediana)} m</b> del conjunto. ` +
+    (ramaTop > ramaMediana * 1.05
+      ? 'Es decir: parte de su ventaja es geometría, no roca.'
+      : 'Su ventaja no se explica por la longitud.');
+}
+
 /* ===================== ranking ===================== */
 function pintarRanking() {
   const v = [...visibles()].sort((a, b) => b.eur - a.eur);
@@ -735,15 +953,15 @@ document.getElementById('horBtn').onclick = e => {
 /* ===================== orquestación ===================== */
 function redibujar() {
   pintarFuente(); pintarChips(); pintarKpis(); pintarLista();
-  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); pintarRanking();
+  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); dibujarRama(); pintarRanking();
 }
 redibujar();
 
 // Los colores salen de variables CSS, así que hay que redibujar al cambiar de tema.
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-  dibujarDeclinacion(); dibujarCurvasTipo();
+  dibujarDeclinacion(); dibujarCurvasTipo(); dibujarRama();
 });
-new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); })
+new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); dibujarRama(); })
   .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 </script>
 

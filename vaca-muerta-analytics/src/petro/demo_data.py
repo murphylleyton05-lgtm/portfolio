@@ -67,7 +67,9 @@ def generar_pozos(
                Esto es importante para que el proyecto sea REPRODUCIBLE: si
                alguien corre tu codigo, tiene que ver exactamente tus numeros.
 
-    Devuelve un DataFrame con una fila por pozo-mes.
+    Devuelve DOS DataFrames:
+      - produccion: una fila por pozo-mes (esquema del Capitulo IV)
+      - fractura:   una fila por pozo (esquema del Anexo IV de fractura)
     """
     rng = np.random.default_rng(semilla)
 
@@ -75,7 +77,8 @@ def generar_pozos(
     fin = pd.Timestamp(mes_fin)
     meses_totales = (fin.year - inicio.year) * 12 + (fin.month - inicio.month)
 
-    filas = []
+    filas: list[dict] = []
+    geometrias: list[dict] = []
 
     for i in range(n_pozos):
         id_pozo = 100000 + i
@@ -89,11 +92,25 @@ def generar_pozos(
         mes_puesta = int(rng.beta(2.0, 1.0) * (meses_totales - 12))
         fecha_puesta = inicio + pd.DateOffset(months=mes_puesta)
 
+        # --- Geometria del pozo ---
+        # Longitud de rama lateral, en metros. En Vaca Muerta el rango tipico
+        # va de 1.500 a 3.500 m, y viene creciendo con los años: los pozos mas
+        # nuevos son mas largos. Eso se simula con el termino de `mes_puesta`.
+        rama_m = float(rng.normal(1800 + 0.006 * mes_puesta * 1000, 400))
+        rama_m = float(np.clip(rama_m, 900, 4200))
+        # Etapas de fractura: aproximadamente una cada 55-70 m de rama.
+        etapas = int(round(rama_m / rng.uniform(55, 70)))
+
         # --- Parametros de la curva del pozo ---
-        # qi: caudal inicial en m3/d. Un pozo bueno de Vaca Muerta arranca
-        # arriba de 150 m3/d (~950 bbl/d). Lognormal porque la distribucion
-        # real de productividad de pozos es asimetrica: pocos muy buenos.
-        qi = float(rng.lognormal(mean=np.log(140 * calidad), sigma=0.45))
+        # qi: caudal inicial en m3/d. Depende de DOS cosas: la calidad de la
+        # roca del bloque y CUANTO RESERVORIO ATRAVIESA el pozo.
+        #
+        # Esa segunda dependencia es el punto de todo el analisis: un pozo mas
+        # largo produce mas aunque la roca sea igual. Aca la metemos a
+        # proposito, escalando con la rama respecto de una de referencia de
+        # 2.500 m, para que el analisis tenga el efecto real que debe corregir.
+        factor_rama = (rama_m / 2500.0) ** 0.85
+        qi = float(rng.lognormal(mean=np.log(140 * calidad * factor_rama), sigma=0.35))
         # Di: declinacion nominal mensual. 0.10-0.22 /mes es tipico de shale.
         di = float(rng.uniform(0.10, 0.22))
         # b: exponente. En shale suele estar entre 0.8 y 1.6.
@@ -103,6 +120,23 @@ def generar_pozos(
         gor = float(rng.uniform(80, 260))
         # Corte de agua inicial y su crecimiento con el tiempo.
         agua_base = float(rng.uniform(0.15, 0.6))
+
+        geometrias.append({
+            "idpozo": id_pozo,
+            "sigla": f"{bloque[:3]}.x-{id_pozo}",
+            "empresa": operadora,
+            "areayacimiento": bloque,
+            "formacion_productiva": "VMUT",
+            "tipo_reservorio": "SHALE",
+            "longitud_rama_horizontal_m": round(rama_m, 1),
+            "cantidad_fracturas": etapas,
+            # Intensidad de completacion: toneladas de arena y m3 de agua por
+            # metro de rama, con dispersion entre operadoras.
+            "arena_bombeada_nacional_tn": round(rama_m * rng.uniform(0.9, 1.6), 1),
+            "arena_bombeada_importada_tn": round(rama_m * rng.uniform(0.05, 0.3), 1),
+            "agua_inyectada_m3": round(rama_m * rng.uniform(18, 32), 1),
+            "fecha_fin_fractura": fecha_puesta.strftime("%Y-%m-%d"),
+        })
 
         meses_vida = meses_totales - mes_puesta
 
@@ -160,7 +194,7 @@ def generar_pozos(
                 "tef": round(dias, 1),
             })
 
-    return pd.DataFrame(filas)
+    return pd.DataFrame(filas), pd.DataFrame(geometrias)
 
 
 def generar_precios(

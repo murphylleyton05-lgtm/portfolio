@@ -90,6 +90,13 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
             "n": int(f.n_meses),
             "acum": round(f.acum_petroleo_bbl / 1000, 1),
             "inicio": pd.Timestamp(f.primer_mes).strftime("%Y-%m"),
+            # Geometria del pozo. Puede no estar: no todos los pozos declaran
+            # fractura, y sin estos datos la app oculta la seccion de
+            # normalizacion en vez de mostrar graficos vacios.
+            "rama": (round(float(f.rama_m)) if getattr(f, "rama_m", None) is not None
+                     and pd.notna(getattr(f, "rama_m", None)) else None),
+            "etapas": (int(f.etapas) if getattr(f, "etapas", None) is not None
+                       and pd.notna(getattr(f, "etapas", None)) else None),
         })
         series[str(f.id_pozo)] = [
             round(v * BARRILES_POR_M3, 1) for v in serie["caudal_petroleo_m3d"]
@@ -107,6 +114,8 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
             "pozos_totales": total,
             "d_term": metadatos["d_terminal_anual"],
             "horizonte": metadatos["horizonte_eur_meses"],
+            # Diagnostico de cuanto de la diferencia de EUR explica la rama.
+            "rama": metadatos.get("normalizacion_rama", {}),
         },
     }
 
@@ -148,6 +157,8 @@ def main() -> None:
     print(f"  {len(datos['wells']):,} pozos incrustados "
           f"(de {datos['meta']['pozos_totales']:,} ajustados)")
     print(f"  periodo: {datos['meta']['periodo']}")
+    con_rama = sum(1 for w in datos["wells"] if w.get("rama"))
+    print(f"  {con_rama:,} con longitud de rama declarada")
     print(f"  web/index.html  ({tam:.1f} MB)  <- abrilo con doble clic")
 
 

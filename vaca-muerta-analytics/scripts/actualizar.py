@@ -31,14 +31,24 @@ RAIZ = Path(__file__).resolve().parents[1]
 PY = sys.executable
 
 
-def paso(numero: int, total: int, titulo: str, comando: list[str]) -> None:
-    """Corre un script del pipeline mostrando en que paso vamos."""
+def paso(numero: int, total: int, titulo: str, comando: list[str],
+         opcional: bool = False) -> None:
+    """
+    Corre un script del pipeline mostrando en que paso vamos.
+
+    Un paso `opcional` que falla avisa pero no corta: sirve para datos que
+    mejoran el analisis pero no son imprescindibles.
+    """
     print(f"\n{'─' * 62}")
     print(f"PASO {numero}/{total} · {titulo}")
     print("─" * 62, flush=True)
 
     t0 = time.time()
     resultado = subprocess.run([PY, *comando], cwd=RAIZ)
+
+    if resultado.returncode != 0 and opcional:
+        print(f"\n  ! El paso {numero} ({titulo}) fallo, pero es opcional: sigo.")
+        return
 
     if resultado.returncode != 0:
         print(f"\n✗ Fallo el paso {numero} ({titulo}).")
@@ -72,10 +82,18 @@ def main() -> None:
     if args.demo:
         pasos.append(("Generando pozos sinteticos", ["scripts/generar_demo.py"]))
     elif not args.sin_descargar:
+        tope = ["--max-mb", str(args.max_mb)] if args.max_mb else []
         pasos.append((
-            "Descargando datos de la Secretaria de Energia",
-            ["scripts/descargar_datos.py", "--dataset", "no_convencional", "--forzar"]
-            + (["--max-mb", str(args.max_mb)] if args.max_mb else []),
+            "Descargando produccion de la Secretaria de Energia",
+            ["scripts/descargar_datos.py", "--dataset", "no_convencional", "--forzar"] + tope,
+        ))
+        # La fractura es opcional: sin ella el proyecto anda, solo que los
+        # rankings quedan sin normalizar por longitud de rama. Por eso este
+        # paso no corta el pipeline si falla.
+        pasos.append((
+            "Descargando datos de fractura (rama lateral y etapas)",
+            ["scripts/descargar_datos.py", "--dataset", "fractura", "--forzar"] + tope,
+            True,
         ))
 
     pasos.append(("Procesando y ajustando curvas de declinacion", ["scripts/preparar_datos.py"]))
@@ -87,8 +105,10 @@ def main() -> None:
         print("La descarga son cientos de MB y el ajuste de miles de pozos")
         print("puede tardar varios minutos. Se puede cortar con Ctrl+C.")
 
-    for i, (titulo, comando) in enumerate(pasos, start=1):
-        paso(i, len(pasos), titulo, comando)
+    for i, entrada in enumerate(pasos, start=1):
+        titulo, comando = entrada[0], entrada[1]
+        opcional = entrada[2] if len(entrada) > 2 else False
+        paso(i, len(pasos), titulo, comando, opcional=opcional)
 
     print(f"\n{'─' * 62}")
     print("LISTO")

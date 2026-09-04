@@ -50,6 +50,42 @@ DATASETS = {
     # Datos de perforacion y terminacion (actividad). Sirve para cruzar
     # actividad de perforacion contra precio del crudo.
     "perforacion": "perforacion-de-pozos-de-gas-y-petroleo",
+    # Fractura (Anexo IV): longitud de rama lateral, etapas, arena y agua por
+    # pozo. Es el dataset que permite normalizar la productividad.
+    "fractura": "datos-de-fractura-de-pozos-de-hidrocarburos-adjunto-iv",
+}
+
+# Terminos con los que buscar cada dataset si el slug de arriba deja de existir.
+# El portal renombra datasets: esto evita que un renombre rompa el pipeline.
+BUSQUEDAS = {
+    "no_convencional": "produccion de petroleo y gas por pozo",
+    "convencional": "produccion de petroleo y gas por pozo",
+    "perforacion": "perforacion de pozos",
+    "fractura": "fractura",
+}
+
+# Que ARCHIVO de cada dataset queremos. Un dataset puede traer 50 recursos:
+# uno por año, mas duplicados ("DDJJ abiertas y cerradas"), mas agregados.
+# Bajarlos todos es cientos de MB al pedo. Estos patrones eligen el que sirve.
+#
+# Para produccion, el portal publica un unico archivo con TODO el no
+# convencional (~145 MB) en vez de un archivo de 300 MB por cada año: es
+# exactamente lo que necesitamos y pesa una fraccion.
+PREFERIDOS = {
+    "no_convencional": r"no.?convencional",
+    "fractura": r"fractura",
+}
+
+# Recursos que nunca queremos: son duplicados del mismo dato.
+EXCLUIDOS = r"ddjj|abiertas y cerradas"
+
+# Palabras que deben aparecer en el titulo para aceptar un candidato de la
+# busqueda. Sin esto, buscar "fractura" podria devolver cualquier cosa.
+PALABRAS_CLAVE = {
+    "no_convencional": ["produccion", "pozo"],
+    "convencional": ["produccion", "pozo"],
+    "perforacion": ["perforacion"],
+    "fractura": ["fractura"],
 }
 
 TIEMPO_ESPERA = 120  # segundos de timeout para las descargas (los CSV son grandes)
@@ -80,6 +116,61 @@ def buscar_datasets(consulta: str, filas: int = 10) -> pd.DataFrame:
         }
         for d in resultados
     ])
+
+
+def _sin_acentos(s: str) -> str:
+    s = str(s).lower()
+    for a, b in (("á", "a"), ("é", "e"), ("í", "i"), ("ó", "o"), ("ú", "u")):
+        s = s.replace(a, b)
+    return s
+
+
+def resolver_slug(clave: str) -> str:
+    """
+    Devuelve el slug real del dataset, aunque el configurado haya cambiado.
+
+    Primero prueba el slug de DATASETS. Si el portal responde 404 (lo que pasa
+    cuando renombran el dataset), lo busca por texto y elige el mejor candidato:
+    el que tenga las palabras clave en el titulo y mas recursos publicados.
+
+    Esto existe porque ya nos paso: el slug escrito de memoria no existia y el
+    pipeline entero se caia por eso. Ahora se recupera solo y avisa que hizo.
+    """
+    if clave not in DATASETS:
+        raise ValueError(f"Clave desconocida: {clave!r}. Opciones: {list(DATASETS)}")
+
+    slug = DATASETS[clave]
+
+    respuesta = requests.get(
+        f"{CKAN_BASE}/package_show", params={"id": slug}, timeout=TIEMPO_ESPERA
+    )
+    if respuesta.ok:
+        return slug
+
+    print(f"[aviso] el slug {slug!r} ya no existe en el portal. Buscando el nuevo...")
+
+    candidatos = buscar_datasets(BUSQUEDAS.get(clave, clave), filas=20)
+    if candidatos.empty:
+        raise RuntimeError(
+            f"No encontre ningun dataset para {clave!r}.\n"
+            f"Busca a mano con:  python scripts/descargar_datos.py --buscar \"{clave}\""
+        )
+
+    requeridas = PALABRAS_CLAVE.get(clave, [])
+    titulos = candidatos["titulo"].fillna("").map(_sin_acentos)
+    sirven = candidatos[titulos.apply(lambda x: all(p in x for p in requeridas))]
+
+    if sirven.empty:
+        raise RuntimeError(
+            f"Encontre datasets para {clave!r} pero ninguno tiene "
+            f"{requeridas} en el titulo:\n{candidatos.to_string(index=False)}"
+        )
+
+    elegido = sirven.sort_values("recursos", ascending=False).iloc[0]
+    print(f"[aviso] uso {elegido['slug']!r} ({elegido['titulo']}, "
+          f"{elegido['recursos']} recursos)")
+    print(f"[aviso] conviene fijarlo en DATASETS['{clave}'] de ingesta.py")
+    return str(elegido["slug"])
 
 
 def listar_recursos(slug: str) -> pd.DataFrame:
@@ -161,12 +252,7 @@ def descargar_dataset(
     priorizan los recursos MAS RECIENTES, que son los que interesan para
     analizar produccion actual.
     """
-    if clave not in DATASETS:
-        raise ValueError(
-            f"Clave desconocida: {clave!r}. Opciones: {list(DATASETS)}"
-        )
-
-    recursos = listar_recursos(DATASETS[clave])
+    recursos = listar_recursos(resolver_slug(clave))
     if solo_csv:
         recursos = recursos[recursos["formato"] == "CSV"]
 
@@ -175,6 +261,23 @@ def descargar_dataset(
             f"El dataset {clave!r} no devolvio recursos CSV. "
             "Revisa con listar_recursos() si cambio el formato."
         )
+
+    nombres = recursos["nombre"].fillna("").map(_sin_acentos)
+
+    # 1) Sacar los duplicados conocidos.
+    sin_duplicados = recursos[~nombres.str.contains(EXCLUIDOS, regex=True)]
+    if not sin_duplicados.empty:
+        recursos = sin_duplicados
+        nombres = recursos["nombre"].fillna("").map(_sin_acentos)
+
+    # 2) Si hay un archivo que es justo el que buscamos, usar SOLO ese.
+    patron = PREFERIDOS.get(clave)
+    if patron:
+        preferidos = recursos[nombres.str.contains(patron, regex=True)]
+        if not preferidos.empty:
+            recursos = preferidos
+            print(f"[recurso] {len(recursos)} archivo(s) matchean {patron!r}: "
+                  f"{', '.join(recursos['nombre'].head(3))}")
 
     if max_archivos or max_mb:
         # Mas nuevo primero. `modificado` puede venir vacio: esos van al final.

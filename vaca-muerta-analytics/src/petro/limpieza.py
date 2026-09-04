@@ -69,6 +69,51 @@ COLUMNAS_MINIMAS = [
 ]
 
 
+def a_id(serie: pd.Series) -> pd.Series:
+    """
+    Convierte una columna de identificadores a texto, sin ".0" al final.
+
+    Parece un detalle cosmetico y no lo es. Los id de pozo son numeros enteros,
+    pero apenas una columna tiene un nulo pandas la pasa a float, y al
+    convertirla a texto queda "100147.0" en vez de "100147". Despues el cruce
+    con el dataset de fractura (que trae "100147") no matchea NINGUNA fila, y
+    el analisis de normalizacion queda vacio SIN DAR ERROR: el peor tipo de bug.
+
+    Por eso todos los id del proyecto pasan por esta funcion.
+    """
+    if pd.api.types.is_numeric_dtype(serie):
+        return serie.round().astype("Int64").astype("string")
+    return (serie.astype("string").str.strip()
+            .str.replace(r"\.0$", "", regex=True))
+
+
+def _unificar_duplicadas(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Colapsa columnas con el mismo nombre en una sola.
+
+    Para cada grupo de columnas homonimas se toma, fila por fila, el primer
+    valor no nulo. Es lo correcto cuando la duplicacion viene de concatenar
+    archivos donde cada uno traia la columna escrita distinto: cada fila tiene
+    dato en una sola de las dos.
+    """
+    if not df.columns.duplicated().any():
+        return df
+
+    repetidas = sorted(set(df.columns[df.columns.duplicated()]))
+    print(f"   [aviso] columnas duplicadas unificadas: {repetidas}")
+
+    salida = {}
+    for nombre in dict.fromkeys(df.columns):
+        bloque = df.loc[:, df.columns == nombre]
+        if bloque.shape[1] == 1:
+            salida[nombre] = bloque.iloc[:, 0]
+        else:
+            # bfill sobre el eje de columnas deja el primer no nulo en la 1ra.
+            salida[nombre] = bloque.bfill(axis=1).iloc[:, 0]
+
+    return pd.DataFrame(salida, index=df.index)
+
+
 def normalizar(df_crudo: pd.DataFrame, dias_minimos: float = 1.0) -> pd.DataFrame:
     """
     Convierte el CSV oficial al esquema normalizado.
@@ -87,6 +132,13 @@ def normalizar(df_crudo: pd.DataFrame, dias_minimos: float = 1.0) -> pd.DataFram
 
     # Los CSV oficiales a veces vienen con nombres en mayusculas o con espacios.
     df.columns = [str(c).strip().lower() for c in df.columns]
+
+    # Al concatenar archivos de distintos años aparecen columnas que solo
+    # difieren en la capitalizacion ("IDPOZO" y "idpozo"). Despues de pasar
+    # todo a minusculas quedan DUPLICADAS, y entonces df["idpozo"] devuelve un
+    # DataFrame en vez de una Serie y todo lo que sigue explota.
+    # Las unificamos quedandonos, para cada fila, con el primer valor no nulo.
+    df = _unificar_duplicadas(df)
 
     presentes = {k: v for k, v in COLUMNAS_OFICIALES.items() if k in df.columns}
     df = df.rename(columns=presentes)
@@ -148,7 +200,7 @@ def normalizar(df_crudo: pd.DataFrame, dias_minimos: float = 1.0) -> pd.DataFram
         else:
             df[col] = pd.NA
 
-    df["id_pozo"] = df["id_pozo"].astype("string")
+    df["id_pozo"] = a_id(df["id_pozo"])
 
     df = df.dropna(subset=["fecha"]).sort_values(["id_pozo", "fecha"])
     return df.reset_index(drop=True)
