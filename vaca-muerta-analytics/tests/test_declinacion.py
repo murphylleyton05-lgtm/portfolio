@@ -200,3 +200,38 @@ def test_curva_tipo_agrega_percentiles_por_mes_de_vida():
     assert ct["n_pozos"].max() == 3
     # El P90 siempre por encima del P10.
     assert (ct["p90"] >= ct["p10"]).all()
+
+
+# --- calidad del ajuste: el filtro que evita rankings absurdos -------------
+
+def test_un_pozo_erratico_da_r2_bajo():
+    """
+    Con datos oficiales aparecieron pozos cuya serie no sigue ninguna
+    declinacion (paradas, intervenciones, datos mal declarados). El ajuste
+    tiene que reportar R2 bajo para que el filtro de calidad los descarte,
+    en vez de darles un EUR gigante y ponerlos primeros en el ranking.
+    """
+    rng = np.random.default_rng(3)
+    fechas = pd.date_range("2021-01-01", periods=30, freq="MS")
+    # Ruido puro alrededor de una media: no hay declinacion que encontrar.
+    caudal = rng.uniform(40, 160, 30)
+    df = pd.DataFrame({
+        "id_pozo": "ERRATICO",
+        "fecha": fechas,
+        "caudal_petroleo_m3d": caudal,
+    })
+    ajuste = declinacion.ajustar_pozo(df, id_pozo="ERRATICO")
+
+    assert ajuste is not None
+    assert ajuste.r2 < 0.7, "un pozo sin tendencia no puede dar un ajuste confiable"
+
+
+def test_b_en_el_tope_dispara_el_eur():
+    """
+    Documenta POR QUE hay que filtrar por b: con b pegado al tope el EUR se
+    multiplica varias veces respecto de un b normal, con el mismo qi y Di.
+    Es la razon por la que los ajustes fallidos encabezaban el ranking.
+    """
+    normal = declinacion.eur(qi=100.0, di=0.15, b=1.0, horizonte_meses=360)
+    en_tope = declinacion.eur(qi=100.0, di=0.15, b=2.0, horizonte_meses=360)
+    assert en_tope > normal * 1.5

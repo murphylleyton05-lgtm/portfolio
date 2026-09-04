@@ -30,6 +30,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from petro import config, declinacion  # noqa: E402
 from petro.limpieza import BARRILES_POR_M3  # noqa: E402
 
+# Un ajuste con b pegado al tope del optimizador no describe al pozo: la
+# integral del EUR diverge y el numero deja de significar algo.
+B_EN_EL_TOPE = 1.98
+
 RAIZ = Path(__file__).resolve().parents[1]
 PLANTILLA = RAIZ / "web" / "plantilla.html"
 
@@ -67,6 +71,39 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
     metadatos = json.loads(config.METADATOS.read_text())
 
     total = len(ajustes)
+
+    # ---------------------------------------------------------------
+    # FILTRO DE CALIDAD. Sin esto el ranking queda encabezado por los
+    # ajustes que FALLARON, no por los mejores pozos.
+    #
+    # Por que: cuando la curva no ajusta, el optimizador clava b en su tope
+    # y la integral del EUR se dispara. Un pozo con R2 = 0 y b = 2.00 puede
+    # dar un EUR de 7 millones de barriles, diez veces lo que produce un
+    # buen pozo real de Vaca Muerta. Ordenar por EUR sin filtrar pone
+    # justamente esos arriba de todo.
+    #
+    # Con datos sinteticos esto no se veia porque todos los pozos ajustaban
+    # bien. Aparecio recien con los datos oficiales.
+    # ---------------------------------------------------------------
+    antes = len(ajustes)
+    confiables = ajustes[
+        (ajustes["r2"] >= config.R2_MINIMO_CONFIABLE)
+        & ajustes["convergio"]
+        & (ajustes["b"] < B_EN_EL_TOPE)
+    ]
+
+    if len(confiables) < 20:
+        # Si casi nada pasa el filtro, algo mas grande esta mal. Avisamos en
+        # vez de mostrar un puñado de pozos como si fuera el panorama.
+        print(f"   [!] solo {len(confiables)} de {antes} ajustes son confiables. "
+              "Revisa los datos de entrada antes de creerle a este ranking.")
+    else:
+        descartados = antes - len(confiables)
+        print(f"   descartados {descartados:,} de {antes:,} ajustes por baja "
+              f"calidad ({descartados / antes:.0%}): R2 < "
+              f"{config.R2_MINIMO_CONFIABLE}, sin converger, o b en el tope")
+        ajustes = confiables
+
     ajustes = ajustes.sort_values("eur", ascending=False).head(max_pozos)
 
     pozos, series = [], {}
@@ -112,6 +149,7 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
             "periodo": f"{metadatos['primer_mes']} a {metadatos['ultimo_mes']}",
             "es_demo": metadatos["es_demo"],
             "pozos_totales": total,
+            "pozos_confiables": int(len(ajustes)),
             "d_term": metadatos["d_terminal_anual"],
             "horizonte": metadatos["horizonte_eur_meses"],
             # Diagnostico de cuanto de la diferencia de EUR explica la rama.

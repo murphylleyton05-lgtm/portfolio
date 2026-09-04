@@ -188,3 +188,27 @@ def test_el_renombrado_no_puede_crear_columnas_duplicadas():
     assert list(df.columns).count("formacion") == 1
     assert df["formacion"].iloc[0] == "VMUT"
     assert df["caudal_petroleo_m3d"].iloc[0] == pytest.approx(300.0)
+
+
+def test_unificar_operadoras_junta_las_variantes_de_razon_social():
+    """
+    Caso real de los datos oficiales: Vista aparece con tres razones sociales
+    distintas a lo largo de la serie. Sin unificar, un ranking por operadora
+    la parte en tres empresas con un tercio de los pozos cada una.
+    """
+    s = pd.Series([
+        "VISTA ENERGY ARGENTINA SAU",
+        "VISTA OIL & GAS ARGENTINA SAU",
+        "Vista Oil & Gas Argentina SA",
+    ])
+    assert limpieza.unificar_operadoras(s).nunique() == 1
+
+
+def test_unificar_operadoras_no_junta_empresas_distintas():
+    s = pd.Series(["YPF S.A.", "SHELL ARGENTINA S.A.", "TECPETROL S.A."])
+    assert limpieza.unificar_operadoras(s).nunique() == 3
+
+
+def test_unificar_operadoras_deja_pasar_las_que_no_conoce():
+    s = pd.Series(["PETROLERA DESCONOCIDA SRL"])
+    assert limpieza.unificar_operadoras(s).iloc[0] == "PETROLERA DESCONOCIDA SRL"

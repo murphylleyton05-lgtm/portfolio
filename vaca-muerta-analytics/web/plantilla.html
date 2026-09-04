@@ -535,8 +535,10 @@ function pintarFuente() {
        curvas de Arps y ruido operativo. La matemática es la misma que se aplica a los
        datos oficiales de la Secretaría de Energía.</span>`
     : `<span><b>Datos oficiales.</b> ${fmt(n)} pozos no convencionales declarados a la
-       Secretaría de Energía de la Nación, ${esc(m.periodo)}. Los últimos meses pueden
-       estar incompletos.</span>`;
+       Secretaría de Energía de la Nación, ${esc(m.periodo)}. De ${fmt(m.pozos_totales)}
+       pozos ajustados se muestran solo los de ajuste confiable: un ajuste malo infla
+       el EUR y encabezaría el ranking sin merecerlo. Los últimos meses del período
+       pueden estar incompletos.</span>`;
 }
 
 /* ===================== indicadores ===================== */

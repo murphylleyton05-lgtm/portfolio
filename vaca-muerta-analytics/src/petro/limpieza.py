@@ -69,6 +69,49 @@ COLUMNAS_MINIMAS = [
 ]
 
 
+# Las operadoras cambian de razon social, se fusionan y se renombran. En una
+# serie de 15 años la misma empresa aparece escrita de varias formas, y sin
+# unificarla los rankings la cuentan como si fueran companias distintas.
+# La clave es un patron; el valor, el nombre con el que la mostramos.
+NOMBRES_OPERADORAS = [
+    (r"^vista", "VISTA ENERGY"),
+    (r"^ypf", "YPF"),
+    (r"^shell", "SHELL"),
+    (r"exxon", "EXXONMOBIL"),
+    (r"^chevron", "CHEVRON"),
+    (r"^tecpetrol", "TECPETROL"),
+    (r"pan american", "PAN AMERICAN ENERGY"),
+    (r"^pluspetrol", "PLUSPETROL"),
+    (r"total austral|^totalenergies", "TOTAL AUSTRAL"),
+    (r"^pampa", "PAMPA ENERGIA"),
+    (r"^pae\b", "PAN AMERICAN ENERGY"),
+    (r"^wintershall", "WINTERSHALL"),
+    (r"^capex", "CAPEX"),
+    (r"^phoenix", "PHOENIX GLOBAL"),
+    (r"^gas y petroleo del neuquen|^gypn", "GAS Y PETROLEO DEL NEUQUEN"),
+    (r"^petronas", "PETRONAS"),
+    (r"^gente de la patagonia", "GENTE DE LA PATAGONIA"),
+]
+
+
+def unificar_operadoras(serie: pd.Series) -> pd.Series:
+    """
+    Lleva las variantes de razon social de cada operadora a un nombre unico.
+
+    "VISTA ENERGY ARGENTINA SAU", "VISTA OIL & GAS ARGENTINA SAU" y
+    "Vista Oil & Gas Argentina SA" son la misma empresa en distintos momentos.
+    Sin unificarlas, un ranking por operadora las cuenta como tres companias
+    con un tercio de los pozos cada una.
+    """
+    normalizada = serie.astype("string").str.strip()
+    minusculas = normalizada.str.lower()
+
+    salida = normalizada.copy()
+    for patron, nombre in NOMBRES_OPERADORAS:
+        salida = salida.mask(minusculas.str.contains(patron, regex=True, na=False), nombre)
+    return salida
+
+
 def a_id(serie: pd.Series) -> pd.Series:
     """
     Convierte una columna de identificadores a texto, sin ".0" al final.
@@ -212,6 +255,7 @@ def normalizar(df_crudo: pd.DataFrame, dias_minimos: float = 1.0,
             df[col] = pd.NA
 
     df["id_pozo"] = a_id(df["id_pozo"])
+    df["empresa"] = unificar_operadoras(df["empresa"])
 
     df = df.dropna(subset=["fecha"]).sort_values(["id_pozo", "fecha"])
     return df.reset_index(drop=True)
