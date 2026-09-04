@@ -238,9 +238,17 @@ que no conviene confiar.
 - **El modelo no aplica a pozos con menos de 9 meses de historia útil**, ni a
   pozos con paradas largas o intervenciones (Arps no describe eso). Esos pozos se
   marcan con R² bajo y se excluyen de los agregados.
-- **No se corrige por longitud de rama lateral ni por etapas de fractura.** Es el
-  principal factor de confusión pendiente: un pozo más largo produce más aunque la
-  roca sea idéntica. Requiere sumar el dataset de fractura (Anexo IV).
+- **No se corrige por espaciamiento entre pozos ni por interferencia.** Un pozo
+  perforado al lado de otro ya en producción rinde menos (efecto *parent-child*).
+  Es el principal factor de confusión que queda sin corregir.
+- **La declinación terminal (6% anual) y el tope de `b` en 2 son decisiones de
+  modelado, no mediciones**, y el backtest sugiere que son conservadoras: el
+  modelo subestima de forma sistemática, y el sesgo crece con el horizonte. Un
+  tope de `b` más alto o una terminal más baja darían EUR mayores.
+- **Solo se modela petróleo.** El gas se lee y se limpia, pero no se le ajusta
+  curva ni se estima EUR.
+- **No hay economía.** Sin precio de venta ni costo de pozo no hay VAN ni punto
+  de equilibrio: el proyecto dice cuánto produce un pozo, no si conviene.
 - **El EUR asume 30 años de vida útil y 6% de declinación terminal.** Ambos son
   supuestos, configurables en `src/petro/config.py`.
 - **La detección de anomalías es un detector, no un diagnóstico:** señala pozos

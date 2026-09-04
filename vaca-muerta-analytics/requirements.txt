@@ -10,6 +10,8 @@ requests==2.33.1
 streamlit==1.63.0
 plotly==7.0.0
 pyarrow==25.0.1
+# statsmodels lo usa plotly para la linea de tendencia del dashboard.
+statsmodels==0.15.0
 
 # Solo para desarrollo (correr los tests):
 pytest==9.1.1

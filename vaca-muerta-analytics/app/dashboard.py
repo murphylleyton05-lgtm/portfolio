@@ -51,7 +51,10 @@ def cargar():
     ajustes = pd.read_parquet(config.AJUSTES)
     precios = pd.read_parquet(config.PRECIOS) if config.PRECIOS.exists() else pd.DataFrame()
     metadatos = json.loads(config.METADATOS.read_text()) if config.METADATOS.exists() else {}
-    return produccion, ajustes, precios, metadatos
+
+    ruta_bt = config.DIR_PROCESADO / "backtest.parquet"
+    backtest = pd.read_parquet(ruta_bt) if ruta_bt.exists() else pd.DataFrame()
+    return produccion, ajustes, precios, metadatos, backtest
 
 
 datos = cargar()
@@ -71,7 +74,7 @@ if datos is None:
     )
     st.stop()
 
-produccion, ajustes, precios, metadatos = datos
+produccion, ajustes, precios, metadatos, backtest = datos
 
 
 # ---------------------------------------------------------------------------
@@ -178,9 +181,11 @@ k5.metric(
 # Pestañas
 # ---------------------------------------------------------------------------
 
-tab_pozo, tab_bench, tab_rank, tab_panorama, tab_macro = st.tabs([
+tab_pozo, tab_bench, tab_val, tab_rama, tab_rank, tab_panorama, tab_macro = st.tabs([
     "📉 Curva de declinacion",
     "📊 Curvas tipo (benchmark)",
+    "🎯 Validacion del modelo",
+    "📏 Roca o largo",
     "🏆 Ranking de pozos",
     "🗺️ Panorama",
     "💵 Contexto macro",
@@ -360,6 +365,149 @@ with tab_bench:
             ),
             width="stretch", hide_index=True,
         )
+
+
+# --- 2b. Validacion del modelo (backtest) --------------------------------
+
+with tab_val:
+    st.subheader("¿Se le puede creer al EUR?")
+    st.markdown(
+        "El EUR es una prediccion a 30 años. Para saber si el numero significa algo "
+        "hay que **esconderle datos al modelo**: se ajusta la curva con los primeros "
+        "24 meses de cada pozo y se le pide predecir los siguientes. El pozo ya "
+        "produjo ese periodo; el modelo no lo vio."
+    )
+
+    resumen_bt = metadatos.get("backtest", {})
+
+    if not resumen_bt.get("suficientes_datos"):
+        st.info(
+            "No hay backtest en los datos procesados. Volve a correr "
+            "`python scripts/preparar_datos.py` para generarlo."
+        )
+    else:
+        horizontes = [h for h in (12, 24, 36) if f"h{h}" in resumen_bt]
+        horizonte = st.radio("Horizonte de prediccion", horizontes,
+                             index=len(horizontes) - 1, horizontal=True,
+                             format_func=lambda h: f"{h} meses")
+        d = resumen_bt[f"h{horizonte}"]
+
+        c1, c2, c3, c4, c5 = st.columns(5)
+        c1.metric("Error por pozo", f"{d['error_absoluto']:.1f} %",
+                  help="Mediana del error absoluto. Cuanto se equivoca en UN pozo.")
+        c2.metric("Sesgo", f"{d['error_mediano']:+.1f} %",
+                  help="Error mediano con signo. Negativo = el modelo subestima.")
+        c3.metric("Dentro de ±20%", f"{d['dentro_20']:.0f} %")
+        agregado = d.get("error_agregado")
+        c4.metric("Error del total", "—" if agregado is None else f"{agregado:+.1f} %",
+                  help="Sumando todos los pozos. Los errores individuales se compensan.")
+        c5.metric("Pozos validados", f"{d['pozos']:,}")
+
+        st.caption(
+            "**Error por pozo** y **error del total** responden preguntas distintas. "
+            "Si un pozo se sobreestima 50% y otro se subestima 50%, cada pozo tiene "
+            "50% de error y el total tiene 0%. Asi se usa el modelo en la practica: "
+            "nadie invierte por el pronostico de un pozo suelto, sino de un programa "
+            "de decenas."
+        )
+
+        col_r, col_p = f"real_{horizonte}", f"pred_{horizonte}"
+        if not backtest.empty and col_r in backtest.columns:
+            bt = backtest[[col_r, col_p, "id_pozo"]].dropna().copy()
+            bt[col_r] = bt[col_r] * BARRILES_POR_M3 / 1000
+            bt[col_p] = bt[col_p] * BARRILES_POR_M3 / 1000
+            tope = float(max(bt[col_r].max(), bt[col_p].max())) * 1.05
+
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=bt[col_r], y=bt[col_p], mode="markers", name="Un pozo",
+                marker=dict(size=6, opacity=0.55),
+                hovertext=bt["id_pozo"],
+            ))
+            fig.add_trace(go.Scatter(
+                x=[0, tope], y=[0, tope], mode="lines", name="Prediccion perfecta",
+                line=dict(dash="dash", width=2, color="grey"),
+            ))
+            fig.update_layout(
+                height=460,
+                xaxis_title=f"Produccion real en {horizonte} meses (Mbbl)",
+                yaxis_title="Produccion predicha (Mbbl)",
+                legend=dict(orientation="h", y=1.1),
+                margin=dict(t=40, b=40),
+            )
+            st.plotly_chart(fig, width="stretch")
+
+
+# --- 2c. Normalizacion por rama lateral ----------------------------------
+
+with tab_rama:
+    st.subheader("¿Es la roca, o el pozo es mas largo?")
+    st.markdown(
+        "Un pozo de 3.000 m de rama lateral produce mas que uno de 1.500 m aunque la "
+        "roca sea identica: atraviesa el doble de reservorio. Comparar EUR crudo "
+        "entre bloques puede decir mas sobre ingenieria de perforacion que sobre "
+        "calidad de roca. La correccion estandar es **EUR por metro de rama**."
+    )
+
+    if "rama_m" not in aj.columns or aj["rama_m"].notna().sum() < 10:
+        st.info(
+            "No hay datos de fractura cargados. Descargalos con:\n\n"
+            "`python scripts/descargar_datos.py --dataset fractura`\n\n"
+            "y volve a correr `python scripts/preparar_datos.py`."
+        )
+    else:
+        con_rama = aj[aj["rama_m"].notna() & aj["eur"].notna()].copy()
+        con_rama["eur_por_metro_bbl"] = con_rama["eur_mbbl"] * 1000 / con_rama["rama_m"]
+
+        dx = metadatos.get("normalizacion_rama", {})
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("La rama explica",
+                  f"{dx.get('varianza_explicada', 0) * 100:.0f} %",
+                  help="De la diferencia de EUR entre pozos.")
+        c2.metric("Rama mediana", f"{dx.get('rama_mediana_m', 0):,} m")
+        c3.metric("El ranking se mueve",
+                  f"{dx.get('cambio_de_puesto_mediano', 0)} puestos",
+                  help="Mediana del cambio de posicion al normalizar.")
+        c4.metric("Top 10 que sobrevive",
+                  f"{dx.get('top10_que_sobrevive', 0)} de 10")
+
+        fig = px.scatter(
+            con_rama, x="rama_m", y="eur_mbbl", trendline="ols",
+            labels={"rama_m": "Longitud de rama lateral (m)",
+                    "eur_mbbl": "EUR estimado (Mbbl)"},
+            hover_data=["sigla", "empresa"],
+        )
+        fig.update_layout(height=430, margin=dict(t=20, b=40))
+        st.plotly_chart(fig, width="stretch")
+
+        st.markdown("**Operadoras: ¿quien tiene mejor roca?**")
+        por_op = (
+            con_rama.groupby("empresa")
+            .agg(pozos=("id_pozo", "count"),
+                 rama_mediana=("rama_m", "median"),
+                 eur_mediano=("eur_mbbl", "median"),
+                 eur_por_metro=("eur_por_metro_bbl", "median"))
+            .reset_index()
+        )
+        por_op = por_op[por_op["pozos"] >= 4]
+
+        if por_op.empty:
+            st.caption("Ninguna operadora tiene suficientes pozos con rama declarada.")
+        else:
+            por_op["puesto_por_eur"] = por_op["eur_mediano"].rank(ascending=False, method="min")
+            por_op["puesto_normalizado"] = por_op["eur_por_metro"].rank(ascending=False, method="min")
+            por_op["cambio"] = (por_op["puesto_por_eur"] - por_op["puesto_normalizado"]).astype(int)
+            st.dataframe(
+                por_op.sort_values("eur_por_metro", ascending=False)[
+                    ["empresa", "pozos", "rama_mediana", "eur_mediano",
+                     "eur_por_metro", "cambio"]
+                ].round(0),
+                width="stretch", hide_index=True,
+            )
+            st.caption(
+                "`cambio` positivo = la operadora sube posiciones al normalizar, "
+                "o sea que su ventaja NO era perforar mas largo."
+            )
 
 
 # --- 3. Ranking ------------------------------------------------------------

@@ -154,7 +154,21 @@ tiene un ángulo propio.
 
 ## El orden recomendado
 
-1. **MVP:** curvas de declinación + EUR + curva tipo (2.1 y 2.2). *Es lo que ya está construido.*
-2. **Semana 3-4:** normalización por rama lateral (2.3), sumando el dataset de fractura.
-3. **Después:** precio con rezago (3.1) y detección de anomalías automatizada (3.2).
-4. **Cuando quieras un diferencial fuerte:** Vaca Muerta vs Permian (3.3).
+| Análisis | Estado |
+|---|---|
+| 2.1 Curvas de declinación y EUR | ✅ construido |
+| 2.2 Curvas tipo y benchmarking | ✅ construido |
+| 2.3 Normalización por rama lateral | ✅ construido (`src/petro/fractura.py`) |
+| **Validación por backtest** | ✅ construido (`src/petro/validacion.py`) |
+| 3.2 Detección de anomalías | ✅ construido (`scripts/detectar_anomalias.py`) |
+| 2.4 Eficiencia de completación (arena/agua vs EUR) | ⬜ los datos ya se descargan |
+| 3.1 Precio con rezago | ⬜ requiere API key de la EIA |
+| 3.3 Vaca Muerta vs Permian | ⬜ requiere el Drilling Productivity Report |
+
+**El backtest no estaba en la lista original y terminó siendo lo más valioso.**
+No es un análisis del sector: es un análisis *del modelo*. Responde la pregunta
+que cualquiera va a hacer antes de mirar un solo gráfico — *¿por qué te creo?* —
+y la responde con un número medido, no con una explicación de la metodología.
+
+Si tenés que elegir una sola cosa para agregar a un proyecto de datos, agregá
+la validación antes que otro análisis.
