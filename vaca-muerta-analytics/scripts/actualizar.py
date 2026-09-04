@@ -99,6 +99,8 @@ def main() -> None:
     pasos.append(("Procesando y ajustando curvas de declinacion", ["scripts/preparar_datos.py"]))
     pasos.append(("Generando la app web", ["scripts/generar_web.py",
                                            "--max-pozos", str(args.max_pozos)]))
+    pasos.append(("Escribiendo los resultados en el README",
+                  ["scripts/actualizar_readme.py"], True))
 
     print("Actualizando Vaca Muerta Analytics")
     if not args.demo and not args.sin_descargar:

@@ -246,6 +246,10 @@
     font-size: 12px; color: var(--ink-2); line-height: 1.45;
   }
   .movio { color: var(--s2); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+  .op-norm { border-top: 1px solid var(--rule); }
+  .sube { color: var(--s3); font-family: "IBM Plex Mono", monospace; }
+  .baja { color: var(--s2); font-family: "IBM Plex Mono", monospace; }
+  .igual { color: var(--ink-3); font-family: "IBM Plex Mono", monospace; }
 
   /* ---------- tabla ---------- */
   .table-scroll { overflow-x: auto; max-height: 460px; overflow-y: auto; }
@@ -473,6 +477,33 @@
           </table>
         </div>
         <p class="nota-rama" id="notaRama"></p>
+      </div>
+    </div>
+
+    <div class="op-norm">
+      <div class="tabla-rama-head" style="padding:14px 20px 4px">
+        Operadoras: ¿quién tiene mejor roca?
+      </div>
+      <p style="margin:0;padding:0 20px 12px;font-size:13px;color:var(--ink-2);max-width:82ch">
+        La columna que importa es <b>EUR por metro</b>. Ordenar por EUR crudo premia a
+        quien perfora más largo; normalizar por metro deja lo que aporta la roca y la
+        completación. La flecha muestra cuántas posiciones se mueve cada operadora
+        al cambiar de un criterio al otro.
+      </p>
+      <div class="table-scroll" style="max-height:none">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Operadora</th>
+              <th class="num">Pozos</th>
+              <th class="num">Rama mediana</th>
+              <th class="num">EUR mediano</th>
+              <th class="num">EUR / metro</th>
+              <th class="num">Cambio</th>
+            </tr>
+          </thead>
+          <tbody id="opNormBody"></tbody>
+        </table>
       </div>
     </div>
   </section>
@@ -1105,7 +1136,50 @@ function dibujarRama() {
     </tr>`;
   }).join('');
 
-  const ramaTop = mediana(porEur.slice(0, 10).map(w => w.rama));
+// --- ranking de operadoras, crudo contra normalizado ---
+  // Es el pago de todo el trabajo de normalización: responde quién perfora
+  // mejor roca, en vez de quién perfora pozos más largos.
+  const porOp = new Map();
+  conRama.forEach(w => {
+    if (!porOp.has(w.op)) porOp.set(w.op, []);
+    porOp.get(w.op).push(w);
+  });
+
+  const filas = [...porOp.entries()]
+    .filter(([, ws]) => ws.length >= 4)     // menos de 4 pozos no es una mediana
+    .map(([op, ws]) => ({
+      op,
+      n: ws.length,
+      rama: mediana(ws.map(w => w.rama)),
+      eur: mediana(ws.map(w => w.eur)),
+      eurm: mediana(ws.map(w => w.eur * 1000 / w.rama)),   // bbl por metro
+    }));
+
+  if (filas.length >= 2) {
+    const porEurOp = [...filas].sort((a, b) => b.eur - a.eur).map(f => f.op);
+    const orden = [...filas].sort((a, b) => b.eurm - a.eurm);
+
+    document.getElementById('opNormBody').innerHTML = orden.map((f, i) => {
+      const cambio = porEurOp.indexOf(f.op) - i;
+      const marca = cambio > 0 ? `<span class="sube">▲ ${cambio}</span>`
+                  : cambio < 0 ? `<span class="baja">▼ ${-cambio}</span>`
+                  : `<span class="igual">—</span>`;
+      return `<tr>
+        <td class="rank-n">${i + 1}</td>
+        <td>${esc(f.op)}</td>
+        <td class="num mono">${fmt(f.n)}</td>
+        <td class="num mono">${fmt(f.rama)} m</td>
+        <td class="num mono">${fmt(f.eur)}</td>
+        <td class="num mono"><b>${fmt(f.eurm)}</b></td>
+        <td class="num">${marca}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    document.getElementById('opNormBody').innerHTML =
+      `<tr><td colspan="7" style="color:var(--ink-3)">Pocas operadoras con datos de rama para comparar.</td></tr>`;
+  }
+
+    const ramaTop = mediana(porEur.slice(0, 10).map(w => w.rama));
   document.getElementById('notaRama').innerHTML =
     `Los 10 mejores por EUR crudo tienen una rama mediana de <b>${fmt(ramaTop)} m</b>, ` +
     `contra <b>${fmt(ramaMediana)} m</b> del conjunto. ` +

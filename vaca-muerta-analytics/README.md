@@ -95,8 +95,24 @@ parte. Eso es información útil, no un fracaso: dice que este modelo sirve para
 evaluar **un conjunto** de pozos, no para decidir sobre uno solo — que es
 exactamente como se usa una curva tipo en la industria.
 
-Las cifras exactas están en la app y en el resumen del workflow, y se recalculan
-en cada corrida mensual.
+### Resultados de la última corrida
+
+Este bloque lo reescribe el workflow en cada actualización, así el README nunca
+queda con números viejos.
+
+<!-- RESULTADOS:INICIO -->
+> Última actualización: **2026-09-04** · datos de demostración (sintéticos) · período **2018-09 a 2026-07** · **150 pozos**, 150 con curva ajustada.
+
+| Horizonte | Error en **un pozo** | Sesgo | Dentro de ±20% | Error en el **total** | Pozos |
+|---|---:|---:|---:|---:|---:|
+| 12 meses | 6.4% | -0.3% | 94% | +0.7% | 84 |
+| 24 meses | 7.3% | +1.8% | 88% | +1.4% | 59 |
+| 36 meses | 8.6% | -0.1% | 85% | +0.6% | 34 |
+
+**En una línea:** a 36 meses el modelo se equivoca **9% en un pozo individual** pero solo **1% en el total** de 34 pozos — los errores se compensan. Y subestima de forma sistemática, lo que es corregible.
+
+**Normalización por rama lateral** (143 pozos con longitud declarada, mediana 2,159 m): la longitud explica el **8%** de la diferencia de EUR entre pozos, pero al normalizar el ranking se mueve **6 puestos** en la mediana y del top 10 por EUR crudo sobreviven solo **8**.
+<!-- RESULTADOS:FIN -->
 
 ---
 

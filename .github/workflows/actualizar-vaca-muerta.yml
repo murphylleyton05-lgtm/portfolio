@@ -116,7 +116,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add web/index.html web/artifact.html
+          git add web/index.html web/artifact.html README.md
           if git diff --cached --quiet; then
             echo "La app no cambió: no hay nada que commitear."
             exit 0
