@@ -40,11 +40,13 @@ CKAN_BASE = "https://datos.energia.gob.ar/api/3/action"
 # Identificadores (slugs) de los datasets que nos interesan en el portal.
 # Si alguno cambia de nombre, `buscar_datasets()` de abajo te ayuda a encontrarlo.
 DATASETS = {
-    # Produccion mensual POZO POR POZO de shale y tight. Este es EL dataset
-    # del proyecto: sin el no hay curvas de declinacion.
-    "no_convencional": "produccion-de-pozos-de-gas-y-petroleo-no-convencional",
-    # Produccion convencional, por si queres comparar convencional vs shale.
-    "convencional": "produccion-de-pozos-de-gas-y-petroleo-por-concesion-de-explotacion",
+    # Produccion mensual POZO POR POZO. Este es EL dataset del proyecto: sin el
+    # no hay curvas de declinacion. Trae convencional y no convencional juntos;
+    # los pozos de shale se separan despues por `sub_tipo_recurso` y `formprod`.
+    # Slug verificado contra el portal (Capitulo IV).
+    "no_convencional": "produccion-de-petroleo-y-gas-por-pozo",
+    # Alias: es el mismo dataset, filtrado despues por tipo de recurso.
+    "convencional": "produccion-de-petroleo-y-gas-por-pozo",
     # Datos de perforacion y terminacion (actividad). Sirve para cruzar
     # actividad de perforacion contra precio del crudo.
     "perforacion": "perforacion-de-pozos-de-gas-y-petroleo",

@@ -62,6 +62,13 @@ jobs:
       - name: Instalar dependencias
         run: pip install pandas numpy scipy requests pyarrow
 
+      # Reporta que datasets y que COLUMNAS hay realmente en el portal. Es la
+      # forma de no adivinar nombres: el log de esta corrida dice la verdad.
+      - name: Explorar el portal
+        if: (inputs.fuente || 'oficiales') != 'demo'
+        continue-on-error: true
+        run: python scripts/explorar_portal.py
+
       - name: Ver que publica el portal
         id: sondeo
         if: (inputs.fuente || 'oficiales') != 'demo'
