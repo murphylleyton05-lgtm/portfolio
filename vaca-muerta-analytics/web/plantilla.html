@@ -229,6 +229,12 @@
   .tabla-rama table th, .tabla-rama table td { padding: 6px 9px; }
   .tabla-rama table { font-size: 12px; }
   .tabla-rama .mono { font-size: 11px; }
+  /* Los nombres reales de pozo (YPF.Nq.LLL-1689(h)) son mucho más largos que
+     los de prueba y desbordaban la tabla. Se recortan con puntos suspensivos
+     y el nombre completo queda en el tooltip. */
+  .tabla-rama td.pozo {
+    max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
   .tabla-rama { border-left: 1px solid var(--rule); display: flex; flex-direction: column; }
   .tabla-rama-head {
     padding: 14px 16px 10px; font-family: "IBM Plex Sans Condensed", sans-serif;
@@ -899,9 +905,9 @@ function dibujarRama() {
     const movio = puestoEur.get(wn.id) - (i + 1);
     return `<tr>
       <td class="rank-n">${i + 1}</td>
-      <td class="mono">${esc(we.sigla)}</td>
+      <td class="mono pozo" title="${esc(we.sigla)}">${esc(we.sigla)}</td>
       <td class="num mono">${fmt(we.rama)}</td>
-      <td class="mono">${esc(wn.sigla)}
+      <td class="mono pozo" title="${esc(wn.sigla)}">${esc(wn.sigla)}
         ${movio > 0 ? `<span class="movio">↑${movio}</span>` : ''}</td>
       <td class="num mono">${fmt(wn.rama)}</td>
     </tr>`;

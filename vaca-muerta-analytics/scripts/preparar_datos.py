@@ -178,7 +178,17 @@ def main() -> None:
             print(f"   {con_datos:,} de {len(ajustes):,} pozos ajustados "
                   f"tienen rama declarada ({con_datos / len(ajustes):.0%})")
 
-            diagnostico_rama = mod_fractura.cuanto_explica_la_rama(ajustes)
+            # OJO: el diagnostico se calcula SOLO sobre ajustes confiables.
+            # Incluir los que fallaron mete EUR de millones de barriles que no
+            # son reales, y ensucia la correlacion que estamos midiendo.
+            solo_buenos = ajustes[
+                (ajustes["r2"] >= config.R2_MINIMO_CONFIABLE)
+                & ajustes["convergio"]
+                & (ajustes["b"] < 1.98)
+            ]
+            print(f"   diagnostico sobre {len(solo_buenos):,} ajustes confiables "
+                  f"(de {len(ajustes):,})")
+            diagnostico_rama = mod_fractura.cuanto_explica_la_rama(solo_buenos)
             if diagnostico_rama.get("suficientes_datos"):
                 d = diagnostico_rama
                 print(f"   rama mediana: {d['rama_mediana_m']:,} m")
