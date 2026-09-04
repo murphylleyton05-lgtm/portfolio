@@ -212,6 +212,7 @@
     gap: 1px; background: var(--rule);
     border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
   }
+  .hallazgo-5 { grid-template-columns: repeat(5, 1fr); }
   .hallazgo > div { background: var(--surface); padding: 13px 18px; }
   .hallazgo .h-l {
     font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .09em;
@@ -285,7 +286,7 @@
     .split { grid-template-columns: 1fr; }
     .split-rama { grid-template-columns: minmax(0, 1fr); }
     .tabla-rama { border-left: 0; border-top: 1px solid var(--rule); }
-    .hallazgo { grid-template-columns: repeat(2, 1fr); }
+    .hallazgo, .hallazgo-5 { grid-template-columns: repeat(2, 1fr); }
     .well-list { border-right: 0; border-bottom: 1px solid var(--rule); max-height: 240px; }
     .method { grid-template-columns: 1fr; gap: 16px; }
   }
@@ -394,7 +395,7 @@
       <div style="display:flex;gap:6px" id="valBotones"></div>
     </div>
 
-    <div class="hallazgo" id="valStats"></div>
+    <div class="hallazgo hallazgo-5" id="valStats"></div>
 
     <div class="split-rama">
       <div class="chart-area">
@@ -874,12 +875,15 @@ function dibujarValidacion() {
 
   // --- los números ---
   const sesgo = d.error_mediano;
+  const agregado = d.error_agregado;
   document.getElementById('valStats').innerHTML = [
-    ['Error típico', `${dec(d.error_absoluto, 1)}%`,
+    ['Error por pozo', `${dec(d.error_absoluto, 1)}%`,
      `mediana del |error| a ${horizonteVal} meses`],
-    ['Dentro de ±20%', `${dec(d.dentro_20, 0)}%`, 'de los pozos evaluados'],
     ['Sesgo', `${sesgo > 0 ? '+' : ''}${dec(sesgo, 1)}%`,
-     sesgo > 0 ? 'el modelo sobreestima' : 'el modelo subestima'],
+     sesgo > 0 ? 'sobreestima sistemáticamente' : 'subestima sistemáticamente'],
+    ['Dentro de ±20%', `${dec(d.dentro_20, 0)}%`, 'de los pozos evaluados'],
+    ['Error del total', agregado == null ? '—' : `${agregado > 0 ? '+' : ''}${dec(agregado, 1)}%`,
+     'sumando todos los pozos juntos'],
     ['Pozos validados', fmt(d.pozos), `ya produjeron los ${horizonteVal} meses`],
   ].map(([l, v, h]) =>
     `<div><div class="h-l">${l}</div><div class="h-v">${v}</div><div class="h-h">${h}</div></div>`
@@ -963,13 +967,24 @@ function dibujarValidacion() {
   q.push(`<text x="${hm.l + hiw / 2}" y="${HH - 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="10.5">error de predicción · azul = dentro de ±20%</text>`);
   hs.innerHTML = q.join('');
 
+  const agr = d.error_agregado;
   document.getElementById('valNota').innerHTML =
     `Cada punto es un pozo. El eje horizontal es lo que <b>realmente</b> produjo en ` +
     `${horizonteVal} meses; el vertical, lo que el modelo <b>predijo</b> sin haber visto ` +
-    `esos meses. Los puntos sobre la diagonal son aciertos; arriba, sobreestimaciones; ` +
-    `abajo, subestimaciones.<br><br>` +
-    `El sesgo importa tanto como el error: un modelo que se equivoca siempre para el ` +
-    `mismo lado se puede corregir; uno que se equivoca al azar, no.`;
+    `esos meses. Sobre la diagonal son aciertos; arriba, sobreestimaciones; abajo, ` +
+    `subestimaciones.<br><br>` +
+    `<b>Pozo por pozo el modelo no es preciso:</b> el error típico es de ` +
+    `${dec(d.error_absoluto, 0)}% y solo ${dec(d.dentro_20, 0)}% de los pozos cae dentro ` +
+    `de ±20%. Eso es información, no un fracaso: dice que no conviene usar este modelo ` +
+    `para decidir sobre un pozo suelto.` +
+    (agr != null
+      ? `<br><br><b>En el agregado anda mejor.</b> Sumando todos los pozos, el error del ` +
+        `total es ${agr > 0 ? '+' : ''}${dec(agr, 0)}%: los errores individuales se ` +
+        `compensan en parte. Así es como se usa en la práctica — nadie invierte por el ` +
+        `pronóstico de un pozo, sino de un programa de decenas.`
+      : '') +
+    `<br><br>El sesgo de ${sesgo > 0 ? '+' : ''}${dec(sesgo, 0)}% es sistemático, y eso ` +
+    `es preferible al error aleatorio: un sesgo conocido se puede corregir.`;
 }
 
 /* ===================== ¿roca o largo? ===================== */

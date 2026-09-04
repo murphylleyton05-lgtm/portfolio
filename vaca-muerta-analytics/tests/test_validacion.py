@@ -161,3 +161,39 @@ def test_los_meses_evaluados_se_corresponden_con_el_horizonte():
     r = validacion.backtest_pozo(_pozo(meses=72), horizontes=(12, 36))
     assert r["meses_evaluados_12"] <= 12
     assert 30 <= r["meses_evaluados_36"] <= 36
+
+
+def test_el_error_agregado_es_distinto_del_mediano():
+    """
+    El error agregado responde otra pregunta que el error por pozo: cuanto se
+    equivoca el modelo en el TOTAL de un conjunto, no en cada pozo. Cuando los
+    errores individuales tienen signos opuestos, se compensan y el agregado es
+    mucho menor. Es la diferencia entre pronosticar un pozo y pronosticar un
+    programa de perforacion.
+    """
+    bt = pd.DataFrame({
+        "id_pozo": ["A", "B"],
+        # Uno sobreestima 50%, el otro subestima 50%: en el total se cancelan.
+        "real_36": [100.0, 100.0],
+        "pred_36": [150.0, 50.0],
+        "error_pct_36": [50.0, -50.0],
+    })
+    # resumen() exige al menos 10 pozos por horizonte; replicamos el patron.
+    bt = pd.concat([bt] * 6, ignore_index=True)
+
+    res = validacion.resumen(bt, horizontes=(36,))
+    d = res["h36"]
+
+    assert d["error_absoluto"] == pytest.approx(50.0)   # cada pozo se equivoca 50%
+    assert d["error_agregado"] == pytest.approx(0.0)    # el total, nada
+
+
+def test_la_frase_menciona_el_agregado_cuando_esta():
+    bt = pd.DataFrame({
+        "id_pozo": [str(i) for i in range(12)],
+        "real_36": [100.0] * 12,
+        "pred_36": [90.0] * 12,
+        "error_pct_36": [-10.0] * 12,
+    })
+    frase = validacion.frase_del_resultado(validacion.resumen(bt, horizontes=(36,)), 36)
+    assert "error del total" in frase

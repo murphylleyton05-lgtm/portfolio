@@ -194,7 +194,7 @@ def resumen(backtest: pd.DataFrame, horizontes: tuple[int, ...] = HORIZONTES) ->
         if len(errores) < 10:
             continue
 
-        salida[f"h{h}"] = {
+        d = {
             "pozos": int(len(errores)),
             "error_mediano": round(float(errores.median()), 1),
             "error_absoluto": round(float(errores.abs().median()), 1),
@@ -202,6 +202,27 @@ def resumen(backtest: pd.DataFrame, horizontes: tuple[int, ...] = HORIZONTES) ->
             "p10": round(float(errores.quantile(0.10)), 1),
             "p90": round(float(errores.quantile(0.90)), 1),
         }
+
+        # ERROR AGREGADO: se suman todos los pozos y recien ahi se compara.
+        #
+        # Es una medida distinta y responde otra pregunta. El error mediano
+        # dice cuanto se equivoca el modelo en UN pozo; el agregado, cuanto se
+        # equivoca en el TOTAL de un conjunto de pozos.
+        #
+        # La diferencia importa porque asi se usa el modelo en la practica:
+        # nadie decide en base al pronostico de un pozo suelto, se decide sobre
+        # un programa de perforacion de decenas. Si los errores individuales se
+        # cancelan entre si, el error del total es mucho menor que el de cada
+        # pozo, y el modelo sirve aunque falle pozo por pozo.
+        cr, cp = f"real_{h}", f"pred_{h}"
+        if cr in backtest.columns and cp in backtest.columns:
+            sub = backtest[[cr, cp]].dropna()
+            total_real = float(sub[cr].sum())
+            if total_real > 0:
+                total_pred = float(sub[cp].sum())
+                d["error_agregado"] = round((total_pred - total_real) / total_real * 100, 1)
+
+        salida[f"h{h}"] = d
 
     return salida
 
@@ -219,11 +240,22 @@ def frase_del_resultado(res: dict, horizonte: int = 36) -> str:
 
     d = res[clave]
     sentido = "sobreestima" if d["error_mediano"] > 0 else "subestima"
-    return (
+
+    frase = (
         f"Entrenado con {MESES_ENTRENAMIENTO} meses, el modelo predice la produccion "
         f"de los {horizonte} meses siguientes con un error absoluto mediano del "
-        f"{d['error_absoluto']:.0f}%, evaluado sobre {d['pozos']:,} pozos que ya "
-        f"produjeron ese periodo. {d['dentro_20']:.0f}% de los pozos caen dentro de "
-        f"+/-20%. El modelo {sentido} de forma sistematica: el error mediano con "
-        f"signo es {d['error_mediano']:+.0f}%."
+        f"{d['error_absoluto']:.0f}% por pozo, evaluado sobre {d['pozos']:,} pozos que "
+        f"ya produjeron ese periodo. Solo {d['dentro_20']:.0f}% cae dentro de +/-20%, "
+        f"y el modelo {sentido} de forma sistematica ({d['error_mediano']:+.0f}%)."
     )
+
+    if "error_agregado" in d:
+        agregado = d["error_agregado"]
+        frase += (
+            f" Sumando todos los pozos, sin embargo, el error del total es del "
+            f"{agregado:+.0f}%: los errores individuales se compensan parcialmente, "
+            f"asi que el modelo sirve mejor para un conjunto de pozos que para "
+            f"pronosticar uno solo."
+        )
+
+    return frase

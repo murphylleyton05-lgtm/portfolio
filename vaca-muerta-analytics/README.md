@@ -26,6 +26,8 @@ La versión web es para mostrar; la de Streamlit es para trabajar.
 | ¿Qué bloque tiene mejor calidad de roca? | Pestaña *Panorama* |
 | ¿Cuánto tarda la actividad en reaccionar al precio del crudo? | Pestaña *Contexto macro* |
 | ¿Qué pozos se salieron de su curva esperada este mes? | `scripts/detectar_anomalias.py` |
+| ¿Este bloque es mejor, o sus pozos son más largos? | Pestaña *¿Es la roca o el pozo es más largo?* |
+| ¿Se le puede creer al modelo? | Pestaña *¿Se le puede creer al modelo?* |
 
 ---
 
@@ -61,6 +63,40 @@ ese corte, cualquier EUR calculado con `b ≥ 1` es inválido.
    puesta en marcha.
 3. **Los meses con producción nula se descartan**, no se tratan como cero. Un
    cero significa "pozo parado", no "el pozo declinó a cero".
+
+---
+
+## Validación: ¿por qué creerle al EUR?
+
+Un EUR es una predicción a 30 años. Cualquiera puede ajustar una curva y publicar
+un número grande, así que el proyecto se valida **escondiéndole datos al modelo**:
+
+1. Se ajusta la curva con los **primeros 24 meses** de cada pozo.
+2. Se le pide predecir los 12, 24 y 36 meses siguientes.
+3. Se compara con lo que el pozo **realmente produjo**.
+
+El pozo ya produjo ese período; el modelo no lo vio. Es una predicción real, no un
+ajuste sobre datos conocidos. Un pozo entra en un horizonte **solo si realmente lo
+vivió**: sin esa condición, el error a 36 meses se calcularía mezclando pozos que
+nunca llegaron ahí.
+
+Se reportan tres cosas distintas, y la diferencia entre ellas es el punto:
+
+| Métrica | Qué responde |
+|---|---|
+| **Error por pozo** (mediana de \|error\|) | Cuánto se equivoca en **un** pozo |
+| **Sesgo** (error mediano con signo) | Si se equivoca siempre para el mismo lado |
+| **Error del total** (agregado) | Cuánto se equivoca en el **conjunto** de pozos |
+
+**El resultado sobre datos reales, en una línea:** pozo por pozo el modelo no es
+preciso, y **subestima de forma sistemática**; el sesgo crece con el horizonte. En
+el agregado anda bastante mejor, porque los errores individuales se compensan en
+parte. Eso es información útil, no un fracaso: dice que este modelo sirve para
+evaluar **un conjunto** de pozos, no para decidir sobre uno solo — que es
+exactamente como se usa una curva tipo en la industria.
+
+Las cifras exactas están en la app y en el resumen del workflow, y se recalculan
+en cada corrida mensual.
 
 ---
 
@@ -133,6 +169,8 @@ vaca-muerta-analytics/
 │   ├── ingesta.py                API CKAN de datos.energia.gob.ar + EIA
 │   ├── limpieza.py               Normalización del esquema oficial
 │   ├── declinacion.py            ⭐ Arps, EUR, curvas tipo
+│   ├── fractura.py               Normalización por rama lateral
+│   ├── validacion.py             Backtest: predecir lo que el modelo no vio
 │   └── demo_data.py              Generador sintético (para correr sin descargar)
 ├── scripts/
 │   ├── actualizar.py             ⭐ Todo el pipeline en un comando
@@ -191,6 +229,12 @@ que no conviene confiar.
   supuestos, configurables en `src/petro/config.py`.
 - **La detección de anomalías es un detector, no un diagnóstico:** señala pozos
   para mirar, no dice qué les pasa.
+- **El modelo no sirve para pronosticar un pozo individual.** El backtest lo
+  muestra: el error típico por pozo es alto y solo una minoría cae dentro de
+  ±20%. Úsese para comparar conjuntos, no para decidir sobre un pozo suelto.
+- **Los ajustes de mala calidad se excluyen de los rankings.** Cuando la curva no
+  ajusta, el optimizador lleva `b` a su tope y el EUR se dispara: sin filtrar,
+  los peores ajustes encabezan el ranking con EUR físicamente imposibles.
 
 ---
 
