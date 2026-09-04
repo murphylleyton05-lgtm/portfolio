@@ -185,7 +185,7 @@ def main() -> None:
             solo_buenos = ajustes[
                 (ajustes["r2"] >= config.R2_MINIMO_CONFIABLE)
                 & ajustes["convergio"]
-                & (ajustes["b"] < 1.98)
+                & (ajustes["b"] < config.B_EN_EL_TOPE)
             ]
             print(f"   diagnostico sobre {len(solo_buenos):,} ajustes confiables "
                   f"(de {len(ajustes):,})")
@@ -257,7 +257,7 @@ def main() -> None:
     confiables_ec = ajustes[
         (ajustes["r2"] >= config.R2_MINIMO_CONFIABLE)
         & ajustes["convergio"]
-        & (ajustes["b"] < 1.98)
+        & (ajustes["b"] < config.B_EN_EL_TOPE)
     ]
     if len(confiables_ec) >= 10:
         evaluados = economia.evaluar(confiables_ec, precio_usd_bbl=config.PRECIO_REFERENCIA,

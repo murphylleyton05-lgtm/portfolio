@@ -69,6 +69,55 @@ def _extraer(nombre: str, texto: str) -> str:
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node no está instalado")
+def test_los_percentiles_del_javascript_coinciden_con_pandas():
+    """
+    La paridad por pozo no alcanza: la app tambien AGREGA (mediana, P10, P90) y
+    ahi puede divergir aunque cada pozo coincida.
+
+    Paso de verdad: el JS tomaba `ordenado[floor(n*q)]` y pandas interpola
+    linealmente, asi que el P90 daba 100.1 en la app y 98.9 en el README. Dos
+    numeros distintos para lo mismo, en la misma pagina.
+    """
+    import numpy as np
+    import pandas as pd
+
+    texto = PLANTILLA.read_text()
+    percentil_js = _extraer("percentil", texto)
+
+    rng = np.random.default_rng(0)
+    muestras = [
+        sorted(rng.uniform(20, 200, n).round(4).tolist())
+        for n in (11, 12, 50, 143, 1000)
+    ]
+    cuantiles = [0.10, 0.25, 0.5, 0.75, 0.90]
+
+    guion = f"""
+{percentil_js}
+const muestras = {json.dumps(muestras)};
+const qs = {json.dumps(cuantiles)};
+console.log(JSON.stringify(muestras.map(m => qs.map(q => percentil(m, q)))));
+"""
+    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as f:
+        f.write(guion)
+        ruta = f.name
+    try:
+        proc = subprocess.run(["node", ruta], capture_output=True, text=True, timeout=60)
+    finally:
+        Path(ruta).unlink(missing_ok=True)
+
+    assert proc.returncode == 0, f"el JS falló:\n{proc.stderr}"
+    js = json.loads(proc.stdout)
+
+    for muestra, fila in zip(muestras, js):
+        serie = pd.Series(muestra)
+        for q, valor_js in zip(cuantiles, fila):
+            assert valor_js == pytest.approx(float(serie.quantile(q)), rel=1e-9), (
+                f"percentil {q} con n={len(muestra)}: JS {valor_js} vs pandas "
+                f"{serie.quantile(q)}"
+            )
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node no está instalado")
 def test_el_javascript_de_la_app_da_lo_mismo_que_el_python():
     texto = PLANTILLA.read_text()
 

@@ -47,7 +47,7 @@ def main() -> None:
     print(f"| EUR mediano | {aj['eur_mbbl'].median():,.0f} Mbbl |")
 
     # Cuantos pozos quedaron pegados al tope de b: ahi el EUR queda inflado.
-    en_tope = int((aj["b"] >= 1.98).sum())
+    en_tope = int((aj["b"] >= config.B_EN_EL_TOPE).sum())
     if en_tope:
         print(f"| Pozos con b en el tope del modelo | {en_tope:,} "
               f"({en_tope / len(aj):.0%}) — su EUR está sobreestimado |")

@@ -124,6 +124,15 @@ solo_convergidos = st.sidebar.checkbox(
     help="Excluye pozos donde el optimizador no encontro solucion.",
 )
 
+excluir_tope = st.sidebar.checkbox(
+    "Excluir b en el tope del modelo", value=True,
+    help=(
+        f"Descarta ajustes con b >= {config.B_EN_EL_TOPE}. Ahi el optimizador llego "
+        "a su limite: la integral del EUR se dispara y esos pozos encabezan el "
+        "ranking sin merecerlo. La app web y el pipeline aplican el mismo filtro."
+    ),
+)
+
 st.sidebar.divider()
 st.sidebar.caption(
     f"Ultimo procesamiento: {metadatos.get('generado_en', 's/d')[:16].replace('T', ' ')}  \n"
@@ -140,6 +149,8 @@ mask = (
 )
 if solo_convergidos:
     mask &= ajustes["convergio"]
+if excluir_tope:
+    mask &= ajustes["b"] < config.B_EN_EL_TOPE
 
 aj = ajustes[mask].copy()
 prod = produccion[produccion["id_pozo"].isin(aj["id_pozo"])].copy()

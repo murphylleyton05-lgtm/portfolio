@@ -32,6 +32,15 @@ R2_MINIMO_CONFIABLE = 0.70    # abajo de esto el ajuste se marca como dudoso
 # con un control, y el precio de equilibrio de cada pozo no depende de el.
 PRECIO_REFERENCIA = 65.0
 
+# Valor de `b` a partir del cual consideramos que el ajuste toco el tope del
+# optimizador. Ahi la curva deja de describir al pozo: la integral del EUR se
+# dispara y el numero pierde sentido.
+#
+# Vive aca y en ningun otro lado a proposito. Estaba repetido en tres archivos,
+# y tocar uno solo habria hecho que la app y el pipeline filtraran distinto sin
+# que ningun test avisara.
+B_EN_EL_TOPE = 1.98
+
 
 def asegurar_carpetas() -> None:
     """Crea las carpetas de datos si no existen."""

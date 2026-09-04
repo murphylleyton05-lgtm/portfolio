@@ -30,10 +30,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from petro import config, declinacion  # noqa: E402
 from petro.limpieza import BARRILES_POR_M3  # noqa: E402
 
-# Un ajuste con b pegado al tope del optimizador no describe al pozo: la
-# integral del EUR diverge y el numero deja de significar algo.
-B_EN_EL_TOPE = 1.98
-
 RAIZ = Path(__file__).resolve().parents[1]
 PLANTILLA = RAIZ / "web" / "plantilla.html"
 
@@ -49,6 +45,22 @@ ENVOLTORIO = """<!doctype html>
 {cuerpo}</body>
 </html>
 """
+
+
+def seleccionar_confiables(ajustes: pd.DataFrame) -> pd.DataFrame:
+    """
+    Los ajustes en los que se puede confiar: R2 suficiente, convergidos, y con
+    `b` por debajo del tope del optimizador.
+
+    Es una funcion aparte y pura para poder testearla: el criterio de "confiable"
+    decide que pozos entran al ranking y a la economia, asi que un cambio
+    silencioso aca cambia todos los numeros del proyecto.
+    """
+    return ajustes[
+        (ajustes["r2"] >= config.R2_MINIMO_CONFIABLE)
+        & ajustes["convergio"]
+        & (ajustes["b"] < config.B_EN_EL_TOPE)
+    ]
 
 
 def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
@@ -90,11 +102,7 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
     # bien. Aparecio recien con los datos oficiales.
     # ---------------------------------------------------------------
     antes = len(ajustes)
-    confiables = ajustes[
-        (ajustes["r2"] >= config.R2_MINIMO_CONFIABLE)
-        & ajustes["convergio"]
-        & (ajustes["b"] < B_EN_EL_TOPE)
-    ]
+    confiables = seleccionar_confiables(ajustes)
 
     if len(confiables) < 20:
         # Si casi nada pasa el filtro, algo mas grande esta mal. Avisamos en
@@ -108,9 +116,15 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
               f"{config.R2_MINIMO_CONFIABLE}, sin converger, o b en el tope")
         ajustes = confiables
 
-    # Guardamos la poblacion completa de ajustes confiables ANTES de recortar a
-    # los mejores: la economia se calcula sobre todos, no sobre los elegidos.
-    confiables_para_poblacion = ajustes.copy()
+    # Poblacion para la economia: SIEMPRE los ajustes confiables, aunque sean
+    # pocos, y nunca los que no pasaron el filtro.
+    #
+    # Ojo con la rama de arriba: cuando casi nada pasa el filtro dejamos
+    # `ajustes` sin filtrar para que los graficos muestren algo, pero meter esos
+    # ajustes rotos en la economia daria precios de equilibrio absurdamente
+    # bajos (b en el tope -> volumen descontado enorme -> el pozo "cierra" a
+    # cualquier precio). Preferimos una seccion vacia a un numero mentiroso.
+    confiables_para_poblacion = confiables.copy()
 
     ajustes = ajustes.sort_values("eur", ascending=False).head(max_pozos)
 

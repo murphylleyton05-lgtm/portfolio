@@ -664,12 +664,29 @@ function qModelo(t, qi, di, b) {
 const fmt = (n, d = 0) => n.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const dec = (n, d) => n.toLocaleString('es-AR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const B_TOPE = 1.98;                 // el ajuste acota b en 2.0; pegado al tope, el EUR queda inflado
-const mediana = a => { const s = [...a].sort((x, y) => x - y); const m = s.length >> 1;
-  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+const mediana = a => percentil([...a].sort((x, y) => x - y), 0.5);
+
+// Percentil con interpolación lineal, igual que el default de numpy/pandas.
+// Tomar `ordenado[floor(n*q)]` da valores levemente distintos de los del
+// pipeline, y entonces la app y el README reportan números que no coinciden.
+function percentil(ordenado, q) {
+  if (!ordenado.length) return NaN;
+  const pos = (ordenado.length - 1) * q;
+  const bajo = Math.floor(pos), alto = Math.ceil(pos);
+  if (bajo === alto) return ordenado[bajo];
+  return ordenado[bajo] + (ordenado[alto] - ordenado[bajo]) * (pos - bajo);
+}
 const SERIES_VARS = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
 const cssVar = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-const OPERADORAS = [...new Set(DATA.wells.map(w => w.op))].sort();
+// La lista de operadoras sale de la UNIÓN de los pozos mostrados y de la
+// población de economía. Sacarla solo de DATA.wells (los 400 de mayor EUR)
+// dejaba afuera, en silencio, a las operadoras que no llegan al top — y la
+// economía decía cubrir a todos los pozos confiables del período.
+const OPERADORAS = [...new Set([
+  ...DATA.wells.map(w => w.op),
+  ...(DATA.poblacion || []).map(w => w.op),
+])].sort();
 const colorOp = op => SERIES_VARS[OPERADORAS.indexOf(op) % 8];
 
 let opsActivas = new Set(OPERADORAS);
@@ -982,11 +999,16 @@ function dibujarEconomia() {
   // La economía se calcula sobre TODOS los pozos con ajuste confiable, no sobre
   // los que se muestran en los gráficos. Esos son los de mayor EUR: usarlos acá
   // daría que el 100% cierra a cualquier precio, que es falso para el conjunto.
+  const seccion = document.getElementById('secEco');
   const poblacion = DATA.poblacion || [];
-  const pozos = poblacion.length
-    ? poblacion.filter(w => opsActivas.has(w.op))
-    : visibles();
-  if (!pozos.length) return;
+
+  // Sin población confiable NO hay alternativa: caer en visibles() usaría los
+  // 400 de mayor EUR, que es justamente el sesgo que esta sección corrige.
+  // Preferimos ocultarla a mostrar un número lindo y falso.
+  if (poblacion.length < 10) { seccion.hidden = true; return; }
+  seccion.hidden = false;
+
+  const pozos = poblacion.filter(w => opsActivas.has(w.op));
 
   // --- controles ---
   const defs = [
@@ -1018,14 +1040,25 @@ function dibujarEconomia() {
   });
 
   // --- cálculo ---
+  // Los controles ya se construyeron arriba: si el filtro de operadora deja
+  // muy pocos pozos avisamos, pero NO escondemos los sliders, porque entonces
+  // el usuario no tendría cómo volver atrás.
   const conBe = pozos.map(w => ({ ...w, be: precioEquilibrio(w) }))
                      .filter(w => isFinite(w.be));
-  if (!conBe.length) return;
+
+  if (conBe.length < 10) {
+    document.getElementById('ecoStats').innerHTML =
+      `<div style="grid-column:1/-1"><div class="h-h">Muy pocos pozos para calcular
+       economía con las operadoras seleccionadas. Sumá alguna más arriba.</div></div>`;
+    document.getElementById('ecoChart').innerHTML = '';
+    document.getElementById('ecoBody').innerHTML = '';
+    return;
+  }
 
   const bes = conBe.map(w => w.be).sort((a, b) => a - b);
   const med = mediana(bes);
-  const p10 = bes[Math.floor(bes.length * 0.10)];
-  const p90 = bes[Math.floor(bes.length * 0.90)];
+  const p10 = percentil(bes, 0.10);
+  const p90 = percentil(bes, 0.90);
   const cierran = conBe.filter(w => w.be <= ECO.precio).length;
   const margen = ECO.precio - med;
 

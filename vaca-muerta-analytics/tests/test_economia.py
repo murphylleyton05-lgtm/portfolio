@@ -190,3 +190,20 @@ def test_resumen_devuelve_los_percentiles_y_los_supuestos():
     assert 0 <= res["rentables_pct"] <= 100
     # Los supuestos viajan con el resultado: sin ellos el numero no se puede leer.
     assert res["supuestos"]["costo_pozo_musd"] == 12.0
+
+
+def test_los_ajustes_rotos_darian_precios_de_equilibrio_absurdos():
+    """
+    Documenta por que la economia se calcula SOLO sobre ajustes confiables.
+
+    Un ajuste fallido lleva b a su tope, y con b alto la curva tiene una cola
+    larguisima: el volumen descontado se dispara y el pozo parece cerrar a
+    cualquier precio. Si esos pozos entraran en el calculo, la conclusion seria
+    que casi todo Vaca Muerta es rentable a 20 dolares, que es falso.
+    """
+    sano = economia.precio_de_equilibrio(qi_m3d=140.0, di_mensual=0.15, b=1.2)
+    roto = economia.precio_de_equilibrio(qi_m3d=140.0, di_mensual=0.15, b=2.0)
+
+    assert roto < sano, "b en el tope infla el volumen y abarata el equilibrio"
+    # La distorsion no es menor: justifica filtrar antes de calcular.
+    assert roto < sano * 0.9
