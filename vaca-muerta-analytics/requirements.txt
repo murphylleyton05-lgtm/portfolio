@@ -1,0 +1,15 @@
+# Stack del proyecto. Instalar con:  pip install -r requirements.txt
+#
+# Las versiones estan fijadas ("pinneadas") a las que se probaron realmente.
+# Fijar versiones es lo que hace que el proyecto siga funcionando dentro de
+# seis meses y que a otra persona le corra igual que a vos.
+pandas==3.0.5
+numpy==2.4.6
+scipy==1.17.1
+requests==2.33.1
+streamlit==1.63.0
+plotly==7.0.0
+pyarrow==25.0.1
+
+# Solo para desarrollo (correr los tests):
+pytest==9.1.1

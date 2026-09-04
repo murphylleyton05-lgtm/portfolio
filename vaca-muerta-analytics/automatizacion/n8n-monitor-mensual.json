@@ -1,0 +1,145 @@
+{
+  "name": "Vaca Muerta - Monitor mensual de pozos",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 20 * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger-mensual",
+      "name": "Dia 20 de cada mes 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-360, 300],
+      "notes": "La Secretaria de Energia suele publicar los datos del mes anterior alrededor del dia 20. Ajusta el dia si en tu experiencia publican otro."
+    },
+    {
+      "parameters": {
+        "command": "cd /ruta/a/vaca-muerta-analytics && .venv/bin/python scripts/descargar_datos.py --dataset no_convencional --forzar"
+      },
+      "id": "descargar",
+      "name": "Descargar datos oficiales",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [-140, 300],
+      "notes": "--forzar ignora el cache: queremos los datos nuevos, y ademas los meses viejos pueden haber sido rectificados."
+    },
+    {
+      "parameters": {
+        "command": "cd /ruta/a/vaca-muerta-analytics && .venv/bin/python scripts/preparar_datos.py"
+      },
+      "id": "procesar",
+      "name": "Procesar y reajustar curvas",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [80, 300]
+    },
+    {
+      "parameters": {
+        "command": "cd /ruta/a/vaca-muerta-analytics && .venv/bin/python scripts/detectar_anomalias.py --umbral 25 --json"
+      },
+      "id": "detectar",
+      "name": "Detectar anomalias",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, 300],
+      "notes": "--json hace que el script imprima solo JSON por stdout, para parsearlo en el nodo siguiente."
+    },
+    {
+      "parameters": {
+        "jsCode": "// El nodo Execute Command devuelve la salida cruda en `stdout`.\n// La parseamos y armamos el mensaje que se va a enviar.\n\nconst salida = $input.first().json.stdout;\n\nlet reporte;\ntry {\n  reporte = JSON.parse(salida);\n} catch (e) {\n  throw new Error('El script no devolvio JSON valido. Salida: ' + String(salida).slice(0, 500));\n}\n\nconst top = (reporte.detalle || []).slice(0, 5);\n\nconst lineas = top.map(p => {\n  const flecha = p.desvio_pct < 0 ? '🔻' : '🔺';\n  return `${flecha} *${p.sigla}* (${p.empresa})\\n` +\n         `   ${p.caudal_real_bbld} bbl/d vs ${p.caudal_esperado_bbld} esperados (${p.desvio_pct > 0 ? '+' : ''}${p.desvio_pct}%)`;\n});\n\nconst mensaje =\n  `📊 *Monitor Vaca Muerta*\\n\\n` +\n  `Pozos evaluados: ${reporte.pozos_evaluados}\\n` +\n  `Desvios detectados: *${reporte.anomalias_encontradas}*\\n` +\n  `   🔻 ${reporte.bajo_rendimiento} por debajo de su curva\\n` +\n  `   🔺 ${reporte.sobre_rendimiento} por encima\\n\\n` +\n  (lineas.length ? `*Mayores desvios:*\\n${lineas.join('\\n')}\\n\\n` : '') +\n  `_Umbral: ±${reporte.umbral_pct}%. Un desvio no es un diagnostico: es una senal para mirar el pozo._`;\n\nreturn [{ json: { mensaje, anomalias: reporte.anomalias_encontradas, reporte } }];"
+      },
+      "id": "formatear",
+      "name": "Armar el mensaje",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "hay-anomalias",
+              "leftValue": "={{ $json.anomalias }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "hay-algo",
+      "name": "Hay algo que reportar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [740, 300],
+      "notes": "Sin este filtro mandarias un mensaje todos los meses aunque no haya nada. Una alerta que llega siempre deja de leerse: es la forma mas rapida de que un sistema de monitoreo muera."
+    },
+    {
+      "parameters": {
+        "chatId": "TU_CHAT_ID",
+        "text": "={{ $json.mensaje }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram",
+      "name": "Avisar por Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [960, 200],
+      "notes": "Necesita una credencial de Telegram Bot API. Se puede reemplazar por Gmail, Slack o WhatsApp sin tocar el resto del flujo."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sin anomalias: no molestamos a nadie, pero dejamos registro de que corrio.\nreturn [{ json: { estado: 'sin_novedades', fecha: new Date().toISOString() } }];"
+      },
+      "id": "sin-novedades",
+      "name": "Sin novedades (no notificar)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 400]
+    }
+  ],
+  "connections": {
+    "Dia 20 de cada mes 09:00": {
+      "main": [[{ "node": "Descargar datos oficiales", "type": "main", "index": 0 }]]
+    },
+    "Descargar datos oficiales": {
+      "main": [[{ "node": "Procesar y reajustar curvas", "type": "main", "index": 0 }]]
+    },
+    "Procesar y reajustar curvas": {
+      "main": [[{ "node": "Detectar anomalias", "type": "main", "index": 0 }]]
+    },
+    "Detectar anomalias": {
+      "main": [[{ "node": "Armar el mensaje", "type": "main", "index": 0 }]]
+    },
+    "Armar el mensaje": {
+      "main": [[{ "node": "Hay algo que reportar?", "type": "main", "index": 0 }]]
+    },
+    "Hay algo que reportar?": {
+      "main": [
+        [{ "node": "Avisar por Telegram", "type": "main", "index": 0 }],
+        [{ "node": "Sin novedades (no notificar)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": ["vaca-muerta", "monitoreo", "portfolio"]
+}

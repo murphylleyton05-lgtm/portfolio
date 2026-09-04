@@ -1,0 +1,14 @@
+# Datos descargados: nunca se commitean (son cientos de MB y se regeneran)
+data/crudo/*
+data/procesado/*
+!data/crudo/.gitkeep
+!data/procesado/.gitkeep
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.streamlit/secrets.toml
+.pytest_cache/
+.ipynb_checkpoints/
