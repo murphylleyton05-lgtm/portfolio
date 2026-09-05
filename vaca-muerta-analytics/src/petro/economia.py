@@ -17,7 +17,11 @@ COMO SE CALCULA ACA
 -------------------
 El valor presente de un pozo, a un precio P, es:
 
-    VAN = (P - opex) * (1 - regalias) * Vd  -  costo_del_pozo
+    VAN = (P - diferencial - opex) * (1 - regalias) * Vd  -  costo_del_pozo
+
+donde P es un precio de REFERENCIA (tipo Brent) y `diferencial` lo baja hasta
+lo que el pozo cobra en boca. Referir el breakeven a un precio de mercado (y no
+al netback) es lo que lo pone en el rango que reporta la industria.
 
 donde `Vd` es el VOLUMEN DESCONTADO: los barriles que produce el pozo, cada uno
 traido a valor de hoy segun cuando se produce. Un barril dentro de diez años
@@ -26,7 +30,7 @@ parte del volumen sale en los primeros años.
 
 Igualando VAN = 0 y despejando el precio:
 
-    precio_equilibrio = costo_del_pozo / ((1 - regalias) * Vd) + opex
+    precio_equilibrio = costo_del_pozo / ((1 - regalias) * Vd) + opex + diferencial
 
 Es analitico: no hace falta iterar. Y esa formula deja ver de una que el
 precio de equilibrio baja si el pozo produce mas (Vd sube) o si el pozo cuesta
@@ -76,6 +80,13 @@ class Supuestos:
 
     costo_pozo_musd: float = 12.0      # millones de USD, pozo perforado y terminado
     opex_usd_bbl: float = 12.0         # costo operativo por barril producido
+    # Castigo por barril entre el precio de referencia (tipo Brent) y lo que
+    # realmente cobra el pozo en boca: el crudo Medanito/Neuquen cotiza con
+    # descuento respecto del Brent, mas transporte y tratamiento hasta el punto
+    # de venta. Sin esto el breakeven queda referido al netback de boca de pozo
+    # y da 30-50% mas bajo que el que reporta la industria (que lo referencia a
+    # un precio de mercado). Orden de magnitud publico: 8-15 USD/bbl.
+    diferencial_usd_bbl: float = 10.0
     regalias_pct: float = 12.0         # regalias provinciales, % del valor boca de pozo
     descuento_anual_pct: float = 10.0  # tasa de descuento anual
     horizonte_meses: int = 240         # 20 años de vida economica
@@ -84,6 +95,7 @@ class Supuestos:
         return {
             "costo_pozo_musd": self.costo_pozo_musd,
             "opex_usd_bbl": self.opex_usd_bbl,
+            "diferencial_usd_bbl": self.diferencial_usd_bbl,
             "regalias_pct": self.regalias_pct,
             "descuento_anual_pct": self.descuento_anual_pct,
             "horizonte_meses": self.horizonte_meses,
@@ -134,7 +146,8 @@ def precio_de_equilibrio(
         return float("inf")
 
     neto = (1 - supuestos.regalias_pct / 100) * vd
-    return supuestos.costo_pozo_musd * 1e6 / neto + supuestos.opex_usd_bbl
+    return (supuestos.costo_pozo_musd * 1e6 / neto
+            + supuestos.opex_usd_bbl + supuestos.diferencial_usd_bbl)
 
 
 def van_musd(
@@ -147,7 +160,8 @@ def van_musd(
 ) -> float:
     """Valor presente neto del pozo, en millones de USD, a un precio dado."""
     vd = volumen_descontado_bbl(qi_m3d, di_mensual, b, supuestos, d_terminal_anual)
-    margen = (precio_usd_bbl - supuestos.opex_usd_bbl) * (1 - supuestos.regalias_pct / 100)
+    realizado = precio_usd_bbl - supuestos.diferencial_usd_bbl
+    margen = (realizado - supuestos.opex_usd_bbl) * (1 - supuestos.regalias_pct / 100)
     return (margen * vd - supuestos.costo_pozo_musd * 1e6) / 1e6
 
 
@@ -170,7 +184,8 @@ def meses_de_repago(
         meses, qi_m3d, di_mensual, b, d_terminal_anual=d_terminal_anual
     )
     bbl = caudal * DIAS_POR_MES * BARRILES_POR_M3
-    margen = (precio_usd_bbl - supuestos.opex_usd_bbl) * (1 - supuestos.regalias_pct / 100)
+    realizado = precio_usd_bbl - supuestos.diferencial_usd_bbl
+    margen = (realizado - supuestos.opex_usd_bbl) * (1 - supuestos.regalias_pct / 100)
 
     if margen <= 0:
         return None

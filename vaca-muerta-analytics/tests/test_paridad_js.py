@@ -51,6 +51,7 @@ SUPUESTOS = [
     economia.Supuestos(),
     economia.Supuestos(costo_pozo_musd=18.0, opex_usd_bbl=8.0),
     economia.Supuestos(regalias_pct=25.0, descuento_anual_pct=15.0),
+    economia.Supuestos(diferencial_usd_bbl=15.0),
 ]
 
 
@@ -145,7 +146,7 @@ const salida = casos.map(c => {{
   const vd = volumenDescontado(c.pozo.qi_bbld, c.pozo.di, c.pozo.b,
                                c.sup.descuento_anual_pct);
   const be = c.sup.costo_pozo_musd * 1e6 / ((1 - c.sup.regalias_pct / 100) * vd)
-             + c.sup.opex_usd_bbl;
+             + c.sup.opex_usd_bbl + c.sup.diferencial_usd_bbl;
   return {{ vd, be }};
 }});
 console.log(JSON.stringify(salida));

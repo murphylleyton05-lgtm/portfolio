@@ -115,9 +115,12 @@ def test_a_igual_forma_de_curva_el_pozo_mas_grande_cierra_a_menos_precio():
     grande = economia.precio_de_equilibrio(qi_m3d=200.0, di_mensual=0.15, b=1.2)
 
     supuestos = economia.Supuestos()
-    # El componente de capex se divide por dos; el opex queda igual.
-    capex_chico = chico - supuestos.opex_usd_bbl
-    capex_grande = grande - supuestos.opex_usd_bbl
+    # Solo el componente de capex escala con el volumen; opex y diferencial son
+    # costos por barril, fijos respecto del tamano del pozo. Los restamos para
+    # aislar el capex, que debe dividirse por dos al duplicar el caudal.
+    fijos = supuestos.opex_usd_bbl + supuestos.diferencial_usd_bbl
+    capex_chico = chico - fijos
+    capex_grande = grande - fijos
     assert capex_grande == pytest.approx(capex_chico / 2, rel=1e-6)
 
 

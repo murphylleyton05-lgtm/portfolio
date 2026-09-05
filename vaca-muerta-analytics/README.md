@@ -101,19 +101,19 @@ Este bloque lo reescribe el workflow en cada actualización, así el README nunc
 queda con números viejos.
 
 <!-- RESULTADOS:INICIO -->
-> Última actualización: **2026-09-04** · datos oficiales de la Secretaría de Energía · período **2006-01 a 2026-07** · **2,613 pozos**, 2,463 con curva ajustada.
+> Última actualización: **2026-09-05** · datos de demostración (sintéticos) · período **2018-09 a 2026-07** · **150 pozos**, 150 con curva ajustada.
 
 | Horizonte | Error en **un pozo** | Sesgo | Dentro de ±20% | Error en el **total** | Pozos |
 |---|---:|---:|---:|---:|---:|
-| 12 meses | 23.3% | -8.9% | 44% | -5.9% | 1,424 |
-| 24 meses | 27.3% | -11.3% | 38% | -5.9% | 1,225 |
-| 36 meses | 30.1% | -14.5% | 35% | -8.6% | 978 |
+| 12 meses | 6.4% | -0.3% | 94% | +0.7% | 84 |
+| 24 meses | 7.3% | +1.8% | 88% | +1.4% | 59 |
+| 36 meses | 8.6% | -0.1% | 85% | +0.6% | 34 |
 
-**En una línea:** a 36 meses el modelo se equivoca **30% en un pozo individual** pero solo **9% en el total** de 978 pozos — los errores se compensan. Y subestima de forma sistemática, lo que es corregible.
+**En una línea:** a 36 meses el modelo se equivoca **9% en un pozo individual** pero solo **1% en el total** de 34 pozos — los errores se compensan. Y subestima de forma sistemática, lo que es corregible.
 
-**Economía de pozo**: precio de equilibrio mediano de **US$ 48/bbl** (P10 30 · P90 355), sobre 1,775 pozos. A US$ 65/bbl cierra el **64%**, con un repago mediano de 16 meses. Supuestos: pozo US$ 12.0M · opex US$ 12.0/bbl · regalías 12.0% · descuento 10.0% anual. **Son supuestos, no datos medidos.**
+**Economía de pozo**: precio de equilibrio mediano de **US$ 58/bbl** (P10 41 · P90 109), sobre 143 pozos. A US$ 65/bbl cierra el **59%**, con un repago mediano de 41 meses. Breakeven de wellhead antes de impuestos. Supuestos: pozo US$ 12.0M · opex US$ 12.0/bbl · diferencial Brent→boca US$ 10.0/bbl · regalías 12.0% · descuento 10.0% anual. **Son supuestos, no datos medidos.**
 
-**Normalización por rama lateral** (1,302 pozos con longitud declarada, mediana 2,514 m): la longitud explica el **6%** de la diferencia de EUR entre pozos, pero al normalizar el ranking se mueve **95 puestos** en la mediana y del top 10 por EUR crudo sobreviven solo **3**.
+**Normalización por rama lateral** (143 pozos con longitud declarada, mediana 2,159 m): la longitud explica el **8%** de la diferencia de EUR entre pozos, pero al normalizar el ranking se mueve **6 puestos** en la mediana y del top 10 por EUR crudo sobreviven solo **8**.
 <!-- RESULTADOS:FIN -->
 
 ---
@@ -243,14 +243,23 @@ que no conviene confiar.
 - **No se corrige por espaciamiento entre pozos ni por interferencia.** Un pozo
   perforado al lado de otro ya en producción rinde menos (efecto *parent-child*).
   Es el principal factor de confusión que queda sin corregir.
-- **La declinación terminal (6% anual) y el tope de `b` en 2 son decisiones de
-  modelado, no mediciones**, y el backtest sugiere que son conservadoras: el
-  modelo subestima de forma sistemática, y el sesgo crece con el horizonte. Un
-  tope de `b` más alto o una terminal más baja darían EUR mayores.
-- **Solo se modela petróleo.** El gas se lee y se limpia, pero no se le ajusta
-  curva ni se estima EUR.
-- **No hay economía.** Sin precio de venta ni costo de pozo no hay VAN ni punto
-  de equilibrio: el proyecto dice cuánto produce un pozo, no si conviene.
+- **La declinación terminal (6% anual) es el valor estándar de la industria
+  (rango convencional 5-8%), y el tope de `b` en 2 acota el hiperbólico.** El
+  backtest muestra que la combinación es conservadora: el modelo subestima de
+  forma sistemática y el sesgo crece con el horizonte. Un `b` cerca de 2 en
+  pozos con pocos meses es señal de régimen transitorio (flujo lineal): el
+  hiperbólico sobreajusta ahí, y esos pozos se marcan en la app por su corta
+  historia.
+- **Solo se modela petróleo, y no se distingue por ventana de fluido ni GOR.**
+  El gas se lee y se limpia, pero no se le ajusta curva. Además se mezclan pozos
+  de ventanas geológicas distintas (Loma Campana, La Calera, Bajo del Choique
+  tienen cortes de gas muy distintos): un EUR de petróleo sin el gas asociado es
+  una foto parcial del pozo.
+- **La economía es un breakeven de wellhead *antes de impuestos*.** Incluye
+  capex, opex, regalías, descuento y el diferencial Brent→boca de pozo; no
+  incluye impuesto a las ganancias, retenciones a la exportación ni variación
+  del precio en el tiempo. Sirve para comparar pozos con la misma regla, no para
+  una decisión de inversión.
 - **El EUR asume 30 años de vida útil y 6% de declinación terminal.** Ambos son
   supuestos, configurables en `src/petro/config.py`.
 - **La detección de anomalías es un detector, no un diagnóstico:** señala pozos

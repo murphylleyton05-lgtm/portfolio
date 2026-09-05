@@ -80,9 +80,10 @@ def main() -> None:
               f"de {eco['pozos']:,} pozos |")
         if eco.get("repago_mediano_meses"):
             print(f"| Repago mediano | {eco['repago_mediano_meses']} meses |")
-        print(f"\n_Supuestos (no datos medidos): pozo US$ {s['costo_pozo_musd']}M · "
-              f"opex US$ {s['opex_usd_bbl']}/bbl · regalías {s['regalias_pct']}% · "
-              f"descuento {s['descuento_anual_pct']}% anual._")
+        print(f"\n_Breakeven de wellhead antes de impuestos. Supuestos: pozo US$ "
+              f"{s['costo_pozo_musd']}M · opex US$ {s['opex_usd_bbl']}/bbl · "
+              f"diferencial Brent→boca US$ {s.get('diferencial_usd_bbl', 0)}/bbl · "
+              f"regalías {s['regalias_pct']}% · descuento {s['descuento_anual_pct']}% anual._")
 
     # --- normalizacion por rama lateral ---
     rama = meta.get("normalizacion_rama", {})
