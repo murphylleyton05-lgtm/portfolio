@@ -67,6 +67,17 @@ def main() -> None:
                       f"{d['error_mediano']:+.1f}% | {d['dentro_20']:.0f}% | "
                       f"{d['pozos']:,} |")
 
+    # --- ventanas de fluido ---
+    flu = meta.get("fluido", {})
+    if flu.get("suficientes_datos") and flu.get("por_ventana"):
+        print("\n### Ventanas de fluido (por GOR de producción)\n")
+        print("| Ventana | Pozos | % | GOR mediano (m³/m³) |")
+        print("|---|---:|---:|---:|")
+        for v, d in flu["por_ventana"].items():
+            print(f"| {v.replace('Petroleo','Petróleo')} | {d['pozos']:,} | "
+                  f"{d['pct']:.0f}% | {d['gor_mediano']:.0f} |")
+        print(f"\n_Proxy por GOR de producción, no tipificación PVT._")
+
     # --- economia ---
     eco = meta.get("economia", {})
     if eco.get("suficientes_datos"):
