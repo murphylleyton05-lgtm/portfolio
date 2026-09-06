@@ -156,6 +156,12 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
                      and pd.notna(getattr(f, "rama_m", None)) else None),
             "etapas": (int(f.etapas) if getattr(f, "etapas", None) is not None
                        and pd.notna(getattr(f, "etapas", None)) else None),
+            # Ventana de fluido por GOR de produccion.
+            "ventana": (str(f.ventana_fluido)
+                        if getattr(f, "ventana_fluido", None) is not None
+                        and pd.notna(getattr(f, "ventana_fluido", None)) else "Sin dato"),
+            "gor": (round(float(f.gor_m3m3)) if getattr(f, "gor_m3m3", None) is not None
+                    and pd.notna(getattr(f, "gor_m3m3", None)) else None),
         })
         series[str(f.id_pozo)] = [
             round(v * BARRILES_POR_M3, 1) for v in serie["caudal_petroleo_m3d"]
@@ -199,6 +205,9 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
             "di": round(f.di_mensual, 5),
             "b": round(f.b, 3),
             "op": str(f.empresa) if pd.notna(f.empresa) else "S/D",
+            "ventana": (str(f.ventana_fluido)
+                        if getattr(f, "ventana_fluido", None) is not None
+                        and pd.notna(getattr(f, "ventana_fluido", None)) else "Sin dato"),
         }
         for f in confiables_para_poblacion.itertuples()
     ]
@@ -218,6 +227,7 @@ def armar_datos(max_pozos: int, meses_minimos: int) -> dict:
             # Diagnostico de cuanto de la diferencia de EUR explica la rama.
             "rama": metadatos.get("normalizacion_rama", {}),
             "backtest": metadatos.get("backtest", {}),
+            "fluido": metadatos.get("fluido", {}),
         },
     }
 

@@ -28,7 +28,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from petro import (config, declinacion, economia,  # noqa: E402
+from petro import (config, declinacion, economia, fluido,  # noqa: E402
                    fractura as mod_fractura, limpieza, validacion)
 
 
@@ -136,6 +136,15 @@ def main() -> None:
     # --- 5. Resumen por pozo ---
     print("\n5) Resumiendo atributos y acumulados por pozo")
     pozos = limpieza.resumen_por_pozo(df)
+
+    # Ventana de fluido por GOR de produccion, para no mezclar pozos de
+    # petroleo con pozos de gas y condensado al comparar.
+    pozos = fluido.agregar_ventana(pozos)
+    resumen_fluido = fluido.resumen(pozos)
+    if resumen_fluido.get("suficientes_datos"):
+        print(f"   ventanas de fluido: "
+              + " · ".join(f"{v} {d['pozos']}" for v, d in resumen_fluido["por_ventana"].items())
+              + f"  (GOR mediano {resumen_fluido['gor_mediano_global']:.0f} m3/m3)")
 
     # --- 6. Ajuste de declinacion ---
     print(f"\n6) Ajustando curvas de declinacion ({df['id_pozo'].nunique():,} pozos)")
@@ -302,6 +311,7 @@ def main() -> None:
         "normalizacion_rama": diagnostico_rama,
         "backtest": resumen_backtest,
         "economia": resumen_economia,
+        "fluido": resumen_fluido,
     }
     config.METADATOS.write_text(json.dumps(metadatos, indent=2, ensure_ascii=False))
 

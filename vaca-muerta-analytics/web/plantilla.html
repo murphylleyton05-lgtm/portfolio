@@ -351,6 +351,13 @@
       </div>
     </div>
 
+    <div class="filters" id="ventanaFiltro" hidden>
+      <span class="flabel">Ventana</span>
+      <div id="ventChips" style="display:contents"></div>
+      <span class="flabel" style="margin-left:auto;text-transform:none;letter-spacing:0"
+            id="ventNota"></span>
+    </div>
+
     <div class="filters">
       <span class="flabel">Operadora</span>
       <div id="opChips" style="display:contents"></div>
@@ -405,6 +412,42 @@
   </section>
 
 
+
+
+  <!-- ============ VENTANA DE FLUIDO ============ -->
+  <section class="panel" id="secFluido" hidden>
+    <div class="panel-head">
+      <div>
+        <h2>No todos los pozos son lo mismo</h2>
+        <p>
+          En Vaca Muerta conviven ventanas geológicas distintas. Un pozo de la ventana
+          de <strong>petróleo negro</strong> produce poco gas asociado; uno de
+          <strong>gas y condensado</strong>, mucho. Compararles el EUR de petróleo sin
+          separarlos mezcla cosas distintas. Acá se clasifican por su
+          <strong>GOR</strong> (relación gas-petróleo), y se ve qué produce cada ventana.
+        </p>
+      </div>
+    </div>
+
+    <div class="hallazgo" id="fluStats"></div>
+
+    <div class="chart-area" style="padding:16px 18px 8px">
+      <div class="legend" id="fluLegend" style="margin-bottom:8px"></div>
+      <div class="chart-wrap">
+        <svg class="chart" id="fluChart" viewBox="0 0 760 340" role="img"
+             aria-label="EUR de petróleo por ventana de fluido"></svg>
+        <div class="tip" id="fluTip"></div>
+      </div>
+    </div>
+
+    <p class="nota-rama" style="border-top:1px solid var(--rule)">
+      La ventana se asigna por el <b>GOR de producción</b> (m³ de gas por m³ de petróleo
+      acumulados): negro &lt; 200, volátil 200–1.000, gas y condensado &gt; 1.000. Es un
+      <b>proxy</b>, no una tipificación PVT de laboratorio — un pozo puede subir su GOR con
+      el tiempo por depletación. Sirve para no mezclar ventanas al comparar, no para tipificar
+      el fluido original del reservorio.
+    </p>
+  </section>
 
   <!-- ============ VALIDACION ============ -->
   <section class="panel" id="secVal" hidden>
@@ -699,12 +742,28 @@ const OPERADORAS = [...new Set([
 const colorOp = op => SERIES_VARS[OPERADORAS.indexOf(op) % 8];
 
 let opsActivas = new Set(OPERADORAS);
+
+// Ventanas de fluido presentes en los datos, y cuáles están activas.
+// El color de cada ventana es fijo: negro=azul, volátil=naranja, gas=aqua.
+const VENTANAS_ORDEN = ["Petroleo negro", "Petroleo volatil", "Gas y condensado", "Sin dato"];
+const VENTANA_VAR = {
+  "Petroleo negro": "--s1", "Petroleo volatil": "--s2",
+  "Gas y condensado": "--s3", "Sin dato": "--ink-3",
+};
+const VENTANA_LABEL = {
+  "Petroleo negro": "Petróleo negro", "Petroleo volatil": "Petróleo volátil",
+  "Gas y condensado": "Gas y condensado", "Sin dato": "Sin dato",
+};
+const VENTANAS_PRESENTES = VENTANAS_ORDEN.filter(
+  v => DATA.wells.some(w => w.ventana === v));
+let ventanasActivas = new Set(VENTANAS_PRESENTES);
 let pozoSel = null;
 let escalaLog = false;
 let horizonteLargo = false;
 let rankCompleto = false;
 
-const visibles = () => DATA.wells.filter(w => opsActivas.has(w.op));
+const visibles = () => DATA.wells.filter(
+  w => opsActivas.has(w.op) && ventanasActivas.has(w.ventana || "Sin dato"));
 
 /* ===================== cartel de procedencia de los datos ===================== */
 function pintarFuente() {
@@ -755,6 +814,31 @@ function pintarChips() {
   });
 }
 document.getElementById('opAll').onclick = () => { opsActivas = new Set(OPERADORAS); redibujar(); };
+
+function pintarVentanas() {
+  const filtro = document.getElementById('ventanaFiltro');
+  // Con una sola ventana (o ninguna clasificada) el filtro no aporta: se oculta.
+  const clasificables = VENTANAS_PRESENTES.filter(v => v !== "Sin dato");
+  if (clasificables.length < 2) { filtro.hidden = true; return; }
+  filtro.hidden = false;
+
+  document.getElementById('ventChips').innerHTML = VENTANAS_PRESENTES.map(v =>
+    `<button class="chip" type="button" data-vent="${v}" aria-pressed="${ventanasActivas.has(v)}">
+       <i class="dot" style="background:var(${VENTANA_VAR[v]})"></i>${VENTANA_LABEL[v]}
+     </button>`).join('');
+  document.querySelectorAll('[data-vent]').forEach(b => b.onclick = () => {
+    const v = b.dataset.vent;
+    ventanasActivas.has(v) ? ventanasActivas.delete(v) : ventanasActivas.add(v);
+    if (!ventanasActivas.size) ventanasActivas = new Set(VENTANAS_PRESENTES);
+    redibujar();
+  });
+
+  const meta = DATA.meta.fluido || {};
+  document.getElementById('ventNota').textContent =
+    meta.gor_mediano_global != null
+      ? `GOR mediano ${fmt(meta.gor_mediano_global)} m³/m³ · clasificación por GOR de producción, no tipificación PVT`
+      : '';
+}
 
 /* ===================== lista de pozos ===================== */
 function pintarLista() {
@@ -974,6 +1058,84 @@ function dibujarCurvasTipo() {
     tip.style.opacity = 1;
   };
   svg.onpointerleave = () => { tip.style.opacity = 0; };
+}
+
+/* ===================== ventana de fluido ===================== */
+/*
+ * Muestra cuántos pozos hay en cada ventana y qué EUR de petróleo produce cada
+ * una. El punto: si las ventanas producen EUR muy distintos, mezclarlas en un
+ * ranking es un error, y esta sección lo demuestra con los datos.
+ */
+function dibujarFluido() {
+  const seccion = document.getElementById('secFluido');
+  const pozos = visibles().filter(w => w.ventana && w.ventana !== "Sin dato" && w.eur);
+
+  // Con una sola ventana no hay nada que comparar: se oculta.
+  const presentes = VENTANAS_ORDEN.filter(v => v !== "Sin dato" && pozos.some(w => w.ventana === v));
+  if (presentes.length < 2) { seccion.hidden = true; return; }
+  seccion.hidden = false;
+
+  // Agrupamos por ventana.
+  const grupos = presentes.map(v => {
+    const ws = pozos.filter(w => w.ventana === v);
+    return {
+      v, n: ws.length,
+      eur: mediana(ws.map(w => w.eur)),
+      gor: mediana(ws.map(w => w.gor).filter(g => g != null)),
+      eurs: ws.map(w => w.eur).sort((a, b) => a - b),
+    };
+  });
+
+  // --- tarjetas ---
+  // La grilla se adapta a cuántas ventanas hay (2 o 3), para no dejar huecos.
+  const stats = document.getElementById('fluStats');
+  stats.style.gridTemplateColumns = `repeat(${grupos.length}, 1fr)`;
+  stats.innerHTML = grupos.map(g =>
+    `<div>
+       <div class="h-l"><i class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(${VENTANA_VAR[g.v]});margin-right:5px"></i>${VENTANA_LABEL[g.v]}</div>
+       <div class="h-v">${fmt(g.n)}</div>
+       <div class="h-h">pozos · EUR mediano ${fmt(g.eur)} Mbbl · GOR ${fmt(g.gor)}</div>
+     </div>`).join('');
+
+  // --- boxplot simple del EUR por ventana ---
+  const svg = document.getElementById('fluChart');
+  const W2 = 760, H2 = 340, m = { t: 18, r: 20, b: 46, l: 60 };
+  const iw = W2 - m.l - m.r, ih = H2 - m.t - m.b;
+  const maxY = Math.max(...pozos.map(w => w.eur)) * 1.05;
+  const sy = v => m.t + ih - (v / maxY) * ih;
+  const anchoCol = iw / grupos.length;
+  const p = [];
+
+  ticks(maxY, 5).forEach(v => {
+    p.push(`<line x1="${m.l}" y1="${sy(v).toFixed(1)}" x2="${m.l + iw}" y2="${sy(v).toFixed(1)}" stroke="${cssVar('--grid')}" stroke-width="1"/>`);
+    p.push(`<text x="${m.l - 9}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+  });
+  p.push(`<line x1="${m.l}" y1="${m.t + ih}" x2="${m.l + iw}" y2="${m.t + ih}" stroke="${cssVar('--rule-strong')}" stroke-width="1"/>`);
+  p.push(`<text x="14" y="${m.t + ih / 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12" transform="rotate(-90 14 ${m.t + ih / 2})">EUR de petróleo (Mbbl)</text>`);
+
+  const q = (arr, p) => { const i = (arr.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i);
+    return lo === hi ? arr[lo] : arr[lo] + (arr[hi] - arr[lo]) * (i - lo); };
+
+  grupos.forEach((g, i) => {
+    const cx = m.l + anchoCol * (i + 0.5);
+    const c = cssVar(VENTANA_VAR[g.v]);
+    const p10 = q(g.eurs, 0.10), p25 = q(g.eurs, 0.25), p50 = q(g.eurs, 0.50),
+          p75 = q(g.eurs, 0.75), p90 = q(g.eurs, 0.90);
+    const w = Math.min(anchoCol * 0.44, 60);
+    // bigotes
+    p.push(`<line x1="${cx}" y1="${sy(p10).toFixed(1)}" x2="${cx}" y2="${sy(p90).toFixed(1)}" stroke="${c}" stroke-width="1.5"/>`);
+    // caja
+    p.push(`<rect x="${(cx - w).toFixed(1)}" y="${sy(p75).toFixed(1)}" width="${(w * 2).toFixed(1)}" height="${(sy(p25) - sy(p75)).toFixed(1)}" rx="3" fill="${c}" fill-opacity=".22" stroke="${c}" stroke-width="1.5"/>`);
+    // mediana
+    p.push(`<line x1="${(cx - w).toFixed(1)}" y1="${sy(p50).toFixed(1)}" x2="${(cx + w).toFixed(1)}" y2="${sy(p50).toFixed(1)}" stroke="${c}" stroke-width="2.5"/>`);
+    // etiqueta ventana
+    p.push(`<text x="${cx.toFixed(1)}" y="${m.t + ih + 20}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12">${VENTANA_LABEL[g.v]}</text>`);
+    p.push(`<text x="${cx.toFixed(1)}" y="${m.t + ih + 35}" text-anchor="middle" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="10.5">n=${g.n}</text>`);
+  });
+  svg.innerHTML = p.join('');
+
+  document.getElementById('fluLegend').innerHTML =
+    `<span style="color:var(--ink-3);font-size:12px">Cada caja: P25–P75 · línea gruesa = mediana · bigotes P10–P90</span>`;
 }
 
 /* ===================== economía: ¿a qué precio cierra? ===================== */
@@ -1530,16 +1692,16 @@ document.getElementById('horBtn').onclick = e => {
 
 /* ===================== orquestación ===================== */
 function redibujar() {
-  pintarFuente(); pintarChips(); pintarKpis(); pintarLista();
-  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); dibujarEconomia(); dibujarEconomia(); pintarRanking();
+  pintarFuente(); pintarVentanas(); pintarChips(); pintarKpis(); pintarLista();
+  dibujarDeclinacion(); pintarParams(); dibujarCurvasTipo(); dibujarFluido(); dibujarValidacion(); dibujarRama(); dibujarEconomia(); pintarRanking();
 }
 redibujar();
 
 // Los colores salen de variables CSS, así que hay que redibujar al cambiar de tema.
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-  dibujarDeclinacion(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); dibujarEconomia();
+  dibujarDeclinacion(); dibujarCurvasTipo(); dibujarFluido(); dibujarValidacion(); dibujarRama(); dibujarEconomia();
 });
-new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); dibujarValidacion(); dibujarRama(); dibujarEconomia(); })
+new MutationObserver(() => { dibujarDeclinacion(); dibujarCurvasTipo(); dibujarFluido(); dibujarValidacion(); dibujarRama(); dibujarEconomia(); })
   .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 </script>
 

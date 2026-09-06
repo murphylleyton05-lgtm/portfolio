@@ -87,6 +87,17 @@ def bloque(meta: dict) -> str:
             f"{s['descuento_anual_pct']}% anual. **Son supuestos, no datos medidos.**"
         )
 
+    flu = meta.get("fluido", {})
+    if flu.get("suficientes_datos") and flu.get("por_ventana"):
+        partes = [f"{v.replace('Petroleo','petróleo')} {d['pozos']} ({d['pct']:.0f}%)"
+                  for v, d in flu["por_ventana"].items()]
+        lineas.append("")
+        lineas.append(
+            f"**Ventanas de fluido** (por GOR de producción, {flu['pozos_clasificados']:,} "
+            f"pozos): " + " · ".join(partes) +
+            f". GOR mediano {flu['gor_mediano_global']:.0f} m³/m³. Es un proxy, no una "
+            "tipificación PVT.")
+
     rama = meta.get("normalizacion_rama", {})
     if rama.get("suficientes_datos"):
         lineas.append("")
