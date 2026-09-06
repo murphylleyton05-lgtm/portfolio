@@ -252,11 +252,15 @@ que no conviene confiar.
   pozos con pocos meses es señal de régimen transitorio (flujo lineal): el
   hiperbólico sobreajusta ahí, y esos pozos se marcan en la app por su corta
   historia.
-- **Solo se modela petróleo, y no se distingue por ventana de fluido ni GOR.**
-  El gas se lee y se limpia, pero no se le ajusta curva. Además se mezclan pozos
-  de ventanas geológicas distintas (Loma Campana, La Calera, Bajo del Choique
-  tienen cortes de gas muy distintos): un EUR de petróleo sin el gas asociado es
-  una foto parcial del pozo.
+- **Solo se ajusta curva y EUR al petróleo, no al gas.** El gas se lee y se usa
+  para clasificar la ventana de fluido (por GOR), pero no se le ajusta una curva
+  de declinación propia. En un pozo de gas y condensado, mirar solo el EUR de
+  petróleo es una foto parcial.
+- **La ventana de fluido es un proxy por GOR de producción, no una tipificación
+  PVT.** Separa pozos de petróleo negro / volátil / gas y condensado con datos
+  públicos, pero la ventana "real" de un reservorio se determina con análisis PVT
+  de laboratorio, que no está en los datos abiertos. Un pozo puede subir su GOR
+  con el tiempo por depletación.
 - **La economía es un breakeven de wellhead *antes de impuestos*.** Incluye
   capex, opex, regalías, descuento y el diferencial Brent→boca de pozo; no
   incluye impuesto a las ganancias, retenciones a la exportación ni variación
@@ -284,6 +288,7 @@ que no conviene confiar.
 | [Plan de 2 semanas](docs/03-plan-2-semanas.md) | Ruta día por día de MVP a proyecto publicado |
 | [Portfolio y marca](docs/04-portfolio-y-marca.md) | Cómo presentarlo para trabajo y para clientes |
 | [Automatización n8n](docs/05-automatizacion-n8n.md) | De dashboard a sistema que corre solo |
+| [Preguntas de entrevista](docs/06-preguntas-de-entrevista.md) | Cómo defender el proyecto: las preguntas difíciles y sus respuestas |
 
 ---
 

@@ -158,6 +158,8 @@ tiene un ángulo propio.
 |---|---|
 | 2.1 Curvas de declinación y EUR | ✅ construido |
 | 2.2 Curvas tipo y benchmarking | ✅ construido |
+| Curva tipo con banda P10/P50/P90 | ✅ construido (rango de incertidumbre, no solo mediana) |
+| Separación por ventana de fluido (GOR) | ✅ construido (`src/petro/fluido.py`) |
 | 2.3 Normalización por rama lateral | ✅ construido (`src/petro/fractura.py`) |
 | **Validación por backtest** | ✅ construido (`src/petro/validacion.py`) |
 | 3.2 Detección de anomalías | ✅ construido (`scripts/detectar_anomalias.py`) |
