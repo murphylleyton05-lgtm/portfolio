@@ -393,13 +393,17 @@
   <section class="panel">
     <div class="panel-head">
       <div>
-        <h2>Curvas tipo por operadora</h2>
-        <p>
-          Alinea todos los pozos por su <em>mes de vida</em>, no por fecha de calendario, y
-          muestra la mediana de cada grupo. Así se compara la calidad de los pozos sin que
-          el resultado dependa de quién perforó más recientemente. Cada línea está suavizada
-          con una mediana móvil de 3 meses; solo se dibujan los meses con al menos 4 pozos.
+        <h2>Curvas tipo</h2>
+        <p id="tcDesc">
+          Alinea todos los pozos por su <em>mes de vida</em>, no por fecha de calendario. Así
+          se compara la calidad de los pozos sin que el resultado dependa de quién perforó
+          más recientemente. Cada línea usa una mediana móvil de 3 meses y solo meses con al
+          menos 4 pozos.
         </p>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="toggle" id="tcModoOp" type="button" aria-pressed="true">Comparar operadoras</button>
+        <button class="toggle" id="tcModoBanda" type="button" aria-pressed="false">Banda P10–P90</button>
       </div>
     </div>
     <div class="chart-area" style="padding:16px 18px 6px">
@@ -815,6 +819,24 @@ function pintarChips() {
 }
 document.getElementById('opAll').onclick = () => { opsActivas = new Set(OPERADORAS); redibujar(); };
 
+function setModoTipo(modo) {
+  tcModo = modo;
+  document.getElementById('tcModoOp').setAttribute('aria-pressed', modo === "operadoras");
+  document.getElementById('tcModoBanda').setAttribute('aria-pressed', modo === "banda");
+  document.getElementById('tcDesc').innerHTML = modo === "banda"
+    ? `Para cada mes de vida, el rango probable del caudal sobre todos los pozos filtrados:
+       la banda va del <b>P10</b> (pozo malo) al <b>P90</b> (pozo bueno), con el <b>P50</b>
+       (mediana) marcado. Es como la industria presenta una curva tipo — un pronóstico es
+       un rango, no un número.`
+    : `Alinea todos los pozos por su <em>mes de vida</em>, no por fecha de calendario. Así
+       se compara la calidad de los pozos sin que el resultado dependa de quién perforó
+       más recientemente. Cada línea usa una mediana móvil de 3 meses y solo meses con al
+       menos 4 pozos.`;
+  dibujarCurvasTipo();
+}
+document.getElementById('tcModoOp').onclick = () => setModoTipo("operadoras");
+document.getElementById('tcModoBanda').onclick = () => setModoTipo("banda");
+
 function pintarVentanas() {
   const filtro = document.getElementById('ventanaFiltro');
   // Con una sola ventana (o ninguna clasificada) el filtro no aporta: se oculta.
@@ -976,7 +998,11 @@ function pintarParams() {
 }
 
 /* ===================== curvas tipo ===================== */
+let tcModo = "operadoras";   // "operadoras" | "banda"
+
 function dibujarCurvasTipo() {
+  if (tcModo === "banda") { dibujarBandaTipo(); return; }
+
   const svg = document.getElementById('typeChart');
   const RT = 104;                       // margen derecho para los rotulos de cada linea
   const HT = 380, ih = HT - M.t - M.b, iw = W - M.l - RT;
@@ -1054,6 +1080,97 @@ function dibujarCurvasTipo() {
     const rb = wrap.getBoundingClientRect();
     const px = (sx(t) / W) * rb.width;
     tip.style.left = Math.min(Math.max(px + 14, 4), Math.max(rb.width - 210, 4)) + 'px';
+    tip.style.top = Math.max((e.clientY - rb.top) - 40, 4) + 'px';
+    tip.style.opacity = 1;
+  };
+  svg.onpointerleave = () => { tip.style.opacity = 0; };
+}
+
+/*
+ * Curva tipo con banda de incertidumbre: para cada mes de vida, el P10, P50 y
+ * P90 del caudal de TODOS los pozos visibles (respeta los filtros de operadora
+ * y de ventana de fluido). Es como la industria presenta una curva tipo —no una
+ * sola línea, sino el rango probable— y comunica que un pronóstico es un rango,
+ * no un número.
+ */
+function dibujarBandaTipo() {
+  const svg = document.getElementById('typeChart');
+  const RT = 42, HT = 380, ih = HT - M.t - M.b, iw = W - M.l - RT;
+
+  const ids = new Set(visibles().map(w => w.id));
+  const porMes = [];
+  DATA.wells.forEach(w => {
+    if (!ids.has(w.id)) return;
+    (DATA.series[w.id] || []).forEach((q, t) => { (porMes[t] ||= []).push(q); });
+  });
+
+  const banda = [];
+  porMes.forEach((arr, t) => {
+    if (arr.length < 4) return;         // igual que las líneas: mínimo 4 pozos
+    const s = arr.slice().sort((a, b) => a - b);
+    banda.push({ t, n: arr.length,
+      p10: percentil(s, 0.10), p50: percentil(s, 0.50), p90: percentil(s, 0.90) });
+  });
+
+  if (banda.length < 3) { svg.innerHTML = ''; document.getElementById('tcLegend').innerHTML = ''; return; }
+
+  const maxX = banda[banda.length - 1].t;
+  const maxY = Math.max(...banda.map(b => b.p90)) * 1.08;
+  const sx = t => M.l + (t / maxX) * iw;
+  const sy = q => M.t + ih - (q / maxY) * ih;
+  const p = [];
+
+  ticks(maxY).forEach(v => {
+    p.push(`<line x1="${M.l}" y1="${sy(v).toFixed(1)}" x2="${M.l + iw}" y2="${sy(v).toFixed(1)}" stroke="${cssVar('--grid')}" stroke-width="1"/>`);
+    p.push(`<text x="${M.l - 9}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`);
+  });
+  ticks(maxX, 6).forEach(v => p.push(
+    `<text x="${sx(v).toFixed(1)}" y="${M.t + ih + 20}" text-anchor="middle" fill="${cssVar('--ink-3')}" font-family="IBM Plex Mono, monospace" font-size="11">${fmt(v)}</text>`));
+  p.push(`<line x1="${M.l}" y1="${M.t + ih}" x2="${M.l + iw}" y2="${M.t + ih}" stroke="${cssVar('--rule-strong')}" stroke-width="1"/>`);
+  p.push(`<text x="${M.l + iw / 2}" y="${HT - 8}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12">Mes de vida del pozo</text>`);
+  p.push(`<text x="14" y="${M.t + ih / 2}" text-anchor="middle" fill="${cssVar('--ink-2')}" font-size="12" transform="rotate(-90 14 ${M.t + ih / 2})">Caudal (bbl/día)</text>`);
+
+  const c = cssVar('--s1');
+  // Área P10–P90: subiendo por P90 y bajando por P10.
+  const arriba = banda.map(b => `${sx(b.t).toFixed(1)},${sy(b.p90).toFixed(1)}`);
+  const abajo = banda.slice().reverse().map(b => `${sx(b.t).toFixed(1)},${sy(b.p10).toFixed(1)}`);
+  p.push(`<polygon points="${arriba.concat(abajo).join(' ')}" fill="${c}" fill-opacity=".14" stroke="none"/>`);
+  // P10 y P90 punteadas, P50 sólida.
+  const linea = (key, w, dash) =>
+    `<path d="${banda.map((b, i) => `${i ? 'L' : 'M'}${sx(b.t).toFixed(1)},${sy(b[key]).toFixed(1)}`).join('')}" fill="none" stroke="${c}" stroke-width="${w}"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`;
+  p.push(linea('p90', 1.5, '4 3'));
+  p.push(linea('p10', 1.5, '4 3'));
+  p.push(linea('p50', 2.5, ''));
+  // Etiquetas al final, separadas verticalmente para que no se pisen.
+  const last = banda[banda.length - 1];
+  const labs = [['P90', last.p90], ['P50', last.p50], ['P10', last.p10]]
+    .map(([lab, v]) => ({ lab, y: sy(v) }))
+    .sort((a, b) => a.y - b.y);
+  for (let i = 1; i < labs.length; i++)
+    labs[i].y = Math.max(labs[i].y, labs[i - 1].y + 13);
+  labs.forEach(({ lab, y }) => {
+    p.push(`<text x="${(sx(last.t) + 6).toFixed(1)}" y="${(y + 3.5).toFixed(1)}" fill="${c}" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="500">${lab}</text>`);
+  });
+  svg.innerHTML = p.join('');
+
+  const nMax = Math.max(...banda.map(b => b.n));
+  document.getElementById('tcLegend').innerHTML =
+    `<span style="color:var(--ink-2);font-size:12px">Banda P10–P90 · línea gruesa = P50 (mediana) · ${fmt(ids.size)} pozos, hasta ${fmt(nMax)} por mes</span>`;
+
+  const tip = document.getElementById('typeTip'), wrap = svg.parentElement;
+  svg.onpointermove = e => {
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    if (loc.x < M.l || loc.x > M.l + iw) { tip.style.opacity = 0; return; }
+    const t = Math.round(((loc.x - M.l) / iw) * maxX);
+    const hit = banda.find(b => b.t === t);
+    if (!hit) { tip.style.opacity = 0; return; }
+    tip.innerHTML = `<div class="tip-t">Mes de vida ${t} · bbl/d</div>` +
+      `<div class="tip-r"><span>P90 (mejor)</span><b>${fmt(hit.p90)}</b></div>` +
+      `<div class="tip-r"><span>P50</span><b>${fmt(hit.p50)}</b></div>` +
+      `<div class="tip-r"><span>P10 (peor)</span><b>${fmt(hit.p10)}</b></div>`;
+    const rb = wrap.getBoundingClientRect();
+    tip.style.left = Math.min(Math.max((sx(t) / W) * rb.width + 14, 4), Math.max(rb.width - 190, 4)) + 'px';
     tip.style.top = Math.max((e.clientY - rb.top) - 40, 4) + 'px';
     tip.style.opacity = 1;
   };
