@@ -1,0 +1,127 @@
+# Baja los datos oficiales de hidrocarburos, ajusta las curvas de declinacion
+# y regenera la app web. Corre en los servidores de GitHub, asi que no hace
+# falta tener Python instalado ni bajar cientos de MB en tu maquina.
+#
+# Como usarlo: pestaña Actions -> "Actualizar Vaca Muerta" -> Run workflow.
+# Tambien corre solo el dia 20 de cada mes, que es cuando la Secretaria de
+# Energia suele publicar el mes anterior.
+
+name: Actualizar Vaca Muerta
+
+on:
+  # El botón "Run workflow" de la pestaña Actions solo aparece cuando el archivo
+  # ya está en la rama principal: es una regla de GitHub. Mientras tanto, este
+  # trigger por push permite correrlo desde la rama de trabajo.
+  # QUITAR este bloque `push` cuando esto se mergee a main.
+  push:
+    branches: [claude/oil-data-analytics-app-gszaq8]
+
+  workflow_dispatch:
+    inputs:
+      fuente:
+        description: "De donde salen los datos"
+        type: choice
+        default: oficiales
+        options: [oficiales, demo]
+      max_mb:
+        description: "Tope de descarga en MB (el runner tiene ~14 GB de disco)"
+        default: "1200"
+      max_pozos:
+        description: "Cuantos pozos incrustar en la app web"
+        default: "400"
+  schedule:
+    # Dia 20 de cada mes, 12:00 UTC (09:00 en Argentina).
+    - cron: "0 12 20 * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: actualizar-vaca-muerta
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: vaca-muerta-analytics
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: vaca-muerta-analytics/requirements.txt
+
+      # Solo lo que el pipeline necesita. Streamlit no hace falta acá: el
+      # dashboard interactivo se corre localmente, no en CI.
+      - name: Instalar dependencias
+        run: pip install pandas numpy scipy requests pyarrow
+
+      # Reporta que datasets y que COLUMNAS hay realmente en el portal. Es la
+      # forma de no adivinar nombres: el log de esta corrida dice la verdad.
+      - name: Explorar el portal
+        if: (inputs.fuente || 'oficiales') != 'demo'
+        continue-on-error: true
+        run: python scripts/explorar_portal.py
+
+      - name: Ver que publica el portal
+        id: sondeo
+        if: (inputs.fuente || 'oficiales') != 'demo'
+        continue-on-error: true
+        run: |
+          python scripts/descargar_datos.py --dataset no_convencional --listar
+
+      # Si el paso anterior falló, lo más probable es que el dataset haya
+      # cambiado de nombre. Buscamos candidatos para que el log diga cuál es.
+      - name: Buscar el dataset (si cambió de nombre)
+        if: (inputs.fuente || 'oficiales') != 'demo' && steps.sondeo.outcome == 'failure'
+        run: |
+          echo "El slug configurado no respondió. Candidatos en el portal:"
+          python scripts/descargar_datos.py --buscar "no convencional" || true
+          echo ""
+          echo "Corregí DATASETS en src/petro/ingesta.py con el slug correcto."
+          exit 1
+
+      - name: Descargar, procesar y regenerar la app
+        run: |
+          FUENTE="${{ inputs.fuente || 'oficiales' }}"
+          if [ "$FUENTE" = "demo" ]; then
+            python scripts/actualizar.py --demo --max-pozos "${{ inputs.max_pozos || 400 }}"
+          else
+            python scripts/actualizar.py \
+              --max-mb "${{ inputs.max_mb || 1200 }}" \
+              --max-pozos "${{ inputs.max_pozos || 400 }}"
+          fi
+
+      - name: Resumen
+        if: always()
+        run: python scripts/resumen_ci.py >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Guardar los datos procesados como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: datos-procesados
+          path: |
+            vaca-muerta-analytics/data/procesado/*.parquet
+            vaca-muerta-analytics/data/procesado/metadatos.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Commitear la app actualizada
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/index.html web/artifact.html README.md
+          if git diff --cached --quiet; then
+            echo "La app no cambió: no hay nada que commitear."
+            exit 0
+          fi
+          PERIODO=$(python -c "import json;m=json.load(open('data/procesado/metadatos.json'));print(m['primer_mes']+' a '+m['ultimo_mes'])")
+          git commit -m "Actualizar app con datos ${PERIODO}" \
+                     -m "Regenerado automáticamente por el workflow Actualizar Vaca Muerta."
+          git push
