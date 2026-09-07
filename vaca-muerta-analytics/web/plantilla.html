@@ -302,6 +302,13 @@
   .method p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
   .method code { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--ink); }
 
+  .limites { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule);
+    border-top: 1px solid var(--rule); }
+  .limite { background: var(--surface); padding: 16px 20px; }
+  .limite h3 { font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 15px; font-weight: 600;
+    margin: 0 0 5px; }
+  .limite p { margin: 0; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  @media (max-width: 900px) { .limites { grid-template-columns: 1fr; } }
   footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-3); }
 
   @media (max-width: 900px) {
@@ -678,12 +685,59 @@
       </p>
     </div>
     <div>
-      <h3>Qué no hace este modelo</h3>
+      <h3>El EUR es una proyección, no un dato</h3>
       <p>
-        No corrige por longitud de rama lateral ni por etapas de fractura: un pozo más largo
-        produce más aunque la roca sea idéntica. Tampoco describe pozos con paradas largas o
-        intervenciones — esos quedan con R² bajo.
+        Es la producción total esperada a 30 años, extrapolada desde la historia disponible.
+        Los pozos con pocos meses tienen un EUR mucho más incierto — están marcados en el
+        ranking. Qué tan creíble es la proyección se mide en la sección de validación.
       </p>
+    </div>
+  </section>
+
+  <section class="panel" id="secLimites">
+    <div class="panel-head">
+      <div>
+        <h2>Lo que esta app no hace</h2>
+        <p>
+          Un análisis sin límites declarados es un análisis en el que no conviene
+          confiar. Estos son los de este, en orden de importancia.
+        </p>
+      </div>
+    </div>
+    <div class="limites">
+      <div class="limite">
+        <h3>No sirve para pronosticar un pozo suelto</h3>
+        <p>El backtest lo muestra: el error típico por pozo es alto y solo una minoría cae
+        dentro de ±20%. Úsese para comparar conjuntos, no para decidir sobre un pozo.</p>
+      </div>
+      <div class="limite">
+        <h3>Los pozos con paradas largas quedan distorsionados</h3>
+        <p>Un reacondicionamiento (workover) o una parada extensa rompe la curva de Arps:
+        esos pozos dan R² bajo y se filtran del ranking, pero no se corrigen de forma
+        automática. Son el ruido inevitable de datos declarados, no medidos.</p>
+      </div>
+      <div class="limite">
+        <h3>Normaliza por rama, no por completación</h3>
+        <p>Corrige el EUR por longitud de rama lateral, pero no cruza con las etapas de
+        fractura ni el agente de sostén (proppant) —variables que hoy definen gran parte
+        del éxito en Vaca Muerta—. Los datos se descargan; el cruce es el próximo paso.</p>
+      </div>
+      <div class="limite">
+        <h3>La ventana de fluido es un proxy</h3>
+        <p>Clasifica por GOR de producción, no por tipificación PVT de laboratorio. Un pozo
+        puede subir su GOR con el tiempo por depletación.</p>
+      </div>
+      <div class="limite">
+        <h3>El breakeven es de boca de pozo, antes de impuestos</h3>
+        <p>Incluye un diferencial de precio pero no impuesto a las ganancias, retenciones ni
+        costos completos de transporte. Sirve para comparar pozos con la misma regla, no
+        para una decisión de inversión.</p>
+      </div>
+      <div class="limite">
+        <h3>No modela interferencia entre pozos</h3>
+        <p>El efecto <em>parent-child</em> —un pozo nuevo perforado al lado de uno en
+        producción rinde menos— se ve en las curvas crudas pero no se modela.</p>
+      </div>
     </div>
   </section>
 
