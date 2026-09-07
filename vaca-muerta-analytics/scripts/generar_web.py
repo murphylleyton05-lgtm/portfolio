@@ -34,11 +34,32 @@ RAIZ = Path(__file__).resolve().parents[1]
 PLANTILLA = RAIZ / "web" / "plantilla.html"
 
 # Envoltorio para la version que se abre sola en el navegador.
+# URL pública del sitio. Las etiquetas de preview (Open Graph) necesitan URLs
+# absolutas: cuando alguien pega el link en LinkedIn o WhatsApp, la plataforma
+# va a buscar la imagen a esta dirección, no a una ruta relativa.
+BASE_URL = "https://murphylleyton05-lgtm.github.io/portfolio/vaca-muerta"
+
+DESCRIPCION = (
+    "Curvas de declinacion, EUR y breakeven de pozos no convencionales de Vaca "
+    "Muerta, con datos oficiales de la Secretaria de Energia y el modelo validado "
+    "contra datos que no vio."
+)
+
 ENVOLTORIO = """<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{descripcion}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vaca Muerta Analytics">
+<meta property="og:description" content="{descripcion}">
+<meta property="og:image" content="{base}/assets/preview.png">
+<meta property="og:url" content="{base}/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Vaca Muerta Analytics">
+<meta name="twitter:description" content="{descripcion}">
+<meta name="twitter:image" content="{base}/assets/preview.png">
 <style>body{{margin:0;font:14px system-ui}}img{{max-width:100%}}[hidden]{{display:none!important}}</style>
 {cabeza}</head>
 <body>
@@ -260,7 +281,8 @@ def main() -> None:
 
     (RAIZ / "web" / "artifact.html").write_text(cuerpo)
     (RAIZ / "web" / "index.html").write_text(
-        ENVOLTORIO.format(cabeza=cabeza, cuerpo=resto)
+        ENVOLTORIO.format(cabeza=cabeza, cuerpo=resto,
+                          base=BASE_URL, descripcion=DESCRIPCION)
     )
 
     fuente = "DEMOSTRACION (sinteticos)" if datos["meta"]["es_demo"] else "OFICIALES"
