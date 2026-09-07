@@ -151,7 +151,8 @@
   .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); font-weight: 500; }
   .chip .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
   .chip-ghost { background: transparent; }
-  :is(.chip, .toggle, .well-item, .link):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  :is(.chip, .toggle, .well-item, .link):focus-visible,
+  .ctrl input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* ---------- panel principal ---------- */
   .split { display: grid; grid-template-columns: 268px 1fr; }
@@ -1303,7 +1304,10 @@ function dibujarEconomia() {
   if (poblacion.length < 10) { seccion.hidden = true; return; }
   seccion.hidden = false;
 
-  const pozos = poblacion.filter(w => opsActivas.has(w.op));
+  // Respeta AMBOS filtros, igual que el resto de la app: si filtrás por ventana
+  // de fluido, la economía se recalcula sobre esa ventana, no sobre todas.
+  const pozos = poblacion.filter(
+    w => opsActivas.has(w.op) && ventanasActivas.has(w.ventana || "Sin dato"));
 
   // --- controles ---
   const defs = [
