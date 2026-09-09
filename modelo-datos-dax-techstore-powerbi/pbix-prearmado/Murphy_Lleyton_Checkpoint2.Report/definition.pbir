@@ -1,0 +1,9 @@
+{
+  "version": "4.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../Murphy_Lleyton_Checkpoint2.SemanticModel"
+    },
+    "byConnection": null
+  }
+}

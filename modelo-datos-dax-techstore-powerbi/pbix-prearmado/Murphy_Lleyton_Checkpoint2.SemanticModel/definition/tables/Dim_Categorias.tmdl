@@ -1,0 +1,28 @@
+table Dim_Categorias
+
+	column id_categoria
+		dataType: int64
+		sourceColumn: id_categoria
+		summarizeBy: sum
+
+	column nombre_categoria
+		dataType: string
+		sourceColumn: nombre_categoria
+		summarizeBy: none
+
+	partition Dim_Categorias = m
+		mode: import
+		source =
+			let
+			    Source = #table(
+			        type table [id_categoria = Int64.Type, nombre_categoria = text],
+			        {
+			            {1, "Notebooks"},
+			            {2, "Perifericos"},
+			            {3, "Componentes"},
+			            {4, "Smartphones"}
+			        }
+			    )
+			in
+			    Source
+

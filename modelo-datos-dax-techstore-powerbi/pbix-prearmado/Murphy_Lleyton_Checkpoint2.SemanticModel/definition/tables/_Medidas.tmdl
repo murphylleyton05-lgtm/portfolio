@@ -1,0 +1,31 @@
+table '_Medidas'
+
+	column Col
+		dataType: int64
+		isHidden
+		sourceColumn: [Col]
+		summarizeBy: none
+
+	measure 'Total Ventas' = SUM(Fact_Ventas[total_venta])
+		formatString: #,##0.00
+
+	measure 'Ventas Online' = CALCULATE([Total Ventas], Fact_Ventas[canal] = "Online")
+		formatString: #,##0.00
+
+	measure 'Ventas YTD' = TOTALYTD([Total Ventas], Dim_Fechas[Date])
+		formatString: #,##0.00
+
+	measure 'Ventas LY' = CALCULATE([Total Ventas], SAMEPERIODLASTYEAR(Dim_Fechas[Date]))
+		formatString: #,##0.00
+
+	measure '% Crecimiento Anual' = ```
+			VAR VentasActual = [Total Ventas]
+			VAR VentasAnterior = [Ventas LY]
+			RETURN
+			    DIVIDE(VentasActual - VentasAnterior, VentasAnterior)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+
+	partition '_Medidas' = calculated
+		mode: import
+		source = ROW("Col", 1)

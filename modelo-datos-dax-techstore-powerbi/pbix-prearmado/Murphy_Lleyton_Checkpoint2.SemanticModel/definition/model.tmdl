@@ -1,0 +1,12 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: es-ES
+
+ref table Dim_Categorias
+ref table Dim_Clientes
+ref table Dim_Productos
+ref table Fact_Ventas
+ref table Dim_Fechas
+ref table '_Medidas'

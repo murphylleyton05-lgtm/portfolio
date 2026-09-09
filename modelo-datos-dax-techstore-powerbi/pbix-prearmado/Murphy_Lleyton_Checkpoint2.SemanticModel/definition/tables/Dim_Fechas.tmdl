@@ -1,0 +1,33 @@
+table Dim_Fechas
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		sourceColumn: [Date]
+		summarizeBy: none
+
+	column 'Año' = YEAR(Dim_Fechas[Date])
+		dataType: int64
+		summarizeBy: none
+
+	column 'Mes Número' = MONTH(Dim_Fechas[Date])
+		dataType: int64
+		summarizeBy: none
+
+	column 'Mes Nombre' = FORMAT(Dim_Fechas[Date], "MMMM")
+		dataType: string
+		sortByColumn: 'Mes Número'
+		summarizeBy: none
+
+	column 'Trimestre' = "T" & QUARTER(Dim_Fechas[Date])
+		dataType: string
+		summarizeBy: none
+
+	column 'Semana' = WEEKNUM(Dim_Fechas[Date])
+		dataType: int64
+		summarizeBy: none
+
+	partition Dim_Fechas = calculated
+		mode: import
+		source = CALENDAR(MIN(Fact_Ventas[fecha_venta]), MAX(Fact_Ventas[fecha_venta]))

@@ -1,0 +1,61 @@
+table Dim_Productos
+
+	column id_producto
+		dataType: int64
+		sourceColumn: id_producto
+		summarizeBy: sum
+
+	column nombre_producto
+		dataType: string
+		sourceColumn: nombre_producto
+		summarizeBy: none
+
+	column categoria
+		dataType: string
+		sourceColumn: categoria
+		summarizeBy: none
+
+	column precio
+		dataType: double
+		sourceColumn: precio
+		summarizeBy: sum
+
+	column costo
+		dataType: double
+		sourceColumn: costo
+		summarizeBy: sum
+
+	column stock
+		dataType: int64
+		sourceColumn: stock
+		summarizeBy: sum
+
+	column activo
+		dataType: int64
+		sourceColumn: activo
+		summarizeBy: sum
+
+	partition Dim_Productos = m
+		mode: import
+		source =
+			let
+			    Source = #table(
+			        type table [id_producto = Int64.Type, nombre_producto = text, categoria = text, precio = number, costo = number, stock = Int64.Type, activo = Int64.Type],
+			        {
+			            {101, "Notebook Lenovo IdeaPad", "Notebooks", 850.0, 620.0, 15, 1},
+			            {102, "Notebook HP Pavilion", "Notebooks", 920.5, 680.0, 10, 1},
+			            {103, "Mouse Logitech M170", "Perifericos", 12.99, 6.5, 120, 1},
+			            {104, "Teclado Redragon K552", "Perifericos", 45.0, 25.0, 60, 1},
+			            {105, "Monitor Samsung 24", "Perifericos", 189.99, 140.0, 25, 1},
+			            {106, "SSD Kingston 480GB", "Componentes", 39.9, 22.0, 80, 1},
+			            {107, "RAM Corsair 8GB", "Componentes", 0.0, 30.0, 40, 1},
+			            {108, "Motherboard ASUS B450", "Componentes", 110.0, 78.0, 18, 1},
+			            {109, "Samsung Galaxy A54", "Smartphones", 399.0, 300.0, 22, 1},
+			            {110, "Xiaomi Redmi Note 12", "Smartphones", 249.0, 180.0, 30, 1},
+			            {111, "Auriculares HyperX Cloud", "Sin Categoria", 79.99, 45.0, 35, 1},
+			            {112, "Webcam Logitech C920", "Perifericos", 89.9, 55.0, 12, 1}
+			        }
+			    )
+			in
+			    Source
+

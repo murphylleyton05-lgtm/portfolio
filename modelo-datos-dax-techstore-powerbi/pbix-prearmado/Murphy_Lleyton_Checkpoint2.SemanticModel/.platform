@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Murphy_Lleyton_Checkpoint2"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "7fd6fa4f-e431-420f-9af6-6d6589a70e0c"
+  }
+}

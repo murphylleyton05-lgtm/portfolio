@@ -1,0 +1,15 @@
+relationship b52f9645-32d5-4c9f-a2a0-e4132e22afdb
+	fromColumn: Fact_Ventas.id_cliente
+	toColumn: Dim_Clientes.id_cliente
+
+relationship e6ddafe1-9ae4-4ccc-89d7-53dfb93a1e91
+	fromColumn: Fact_Ventas.id_producto
+	toColumn: Dim_Productos.id_producto
+
+relationship 6b685344-9121-4705-91a3-f09d3d770341
+	fromColumn: Fact_Ventas.fecha_venta
+	toColumn: Dim_Fechas.Date
+
+relationship 37df6cc9-7ab4-4591-8a1d-f1c21fd96f74
+	fromColumn: Dim_Productos.categoria
+	toColumn: Dim_Categorias.nombre_categoria

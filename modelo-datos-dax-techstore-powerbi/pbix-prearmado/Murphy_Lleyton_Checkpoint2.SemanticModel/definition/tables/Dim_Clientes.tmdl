@@ -1,0 +1,60 @@
+table Dim_Clientes
+
+	column id_cliente
+		dataType: int64
+		sourceColumn: id_cliente
+		summarizeBy: sum
+
+	column nombre_cliente
+		dataType: string
+		sourceColumn: nombre_cliente
+		summarizeBy: none
+
+	column email
+		dataType: string
+		sourceColumn: email
+		summarizeBy: none
+
+	column ciudad
+		dataType: string
+		sourceColumn: ciudad
+		summarizeBy: none
+
+	column pais
+		dataType: string
+		sourceColumn: pais
+		summarizeBy: none
+
+	column fecha_registro
+		dataType: dateTime
+		sourceColumn: fecha_registro
+		summarizeBy: none
+
+	column canal
+		dataType: string
+		sourceColumn: canal
+		summarizeBy: none
+
+	partition Dim_Clientes = m
+		mode: import
+		source =
+			let
+			    Source = #table(
+			        type table [id_cliente = Int64.Type, nombre_cliente = text, email = text, ciudad = text, pais = text, fecha_registro = date, canal = text],
+			        {
+			            {1, "Martin Gomez", "mgomez@mail.com", "Buenos Aires", "Argentina", #date(2023, 1, 15), "Online"},
+			            {2, "Lucia Fernandez", "lfernandez@mail.com", "Cordoba", "Argentina", #date(2023, 2, 3), "Tienda"},
+			            {3, "Carlos Rojas", "Sin dato", "Santiago", "Chile", #date(2023, 2, 20), "Online"},
+			            {4, "Ana Torres", "atorres@mail.com", "Sin dato", "Mexico", #date(2023, 3, 11), "Online"},
+			            {5, "Diego Morales", "dmorales@mail.com", "Lima", "Peru", #date(2023, 4, 5), "Tienda"},
+			            {6, "Sofia Castro", "scastro@mail.com", "Bogota", "Colombia", #date(2023, 5, 19), "Online"},
+			            {7, "Javier Nunez", "jnunez@mail.com", "Montevideo", "Uruguay", #date(2023, 6, 22), "Tienda"},
+			            {8, "Valentina Ruiz", "vruiz@mail.com", "Guadalajara", "Mexico", #date(2023, 7, 30), "Online"},
+			            {9, "Mateo Silva", "msilva@mail.com", "Rosario", "Argentina", #date(2023, 8, 14), "Online"},
+			            {10, "Camila Vargas", "cvargas@mail.com", "Quito", "Ecuador", #date(2023, 9, 25), "Tienda"},
+			            {11, "Nicolas Herrera", "nherrera@mail.com", "Asuncion", "Paraguay", #date(2023, 10, 8), "Online"}
+			        }
+			    )
+			in
+			    Source
+

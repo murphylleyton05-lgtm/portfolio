@@ -1,0 +1,119 @@
+table Fact_Ventas
+
+	column id_venta
+		dataType: int64
+		sourceColumn: id_venta
+		summarizeBy: sum
+
+	column fecha_venta
+		dataType: dateTime
+		sourceColumn: fecha_venta
+		summarizeBy: none
+
+	column id_cliente
+		dataType: int64
+		sourceColumn: id_cliente
+		summarizeBy: sum
+
+	column id_producto
+		dataType: int64
+		sourceColumn: id_producto
+		summarizeBy: sum
+
+	column cantidad
+		dataType: int64
+		sourceColumn: cantidad
+		summarizeBy: sum
+
+	column precio_unitario
+		dataType: double
+		sourceColumn: precio_unitario
+		summarizeBy: sum
+
+	column descuento
+		dataType: double
+		sourceColumn: descuento
+		summarizeBy: sum
+
+	column total_venta
+		dataType: double
+		sourceColumn: total_venta
+		summarizeBy: sum
+
+	column canal
+		dataType: string
+		sourceColumn: canal
+		summarizeBy: none
+
+	column nombre_producto
+		dataType: string
+		sourceColumn: nombre_producto
+		summarizeBy: none
+
+	column categoria
+		dataType: string
+		sourceColumn: categoria
+		summarizeBy: none
+
+	partition Fact_Ventas = m
+		mode: import
+		source =
+			let
+			    Source = #table(
+			        type table [id_venta = Int64.Type, fecha_venta = date, id_cliente = Int64.Type, id_producto = Int64.Type, cantidad = Int64.Type, precio_unitario = number, descuento = number, total_venta = number, canal = text, nombre_producto = text, categoria = text],
+			        {
+			            {1, #date(2024, 5, 5), 3, 112, 5, 89.9, 0.0, 449.5, "Online", "Webcam Logitech C920", "Perifericos"},
+			            {2, #date(2024, 3, 4), 5, 109, 2, 399.0, 39.9, 758.1, "Tienda", "Samsung Galaxy A54", "Smartphones"},
+			            {3, #date(2024, 3, 10), 9, 112, 5, 89.9, 0.0, 449.5, "Tienda", "Webcam Logitech C920", "Perifericos"},
+			            {4, #date(2024, 7, 19), 6, 109, 1, 399.0, 0.0, 399.0, "Tienda", "Samsung Galaxy A54", "Smartphones"},
+			            {5, #date(2024, 11, 8), 3, 109, 2, 399.0, 39.9, 758.1, "Online", "Samsung Galaxy A54", "Smartphones"},
+			            {6, #date(2024, 1, 2), 11, 107, 4, 95.0, 0.0, 380.0, "Online", "RAM Corsair 8GB", "Componentes"},
+			            {7, #date(2023, 12, 10), 7, 106, 3, 39.9, 0.0, 119.7, "Tienda", "SSD Kingston 480GB", "Componentes"},
+			            {8, #date(2024, 3, 22), 7, 106, 5, 39.9, 0.0, 199.5, "Tienda", "SSD Kingston 480GB", "Componentes"},
+			            {9, #date(2023, 9, 1), 4, 101, 2, 850.0, 0.0, 1700.0, "Tienda", "Notebook Lenovo IdeaPad", "Notebooks"},
+			            {10, #date(2024, 6, 10), 6, 110, 4, 249.0, 99.6, 896.4, "Online", "Xiaomi Redmi Note 12", "Smartphones"},
+			            {11, #date(2023, 12, 15), 11, 110, 2, 249.0, 0.0, 498.0, "Tienda", "Xiaomi Redmi Note 12", "Smartphones"},
+			            {12, #date(2024, 1, 19), 3, 104, 3, 45.0, 6.75, 128.25, "Online", "Teclado Redragon K552", "Perifericos"},
+			            {13, #date(2023, 10, 5), 7, 110, 3, 249.0, 0.0, 747.0, "Tienda", "Xiaomi Redmi Note 12", "Smartphones"},
+			            {14, #date(2023, 7, 2), 11, 112, 2, 89.9, 0.0, 179.8, "Online", "Webcam Logitech C920", "Perifericos"},
+			            {15, #date(2024, 8, 26), 11, 102, 1, 920.5, 0.0, 920.5, "Online", "Notebook HP Pavilion", "Notebooks"},
+			            {16, #date(2023, 6, 13), 8, 112, 2, 89.9, 0.0, 179.8, "Online", "Webcam Logitech C920", "Perifericos"},
+			            {17, #date(2023, 4, 3), 4, 105, 2, 189.99, 19.0, 360.98, "Tienda", "Monitor Samsung 24", "Perifericos"},
+			            {18, #date(2024, 5, 17), 9, 107, 4, 95.0, 0.0, 380.0, "Online", "RAM Corsair 8GB", "Componentes"},
+			            {19, #date(2023, 11, 14), 5, 105, 2, 189.99, 38.0, 341.98, "Tienda", "Monitor Samsung 24", "Perifericos"},
+			            {20, #date(2024, 7, 2), 2, 108, 2, 110.0, 0.0, 220.0, "Tienda", "Motherboard ASUS B450", "Componentes"},
+			            {21, #date(2023, 7, 9), 9, 104, 3, 45.0, 0.0, 135.0, "Online", "Teclado Redragon K552", "Perifericos"},
+			            {22, #date(2024, 8, 24), 11, 109, 4, 399.0, 0.0, 1596.0, "Online", "Samsung Galaxy A54", "Smartphones"},
+			            {23, #date(2023, 9, 2), 1, 109, 2, 399.0, 0.0, 798.0, "Online", "Samsung Galaxy A54", "Smartphones"},
+			            {24, #date(2024, 6, 9), 3, 104, 4, 45.0, 18.0, 162.0, "Online", "Teclado Redragon K552", "Perifericos"},
+			            {25, #date(2023, 6, 24), 2, 103, 5, 12.99, 0.0, 64.95, "Online", "Mouse Logitech M170", "Perifericos"},
+			            {26, #date(2024, 9, 10), 2, 109, 2, 399.0, 79.8, 718.2, "Tienda", "Samsung Galaxy A54", "Smartphones"},
+			            {27, #date(2023, 1, 10), 2, 105, 1, 189.99, 0.0, 189.99, "Online", "Monitor Samsung 24", "Perifericos"},
+			            {28, #date(2023, 4, 26), 11, 110, 5, 249.0, 0.0, 1245.0, "Online", "Xiaomi Redmi Note 12", "Smartphones"},
+			            {29, #date(2024, 10, 31), 4, 108, 2, 110.0, 11.0, 209.0, "Tienda", "Motherboard ASUS B450", "Componentes"},
+			            {30, #date(2023, 10, 16), 8, 111, 4, 79.99, 0.0, 319.96, "Tienda", "Auriculares HyperX Cloud", "Sin Categoria"},
+			            {31, #date(2024, 9, 1), 8, 107, 5, 95.0, 0.0, 475.0, "Online", "RAM Corsair 8GB", "Componentes"},
+			            {32, #date(2023, 6, 23), 5, 107, 2, 95.0, 0.0, 190.0, "Tienda", "RAM Corsair 8GB", "Componentes"},
+			            {33, #date(2024, 4, 20), 11, 101, 1, 850.0, 0.0, 850.0, "Online", "Notebook Lenovo IdeaPad", "Notebooks"},
+			            {34, #date(2023, 8, 26), 9, 107, 1, 95.0, 0.0, 95.0, "Tienda", "RAM Corsair 8GB", "Componentes"},
+			            {35, #date(2024, 7, 30), 8, 109, 1, 399.0, 19.95, 379.05, "Tienda", "Samsung Galaxy A54", "Smartphones"},
+			            {36, #date(2023, 1, 20), 9, 106, 5, 39.9, 0.0, 199.5, "Online", "SSD Kingston 480GB", "Componentes"},
+			            {37, #date(2023, 8, 28), 10, 102, 4, 920.5, 0.0, 3682.0, "Online", "Notebook HP Pavilion", "Notebooks"},
+			            {38, #date(2023, 7, 8), 1, 106, 3, 39.9, 0.0, 119.7, "Tienda", "SSD Kingston 480GB", "Componentes"},
+			            {39, #date(2023, 6, 24), 6, 108, 4, 110.0, 22.0, 418.0, "Tienda", "Motherboard ASUS B450", "Componentes"},
+			            {40, #date(2023, 6, 22), 1, 102, 1, 920.5, 0.0, 920.5, "Tienda", "Notebook HP Pavilion", "Notebooks"},
+			            {41, #date(2024, 10, 22), 3, 109, 1, 399.0, 0.0, 399.0, "Tienda", "Samsung Galaxy A54", "Smartphones"},
+			            {42, #date(2023, 2, 5), 5, 104, 1, 45.0, 0.0, 45.0, "Online", "Teclado Redragon K552", "Perifericos"},
+			            {43, #date(2023, 8, 15), 10, 110, 1, 249.0, 12.45, 236.55, "Online", "Xiaomi Redmi Note 12", "Smartphones"},
+			            {44, #date(2024, 9, 13), 5, 107, 5, 95.0, 0.0, 475.0, "Online", "RAM Corsair 8GB", "Componentes"},
+			            {45, #date(2023, 1, 10), 9, 102, 2, 920.5, 92.05, 1748.95, "Tienda", "Notebook HP Pavilion", "Notebooks"},
+			            {46, #date(2024, 4, 10), 10, 103, 2, 12.99, 2.6, 23.38, "Tienda", "Mouse Logitech M170", "Perifericos"},
+			            {47, #date(2023, 10, 20), 10, 106, 4, 39.9, 0.0, 159.6, "Tienda", "SSD Kingston 480GB", "Componentes"},
+			            {48, #date(2024, 2, 21), 5, 106, 5, 39.9, 19.95, 179.55, "Online", "SSD Kingston 480GB", "Componentes"},
+			            {49, #date(2023, 9, 10), 6, 104, 4, 45.0, 9.0, 171.0, "Tienda", "Teclado Redragon K552", "Perifericos"},
+			            {50, #date(2023, 10, 30), 11, 111, 2, 79.99, 8.0, 151.98, "Online", "Auriculares HyperX Cloud", "Sin Categoria"}
+			        }
+			    )
+			in
+			    Source
+
