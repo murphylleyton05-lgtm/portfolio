@@ -1,0 +1,68 @@
+// ============================================================================
+//  _Medidas  —  Tabla contenedora de medidas (SIN columnas de datos)
+//  Se crea con: Inicio > Especificar datos > nombre "_Medidas" > Cargar,
+//  y luego se ELIMINA la "Columna 1" por defecto. Al quedar vacía toma el
+//  ícono de calculadora en el panel de datos.
+//
+//  Crear cada medida con: clic derecho sobre _Medidas > Nueva medida.
+//  El prefijo "_" hace que la tabla quede primera en el panel (orden alfabético).
+// ============================================================================
+
+
+// ---------------------------------------------------------------------------
+// Medida 1 — BASE: agregación simple
+// Suma del importe de todas las ventas en el contexto de filtro actual.
+// ---------------------------------------------------------------------------
+Total Ventas =
+SUM ( Fact_Ventas[total_venta] )
+
+
+// ---------------------------------------------------------------------------
+// Medida 2 — FILTRADA con CALCULATE
+// Reutiliza [Total Ventas] pero forzando el filtro canal = "Online".
+// (En este dataset el canal vive en Fact_Ventas[canal]; valores: Online / Tienda.)
+// ---------------------------------------------------------------------------
+Ventas Online =
+CALCULATE (
+    [Total Ventas],
+    Fact_Ventas[canal] = "Online"
+)
+
+
+// ---------------------------------------------------------------------------
+// Medida 3 — INTELIGENCIA DE TIEMPO: acumulado del año a la fecha (YTD)
+// Requiere que Dim_Fechas esté MARCADA COMO TABLA DE FECHAS.
+// ---------------------------------------------------------------------------
+Ventas YTD =
+TOTALYTD (
+    [Total Ventas],
+    Dim_Fechas[Date]
+)
+
+
+// ---------------------------------------------------------------------------
+// Medida 4 — COMPARATIVA ANUAL: mismo período del año anterior
+// Devuelve BLANK cuando no hay año anterior comparable (ej: 2023 si es el
+// primer año del calendario).
+// ---------------------------------------------------------------------------
+Ventas LY =
+CALCULATE (
+    [Total Ventas],
+    SAMEPERIODLASTYEAR ( Dim_Fechas[Date] )
+)
+
+
+// ---------------------------------------------------------------------------
+// Medida 5 — OPTIMIZADA con VAR + DIVIDE
+// Guarda el actual y el anterior en variables (se calcula [Ventas LY] UNA sola
+// vez) y usa DIVIDE para evitar el error de división por cero.
+// Formatear como porcentaje: Herramientas de medida > Formato > % .
+// ---------------------------------------------------------------------------
+% Crecimiento Anual =
+VAR VentasActual   = [Total Ventas]
+VAR VentasAnterior = [Ventas LY]
+RETURN
+    DIVIDE (
+        VentasActual - VentasAnterior,
+        VentasAnterior
+    )

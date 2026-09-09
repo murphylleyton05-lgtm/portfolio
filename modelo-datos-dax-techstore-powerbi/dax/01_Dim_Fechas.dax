@@ -1,0 +1,29 @@
+// ============================================================================
+//  Dim_Fechas  —  Tabla calendario del modelo
+//  Crear con: Inicio > Nueva tabla  (pegar la fórmula completa de abajo)
+//
+//  El rango se deriva de Fact_Ventas[fecha_venta], así el calendario cubre
+//  EXACTAMENTE los días con ventas (2023-01-xx a 2024-12-xx) y no genera
+//  años vacíos. Alternativa válida del curso: CALENDARAUTO() (ver nota al pie).
+//
+//  IMPORTANTE: después de crearla hay que MARCARLA COMO TABLA DE FECHAS
+//  (clic derecho sobre Dim_Fechas > Marcar como tabla de fechas > columna Date).
+//  Sin ese paso, TOTALYTD y SAMEPERIODLASTYEAR NO funcionan aunque la
+//  fórmula esté correcta.
+// ============================================================================
+
+Dim_Fechas =
+CALENDAR (
+    MIN ( Fact_Ventas[fecha_venta] ),
+    MAX ( Fact_Ventas[fecha_venta] )
+)
+
+// ----------------------------------------------------------------------------
+// Alternativa (si preferís que el motor detecte el rango automáticamente a
+// partir de TODAS las columnas de fecha del modelo):
+//
+// Dim_Fechas = CALENDARAUTO()
+//
+// CALENDAR(MIN, MAX) es más preciso para este caso porque acota el calendario
+// a las fechas reales de Fact_Ventas en lugar de expandir al año fiscal completo.
+// ----------------------------------------------------------------------------

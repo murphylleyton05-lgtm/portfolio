@@ -1,0 +1,29 @@
+// ============================================================================
+//  Dim_Fechas — Columnas calculadas
+//  Crear cada una con: seleccionar Dim_Fechas > Nueva columna
+//  (una fórmula por columna; pegar de a una)
+//
+//  La columna base "Date" ya viene de CALENDAR() / CALENDARAUTO().
+// ============================================================================
+
+// Año (número entero: 2023, 2024...) — usar como Columnas en la matriz de validación
+Año = YEAR ( Dim_Fechas[Date] )
+
+// Mes como número (1..12) — sirve para ORDENAR "Mes Nombre" correctamente
+Mes Número = MONTH ( Dim_Fechas[Date] )
+
+// Mes como nombre ("enero", "febrero"...) — usar como Filas en la matriz
+// (recordá: Ordenar por columna > Mes Número, si no ordena alfabéticamente)
+Mes Nombre = FORMAT ( Dim_Fechas[Date], "MMMM" )
+
+// Trimestre ("T1".."T4")
+Trimestre = "T" & QUARTER ( Dim_Fechas[Date] )
+
+// Semana del año (1..53)
+Semana = WEEKNUM ( Dim_Fechas[Date] )
+
+// ----------------------------------------------------------------------------
+// TIP: para que "Mes Nombre" no salga alfabético (abril, agosto, diciembre...),
+// seleccioná la columna Mes Nombre > Herramientas de columna > Ordenar por
+// columna > Mes Número. Así enero(1) va antes que febrero(2), etc.
+// ----------------------------------------------------------------------------
