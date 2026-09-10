@@ -1,0 +1,143 @@
+activo_id,tipo,criticidad,horas_operacion,edad_meses,ciclos_arranque,vibracion_mm_s,temp_prom_c,dias_desde_mant,carga_prom_pct,fallas_previas,fallo_30d
+EQ-001,Bomba de fractura,Media,28985,79,1451,4.31,64.9,128,73.0,2,1
+EQ-002,Bomba de fractura,Media,4541,15,412,2.39,53.9,71,82.0,2,0
+EQ-003,Bomba de fractura,Alta,22608,60,2289,4.12,57.9,2,74.0,5,0
+EQ-004,Bomba de fractura,Alta,15500,42,894,3.61,54.0,20,74.0,5,0
+EQ-005,Bomba de fractura,Alta,22933,74,3779,5.06,62.1,13,74.0,7,1
+EQ-006,Bomba de fractura,Alta,24414,72,1261,3.27,71.3,9,63.0,4,0
+EQ-007,Bomba de fractura,Alta,4366,14,369,2.13,63.6,71,81.0,4,1
+EQ-008,Bomba de fractura,Alta,17962,53,988,3.9,56.9,33,69.0,6,0
+EQ-009,Bomba de fractura,Alta,27404,80,2402,3.25,64.4,24,90.0,4,0
+EQ-010,Bomba de fractura,Alta,22857,80,2415,4.0,63.8,1,70.0,5,0
+EQ-011,Bomba de fractura,Alta,15532,50,1159,4.46,67.1,204,81.0,9,1
+EQ-012,Bomba de fractura,Alta,10909,40,859,3.29,51.5,60,68.0,2,0
+EQ-013,Bomba de fractura,Alta,16756,46,1373,3.16,64.8,12,70.0,4,0
+EQ-014,Bomba de fractura,Alta,30777,83,5051,5.25,61.9,10,60.0,6,1
+EQ-015,Bomba de fractura,Alta,25962,73,1704,3.09,59.9,7,42.0,1,0
+EQ-016,Bomba de fractura,Alta,11917,32,730,3.75,62.8,210,89.0,5,1
+EQ-017,Bomba de fractura,Alta,16874,46,871,4.55,60.4,52,61.0,5,0
+EQ-018,Bomba de fractura,Alta,12718,39,550,3.22,58.1,34,64.0,3,0
+EQ-019,Bomba de fractura,Alta,9077,29,940,2.16,71.0,87,57.0,3,0
+EQ-020,Bomba de fractura,Alta,17053,53,1020,3.53,59.9,33,82.0,4,0
+EQ-021,Bomba de fractura,Alta,3597,13,268,2.09,52.5,20,91.0,1,0
+EQ-022,Bomba de fractura,Alta,20571,63,915,4.59,63.0,1,72.0,4,0
+EQ-023,Bomba de fractura,Alta,6625,20,988,1.43,65.9,31,70.0,1,0
+EQ-024,Bomba de fractura,Media,25751,72,1443,5.87,59.1,66,79.0,7,1
+EQ-025,Bomba de fractura,Alta,20936,76,1730,4.78,58.9,52,84.0,4,1
+EQ-026,Bomba de fractura,Alta,25995,73,3122,4.49,66.9,5,51.0,5,0
+EQ-027,Bomba de fractura,Alta,22874,67,1316,4.67,59.7,27,58.0,4,1
+EQ-028,Bomba de fractura,Alta,4366,16,246,3.91,51.1,14,71.0,0,0
+EQ-029,Bomba de fractura,Alta,13980,41,1787,3.29,63.1,34,88.0,2,0
+EQ-030,Bomba de fractura,Alta,16714,57,1598,3.11,60.4,3,73.0,5,1
+EQ-031,Bomba de fractura,Baja,8073,29,409,2.74,60.4,4,83.0,4,0
+EQ-032,Bomba de fractura,Alta,10438,29,608,3.83,53.9,51,72.0,2,0
+EQ-033,Bomba de fractura,Alta,20170,57,966,4.34,49.0,4,71.0,6,0
+EQ-034,Bomba de fractura,Alta,5975,20,381,3.41,62.0,3,93.0,1,0
+EQ-035,Bomba de fractura,Alta,6042,16,263,3.2,64.0,1,75.0,3,1
+EQ-036,Bomba de fractura,Media,22869,65,1204,4.79,65.3,23,63.0,7,1
+EQ-037,Bomba de fractura,Alta,11851,36,624,3.06,67.2,138,69.0,4,1
+EQ-038,Bomba de fractura,Baja,22307,78,1184,4.99,60.8,12,53.0,8,1
+EQ-039,Bomba de fractura,Alta,6310,19,449,2.5,54.1,64,100.0,2,0
+EQ-040,Bomba de fractura,Alta,3532,11,536,1.19,52.5,85,59.0,3,0
+EQ-041,Bomba de fractura,Alta,10331,28,989,2.79,57.9,19,63.0,7,0
+EQ-042,Bomba de fractura,Alta,4336,15,201,1.6,56.4,70,69.0,2,0
+EQ-043,Bomba de fractura,Alta,23652,70,1511,4.36,68.9,39,80.0,4,1
+EQ-044,Bomba de fractura,Alta,5261,14,229,1.26,64.9,1,70.0,2,0
+EQ-045,Bomba de fractura,Alta,20372,67,1212,4.24,60.1,80,71.0,8,0
+EQ-046,Bomba de fractura,Alta,24654,70,1315,5.43,72.6,8,65.0,6,1
+EQ-047,Bomba de fractura,Alta,24743,67,1478,3.39,71.0,22,75.0,5,1
+EQ-048,Bomba de fractura,Alta,26903,81,1314,5.1,64.7,50,75.0,9,1
+EQ-049,Bomba de inyeccion,Media,22562,38,1072,5.39,69.1,15,67.0,1,0
+EQ-050,Bomba de inyeccion,Media,29476,63,1267,4.56,68.8,24,67.0,4,0
+EQ-051,Bomba de inyeccion,Media,6836,12,426,1.72,57.3,37,71.0,0,0
+EQ-052,Bomba de inyeccion,Media,33924,67,3563,5.53,74.6,44,72.0,3,1
+EQ-053,Bomba de inyeccion,Media,30140,49,2095,6.35,63.4,25,69.0,7,1
+EQ-054,Bomba de inyeccion,Media,16896,28,1315,2.81,63.0,8,85.0,2,0
+EQ-055,Bomba de inyeccion,Media,21387,35,1522,2.73,64.8,9,51.0,2,0
+EQ-056,Bomba de inyeccion,Media,33690,57,2041,4.9,64.9,21,61.0,3,0
+EQ-057,Bomba de inyeccion,Media,24670,45,1944,6.03,64.3,17,72.0,5,1
+EQ-058,Bomba de inyeccion,Media,41207,74,2246,5.13,65.7,44,82.0,4,1
+EQ-059,Bomba de inyeccion,Media,25529,42,1792,2.38,69.7,36,87.0,4,0
+EQ-060,Bomba de inyeccion,Media,27059,45,1306,5.46,64.6,128,45.0,4,0
+EQ-061,Bomba de inyeccion,Media,20423,35,1918,3.17,64.4,15,90.0,2,0
+EQ-062,Bomba de inyeccion,Media,14868,29,2060,2.86,62.6,64,80.0,2,0
+EQ-063,Bomba de inyeccion,Media,37237,67,1646,5.75,67.1,12,72.0,4,1
+EQ-064,Bomba de inyeccion,Media,14206,26,959,3.14,50.3,3,74.0,0,0
+EQ-065,Bomba de inyeccion,Media,50866,79,7868,7.01,75.5,42,75.0,7,1
+EQ-066,Bomba de inyeccion,Baja,9273,18,457,3.27,51.1,18,75.0,4,0
+EQ-067,Bomba de inyeccion,Media,49233,78,2730,7.61,75.7,56,80.0,5,1
+EQ-068,Bomba de inyeccion,Media,4376,9,374,2.17,45.0,36,51.0,1,0
+EQ-069,Bomba de inyeccion,Media,33697,57,2072,5.76,79.7,15,71.0,7,1
+EQ-070,Bomba de inyeccion,Media,14126,26,662,3.46,68.7,2,71.0,5,0
+EQ-071,Bomba de inyeccion,Media,15899,29,700,3.32,65.5,66,49.0,4,0
+EQ-072,Bomba de inyeccion,Baja,6639,13,775,2.06,55.0,21,67.0,0,0
+EQ-073,Bomba de inyeccion,Baja,29835,61,1443,2.91,67.2,1,82.0,2,0
+EQ-074,Bomba de inyeccion,Media,12752,21,752,2.79,62.0,5,99.0,1,0
+EQ-075,Bomba de inyeccion,Media,37910,65,1961,5.99,79.5,123,69.0,4,1
+EQ-076,Bomba de inyeccion,Media,24651,49,1286,4.81,62.3,26,87.0,2,0
+EQ-077,Bomba de inyeccion,Media,13900,29,1396,3.15,69.2,11,60.0,4,0
+EQ-078,Bomba de inyeccion,Media,38683,75,2373,6.16,68.8,14,75.0,3,1
+EQ-079,Bomba de inyeccion,Media,32462,68,1943,7.2,80.8,1,75.0,6,1
+EQ-080,Bomba de inyeccion,Media,33428,65,1620,4.85,59.3,91,81.0,5,1
+EQ-081,Bomba de inyeccion,Media,17767,36,2377,3.51,66.9,31,67.0,3,0
+EQ-082,Bomba de inyeccion,Media,33902,59,1657,5.39,73.5,20,57.0,8,1
+EQ-083,Compresor de gas,Alta,37614,54,4461,6.55,82.9,34,67.0,6,1
+EQ-084,Compresor de gas,Baja,23770,37,2998,5.81,69.3,6,44.0,5,0
+EQ-085,Compresor de gas,Alta,35688,60,3770,4.41,72.1,6,67.0,5,1
+EQ-086,Compresor de gas,Alta,31352,46,2259,5.49,75.1,46,72.0,2,1
+EQ-087,Compresor de gas,Alta,17916,26,2876,2.19,66.0,44,76.0,2,0
+EQ-088,Compresor de gas,Alta,9976,18,896,2.42,51.2,10,98.0,5,0
+EQ-089,Compresor de gas,Alta,33524,63,2803,5.48,68.8,10,73.0,7,1
+EQ-090,Compresor de gas,Alta,53835,75,4645,9.61,75.5,13,79.0,2,1
+EQ-091,Compresor de gas,Alta,39801,59,2733,6.32,80.6,59,73.0,4,1
+EQ-092,Compresor de gas,Alta,36272,61,1585,6.36,73.7,43,50.0,5,1
+EQ-093,Compresor de gas,Alta,26381,41,1369,4.0,54.3,8,51.0,3,0
+EQ-094,Compresor de gas,Baja,43999,60,4078,5.46,68.1,28,55.0,7,0
+EQ-095,Compresor de gas,Alta,43769,64,3022,7.22,71.9,2,73.0,1,0
+EQ-096,Compresor de gas,Alta,41187,64,2276,6.69,74.2,21,70.0,8,1
+EQ-097,Compresor de gas,Alta,34979,59,2004,4.72,59.4,96,71.0,4,1
+EQ-098,Compresor de gas,Alta,29269,55,2204,4.47,67.5,3,100.0,5,1
+EQ-099,Compresor de gas,Alta,12462,23,531,2.8,62.0,5,59.0,2,0
+EQ-100,Compresor de gas,Alta,38851,53,1681,6.24,69.8,58,66.0,4,1
+EQ-101,Compresor de gas,Alta,41527,78,2611,5.95,64.8,51,92.0,2,1
+EQ-102,Compresor de gas,Alta,48079,78,4962,6.66,73.1,19,83.0,4,1
+EQ-103,Compresor de gas,Alta,7693,13,1183,1.26,58.9,1,74.0,5,0
+EQ-104,Compresor de gas,Alta,36322,61,3028,7.51,74.7,43,74.0,8,1
+EQ-105,Compresor de gas,Alta,7536,13,456,3.23,57.9,84,68.0,1,0
+EQ-106,Compresor de gas,Alta,16011,29,866,2.81,61.9,4,57.0,1,0
+EQ-107,Compresor de gas,Alta,52583,72,5058,9.26,74.2,22,74.0,5,1
+EQ-108,Compresor de gas,Alta,46549,69,3093,8.1,74.6,8,76.0,8,1
+EQ-109,Compresor de gas,Alta,8020,15,336,3.41,64.9,37,73.0,3,0
+EQ-110,Compresor de gas,Alta,57939,80,7023,8.48,76.2,61,53.0,9,1
+EQ-111,Compresor de gas,Alta,10451,15,1671,1.92,59.3,5,89.0,2,0
+EQ-112,Compresor de gas,Alta,6150,10,343,2.77,59.9,5,65.0,0,0
+EQ-113,Bomba booster,Alta,42446,83,4656,6.69,77.5,33,80.0,2,1
+EQ-114,Bomba booster,Baja,23029,51,1214,5.72,54.0,90,81.0,2,0
+EQ-115,Bomba booster,Media,20317,44,2802,4.0,70.9,25,81.0,4,0
+EQ-116,Bomba booster,Baja,8571,16,931,2.02,55.4,79,72.0,0,0
+EQ-117,Bomba booster,Baja,20124,46,1310,4.87,64.8,37,80.0,0,0
+EQ-118,Bomba booster,Baja,3134,7,372,1.43,65.2,10,78.0,0,0
+EQ-119,Bomba booster,Alta,15969,34,1113,3.87,74.0,8,63.0,1,0
+EQ-120,Bomba booster,Baja,35562,65,1963,4.3,68.5,61,77.0,5,0
+EQ-121,Bomba booster,Baja,32596,80,3660,4.28,58.4,76,43.0,3,0
+EQ-122,Bomba booster,Baja,36937,69,2291,6.14,68.4,19,80.0,3,1
+EQ-123,Bomba booster,Baja,29221,69,1810,4.85,72.7,6,96.0,4,0
+EQ-124,Bomba booster,Media,18416,39,919,3.21,62.5,67,74.0,3,0
+EQ-125,Bomba booster,Alta,18947,42,840,4.71,59.4,14,84.0,3,0
+EQ-126,Bomba booster,Baja,41749,83,5696,4.65,76.4,16,79.0,3,1
+EQ-127,Bomba booster,Media,39828,74,1742,5.63,65.6,1,50.0,2,0
+EQ-128,Bomba booster,Baja,20428,40,1809,4.2,66.4,142,88.0,3,1
+EQ-129,Bomba booster,Media,30577,64,3533,5.37,62.7,95,83.0,2,1
+EQ-130,Bomba booster,Media,29346,52,2055,5.3,82.8,112,69.0,0,1
+EQ-131,Bomba booster,Baja,26652,61,2471,4.41,59.7,37,59.0,1,0
+EQ-132,Bomba booster,Baja,21501,40,1352,4.24,64.4,17,83.0,1,0
+EQ-133,Bomba booster,Baja,22999,42,1371,3.96,61.6,48,62.0,2,0
+EQ-134,Bomba booster,Baja,21671,46,1271,4.18,71.6,30,53.0,2,0
+EQ-135,Bomba booster,Baja,36512,81,4402,5.45,76.5,41,90.0,1,1
+EQ-136,Bomba booster,Baja,11639,28,497,3.14,56.2,12,73.0,0,0
+EQ-137,Bomba booster,Baja,7286,15,697,2.51,59.4,11,87.0,1,0
+EQ-138,Bomba booster,Baja,37875,67,5007,6.04,64.5,37,72.0,2,1
+EQ-139,Bomba booster,Media,16656,30,2213,2.73,73.3,72,67.0,1,0
+EQ-140,Bomba booster,Baja,35273,79,5867,5.65,58.5,121,60.0,2,1
+EQ-141,Bomba booster,Baja,28133,54,1306,5.67,74.4,11,91.0,7,1
+EQ-142,Bomba booster,Baja,19821,35,1232,4.17,61.4,15,48.0,1,0

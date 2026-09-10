@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta property="og:title" content="Asset Reliability Analytics — Vaca Muerta">
+<meta property="og:description" content="Dashboard de cadena de suministro de arena de fractura y gasoil: OTIF, lead time, stock, quiebres y costo logístico. Datos simulados.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://murphylleyton05-lgtm.github.io/portfolio/confiabilidad/">
+<meta name="twitter:card" content="summary_large_image">
+<title>Asset Reliability Analytics</title>
+<meta name="description" content="Tablero de confiabilidad de activos rotativos (bombas y compresores) de Vaca Muerta: disponibilidad, MTBF, MTTR, Pareto de fallas y un modelo predictivo de falla. Datos simulados.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0A0B0F; --bg-2:#0E1015; --surface:#14161C; --surface-2:#1C1F27; --surface-3:#262A34;
+    --ink:#F4F6FA; --ink-2:#A6ADBD; --ink-3:#6A7182; --rule:#23262F; --rule-strong:#333846;
+    --accent:#FF9D42; --accent-2:#45C7FF; --accent-soft:rgba(255,157,66,.13); --accent-line:rgba(255,157,66,.35);
+    --ok:#199e70; --warn:#c98500; --bad:#d95926;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#2f9e2f; --s7:#9085e9; --s8:#e66767;
+    --grid:#1E212A;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -14px rgba(0,0,0,.7);
+    --glow:0 0 0 1px var(--accent-line), 0 0 20px -4px rgba(255,157,66,.35);
+    --tile:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,0));
+    --r:18px; --r-tile:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(60vw 40vh at 12% -8%, rgba(255,157,66,.06), transparent 60%), radial-gradient(50vw 40vh at 100% 0%, rgba(69,199,255,.05), transparent 55%);
+    background-attachment:fixed;}
+  .wrap{max-width:1180px; margin:0 auto; padding:40px 22px 72px}
+  h1,h2,h3{font-family:'Sora',sans-serif; letter-spacing:-.02em; margin:0}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  a{color:var(--accent-2); text-decoration:none} a:hover{text-decoration:underline}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); display:flex; align-items:center; gap:12px; margin-bottom:18px}
+  .eyebrow::before{content:""; width:26px; height:2px; background:var(--accent); display:inline-block; border-radius:2px}
+  h1{font-size:clamp(32px,5.2vw,54px); font-weight:800; line-height:1.03; background:linear-gradient(180deg,#fff,#c8ccd6); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .lede{max-width:650px; color:var(--ink-2); font-size:16px; margin-top:16px} .lede b{color:var(--ink)}
+  .banner{margin-top:22px; padding:14px 16px; border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:12px; background:linear-gradient(180deg,var(--accent-soft),transparent); color:var(--ink-2); font-size:13px} .banner b{color:var(--ink)}
+  .grid{display:grid; gap:14px}
+  .kpis{grid-template-columns:repeat(6,1fr); margin-top:28px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--surface-2); background-image:var(--tile); border:1px solid var(--rule); border-radius:var(--r-tile); padding:16px}
+  .tile .lab{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3)}
+  .tile .val{font-family:'Sora',sans-serif; font-weight:700; font-size:25px; margin-top:9px; line-height:1}
+  .tile .val small{font-size:13px; color:var(--ink-2); font-weight:600; margin-left:3px}
+  .tile .sub{font-size:11.5px; color:var(--ink-3); margin-top:6px}
+  .tile.good .val{color:var(--ok)} .tile.alert .val{color:var(--accent)}
+  .panel{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r); padding:22px 22px 20px; margin-top:26px; box-shadow:var(--shadow); min-width:0}
+  .panel h2{font-size:19px; font-weight:700} .panel .desc{color:var(--ink-2); font-size:13.5px; margin-top:6px; max-width:700px}
+  .panel.hl{border-color:var(--accent-line); box-shadow:var(--shadow), 0 0 0 1px var(--accent-line)}
+  .tag{display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); border:1px solid var(--accent-line); background:var(--accent-soft); padding:3px 9px; border-radius:999px; margin-bottom:10px}
+  svg{display:block; width:100%; height:auto; overflow:visible}
+  .axis{fill:var(--ink-3); font-family:'JetBrains Mono',monospace; font-size:10px}
+  .axis-line{stroke:var(--grid); stroke-width:1}
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:12px; font-size:12px; color:var(--ink-2)}
+  .legend span{display:inline-flex; align-items:center; gap:7px} .legend i{width:14px; height:3px; border-radius:2px; display:inline-block}
+  table{width:100%; border-collapse:collapse; font-size:13px; margin-top:8px}
+  th,td{padding:9px 10px; text-align:right; border-bottom:1px solid var(--rule)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:500}
+  tbody tr:hover{background:var(--surface-2)} td .num{font-family:'JetBrains Mono',monospace}
+  .scroll{overflow-x:auto; max-width:100%} .scroll table{min-width:520px}
+  .badge{font-family:'JetBrains Mono',monospace; font-size:10.5px; padding:3px 8px; border-radius:6px; white-space:nowrap}
+  .b-alta{background:rgba(217,89,38,.18); color:#f0916b} .b-media{background:rgba(201,133,0,.18); color:#e7b64d} .b-baja{background:rgba(25,158,112,.16); color:#5fd6aa}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:26px} .two>*{min-width:0}
+  @media(max-width:820px){.two{grid-template-columns:1fr}}
+  .model-metrics{grid-template-columns:repeat(4,1fr); margin-top:16px}
+  @media(max-width:640px){.model-metrics{grid-template-columns:repeat(2,1fr)}}
+  .cm{display:grid; grid-template-columns:auto 1fr 1fr; gap:6px; font-size:12px; margin-top:8px; max-width:340px}
+  .cm div{padding:10px; border-radius:8px; text-align:center; background:var(--surface-2)}
+  .cm .h{background:transparent; color:var(--ink-3); font-family:'JetBrains Mono',monospace; font-size:10.5px; display:flex; align-items:center; justify-content:center}
+  .cm .cell{font-family:'JetBrains Mono',monospace} .cm .tp{background:rgba(25,158,112,.18)} .cm .tn{background:rgba(57,135,229,.16)}
+  .cm .fp,.cm .fn{background:rgba(217,89,38,.16)}
+  .probbar{height:8px; background:var(--surface-3); border-radius:5px; overflow:hidden; min-width:60px; display:inline-block; width:70px; vertical-align:middle; margin-right:7px}
+  .probbar>div{height:100%}
+  .limits{grid-template-columns:repeat(2,1fr); margin-top:14px} @media(max-width:640px){.limits{grid-template-columns:1fr}}
+  .limits .tile .val{font-size:15px} .limits .tile p{margin:8px 0 0; color:var(--ink-2); font-size:12.5px}
+  footer{margin-top:44px; padding-top:22px; border-top:1px solid var(--rule); color:var(--ink-3); font-size:12.5px}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="eyebrow">Vaca Muerta · Confiabilidad de activos</div>
+  <h1>Asset Reliability Analytics</h1>
+  <p class="lede">Una flota de <b>bombas y compresores</b> mueve toda la operación. Cada parada no planificada cuesta
+    producción y reparación. Este tablero mide la <b>confiabilidad</b> de esos equipos —disponibilidad, MTBF, MTTR,
+    modos de falla— y entrena un <b>modelo que estima qué activo va a fallar</b> en los próximos 30 días.</p>
+  <div class="banner" id="banner"></div>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <div class="two">
+    <section class="panel" style="margin-top:26px">
+      <h2>Disponibilidad y fallas por mes</h2>
+      <p class="desc">Disponibilidad (línea) vs. cantidad de fallas (barras).</p>
+      <div id="c_disp"></div>
+      <div class="legend"><span><i style="background:var(--s3)"></i>Disponibilidad (%)</span><span><i style="background:var(--s2)"></i>Fallas</span></div>
+    </section>
+    <section class="panel" style="margin-top:26px">
+      <h2>Modos de falla (Pareto)</h2>
+      <p class="desc">Pocos modos explican la mayoría de las fallas: ahí conviene atacar.</p>
+      <div id="c_pareto"></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Confiabilidad por tipo de activo</h2>
+    <p class="desc">Las bombas de fractura tienen el duty más duro; los compresores, el costo por evento más alto.</p>
+    <div class="scroll">
+      <table id="t_tipos">
+        <thead><tr><th>Tipo</th><th>Activos</th><th>Fallas</th><th>MTBF (h)</th><th>MTTR (h)</th><th>Disponib.</th><th>Costo mant.</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MODELO -->
+  <section class="panel hl">
+    <span class="tag">Modelo predictivo</span>
+    <h2>¿Qué activo va a fallar?</h2>
+    <p class="desc">Una <b>regresión logística</b> (numpy, sin librerías de ML) estima la probabilidad de falla en los
+      próximos 30 días a partir de las variables de condición de cada equipo. Las métricas son sobre un
+      <b>set de test que el modelo no vio</b>.</p>
+    <div class="grid model-metrics" id="metrics"></div>
+
+    <div class="two" style="margin-top:22px">
+      <div>
+        <h3 style="font-size:14px; color:var(--ink-2); font-family:'JetBrains Mono',monospace; letter-spacing:.06em">MATRIZ DE CONFUSIÓN (TEST)</h3>
+        <div class="cm" id="cm"></div>
+        <p class="desc" style="margin-top:12px">Qué variables pesan más en el riesgo (coeficientes estandarizados, + = más riesgo):</p>
+        <div id="c_pesos"></div>
+      </div>
+      <div>
+        <h3 style="font-size:14px; color:var(--ink-2); font-family:'JetBrains Mono',monospace; letter-spacing:.06em">RIESGO: HORAS vs VIBRACIÓN</h3>
+        <p class="desc">Cada punto es un activo; el color es su probabilidad de falla.</p>
+        <div id="c_scatter"></div>
+        <div class="legend"><span><i style="background:var(--s3);width:10px;height:10px;border-radius:50%"></i>Bajo</span><span><i style="background:var(--s4);width:10px;height:10px;border-radius:50%"></i>Medio</span><span><i style="background:var(--bad);width:10px;height:10px;border-radius:50%"></i>Alto</span></div>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px; margin-top:24px">Watchlist — activos a intervenir primero</h3>
+    <p class="desc">Ordenados por probabilidad de falla. Cruzar con la criticidad para priorizar el mantenimiento.</p>
+    <div class="scroll">
+      <table id="t_watch">
+        <thead><tr><th>Activo</th><th>Tipo</th><th>Prob. falla</th><th>Vibración</th><th>Temp.</th><th>Días s/mant</th><th>Fallas prev.</th><th>Criticidad</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Lo que este tablero no hace</h2>
+    <p class="desc">Los límites, declarados.</p>
+    <div class="grid limits">
+      <div class="tile"><div class="val">Data Analytics, no ingeniería de confiabilidad</div><p>Es analítica de datos aplicada a Asset Reliability, no un análisis RCM/FMEA formal ni un dictamen de un ingeniero de confiabilidad.</p></div>
+      <div class="tile"><div class="val">Los datos son simulados</div><p>La flota, las fallas y las variables salen de un generador con semilla fija. La etiqueta de falla se construyó a partir de esas variables, así que el modelo aprende una señal real pero sintética.</p></div>
+      <div class="tile"><div class="val">Un modelo simple y transparente</div><p>Regresión logística sobre variables agregadas, no series temporales de sensores en alta frecuencia. Se eligió por ser interpretable, no por ser el más potente.</p></div>
+      <div class="tile"><div class="val">Predice riesgo, no la causa raíz</div><p>Dice qué activo mirar primero; el modo de falla y la causa se confirman con inspección.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Proyecto de portfolio · <b>Data Analytics aplicado a Asset Reliability</b> · datos simulados con Python (numpy).
+    Los CSV quedan en esquema estrella (dim_/fact_), listos para Power BI, y el modelo se entrena aparte en <span class="mono">scripts/modelo.py</span>.
+  </footer>
+</div>
+
+<script>
+const D = /*__DATOS__*/{"meta":{"generado":"2026-09-01","periodo":"2024-09 a 2026-08","activos":142,"eventos":506,"meses":24},"kpis":{"disponibilidad":97.9,"mtbf_h":3509,"mttr_h":75.2,"downtime_h":38054,"fallas":506,"costo_mantenimiento_usd":37686731.0,"costo_downtime_prom":74480},"serie":{"meses":["2024-09","2024-10","2024-11","2024-12","2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08"],"disponibilidad":[97.1,97.8,97.8,97.7,98.8,97.0,97.6,98.5,98.5,98.0,98.0,97.9,97.5,98.7,97.1,98.8,97.6,97.9,98.0,97.5,98.2,97.9,97.7,98.1],"fallas":[20,18,14,20,16,26,28,17,19,18,26,23,22,16,28,16,19,20,22,26,25,23,23,21]},"pareto":[{"modo":"Rodamiento","n":104,"acum_pct":20.6},{"modo":"Sello mecanico","n":90,"acum_pct":38.3},{"modo":"Sobrecalentamiento","n":67,"acum_pct":51.6},{"modo":"Vibracion excesiva","n":61,"acum_pct":63.6},{"modo":"Falla electrica","n":60,"acum_pct":75.5},{"modo":"Fuga hidraulica","n":53,"acum_pct":86.0},{"modo":"Valvula","n":39,"acum_pct":93.7},{"modo":"Lubricacion","n":32,"acum_pct":100.0}],"tipos":[{"tipo":"Bomba de fractura","activos":48,"fallas":202,"mtbf_h":1975,"mttr_h":78.5,"disponibilidad":96.2,"costo_usd":16077217.0},{"tipo":"Bomba de inyeccion","activos":34,"fallas":118,"mtbf_h":4213,"mttr_h":74.0,"disponibilidad":98.3,"costo_usd":5893193.0},{"tipo":"Compresor de gas","activos":30,"fallas":125,"mtbf_h":3960,"mttr_h":71.9,"disponibilidad":98.2,"costo_usd":13102564.0},{"tipo":"Bomba booster","activos":30,"fallas":61,"mtbf_h":6300,"mttr_h":73.4,"disponibilidad":98.8,"costo_usd":2613757.0}],"modelo":{"modelo":"Regresión logística (numpy, sin sklearn)","n_train":99,"n_test":43,"base_rate":0.408,"auc":0.921,"accuracy":0.907,"precision":0.929,"recall":0.812,"confusion":{"tp":13,"tn":26,"fp":1,"fn":3},"pesos":[{"feature":"vibracion_mm_s","etiqueta":"Vibración (mm/s)","peso":1.584},{"feature":"temp_prom_c","etiqueta":"Temperatura (°C)","peso":1.253},{"feature":"dias_desde_mant","etiqueta":"Días desde mantenimiento","peso":1.001},{"feature":"edad_meses","etiqueta":"Edad (meses)","peso":0.989},{"feature":"fallas_previas","etiqueta":"Fallas previas","peso":0.891},{"feature":"horas_operacion","etiqueta":"Horas de operación","peso":-0.571},{"feature":"carga_prom_pct","etiqueta":"Carga promedio (%)","peso":0.53},{"feature":"ciclos_arranque","etiqueta":"Ciclos de arranque","peso":0.146}],"watchlist":[{"activo_id":"EQ-011","tipo":"Bomba de fractura","criticidad":"Alta","prob":0.999,"vibracion":4.46,"temp":67.1,"horas":15532,"dias_mant":204,"fallas_previas":9},{"activo_id":"EQ-110","tipo":"Compresor de gas","criticidad":"Alta","prob":0.999,"vibracion":8.48,"temp":76.2,"horas":57939,"dias_mant":61,"fallas_previas":9},{"activo_id":"EQ-065","tipo":"Bomba de inyeccion","criticidad":"Media","prob":0.996,"vibracion":7.01,"temp":75.5,"horas":50866,"dias_mant":42,"fallas_previas":7},{"activo_id":"EQ-104","tipo":"Compresor de gas","criticidad":"Alta","prob":0.996,"vibracion":7.51,"temp":74.7,"horas":36322,"dias_mant":43,"fallas_previas":8},{"activo_id":"EQ-067","tipo":"Bomba de inyeccion","criticidad":"Media","prob":0.995,"vibracion":7.61,"temp":75.7,"horas":49233,"dias_mant":56,"fallas_previas":5},{"activo_id":"EQ-107","tipo":"Compresor de gas","criticidad":"Alta","prob":0.995,"vibracion":9.26,"temp":74.2,"horas":52583,"dias_mant":22,"fallas_previas":5},{"activo_id":"EQ-075","tipo":"Bomba de inyeccion","criticidad":"Media","prob":0.994,"vibracion":5.99,"temp":79.5,"horas":37910,"dias_mant":123,"fallas_previas":4},{"activo_id":"EQ-108","tipo":"Compresor de gas","criticidad":"Alta","prob":0.994,"vibracion":8.1,"temp":74.6,"horas":46549,"dias_mant":8,"fallas_previas":8},{"activo_id":"EQ-079","tipo":"Bomba de inyeccion","criticidad":"Media","prob":0.991,"vibracion":7.2,"temp":80.8,"horas":32462,"dias_mant":1,"fallas_previas":6},{"activo_id":"EQ-090","tipo":"Compresor de gas","criticidad":"Alta","prob":0.991,"vibracion":9.61,"temp":75.5,"horas":53835,"dias_mant":13,"fallas_previas":2},{"activo_id":"EQ-083","tipo":"Compresor de gas","criticidad":"Alta","prob":0.987,"vibracion":6.55,"temp":82.9,"horas":37614,"dias_mant":34,"fallas_previas":6},{"activo_id":"EQ-091","tipo":"Compresor de gas","criticidad":"Alta","prob":0.978,"vibracion":6.32,"temp":80.6,"horas":39801,"dias_mant":59,"fallas_previas":4}],"scatter":[{"x":15532,"y":4.46,"p":0.999,"crit":"Alta"},{"x":57939,"y":8.48,"p":0.999,"crit":"Alta"},{"x":50866,"y":7.01,"p":0.996,"crit":"Media"},{"x":36322,"y":7.51,"p":0.996,"crit":"Alta"},{"x":49233,"y":7.61,"p":0.995,"crit":"Media"},{"x":52583,"y":9.26,"p":0.995,"crit":"Alta"},{"x":37910,"y":5.99,"p":0.994,"crit":"Media"},{"x":46549,"y":8.1,"p":0.994,"crit":"Alta"},{"x":32462,"y":7.2,"p":0.991,"crit":"Media"},{"x":53835,"y":9.61,"p":0.991,"crit":"Alta"},{"x":37614,"y":6.55,"p":0.987,"crit":"Alta"},{"x":39801,"y":6.32,"p":0.978,"crit":"Alta"},{"x":41187,"y":6.69,"p":0.978,"crit":"Alta"},{"x":42446,"y":6.69,"p":0.975,"crit":"Alta"},{"x":26903,"y":5.1,"p":0.97,"crit":"Alta"},{"x":11917,"y":3.75,"p":0.967,"crit":"Alta"},{"x":33697,"y":5.76,"p":0.963,"crit":"Media"},{"x":28133,"y":5.67,"p":0.96,"crit":"Baja"},{"x":48079,"y":6.66,"p":0.956,"crit":"Alta"},{"x":29346,"y":5.3,"p":0.942,"crit":"Media"},{"x":25751,"y":5.87,"p":0.94,"crit":"Media"},{"x":36512,"y":5.45,"p":0.937,"crit":"Baja"},{"x":33924,"y":5.53,"p":0.88,"crit":"Media"},{"x":33902,"y":5.39,"p":0.871,"crit":"Media"},{"x":24654,"y":5.43,"p":0.87,"crit":"Alta"},{"x":36272,"y":6.36,"p":0.867,"crit":"Alta"},{"x":20428,"y":4.2,"p":0.866,"crit":"Baja"},{"x":20372,"y":4.24,"p":0.857,"crit":"Alta"},{"x":29221,"y":4.85,"p":0.842,"crit":"Baja"},{"x":28985,"y":4.31,"p":0.836,"crit":"Media"},{"x":41749,"y":4.65,"p":0.836,"crit":"Baja"},{"x":33524,"y":5.48,"p":0.834,"crit":"Alta"},{"x":41527,"y":5.95,"p":0.826,"crit":"Alta"},{"x":38851,"y":6.24,"p":0.797,"crit":"Alta"},{"x":22933,"y":5.06,"p":0.795,"crit":"Alta"},{"x":30577,"y":5.37,"p":0.795,"crit":"Media"},{"x":35273,"y":5.65,"p":0.788,"crit":"Baja"},{"x":30140,"y":6.35,"p":0.777,"crit":"Media"},{"x":36937,"y":6.14,"p":0.757,"crit":"Baja"},{"x":33428,"y":4.85,"p":0.75,"crit":"Media"},{"x":38683,"y":6.16,"p":0.744,"crit":"Media"},{"x":35562,"y":4.3,"p":0.736,"crit":"Baja"},{"x":23652,"y":4.36,"p":0.733,"crit":"Alta"},{"x":41207,"y":5.13,"p":0.717,"crit":"Media"},{"x":27059,"y":5.46,"p":0.69,"crit":"Media"},{"x":20936,"y":4.78,"p":0.681,"crit":"Alta"},{"x":31352,"y":5.49,"p":0.671,"crit":"Alta"},{"x":22869,"y":4.79,"p":0.67,"crit":"Media"},{"x":43999,"y":5.46,"p":0.665,"crit":"Baja"},{"x":43769,"y":7.22,"p":0.665,"crit":"Alta"},{"x":30777,"y":5.25,"p":0.642,"crit":"Alta"},{"x":22307,"y":4.99,"p":0.619,"crit":"Baja"},{"x":11851,"y":3.06,"p":0.615,"crit":"Alta"},{"x":29269,"y":4.47,"p":0.606,"crit":"Alta"},{"x":37237,"y":5.75,"p":0.569,"crit":"Media"},{"x":37875,"y":6.04,"p":0.568,"crit":"Baja"},{"x":24670,"y":6.03,"p":0.56,"crit":"Media"},{"x":24743,"y":3.39,"p":0.501,"crit":"Alta"},{"x":34979,"y":4.72,"p":0.493,"crit":"Alta"},{"x":35688,"y":4.41,"p":0.453,"crit":"Alta"},{"x":20317,"y":4.0,"p":0.449,"crit":"Media"},{"x":27404,"y":3.25,"p":0.425,"crit":"Alta"},{"x":29476,"y":4.56,"p":0.41,"crit":"Media"},{"x":23029,"y":5.72,"p":0.408,"crit":"Baja"},{"x":22857,"y":4.0,"p":0.367,"crit":"Alta"},{"x":25995,"y":4.49,"p":0.328,"crit":"Alta"},{"x":23770,"y":5.81,"p":0.288,"crit":"Baja"},{"x":16874,"y":4.55,"p":0.255,"crit":"Alta"},{"x":24414,"y":3.27,"p":0.247,"crit":"Alta"},{"x":20571,"y":4.59,"p":0.223,"crit":"Alta"},{"x":24651,"y":4.81,"p":0.191,"crit":"Media"},{"x":22874,"y":4.67,"p":0.178,"crit":"Alta"},{"x":32596,"y":4.28,"p":0.177,"crit":"Baja"},{"x":17962,"y":3.9,"p":0.158,"crit":"Alta"},{"x":17053,"y":3.53,"p":0.147,"crit":"Alta"},{"x":20124,"y":4.87,"p":0.145,"crit":"Baja"},{"x":33690,"y":4.9,"p":0.144,"crit":"Media"},{"x":25529,"y":2.38,"p":0.143,"crit":"Media"},{"x":22562,"y":5.39,"p":0.138,"crit":"Media"},{"x":39828,"y":5.63,"p":0.126,"crit":"Media"},{"x":21671,"y":4.18,"p":0.121,"crit":"Baja"},{"x":22608,"y":4.12,"p":0.114,"crit":"Alta"},{"x":18947,"y":4.71,"p":0.107,"crit":"Alta"},{"x":9077,"y":2.16,"p":0.102,"crit":"Alta"},{"x":16656,"y":2.73,"p":0.1,"crit":"Media"},{"x":18416,"y":3.21,"p":0.096,"crit":"Media"},{"x":13980,"y":3.29,"p":0.089,"crit":"Alta"},{"x":14126,"y":3.46,"p":0.082,"crit":"Media"},{"x":17767,"y":3.51,"p":0.079,"crit":"Media"},{"x":16714,"y":3.11,"p":0.071,"crit":"Alta"},{"x":16756,"y":3.16,"p":0.065,"crit":"Alta"},{"x":21501,"y":4.24,"p":0.062,"crit":"Baja"},{"x":15969,"y":3.87,"p":0.061,"crit":"Alta"},{"x":15899,"y":3.32,"p":0.06,"crit":"Media"},{"x":4366,"y":2.13,"p":0.056,"crit":"Alta"},{"x":14868,"y":2.86,"p":0.05,"crit":"Media"},{"x":29835,"y":2.91,"p":0.048,"crit":"Baja"},{"x":26652,"y":4.41,"p":0.046,"crit":"Baja"},{"x":20170,"y":4.34,"p":0.045,"crit":"Alta"},{"x":13900,"y":3.15,"p":0.044,"crit":"Media"},{"x":22999,"y":3.96,"p":0.042,"crit":"Baja"},{"x":8020,"y":3.41,"p":0.041,"crit":"Alta"},{"x":20423,"y":3.17,"p":0.04,"crit":"Media"},{"x":15500,"y":3.61,"p":0.035,"crit":"Alta"},{"x":10331,"y":2.79,"p":0.028,"crit":"Alta"},{"x":8073,"y":2.74,"p":0.021,"crit":"Baja"},{"x":17916,"y":2.19,"p":0.02,"crit":"Alta"},{"x":6310,"y":2.5,"p":0.019,"crit":"Alta"},{"x":12718,"y":3.22,"p":0.018,"crit":"Alta"},{"x":10438,"y":3.83,"p":0.017,"crit":"Alta"},{"x":5975,"y":3.41,"p":0.016,"crit":"Alta"},{"x":6042,"y":3.2,"p":0.015,"crit":"Alta"},{"x":16896,"y":2.81,"p":0.013,"crit":"Media"},{"x":7536,"y":3.23,"p":0.013,"crit":"Alta"},{"x":10909,"y":3.29,"p":0.012,"crit":"Alta"},{"x":12752,"y":2.79,"p":0.01,"crit":"Media"},{"x":4541,"y":2.39,"p":0.008,"crit":"Media"},{"x":9976,"y":2.42,"p":0.007,"crit":"Alta"},{"x":19821,"y":4.17,"p":0.007,"crit":"Baja"},{"x":25962,"y":3.09,"p":0.005,"crit":"Alta"},{"x":9273,"y":3.27,"p":0.005,"crit":"Baja"},{"x":6625,"y":1.43,"p":0.004,"crit":"Alta"},{"x":21387,"y":2.73,"p":0.004,"crit":"Media"},{"x":26381,"y":4.0,"p":0.004,"crit":"Alta"},{"x":4336,"y":1.6,"p":0.003,"crit":"Alta"},{"x":12462,"y":2.8,"p":0.003,"crit":"Alta"},{"x":10451,"y":1.92,"p":0.003,"crit":"Alta"},{"x":7286,"y":2.51,"p":0.003,"crit":"Baja"},{"x":7693,"y":1.26,"p":0.002,"crit":"Alta"},{"x":16011,"y":2.81,"p":0.002,"crit":"Alta"},{"x":8571,"y":2.02,"p":0.002,"crit":"Baja"},{"x":11639,"y":3.14,"p":0.002,"crit":"Baja"},{"x":3597,"y":2.09,"p":0.001,"crit":"Alta"},{"x":4366,"y":3.91,"p":0.001,"crit":"Alta"},{"x":3532,"y":1.19,"p":0.001,"crit":"Alta"},{"x":5261,"y":1.26,"p":0.001,"crit":"Alta"},{"x":6836,"y":1.72,"p":0.001,"crit":"Media"},{"x":14206,"y":3.14,"p":0.001,"crit":"Media"},{"x":6150,"y":2.77,"p":0.001,"crit":"Alta"},{"x":3134,"y":1.43,"p":0.001,"crit":"Baja"},{"x":4376,"y":2.17,"p":0.0,"crit":"Media"},{"x":6639,"y":2.06,"p":0.0,"crit":"Baja"}],"en_riesgo_alto":58}};
+const $ = s => document.querySelector(s);
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const fmt=(n,d=0)=>Number(n).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usd=n=>{const a=Math.abs(n); return a>=1e6?'US$ '+fmt(n/1e6,1)+' M':a>=1e3?'US$ '+fmt(n/1e3,0)+' k':'US$ '+fmt(n,0);};
+const m=D.meta, k=D.kpis, M=D.modelo;
+
+$('#banner').innerHTML = `<b>Datos de demostración.</b> Flota simulada de ${m.activos} equipos rotativos con
+  ${m.eventos} eventos de falla, período <span class="mono">${m.periodo}</span>. La lógica es realista; los datos no son de una operación real.`;
+
+const kpis=[
+  {lab:'Disponibilidad', val:fmt(k.disponibilidad,1), unit:'%', sub:'sobre horas programadas', good:k.disponibilidad>=97},
+  {lab:'MTBF', val:fmt(k.mtbf_h), unit:'h', sub:'entre fallas'},
+  {lab:'MTTR', val:fmt(k.mttr_h,1), unit:'h', sub:'por reparación'},
+  {lab:'Downtime', val:fmt(k.downtime_h/1000,1), unit:'k h', sub:'total del período'},
+  {lab:'Fallas', val:fmt(k.fallas), unit:'', sub:`${m.meses} meses`},
+  {lab:'Costo mant.', val:fmt(k.costo_mantenimiento_usd/1e6,1), unit:'M US$', sub:`${usd(k.costo_downtime_prom)}/evento`},
+];
+$('#kpis').innerHTML = kpis.map(x=>`<div class="tile ${x.good?'good':''}"><div class="lab">${x.lab}</div>
+  <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div><div class="sub">${x.sub}</div></div>`).join('');
+
+function ejeY(g,x0,y0,h,max,fn,ticks=4){for(let i=0;i<=ticks;i++){const v=max*i/ticks,y=y0-h*i/ticks;
+  g.appendChild(el('line',{x1:x0,y1:y,x2:x0+1,y2:y,class:'axis-line'}));
+  const t=el('text',{x:x0-8,y:y+3,'text-anchor':'end',class:'axis'});t.textContent=fn(v);g.appendChild(t);}}
+
+/* Disponibilidad (linea) + fallas (barras) */
+function dibujarDisp(){
+  const box=$('#c_disp');box.innerHTML='';const W=470,H=250,mL=40,mR=34,mT=14,mB=32,iw=W-mL-mR,ih=H-mT-mB;
+  const meses=D.serie.meses,disp=D.serie.disponibilidad,fallas=D.serie.fallas;
+  const maxF=Math.max(...fallas,1)*1.3,minD=Math.min(...disp)-2,rangeD=100-minD;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
+  for(let i=0;i<=4;i++){const v=minD+rangeD*i/4,y=ih-ih*i/4;g.appendChild(el('line',{x1:0,y1:y,x2:iw,y2:y,class:'axis-line'}));
+    const t=el('text',{x:-8,y:y+3,'text-anchor':'end',class:'axis'});t.textContent=fmt(v,0)+'%';g.appendChild(t);}
+  const bw=iw/meses.length*0.55;
+  fallas.forEach((v,i)=>{const x=iw*(i+0.5)/meses.length-bw/2,bh=ih*v/maxF;g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:2,fill:cssVar('--s2'),opacity:.75}));});
+  const pts=disp.map((v,i)=>[iw*(i+0.5)/meses.length, ih-ih*(v-minD)/rangeD]);
+  g.appendChild(el('path',{d:'M'+pts.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--s3'),'stroke-width':2.4}));
+  pts.forEach(p=>g.appendChild(el('circle',{cx:p[0],cy:p[1],r:2.2,fill:cssVar('--s3')})));
+  for(let i=0;i<=4;i++){const v=maxF*i/4,y=ih-ih*i/4;const t=el('text',{x:iw+8,y:y+3,'text-anchor':'start',class:'axis'});t.textContent=fmt(v,0);g.appendChild(t);}
+  meses.forEach((mm,i)=>{if(i%4===0||i===meses.length-1){const t=el('text',{x:iw*(i+0.5)/meses.length,y:ih+16,'text-anchor':'middle',class:'axis'});t.textContent=mm.slice(2);g.appendChild(t);}});
+  box.appendChild(svg);
+}
+
+/* Pareto */
+function dibujarPareto(){
+  const box=$('#c_pareto');box.innerHTML='';const W=470,H=250,mL=36,mR=34,mT=14,mB=56,iw=W-mL-mR,ih=H-mT-mB;
+  const p=D.pareto,max=Math.max(...p.map(x=>x.n))*1.15;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
+  ejeY(g,0,ih,ih,max,v=>fmt(v,0));
+  const bw=iw/p.length*0.66;
+  p.forEach((b,i)=>{const x=iw*(i+0.5)/p.length-bw/2,bh=ih*b.n/max;g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:2,fill:cssVar('--s1'),opacity:.9}));
+    const t=el('text',{x:iw*(i+0.5)/p.length,y:ih+14,'text-anchor':'end',class:'axis',transform:`rotate(-38 ${iw*(i+0.5)/p.length} ${ih+14})`});t.textContent=b.modo;g.appendChild(t);});
+  const cum=p.map((b,i)=>[iw*(i+0.5)/p.length, ih-ih*b.acum_pct/100]);
+  g.appendChild(el('path',{d:'M'+cum.map(c=>c.join(',')).join(' L'),fill:'none',stroke:cssVar('--accent'),'stroke-width':2,'stroke-dasharray':'4 3'}));
+  cum.forEach(c=>g.appendChild(el('circle',{cx:c[0],cy:c[1],r:2.4,fill:cssVar('--accent')})));
+  for(let i=0;i<=4;i++){const y=ih-ih*i/4;const t=el('text',{x:iw+8,y:y+3,'text-anchor':'start',class:'axis'});t.textContent=(25*i)+'%';g.appendChild(t);}
+  box.appendChild(svg);
+}
+
+/* Metrics + confusion */
+$('#metrics').innerHTML=[
+  {lab:'AUC', val:fmt(M.auc,3), sub:'poder de discriminación'},
+  {lab:'Accuracy', val:fmt(M.accuracy*100,0)+'%', sub:'aciertos en test'},
+  {lab:'Precision', val:fmt(M.precision*100,0)+'%', sub:'de los que marca, aciertan'},
+  {lab:'Recall', val:fmt(M.recall*100,0)+'%', sub:'de los que fallan, detecta'},
+].map(x=>`<div class="tile"><div class="lab">${x.lab}</div><div class="val">${x.val}</div><div class="sub">${x.sub}</div></div>`).join('');
+const c=M.confusion;
+$('#cm').innerHTML=`<div class="h"></div><div class="h">Pred: falla</div><div class="h">Pred: ok</div>
+  <div class="h">Real: falla</div><div class="cell tp">${c.tp}</div><div class="cell fn">${c.fn}</div>
+  <div class="h">Real: ok</div><div class="cell fp">${c.fp}</div><div class="cell tn">${c.tn}</div>`;
+
+/* Pesos (barras horizontales firmadas) */
+function dibujarPesos(){
+  const box=$('#c_pesos');const p=M.pesos,max=Math.max(...p.map(x=>Math.abs(x.peso)));
+  box.innerHTML=p.map(x=>{const w=100*Math.abs(x.peso)/max,pos=x.peso>=0;
+    return `<div style="display:flex;align-items:center;gap:10px;margin:7px 0;font-size:12px">
+      <span style="width:150px;color:var(--ink-2);text-align:right;flex:none">${x.etiqueta}</span>
+      <div style="flex:1;height:10px;background:var(--surface-2);border-radius:5px;overflow:hidden">
+        <div style="height:100%;width:${w}%;background:${pos?'var(--bad)':'var(--s1)'};border-radius:5px"></div></div>
+      <span class="mono" style="width:44px;color:var(--ink-3)">${fmt(x.peso,2)}</span></div>`;}).join('');
+}
+
+/* Scatter horas vs vibracion, color por prob */
+function dibujarScatter(){
+  const box=$('#c_scatter');box.innerHTML='';const W=470,H=250,mL=44,mR=12,mT=12,mB=34,iw=W-mL-mR,ih=H-mT-mB;
+  const s=D.modelo.scatter,maxX=Math.max(...s.map(p=>p.x))*1.05,maxY=Math.max(...s.map(p=>p.y))*1.05;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
+  ejeY(g,0,ih,ih,maxY,v=>fmt(v,0));
+  for(let i=0;i<=4;i++){const v=maxX*i/4,x=iw*i/4;const t=el('text',{x,y:ih+16,'text-anchor':'middle',class:'axis'});t.textContent=fmt(v/1000,0)+'k';g.appendChild(t);}
+  const col=p=>p>=0.5?cssVar('--bad'):p>=0.25?cssVar('--s4'):cssVar('--s3');
+  s.forEach(p=>{g.appendChild(el('circle',{cx:iw*p.x/maxX,cy:ih-ih*p.y/maxY,r:4,fill:col(p.p),opacity:.8}));});
+  const tx=el('text',{x:iw/2,y:ih+30,'text-anchor':'middle',class:'axis'});tx.textContent='horas de operación';g.appendChild(tx);
+  box.appendChild(svg);
+}
+
+function pintarTipos(){
+  $('#t_tipos tbody').innerHTML=D.tipos.map(r=>`<tr><td>${r.tipo}</td><td class="num">${r.activos}</td>
+    <td class="num">${r.fallas}</td><td class="num">${fmt(r.mtbf_h)}</td><td class="num">${fmt(r.mttr_h,1)}</td>
+    <td class="num" style="color:${r.disponibilidad>=97?'var(--ok)':r.disponibilidad>=94?'var(--warn)':'var(--bad)'}">${fmt(r.disponibilidad,1)}%</td>
+    <td class="num">${usd(r.costo_usd)}</td></tr>`).join('');
+}
+function badgeCrit(c){const k=c.toLowerCase();return `<span class="badge b-${k}">${c}</span>`;}
+function pintarWatch(){
+  $('#t_watch tbody').innerHTML=M.watchlist.map(r=>{const col=r.prob>=0.5?'var(--bad)':r.prob>=0.25?'var(--s4)':'var(--s3)';
+    return `<tr><td class="num">${r.activo_id}</td><td>${r.tipo}</td>
+    <td><span class="probbar"><div style="width:${Math.round(r.prob*100)}%;background:${col}"></div></span><span class="num">${fmt(r.prob*100,0)}%</span></td>
+    <td class="num">${fmt(r.vibracion,1)}</td><td class="num">${fmt(r.temp,0)}°</td><td class="num">${r.dias_mant}</td>
+    <td class="num">${r.fallas_previas}</td><td>${badgeCrit(r.criticidad)}</td></tr>`;}).join('');
+}
+
+dibujarDisp();dibujarPareto();dibujarPesos();dibujarScatter();pintarTipos();pintarWatch();
+</script>
+
+</body>
+</html>
