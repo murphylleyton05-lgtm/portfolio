@@ -43,6 +43,10 @@ FEATS = ["rama_m", "etapas", "arena_tn", "agua_m3", "arena_por_metro", "es_volat
 ETIQ = {"rama_m": "Longitud de rama (m)", "etapas": "Etapas", "arena_tn": "Arena total (t)",
         "agua_m3": "Agua (m³)", "arena_por_metro": "Arena por metro (t/m)", "es_volatil": "Ventana volátil"}
 
+# Los datos reales traen NaN/inf en algunas columnas (p.ej. intensidad cuando la
+# rama es 0 o falta un valor). Se descartan esas filas para no romper el modelo.
+df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=FEATS + ["eur_bbl"]).reset_index(drop=True)
+
 X = df[FEATS].to_numpy(dtype=float)
 y = np.log(df["eur_bbl"].to_numpy(dtype=float))   # log para domar la asimetría
 n = len(df)
@@ -62,10 +66,11 @@ def entrenar(Z, yv, lam=1.0):
     w = np.linalg.solve(Zi.T @ Zi + R, Zi.T @ yv)
     return w  # w[0] = intercepto
 
+YLO, YHI = y.min() - 3, y.max() + 3  # límites sanos para no desbordar el exp
 def r2_eur(Ztr_, Zte_, lam=1.0):
     """Entrena en train, evalúa R² (espacio EUR) y MAPE en test. Devuelve (r2, mape, pred_te)."""
     ww = entrenar(Ztr_, y[tr], lam)
-    pred_log = np.hstack([np.ones((len(Zte_), 1)), Zte_]) @ ww
+    pred_log = np.clip(np.hstack([np.ones((len(Zte_), 1)), Zte_]) @ ww, YLO, YHI)
     real, pred = np.exp(y[te]), np.exp(pred_log)
     r2_ = 1 - np.sum((real - pred) ** 2) / np.sum((real - real.mean()) ** 2)
     mape_ = float(np.mean(np.abs((real - pred) / real)) * 100)
