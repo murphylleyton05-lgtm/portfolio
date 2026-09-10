@@ -1,0 +1,8 @@
+proveedor_id,proveedor,material,origen,distancia_km,confiabilidad,lead_base_dias
+PRV-01,Arenera del Sur,Arena,Chelforo (RN),420,0.93,5
+PRV-02,Silice Patagonia,Arena,Dolavon (CH),610,0.86,7
+PRV-03,NQN Frac Sand,Arena,Anelo (NQN),95,0.9,2
+PRV-04,Arenas Cuyanas,Arena,San Rafael (MZA),780,0.8,8
+PRV-05,Combustibles del Alto,Gasoil,Plaza Huincul (NQN),110,0.95,2
+PRV-06,Distribuidora Neuquen,Gasoil,Neuquen (NQN),130,0.91,2
+PRV-07,Sur Energia,Gasoil,Bahia Blanca (BA),640,0.84,6

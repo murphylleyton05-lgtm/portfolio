@@ -1,0 +1,339 @@
+
+
+<div class="wrap">
+  <div class="eyebrow">Cuenca Neuquina · Logística de fractura</div>
+  <h1>Frac Sand &amp; Fuel Logistics</h1>
+  <p class="lede">Un set de fractura consume <b>cientos de toneladas de arena por etapa</b> y gasoil sin parar. Si la arena
+    no llega, el equipo se detiene y cada día parado cuesta una fortuna. Este panel sigue la cadena de suministro de
+    <b>arena</b> y <b>gasoil</b> hacia las locaciones: cumplimiento de entregas, tiempos, <b>stock</b> y <b>costo logístico</b>.</p>
+  <div class="banner" id="banner"></div>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <!-- Consumo mensual -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Consumo por mes</h2>
+        <p class="desc">Arena (barras, eje izquierdo) y gasoil (línea, eje derecho) entregados cada mes. La demanda sube
+          con la actividad de fractura y tiene estacionalidad.</p>
+      </div>
+    </div>
+    <div id="c_consumo"></div>
+    <div class="legend">
+      <span><i style="background:var(--s4)"></i>Arena (t)</span>
+      <span><i style="background:var(--accent-2)"></i>Gasoil (m³)</span>
+    </div>
+  </section>
+
+  <!-- Stock -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Stock de arena en el yard</h2>
+        <p class="desc">Nivel diario de arena disponible. La línea punteada es el <b>stock de seguridad</b>; cuando el
+          stock lo perfora, el riesgo de quiebre es alto. Los puntos marcan <b>días de quiebre</b> (equipo parado).</p>
+      </div>
+    </div>
+    <div id="c_stock"></div>
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>Stock de arena (t)</span>
+      <span><i style="background:var(--ink-3)"></i>Stock de seguridad</span>
+      <span><i style="background:var(--bad); width:10px; height:10px; border-radius:50%"></i>Día de quiebre</span>
+    </div>
+  </section>
+
+  <div class="two">
+    <!-- OTIF -->
+    <section class="panel" style="margin-top:26px">
+      <h2>Cumplimiento (OTIF) por mes</h2>
+      <p class="desc">% de envíos entregados <b>a tiempo y completos</b>.</p>
+      <div id="c_otif"></div>
+    </section>
+    <!-- Lead time hist -->
+    <section class="panel" style="margin-top:26px">
+      <h2>Distribución de lead time — arena</h2>
+      <p class="desc">Días desde la orden hasta la entrega. La cola larga es el riesgo.</p>
+      <div id="c_hist"></div>
+    </section>
+  </div>
+
+  <!-- Ranking proveedores -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Performance de proveedores</h2>
+        <p class="desc">Ordenados por OTIF. El lead time y el retraso muestran quién es confiable; el costo, quién es caro.</p>
+      </div>
+    </div>
+    <div class="scroll">
+      <table id="t_ranking">
+        <thead><tr>
+          <th>Proveedor</th><th>Material</th><th>Origen</th><th>Envíos</th><th>Volumen</th>
+          <th>OTIF</th><th>Lead (d)</th><th>Retraso (d)</th><th>Costo log.</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Costo -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>¿En qué se va el costo?</h2>
+        <p class="desc">Desglose del costo total de abastecimiento. El <b>flete</b> suele pesar tanto como la arena misma
+          cuando el yard está a cientos de kilómetros.</p>
+      </div>
+    </div>
+    <div id="c_costo"></div>
+  </section>
+
+  <div class="two">
+    <!-- Rutas -->
+    <section class="panel" style="margin-top:26px">
+      <h2>Rutas de abastecimiento</h2>
+      <p class="desc">Origen del proveedor y costo de flete acumulado.</p>
+      <div class="scroll">
+        <table id="t_rutas">
+          <thead><tr><th>Origen</th><th>Proveedor</th><th>Dist.</th><th>Envíos</th><th>US$/envío</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+    <!-- Recientes -->
+    <section class="panel" style="margin-top:26px">
+      <h2>Últimos envíos</h2>
+      <p class="desc">Las entregas más recientes y su estado.</p>
+      <div class="scroll">
+        <table id="t_recientes">
+          <thead><tr><th>Fecha</th><th>Material</th><th>Pad</th><th>Cant.</th><th>Estado</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Limitaciones -->
+  <section class="panel">
+    <h2>Lo que este panel no hace</h2>
+    <p class="desc">Declarar los límites es parte del trabajo: muestra que se sabe dónde termina el modelo.</p>
+    <div class="grid limits">
+      <div class="tile"><div class="val">Los datos son simulados</div><p>No son operaciones reales. La lógica de negocio (demanda, lead time, quiebres, costo de flete) es realista, pero los números salen de un generador con semilla fija, no de un ERP.</p></div>
+      <div class="tile"><div class="val">Un solo yard consolidado</div><p>El stock se modela sobre un depósito único. En la realidad hay varios yards y transferencias entre ellos, que acá no se representan.</p></div>
+      <div class="tile"><div class="val">Costo de standby aproximado</div><p>El costo de un set parado se toma como una tarifa fija por día. El costo real depende del contrato y de la etapa de la operación.</p></div>
+      <div class="tile"><div class="val">Sin optimización de ruteo</div><p>Muestra el costo de las rutas, pero no resuelve el ruteo óptimo ni el mix de proveedores. Es diagnóstico, no prescriptivo.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Proyecto de portfolio · <b>Data Analytics aplicado a Supply Chain</b> · datos simulados con Python (librería estándar).
+    Los CSV quedan en esquema estrella (dim_/fact_), listos para modelar en Power BI.
+  </footer>
+</div>
+
+<script>
+const D = /*__DATOS__*/{"meta":{"generado":"2026-09-01","periodo":"2024-10 a 2026-09","meses":24,"envios":834,"pads":12,"proveedores":7,"sets_fractura":3},"kpis":{"arena_total_t":3259369.0,"gasoil_total_m3":51159.0,"otif_pct":85.1,"a_tiempo_pct":91.6,"fill_rate_pct":93.4,"lead_prom_dias":5.3,"retraso_prom_dias":3.2,"cobertura_dias":7.7,"dias_quiebre":7,"dias_bajo_seguridad":51,"costo_logistico_usd":275736395.0,"costo_total_usd":598014851.0,"standby_usd":1015000.0,"costo_log_por_t":84.6},"serie":{"meses":["2024-10","2024-11","2024-12","2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08","2026-09"],"arena_t":[143090.0,117078.0,123356.0,123494.0,135407.0,151121.0,157676.0,139868.0,133796.0,126456.0,131786.0,155498.0,144889.0,134931.0,146446.0,145308.0,139016.0,166102.0,173339.0,153410.0,157910.0,156610.0,149140.0,162671.0],"gasoil_m3":[2087.0,1707.0,1799.0,1801.0,1975.0,2204.0,2299.0,2040.0,1951.0,1844.0,1922.0,2268.0,2113.0,1968.0,2136.0,2119.0,2027.0,2422.0,2528.0,2237.0,2303.0,2284.0,2175.0,2372.0],"otif_pct":[80.0,93.8,88.5,83.9,88.2,86.5,88.4,79.4,91.4,88.9,82.4,92.5,91.4,76.5,75.0,82.9,87.9,88.9,88.4,83.8,70.3,80.6,82.9,95.0]},"stock":{"fechas":["2024-10-01","2024-10-02","2024-10-03","2024-10-04","2024-10-05","2024-10-06","2024-10-07","2024-10-08","2024-10-09","2024-10-10","2024-10-11","2024-10-12","2024-10-13","2024-10-14","2024-10-15","2024-10-16","2024-10-17","2024-10-18","2024-10-19","2024-10-20","2024-10-21","2024-10-22","2024-10-23","2024-10-24","2024-10-25","2024-10-26","2024-10-27","2024-10-28","2024-10-29","2024-10-30","2024-10-31","2024-11-01","2024-11-02","2024-11-03","2024-11-04","2024-11-05","2024-11-06","2024-11-07","2024-11-08","2024-11-09","2024-11-10","2024-11-11","2024-11-12","2024-11-13","2024-11-14","2024-11-15","2024-11-16","2024-11-17","2024-11-18","2024-11-19","2024-11-20","2024-11-21","2024-11-22","2024-11-23","2024-11-24","2024-11-25","2024-11-26","2024-11-27","2024-11-28","2024-11-29","2024-11-30","2024-12-01","2024-12-02","2024-12-03","2024-12-04","2024-12-05","2024-12-06","2024-12-07","2024-12-08","2024-12-09","2024-12-10","2024-12-11","2024-12-12","2024-12-13","2024-12-14","2024-12-15","2024-12-16","2024-12-17","2024-12-18","2024-12-19","2024-12-20","2024-12-21","2024-12-22","2024-12-23","2024-12-24","2024-12-25","2024-12-26","2024-12-27","2024-12-28","2024-12-29","2024-12-30","2024-12-31","2025-01-01","2025-01-02","2025-01-03","2025-01-04","2025-01-05","2025-01-06","2025-01-07","2025-01-08","2025-01-09","2025-01-10","2025-01-11","2025-01-12","2025-01-13","2025-01-14","2025-01-15","2025-01-16","2025-01-17","2025-01-18","2025-01-19","2025-01-20","2025-01-21","2025-01-22","2025-01-23","2025-01-24","2025-01-25","2025-01-26","2025-01-27","2025-01-28","2025-01-29","2025-01-30","2025-01-31","2025-02-01","2025-02-02","2025-02-03","2025-02-04","2025-02-05","2025-02-06","2025-02-07","2025-02-08","2025-02-09","2025-02-10","2025-02-11","2025-02-12","2025-02-13","2025-02-14","2025-02-15","2025-02-16","2025-02-17","2025-02-18","2025-02-19","2025-02-20","2025-02-21","2025-02-22","2025-02-23","2025-02-24","2025-02-25","2025-02-26","2025-02-27","2025-02-28","2025-03-01","2025-03-02","2025-03-03","2025-03-04","2025-03-05","2025-03-06","2025-03-07","2025-03-08","2025-03-09","2025-03-10","2025-03-11","2025-03-12","2025-03-13","2025-03-14","2025-03-15","2025-03-16","2025-03-17","2025-03-18","2025-03-19","2025-03-20","2025-03-21","2025-03-22","2025-03-23","2025-03-24","2025-03-25","2025-03-26","2025-03-27","2025-03-28","2025-03-29","2025-03-30","2025-03-31","2025-04-01","2025-04-02","2025-04-03","2025-04-04","2025-04-05","2025-04-06","2025-04-07","2025-04-08","2025-04-09","2025-04-10","2025-04-11","2025-04-12","2025-04-13","2025-04-14","2025-04-15","2025-04-16","2025-04-17","2025-04-18","2025-04-19","2025-04-20","2025-04-21","2025-04-22","2025-04-23","2025-04-24","2025-04-25","2025-04-26","2025-04-27","2025-04-28","2025-04-29","2025-04-30","2025-05-01","2025-05-02","2025-05-03","2025-05-04","2025-05-05","2025-05-06","2025-05-07","2025-05-08","2025-05-09","2025-05-10","2025-05-11","2025-05-12","2025-05-13","2025-05-14","2025-05-15","2025-05-16","2025-05-17","2025-05-18","2025-05-19","2025-05-20","2025-05-21","2025-05-22","2025-05-23","2025-05-24","2025-05-25","2025-05-26","2025-05-27","2025-05-28","2025-05-29","2025-05-30","2025-05-31","2025-06-01","2025-06-02","2025-06-03","2025-06-04","2025-06-05","2025-06-06","2025-06-07","2025-06-08","2025-06-09","2025-06-10","2025-06-11","2025-06-12","2025-06-13","2025-06-14","2025-06-15","2025-06-16","2025-06-17","2025-06-18","2025-06-19","2025-06-20","2025-06-21","2025-06-22","2025-06-23","2025-06-24","2025-06-25","2025-06-26","2025-06-27","2025-06-28","2025-06-29","2025-06-30","2025-07-01","2025-07-02","2025-07-03","2025-07-04","2025-07-05","2025-07-06","2025-07-07","2025-07-08","2025-07-09","2025-07-10","2025-07-11","2025-07-12","2025-07-13","2025-07-14","2025-07-15","2025-07-16","2025-07-17","2025-07-18","2025-07-19","2025-07-20","2025-07-21","2025-07-22","2025-07-23","2025-07-24","2025-07-25","2025-07-26","2025-07-27","2025-07-28","2025-07-29","2025-07-30","2025-07-31","2025-08-01","2025-08-02","2025-08-03","2025-08-04","2025-08-05","2025-08-06","2025-08-07","2025-08-08","2025-08-09","2025-08-10","2025-08-11","2025-08-12","2025-08-13","2025-08-14","2025-08-15","2025-08-16","2025-08-17","2025-08-18","2025-08-19","2025-08-20","2025-08-21","2025-08-22","2025-08-23","2025-08-24","2025-08-25","2025-08-26","2025-08-27","2025-08-28","2025-08-29","2025-08-30","2025-08-31","2025-09-01","2025-09-02","2025-09-03","2025-09-04","2025-09-05","2025-09-06","2025-09-07","2025-09-08","2025-09-09","2025-09-10","2025-09-11","2025-09-12","2025-09-13","2025-09-14","2025-09-15","2025-09-16","2025-09-17","2025-09-18","2025-09-19","2025-09-20","2025-09-21","2025-09-22","2025-09-23","2025-09-24","2025-09-25","2025-09-26","2025-09-27","2025-09-28","2025-09-29","2025-09-30","2025-10-01","2025-10-02","2025-10-03","2025-10-04","2025-10-05","2025-10-06","2025-10-07","2025-10-08","2025-10-09","2025-10-10","2025-10-11","2025-10-12","2025-10-13","2025-10-14","2025-10-15","2025-10-16","2025-10-17","2025-10-18","2025-10-19","2025-10-20","2025-10-21","2025-10-22","2025-10-23","2025-10-24","2025-10-25","2025-10-26","2025-10-27","2025-10-28","2025-10-29","2025-10-30","2025-10-31","2025-11-01","2025-11-02","2025-11-03","2025-11-04","2025-11-05","2025-11-06","2025-11-07","2025-11-08","2025-11-09","2025-11-10","2025-11-11","2025-11-12","2025-11-13","2025-11-14","2025-11-15","2025-11-16","2025-11-17","2025-11-18","2025-11-19","2025-11-20","2025-11-21","2025-11-22","2025-11-23","2025-11-24","2025-11-25","2025-11-26","2025-11-27","2025-11-28","2025-11-29","2025-11-30","2025-12-01","2025-12-02","2025-12-03","2025-12-04","2025-12-05","2025-12-06","2025-12-07","2025-12-08","2025-12-09","2025-12-10","2025-12-11","2025-12-12","2025-12-13","2025-12-14","2025-12-15","2025-12-16","2025-12-17","2025-12-18","2025-12-19","2025-12-20","2025-12-21","2025-12-22","2025-12-23","2025-12-24","2025-12-25","2025-12-26","2025-12-27","2025-12-28","2025-12-29","2025-12-30","2025-12-31","2026-01-01","2026-01-02","2026-01-03","2026-01-04","2026-01-05","2026-01-06","2026-01-07","2026-01-08","2026-01-09","2026-01-10","2026-01-11","2026-01-12","2026-01-13","2026-01-14","2026-01-15","2026-01-16","2026-01-17","2026-01-18","2026-01-19","2026-01-20","2026-01-21","2026-01-22","2026-01-23","2026-01-24","2026-01-25","2026-01-26","2026-01-27","2026-01-28","2026-01-29","2026-01-30","2026-01-31","2026-02-01","2026-02-02","2026-02-03","2026-02-04","2026-02-05","2026-02-06","2026-02-07","2026-02-08","2026-02-09","2026-02-10","2026-02-11","2026-02-12","2026-02-13","2026-02-14","2026-02-15","2026-02-16","2026-02-17","2026-02-18","2026-02-19","2026-02-20","2026-02-21","2026-02-22","2026-02-23","2026-02-24","2026-02-25","2026-02-26","2026-02-27","2026-02-28","2026-03-01","2026-03-02","2026-03-03","2026-03-04","2026-03-05","2026-03-06","2026-03-07","2026-03-08","2026-03-09","2026-03-10","2026-03-11","2026-03-12","2026-03-13","2026-03-14","2026-03-15","2026-03-16","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26","2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02","2026-04-03","2026-04-04","2026-04-05","2026-04-06","2026-04-07","2026-04-08","2026-04-09","2026-04-10","2026-04-11","2026-04-12","2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-18","2026-04-19","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-25","2026-04-26","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-02","2026-05-03","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-09","2026-05-10","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15","2026-05-16","2026-05-17","2026-05-18","2026-05-19","2026-05-20","2026-05-21","2026-05-22","2026-05-23","2026-05-24","2026-05-25","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-05-30","2026-05-31","2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05","2026-06-06","2026-06-07","2026-06-08","2026-06-09","2026-06-10","2026-06-11","2026-06-12","2026-06-13","2026-06-14","2026-06-15","2026-06-16","2026-06-17","2026-06-18","2026-06-19","2026-06-20","2026-06-21","2026-06-22","2026-06-23","2026-06-24","2026-06-25","2026-06-26","2026-06-27","2026-06-28","2026-06-29","2026-06-30","2026-07-01","2026-07-02","2026-07-03","2026-07-04","2026-07-05","2026-07-06","2026-07-07","2026-07-08","2026-07-09","2026-07-10","2026-07-11","2026-07-12","2026-07-13","2026-07-14","2026-07-15","2026-07-16","2026-07-17","2026-07-18","2026-07-19","2026-07-20","2026-07-21","2026-07-22","2026-07-23","2026-07-24","2026-07-25","2026-07-26","2026-07-27","2026-07-28","2026-07-29","2026-07-30","2026-07-31","2026-08-01","2026-08-02","2026-08-03","2026-08-04","2026-08-05","2026-08-06","2026-08-07","2026-08-08","2026-08-09","2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-15","2026-08-16","2026-08-17","2026-08-18","2026-08-19","2026-08-20","2026-08-21","2026-08-22","2026-08-23","2026-08-24","2026-08-25","2026-08-26","2026-08-27","2026-08-28","2026-08-29","2026-08-30","2026-08-31"],"stock_t":[60502.0,56309.0,52746.0,49172.0,43658.0,38774.0,33365.0,28155.0,23446.0,17607.0,13305.0,8555.0,11788.0,23851.0,27229.0,22414.0,17269.0,13827.0,18916.0,14845.0,11315.0,7390.0,30769.0,26727.0,30722.0,37048.0,32768.0,28903.0,24889.0,19145.0,14146.0,10236.0,23718.0,19314.0,16147.0,12508.0,16619.0,12411.0,17428.0,13122.0,17454.0,24568.0,21258.0,27465.0,23966.0,29527.0,44212.0,39342.0,34617.0,31119.0,26877.0,23202.0,27477.0,32696.0,47246.0,43898.0,39861.0,38373.0,34286.0,37535.0,33852.0,30498.0,42631.0,38631.0,35563.0,41663.0,38554.0,43354.0,38724.0,43846.0,40840.0,37124.0,32040.0,36906.0,31877.0,27094.0,24203.0,37636.0,33252.0,29190.0,26693.0,31473.0,28359.0,33521.0,29645.0,24655.0,19838.0,16386.0,12405.0,26622.0,39734.0,34930.0,40387.0,36094.0,31867.0,28658.0,24088.0,29102.0,33419.0,38318.0,35449.0,32986.0,30074.0,43115.0,38287.0,33563.0,30009.0,27011.0,31118.0,26137.0,32071.0,28118.0,41124.0,45489.0,40912.0,37757.0,33829.0,29734.0,26275.0,21460.0,25840.0,31511.0,27440.0,30963.0,35867.0,31541.0,34293.0,29051.0,24383.0,19499.0,15689.0,11599.0,7201.0,11215.0,20033.0,24874.0,37476.0,32285.0,28183.0,22249.0,16439.0,13477.0,18402.0,22042.0,17979.0,14139.0,17102.0,28774.0,24012.0,18405.0,12737.0,17701.0,22912.0,27162.0,31574.0,34966.0,29466.0,24118.0,17921.0,14142.0,9533.0,14050.0,17240.0,39923.0,39419.0,34684.0,30022.0,34670.0,30478.0,24447.0,19728.0,22909.0,26876.0,32263.0,28999.0,23207.0,17051.0,20001.0,14174.0,28293.0,41451.0,46363.0,42142.0,38185.0,33286.0,26601.0,22036.0,15945.0,19797.0,14768.0,8166.0,37187.0,31767.0,25868.0,29018.0,33332.0,26697.0,21208.0,24752.0,19995.0,16042.0,10539.0,14215.0,7921.0,12754.0,6142.0,11200.0,6869.0,28169.0,35856.0,31380.0,27242.0,21745.0,17874.0,13123.0,26412.0,31125.0,35449.0,39851.0,35628.0,31864.0,26806.0,33079.0,28830.0,32914.0,28907.0,33894.0,46835.0,43403.0,38997.0,33226.0,27460.0,24027.0,20240.0,42991.0,46072.0,49560.0,44090.0,39908.0,36261.0,30905.0,25879.0,30112.0,33397.0,37163.0,33932.0,37679.0,35821.0,30953.0,34358.0,30811.0,27312.0,23834.0,30481.0,26590.0,21868.0,34715.0,30995.0,35168.0,40330.0,35899.0,30427.0,25102.0,39526.0,37825.0,33923.0,39623.0,34486.0,38631.0,43839.0,38777.0,34188.0,29908.0,26949.0,23840.0,21992.0,26021.0,21838.0,25914.0,39667.0,36391.0,42141.0,38500.0,33510.0,28754.0,32902.0,27912.0,24495.0,20988.0,35725.0,39985.0,35029.0,39716.0,35362.0,32071.0,27010.0,31098.0,25931.0,22076.0,17125.0,23193.0,44622.0,40926.0,35863.0,30892.0,25774.0,20783.0,24519.0,28644.0,34379.0,29242.0,33211.0,38533.0,33528.0,31486.0,27698.0,22744.0,29695.0,35654.0,32133.0,28291.0,32107.0,35726.0,32001.0,27413.0,23401.0,27016.0,31662.0,26365.0,23029.0,17658.0,14173.0,26823.0,32171.0,38414.0,33420.0,27574.0,22931.0,17440.0,12223.0,15898.0,28624.0,33174.0,36425.0,32688.0,26269.0,39040.0,33219.0,27334.0,21655.0,16866.0,30888.0,25541.0,28447.0,23804.0,17610.0,11789.0,16125.0,20479.0,33447.0,28547.0,33036.0,28934.0,23982.0,17521.0,12383.0,6655.0,10676.0,33418.0,28619.0,34238.0,30122.0,25632.0,20749.0,15670.0,29093.0,24570.0,29735.0,28025.0,31301.0,34782.0,30973.0,27386.0,22672.0,17650.0,22444.0,44099.0,38768.0,35682.0,40656.0,36769.0,33340.0,29334.0,24726.0,19136.0,15581.0,37811.0,32986.0,47157.0,42165.0,37681.0,33828.0,28937.0,25685.0,20555.0,15378.0,11871.0,42854.0,39173.0,42597.0,38055.0,34690.0,30824.0,25449.0,30024.0,24767.0,28255.0,24719.0,19981.0,23371.0,17887.0,13106.0,17051.0,21627.0,16297.0,13241.0,16508.0,11140.0,15559.0,11472.0,34548.0,29460.0,24032.0,19252.0,14193.0,10065.0,32266.0,31630.0,36522.0,32274.0,36486.0,32719.0,28705.0,23468.0,18198.0,14627.0,19354.0,23501.0,19000.0,15051.0,19598.0,22743.0,17796.0,12555.0,15900.0,10473.0,15065.0,29204.0,35110.0,38821.0,33206.0,27328.0,31724.0,35384.0,30576.0,25617.0,21664.0,17713.0,22179.0,27778.0,32549.0,27392.0,31886.0,28077.0,23476.0,19766.0,23796.0,38041.0,40918.0,36062.0,32615.0,27553.0,23822.0,28234.0,33700.0,29330.0,34441.0,30208.0,33467.0,29219.0,23554.0,17666.0,13390.0,18657.0,15028.0,18996.0,21569.0,26460.0,21078.0,24341.0,27941.0,22270.0,16055.0,11926.0,8294.0,13304.0,17992.0,38690.0,33547.0,29366.0,23847.0,18140.0,14099.0,26818.0,29650.0,34803.0,28487.0,30692.0,26510.0,40531.0,35737.0,38795.0,32062.0,27014.0,29975.0,34803.0,31200.0,25460.0,21297.0,24085.0,17676.0,20989.0,25852.0,29888.0,23681.0,27862.0,31646.0,35727.0,30351.0,25470.0,19063.0,12975.0,17312.0,19645.0,13880.0,7535.0,1555.0,0.0,2553.0,4257.0,0.0,11123.0,32115.0,30824.0,25254.0,18729.0,13700.0,24213.0,26406.0,21965.0,23919.0,27978.0,22314.0,16179.0,28761.0,24508.0,28691.0,23943.0,28170.0,30491.0,25229.0,18221.0,29812.0,24758.0,20565.0,22386.0,17949.0,14030.0,16713.0,29081.0,23604.0,27230.0,40183.0,34422.0,30601.0,26424.0,20944.0,16532.0,11357.0,24611.0,19577.0,17231.0,29481.0,25001.0,19490.0,15177.0,10917.0,7019.0,2923.0,0.0,0.0,21452.0,26395.0,40296.0,35391.0,29820.0,23551.0,23044.0,18420.0,21756.0,17394.0,21999.0,17680.0,45922.0,40558.0,35960.0,29298.0,23877.0,18031.0,13869.0,7519.0,29149.0,31824.0,26342.0,24852.0,19763.0,15430.0,11489.0,4925.0,7881.0,1668.0,5647.0,10553.0,12898.0,8951.0,4721.0,0.0,0.0,13637.0,18576.0,39800.0,43453.0,37579.0,33303.0,28187.0,40387.0,35497.0,38424.0,31986.0,27484.0,22090.0,25742.0,28951.0,22633.0,18408.0,14174.0,8668.0,4586.0,9528.0,14639.0,19956.0,27720.0,22403.0,26877.0,22585.0,18608.0,12982.0,17120.0,11538.0,14580.0,8993.0,21839.0,16594.0,10615.0,14944.0,10013.0,4804.0,0.0,12304.0,26729.0,25024.0,20731.0,15250.0,22508.0,18267.0,23455.0,18136.0,30657.0,24654.0,19841.0,24061.0,29347.0,25776.0,21148.0,25897.0,21758.0,18048.0,37763.0,40988.0,35975.0],"seguridad_t":12000,"objetivo_t":78000,"quiebres":[547,550,599,600,636,637,677]},"costo_desglose":[{"concepto":"Arena (material)","usd":273677406.0},{"concepto":"Gasoil (material)","usd":48601050.0},{"concepto":"Transporte / flete","usd":241383596.0},{"concepto":"Almacenamiento","usd":1129599.0},{"concepto":"Demoras (demurrage)","usd":32208200},{"concepto":"Standby por quiebre","usd":1015000.0}],"ranking":[{"proveedor":"Combustibles del Alto","material":"Gasoil","origen":"Plaza Huincul (NQN)","distancia_km":110,"envios":209,"volumen":24890.0,"unidad":"m3","otif":90.4,"lead_dias":3.1,"retraso_dias":0,"costo_log_usd":598472.0},{"proveedor":"Arenera del Sur","material":"Arena","origen":"Chelforo (RN)","distancia_km":420,"envios":165,"volumen":1371215.0,"unidad":"t","otif":89.1,"lead_dias":6.1,"retraso_dias":0.02,"costo_log_usd":99669643.0},{"proveedor":"Sur Energia","material":"Gasoil","origen":"Bahia Blanca (BA)","distancia_km":640,"envios":106,"volumen":12643.0,"unidad":"m3","otif":84.9,"lead_dias":7.2,"retraso_dias":0.26,"costo_log_usd":1112185.0},{"proveedor":"Distribuidora Neuquen","material":"Gasoil","origen":"Neuquen (NQN)","distancia_km":130,"envios":115,"volumen":13626.0,"unidad":"m3","otif":82.6,"lead_dias":3,"retraso_dias":0.06,"costo_log_usd":386484.0},{"proveedor":"NQN Frac Sand","material":"Arena","origen":"Anelo (NQN)","distancia_km":95,"envios":76,"volumen":595928.0,"unidad":"t","otif":81.6,"lead_dias":3,"retraso_dias":0.04,"costo_log_usd":17564514.0},{"proveedor":"Silice Patagonia","material":"Arena","origen":"Dolavon (CH)","distancia_km":610,"envios":102,"volumen":792162.0,"unidad":"t","otif":79.4,"lead_dias":8.4,"retraso_dias":0.39,"costo_log_usd":87529634.0},{"proveedor":"Arenas Cuyanas","material":"Arena","origen":"San Rafael (MZA)","distancia_km":780,"envios":61,"volumen":500064.0,"unidad":"t","otif":75.4,"lead_dias":9.5,"retraso_dias":0.44,"costo_log_usd":66730864.0}],"hist_lead":[{"rango":"0-2","n":29},{"rango":"3-4","n":49},{"rango":"5-6","n":105},{"rango":"7-8","n":138},{"rango":"9-11","n":66},{"rango":"12+","n":17}],"rutas":[{"origen":"Chelforo (RN)","proveedor":"Arenera del Sur","distancia_km":420,"envios":165,"costo_flete_usd":93785943.0,"costo_prom_envio_usd":568400.0},{"origen":"Dolavon (CH)","proveedor":"Silice Patagonia","distancia_km":610,"envios":102,"costo_flete_usd":73389884.0,"costo_prom_envio_usd":719509.0},{"origen":"San Rafael (MZA)","proveedor":"Arenas Cuyanas","distancia_km":780,"envios":61,"costo_flete_usd":57309464.0,"costo_prom_envio_usd":939499.0},{"origen":"Anelo (NQN)","proveedor":"NQN Frac Sand","distancia_km":95,"envios":76,"costo_flete_usd":15033214.0,"costo_prom_envio_usd":197805.0},{"origen":"Bahia Blanca (BA)","proveedor":"Sur Energia","distancia_km":640,"envios":106,"costo_flete_usd":1002535.0,"costo_prom_envio_usd":9458.0},{"origen":"Plaza Huincul (NQN)","proveedor":"Combustibles del Alto","distancia_km":110,"envios":209,"costo_flete_usd":537272.0,"costo_prom_envio_usd":2571.0},{"origen":"Neuquen (NQN)","proveedor":"Distribuidora Neuquen","distancia_km":130,"envios":115,"costo_flete_usd":325284.0,"costo_prom_envio_usd":2829.0}],"recientes":[{"folio":"ENV-00824","fecha_real":"2026-10-03","material":"Gasoil grado 2","proveedor":"Sur Energia","pad":"Fortin de Piedra","cant_real":119.4,"unidad":"m3","retraso_dias":0,"estado":"OTIF"},{"folio":"ENV-00821","fecha_real":"2026-09-29","material":"Gasoil grado 2","proveedor":"Sur Energia","pad":"Loma Campana","cant_real":121.0,"unidad":"m3","retraso_dias":0,"estado":"OTIF"},{"folio":"ENV-00827","fecha_real":"2026-09-29","material":"Gasoil grado 2","proveedor":"Combustibles del Alto","pad":"Bandurria Sur","cant_real":119.7,"unidad":"m3","retraso_dias":0,"estado":"OTIF"},{"folio":"ENV-00820","fecha_real":"2026-09-26","material":"Gasoil grado 2","proveedor":"Distribuidora Neuquen","pad":"Aguada Pichana","cant_real":120.1,"unidad":"m3","retraso_dias":0,"estado":"OTIF"},{"folio":"ENV-00830","fecha_real":"2026-09-26","material":"Gasoil grado 2","proveedor":"Sur Energia","pad":"Bandurria Sur","cant_real":119.2,"unidad":"m3","retraso_dias":-1,"estado":"OTIF"},{"folio":"ENV-00817","fecha_real":"2026-09-25","material":"Gasoil grado 2","proveedor":"Combustibles del Alto","pad":"Aguada Federal","cant_real":119.7,"unidad":"m3","retraso_dias":0,"estado":"OTIF"},{"folio":"ENV-00403","fecha_real":"2026-08-30","material":"Arena gruesa (40/70)","proveedor":"Silice Patagonia","pad":"Los Toldos","cant_real":8941.5,"unidad":"t","retraso_dias":-1,"estado":"OTIF"},{"folio":"ENV-00401","fecha_real":"2026-08-29","material":"Arena fina (100 mesh)","proveedor":"Silice Patagonia","pad":"Bajada del Palo","cant_real":9058.2,"unidad":"t","retraso_dias":0,"estado":"OTIF"},{"folio":"ENV-00402","fecha_real":"2026-08-29","material":"Arena fina (100 mesh)","proveedor":"Silice Patagonia","pad":"Bandurria Sur","cant_real":7788.0,"unidad":"t","retraso_dias":-1,"estado":"Incompleto"},{"folio":"ENV-00404","fecha_real":"2026-08-29","material":"Arena gruesa (40/70)","proveedor":"Arenera del Sur","pad":"Aguada Federal","cant_real":8924.0,"unidad":"t","retraso_dias":2,"estado":"Demorado"},{"folio":"ENV-00400","fecha_real":"2026-08-26","material":"Arena fina (100 mesh)","proveedor":"NQN Frac Sand","pad":"Coiron Amargo","cant_real":9080.9,"unidad":"t","retraso_dias":0,"estado":"OTIF"},{"folio":"ENV-00397","fecha_real":"2026-08-23","material":"Arena fina (100 mesh)","proveedor":"Arenera del Sur","pad":"Los Toldos","cant_real":8966.9,"unidad":"t","retraso_dias":3,"estado":"Demorado"}]};
+
+const $ = s => document.querySelector(s);
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+const fmt = (n,d=0) => Number(n).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+function usd(n){ const a=Math.abs(n);
+  if(a>=1e6) return 'US$ '+fmt(n/1e6,1)+' M';
+  if(a>=1e3) return 'US$ '+fmt(n/1e3,0)+' k';
+  return 'US$ '+fmt(n,0);
+}
+
+/* ---------- Banner + KPIs ---------- */
+const m = D.meta, k = D.kpis;
+$('#banner').innerHTML = `<b>Datos de demostración.</b> ${fmt(m.envios)} envíos simulados hacia ${m.pads} locaciones,
+  ${m.sets_fractura} sets de fractura, período <span class="mono">${m.periodo}</span>. La lógica de la cadena es
+  realista; los datos no son de una operación real.`;
+
+const kpis = [
+  {lab:'OTIF', val:fmt(k.otif_pct,1), unit:'%', sub:'a tiempo y completo'},
+  {lab:'Arena entregada', val:fmt(k.arena_total_t/1e6,2), unit:'M t', sub:`${fmt(k.gasoil_total_m3)} m³ de gasoil`},
+  {lab:'Lead time', val:fmt(k.lead_prom_dias,1), unit:'d', sub:`retraso medio ${fmt(k.retraso_prom_dias,1)} d`},
+  {lab:'Cobertura de stock', val:fmt(k.cobertura_dias,1), unit:'d', sub:`seguridad ${fmt(D.stock.seguridad_t/1000,0)}k t`},
+  {lab:'Días de quiebre', val:fmt(k.dias_quiebre), unit:'', sub:`${fmt(k.dias_bajo_seguridad)} d bajo seguridad`, alert:k.dias_quiebre>0},
+  {lab:'Costo logístico', val:fmt(k.costo_logistico_usd/1e6,0), unit:'M US$', sub:`${fmt(k.costo_log_por_t,1)} US$/t de arena`},
+];
+$('#kpis').innerHTML = kpis.map(x=>`
+  <div class="tile ${x.alert?'alert':''}">
+    <div class="lab">${x.lab}</div>
+    <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div>
+    <div class="sub">${x.sub}</div>
+  </div>`).join('');
+
+/* ---------- helpers de ejes ---------- */
+function ejeY(g, x0, y0, h, max, fmtFn, ticks=4){
+  for(let i=0;i<=ticks;i++){
+    const v = max*i/ticks, y = y0 - h*i/ticks;
+    g.appendChild(el('line',{x1:x0,y1:y,x2:x0+1,y2:y,class:'axis-line'}));
+    const t=el('text',{x:x0-8,y:y+3,'text-anchor':'end',class:'axis'}); t.textContent=fmtFn(v); g.appendChild(t);
+  }
+}
+
+/* ---------- Consumo mensual: barras arena + linea gasoil (dual eje) ---------- */
+function dibujarConsumo(){
+  const box=$('#c_consumo'); box.innerHTML='';
+  const W=980,H=300, mL=54,mR=54,mT=14,mB=42;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const meses=D.serie.meses, arena=D.serie.arena_t, gas=D.serie.gasoil_m3;
+  const maxA=Math.max(...arena)*1.1, maxG=Math.max(...gas)*1.2;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const g=el('g',{transform:`translate(${mL},${mT})`}); svg.appendChild(g);
+  ejeY(g,0,ih,ih,maxA, v=>fmt(v/1000,0)+'k');
+  // barras arena
+  const bw=iw/meses.length*0.6;
+  meses.forEach((mm,i)=>{
+    const x=iw*(i+0.5)/meses.length - bw/2;
+    const bh=ih*arena[i]/maxA;
+    g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:3,fill:cssVar('--s4'),opacity:.9}));
+    if(i%3===0 || i===meses.length-1){
+      const t=el('text',{x:iw*(i+0.5)/meses.length,y:ih+16,'text-anchor':'middle',class:'axis'});
+      t.textContent=mm.slice(2); g.appendChild(t);
+    }
+  });
+  // linea gasoil
+  const pts=gas.map((v,i)=>[iw*(i+0.5)/meses.length, ih-ih*v/maxG]);
+  g.appendChild(el('path',{d:'M'+pts.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--accent-2'),'stroke-width':2.4}));
+  pts.forEach(p=>g.appendChild(el('circle',{cx:p[0],cy:p[1],r:2.6,fill:cssVar('--accent-2')})));
+  // eje derecho gasoil
+  for(let i=0;i<=4;i++){ const v=maxG*i/4, y=ih-ih*i/4;
+    const t=el('text',{x:iw+8,y:y+3,'text-anchor':'start',class:'axis'}); t.textContent=fmt(v/1000,1)+'k'; g.appendChild(t);
+  }
+  box.appendChild(svg);
+}
+
+/* ---------- Stock diario con umbral y quiebres ---------- */
+function dibujarStock(){
+  const box=$('#c_stock'); box.innerHTML='';
+  const W=980,H=320, mL=56,mR=16,mT=14,mB=34;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const st=D.stock.stock_t, seg=D.stock.seguridad_t, fechas=D.stock.fechas;
+  const max=Math.max(...st, seg)*1.1;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const g=el('g',{transform:`translate(${mL},${mT})`}); svg.appendChild(g);
+  ejeY(g,0,ih,ih,max, v=>fmt(v/1000,0)+'k');
+  const X=i=>iw*i/(st.length-1), Y=v=>ih-ih*Math.max(0,v)/max;
+  // area
+  const line=st.map((v,i)=>[X(i),Y(v)]);
+  const area='M'+line.map(p=>p.join(',')).join(' L')+` L${X(st.length-1)},${ih} L0,${ih} Z`;
+  const grad=el('linearGradient',{id:'gst',x1:0,y1:0,x2:0,y2:1});
+  grad.appendChild(el('stop',{offset:'0%','stop-color':cssVar('--accent'),'stop-opacity':.28}));
+  grad.appendChild(el('stop',{offset:'100%','stop-color':cssVar('--accent'),'stop-opacity':0}));
+  svg.appendChild(grad);
+  g.appendChild(el('path',{d:area,fill:'url(#gst)'}));
+  g.appendChild(el('path',{d:'M'+line.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--accent'),'stroke-width':2}));
+  // umbral seguridad
+  g.appendChild(el('line',{x1:0,y1:Y(seg),x2:iw,y2:Y(seg),stroke:cssVar('--ink-3'),'stroke-width':1.3,'stroke-dasharray':'6 5'}));
+  // quiebres
+  D.stock.quiebres.forEach(i=>{
+    g.appendChild(el('circle',{cx:X(i),cy:ih,r:4.5,fill:cssVar('--bad')}));
+  });
+  // eje X (meses)
+  fechas.forEach((f,i)=>{ if(f.slice(8)==='01' && f.slice(5,7)%3===1){
+    const t=el('text',{x:X(i),y:ih+18,'text-anchor':'middle',class:'axis'}); t.textContent=f.slice(2,7); g.appendChild(t);
+  }});
+  box.appendChild(svg);
+}
+
+/* ---------- OTIF por mes ---------- */
+function dibujarOtif(){
+  const box=$('#c_otif'); box.innerHTML='';
+  const W=460,H=240, mL=40,mR=12,mT=12,mB=32;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const v=D.serie.otif_pct, meses=D.serie.meses;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const g=el('g',{transform:`translate(${mL},${mT})`}); svg.appendChild(g);
+  ejeY(g,0,ih,ih,100, x=>fmt(x,0)+'%',5);
+  const X=i=>iw*i/(v.length-1), Y=x=>ih-ih*x/100;
+  const line=v.map((x,i)=>[X(i),Y(x)]);
+  g.appendChild(el('path',{d:'M'+line.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--s3'),'stroke-width':2.4}));
+  line.forEach(p=>g.appendChild(el('circle',{cx:p[0],cy:p[1],r:2.4,fill:cssVar('--s3')})));
+  meses.forEach((mm,i)=>{ if(i%4===0||i===meses.length-1){
+    const t=el('text',{x:X(i),y:ih+16,'text-anchor':'middle',class:'axis'}); t.textContent=mm.slice(2); g.appendChild(t);}});
+  box.appendChild(svg);
+}
+
+/* ---------- Histograma lead time ---------- */
+function dibujarHist(){
+  const box=$('#c_hist'); box.innerHTML='';
+  const W=460,H=240, mL=40,mR=12,mT=12,mB=36;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const h=D.hist_lead, max=Math.max(...h.map(x=>x.n))*1.1;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const g=el('g',{transform:`translate(${mL},${mT})`}); svg.appendChild(g);
+  ejeY(g,0,ih,ih,max, x=>fmt(x,0));
+  const bw=iw/h.length*0.7;
+  h.forEach((b,i)=>{
+    const x=iw*(i+0.5)/h.length-bw/2, bh=ih*b.n/max;
+    const col = i>=4 ? cssVar('--bad') : cssVar('--s1');
+    g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:3,fill:col,opacity:.9}));
+    const t=el('text',{x:iw*(i+0.5)/h.length,y:ih+16,'text-anchor':'middle',class:'axis'}); t.textContent=b.rango; g.appendChild(t);
+  });
+  const cap=el('text',{x:iw/2,y:ih+30,'text-anchor':'middle',class:'axis'}); cap.textContent='días'; g.appendChild(cap);
+  box.appendChild(svg);
+}
+
+/* ---------- Costo desglose (barras horizontales) ---------- */
+function dibujarCosto(){
+  const box=$('#c_costo'); box.innerHTML='';
+  const d=D.costo_desglose.filter(x=>x.usd>0).sort((a,b)=>b.usd-a.usd);
+  const total=d.reduce((s,x)=>s+x.usd,0);
+  const max=Math.max(...d.map(x=>x.usd));
+  const cols=[cssVar('--s4'),cssVar('--s1'),cssVar('--accent-2'),cssVar('--s3'),cssVar('--s5'),cssVar('--bad')];
+  box.innerHTML = d.map((x,i)=>{
+    const w=100*x.usd/max, p=100*x.usd/total;
+    return `<div style="margin:11px 0">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+        <span>${x.concepto}</span>
+        <span class="mono" style="color:var(--ink-2)">${usd(x.usd)} · ${fmt(p,0)}%</span>
+      </div>
+      <div style="height:12px;background:var(--surface-2);border-radius:6px;overflow:hidden">
+        <div style="height:100%;width:${w}%;background:${cols[i%cols.length]};border-radius:6px"></div>
+      </div></div>`;
+  }).join('') + `<div style="margin-top:14px;font-size:12.5px;color:var(--ink-3)" class="mono">Total abastecimiento: ${usd(total)}</div>`;
+}
+
+/* ---------- Tablas ---------- */
+function badge(estado){
+  if(estado==='OTIF') return '<span class="badge b-ok">OTIF</span>';
+  if(estado==='Incompleto') return '<span class="badge b-warn">Incompleto</span>';
+  return '<span class="badge b-bad">'+estado+'</span>';
+}
+function pintarRanking(){
+  $('#t_ranking tbody').innerHTML = D.ranking.map(r=>`<tr>
+    <td>${r.proveedor}</td><td>${r.material}</td><td>${r.origen}</td>
+    <td class="num">${fmt(r.envios)}</td>
+    <td class="num">${fmt(r.volumen)} ${r.unidad}</td>
+    <td class="num" style="color:${r.otif>=85?'var(--ok)':r.otif>=75?'var(--warn)':'var(--bad)'}">${fmt(r.otif,1)}%</td>
+    <td class="num">${fmt(r.lead_dias,1)}</td>
+    <td class="num">${fmt(r.retraso_dias,2)}</td>
+    <td class="num">${usd(r.costo_log_usd)}</td></tr>`).join('');
+}
+function pintarRutas(){
+  $('#t_rutas tbody').innerHTML = D.rutas.slice(0,8).map(r=>`<tr>
+    <td>${r.origen}</td><td>${r.proveedor}</td>
+    <td class="num">${fmt(r.distancia_km)} km</td>
+    <td class="num">${fmt(r.envios)}</td>
+    <td class="num">${usd(r.costo_prom_envio_usd)}</td></tr>`).join('');
+}
+function pintarRecientes(){
+  $('#t_recientes tbody').innerHTML = D.recientes.map(r=>`<tr>
+    <td class="num">${r.fecha_real.slice(2)}</td>
+    <td>${r.material.replace(' (100 mesh)','').replace(' (40/70)','').replace(' grado 2','')}</td>
+    <td>${r.pad}</td>
+    <td class="num">${fmt(r.cant_real)} ${r.unidad}</td>
+    <td>${badge(r.estado)}</td></tr>`).join('');
+}
+
+function render(){
+  dibujarConsumo(); dibujarStock(); dibujarOtif(); dibujarHist(); dibujarCosto();
+  pintarRanking(); pintarRutas(); pintarRecientes();
+}
+render();
+</script>

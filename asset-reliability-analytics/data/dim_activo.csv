@@ -1,0 +1,143 @@
+activo_id,tipo,marca,ubicacion,edad_meses,horas_operacion,ciclos_arranque,vibracion_mm_s,temp_prom_c,dias_desde_mant,carga_prom_pct,fallas_previas,criticidad,fallo_30d
+EQ-001,Bomba de fractura,SPM,Rincon La Ceniza,79,28985,1451,4.31,64.9,128,73.0,2,Media,1
+EQ-002,Bomba de fractura,FMC,Rincon La Ceniza,15,4541,412,2.39,53.9,71,82.0,2,Media,0
+EQ-003,Bomba de fractura,Gardner Denver,Bajada del Palo,60,22608,2289,4.12,57.9,2,74.0,5,Alta,0
+EQ-004,Bomba de fractura,FMC,Aguada Pichana,42,15500,894,3.61,54.0,20,74.0,5,Alta,0
+EQ-005,Bomba de fractura,SPM,Bajada del Palo,74,22933,3779,5.06,62.1,13,74.0,7,Alta,1
+EQ-006,Bomba de fractura,Gardner Denver,Aguada Pichana,72,24414,1261,3.27,71.3,9,63.0,4,Alta,0
+EQ-007,Bomba de fractura,SPM,El Trapial,14,4366,369,2.13,63.6,71,81.0,4,Alta,1
+EQ-008,Bomba de fractura,Gardner Denver,Bajada del Palo,53,17962,988,3.9,56.9,33,69.0,6,Alta,0
+EQ-009,Bomba de fractura,Gardner Denver,Bajada del Palo,80,27404,2402,3.25,64.4,24,90.0,4,Alta,0
+EQ-010,Bomba de fractura,Gardner Denver,Aguada Pichana,80,22857,2415,4.0,63.8,1,70.0,5,Alta,0
+EQ-011,Bomba de fractura,Gardner Denver,Fortin de Piedra,50,15532,1159,4.46,67.1,204,81.0,9,Alta,1
+EQ-012,Bomba de fractura,FMC,Loma Campana,40,10909,859,3.29,51.5,60,68.0,2,Alta,0
+EQ-013,Bomba de fractura,FMC,Bajada del Palo,46,16756,1373,3.16,64.8,12,70.0,4,Alta,0
+EQ-014,Bomba de fractura,FMC,Loma Campana,83,30777,5051,5.25,61.9,10,60.0,6,Alta,1
+EQ-015,Bomba de fractura,Gardner Denver,Fortin de Piedra,73,25962,1704,3.09,59.9,7,42.0,1,Alta,0
+EQ-016,Bomba de fractura,Gardner Denver,Bajada del Palo,32,11917,730,3.75,62.8,210,89.0,5,Alta,1
+EQ-017,Bomba de fractura,SPM,Bandurria Sur,46,16874,871,4.55,60.4,52,61.0,5,Alta,0
+EQ-018,Bomba de fractura,FMC,Bajada del Palo,39,12718,550,3.22,58.1,34,64.0,3,Alta,0
+EQ-019,Bomba de fractura,SPM,Rincon La Ceniza,29,9077,940,2.16,71.0,87,57.0,3,Alta,0
+EQ-020,Bomba de fractura,Gardner Denver,Aguada Pichana,53,17053,1020,3.53,59.9,33,82.0,4,Alta,0
+EQ-021,Bomba de fractura,FMC,Rincon La Ceniza,13,3597,268,2.09,52.5,20,91.0,1,Alta,0
+EQ-022,Bomba de fractura,FMC,Bajada del Palo,63,20571,915,4.59,63.0,1,72.0,4,Alta,0
+EQ-023,Bomba de fractura,Gardner Denver,Bajada del Palo,20,6625,988,1.43,65.9,31,70.0,1,Alta,0
+EQ-024,Bomba de fractura,Gardner Denver,Bajada del Palo,72,25751,1443,5.87,59.1,66,79.0,7,Media,1
+EQ-025,Bomba de fractura,FMC,Aguada Pichana,76,20936,1730,4.78,58.9,52,84.0,4,Alta,1
+EQ-026,Bomba de fractura,SPM,Aguada Pichana,73,25995,3122,4.49,66.9,5,51.0,5,Alta,0
+EQ-027,Bomba de fractura,Gardner Denver,Bajada del Palo,67,22874,1316,4.67,59.7,27,58.0,4,Alta,1
+EQ-028,Bomba de fractura,SPM,Bajada del Palo,16,4366,246,3.91,51.1,14,71.0,0,Alta,0
+EQ-029,Bomba de fractura,SPM,Fortin de Piedra,41,13980,1787,3.29,63.1,34,88.0,2,Alta,0
+EQ-030,Bomba de fractura,Gardner Denver,Bajada del Palo,57,16714,1598,3.11,60.4,3,73.0,5,Alta,1
+EQ-031,Bomba de fractura,SPM,Rincon La Ceniza,29,8073,409,2.74,60.4,4,83.0,4,Baja,0
+EQ-032,Bomba de fractura,Gardner Denver,Loma Campana,29,10438,608,3.83,53.9,51,72.0,2,Alta,0
+EQ-033,Bomba de fractura,FMC,Rincon La Ceniza,57,20170,966,4.34,49.0,4,71.0,6,Alta,0
+EQ-034,Bomba de fractura,Gardner Denver,Aguada Pichana,20,5975,381,3.41,62.0,3,93.0,1,Alta,0
+EQ-035,Bomba de fractura,FMC,Bajada del Palo,16,6042,263,3.2,64.0,1,75.0,3,Alta,1
+EQ-036,Bomba de fractura,Gardner Denver,Loma Campana,65,22869,1204,4.79,65.3,23,63.0,7,Media,1
+EQ-037,Bomba de fractura,SPM,Rincon La Ceniza,36,11851,624,3.06,67.2,138,69.0,4,Alta,1
+EQ-038,Bomba de fractura,SPM,Loma Campana,78,22307,1184,4.99,60.8,12,53.0,8,Baja,1
+EQ-039,Bomba de fractura,SPM,Bandurria Sur,19,6310,449,2.5,54.1,64,100.0,2,Alta,0
+EQ-040,Bomba de fractura,FMC,Bajada del Palo,11,3532,536,1.19,52.5,85,59.0,3,Alta,0
+EQ-041,Bomba de fractura,FMC,Rincon La Ceniza,28,10331,989,2.79,57.9,19,63.0,7,Alta,0
+EQ-042,Bomba de fractura,FMC,Bandurria Sur,15,4336,201,1.6,56.4,70,69.0,2,Alta,0
+EQ-043,Bomba de fractura,Gardner Denver,Fortin de Piedra,70,23652,1511,4.36,68.9,39,80.0,4,Alta,1
+EQ-044,Bomba de fractura,Gardner Denver,Bajada del Palo,14,5261,229,1.26,64.9,1,70.0,2,Alta,0
+EQ-045,Bomba de fractura,SPM,Rincon La Ceniza,67,20372,1212,4.24,60.1,80,71.0,8,Alta,0
+EQ-046,Bomba de fractura,SPM,Rincon La Ceniza,70,24654,1315,5.43,72.6,8,65.0,6,Alta,1
+EQ-047,Bomba de fractura,SPM,Bandurria Sur,67,24743,1478,3.39,71.0,22,75.0,5,Alta,1
+EQ-048,Bomba de fractura,Gardner Denver,Bandurria Sur,81,26903,1314,5.1,64.7,50,75.0,9,Alta,1
+EQ-049,Bomba de inyeccion,Grundfos,Loma Campana,38,22562,1072,5.39,69.1,15,67.0,1,Media,0
+EQ-050,Bomba de inyeccion,Sulzer,Bajada del Palo,63,29476,1267,4.56,68.8,24,67.0,4,Media,0
+EQ-051,Bomba de inyeccion,Sulzer,Loma Campana,12,6836,426,1.72,57.3,37,71.0,0,Media,0
+EQ-052,Bomba de inyeccion,Flowserve,Loma Campana,67,33924,3563,5.53,74.6,44,72.0,3,Media,1
+EQ-053,Bomba de inyeccion,Grundfos,El Trapial,49,30140,2095,6.35,63.4,25,69.0,7,Media,1
+EQ-054,Bomba de inyeccion,Sulzer,Fortin de Piedra,28,16896,1315,2.81,63.0,8,85.0,2,Media,0
+EQ-055,Bomba de inyeccion,Sulzer,Rincon La Ceniza,35,21387,1522,2.73,64.8,9,51.0,2,Media,0
+EQ-056,Bomba de inyeccion,Flowserve,Bajada del Palo,57,33690,2041,4.9,64.9,21,61.0,3,Media,0
+EQ-057,Bomba de inyeccion,Flowserve,Fortin de Piedra,45,24670,1944,6.03,64.3,17,72.0,5,Media,1
+EQ-058,Bomba de inyeccion,Sulzer,Bandurria Sur,74,41207,2246,5.13,65.7,44,82.0,4,Media,1
+EQ-059,Bomba de inyeccion,Sulzer,Rincon La Ceniza,42,25529,1792,2.38,69.7,36,87.0,4,Media,0
+EQ-060,Bomba de inyeccion,Grundfos,Fortin de Piedra,45,27059,1306,5.46,64.6,128,45.0,4,Media,0
+EQ-061,Bomba de inyeccion,Grundfos,Bajada del Palo,35,20423,1918,3.17,64.4,15,90.0,2,Media,0
+EQ-062,Bomba de inyeccion,Grundfos,Fortin de Piedra,29,14868,2060,2.86,62.6,64,80.0,2,Media,0
+EQ-063,Bomba de inyeccion,Sulzer,Bandurria Sur,67,37237,1646,5.75,67.1,12,72.0,4,Media,1
+EQ-064,Bomba de inyeccion,Flowserve,Bandurria Sur,26,14206,959,3.14,50.3,3,74.0,0,Media,0
+EQ-065,Bomba de inyeccion,Grundfos,Bandurria Sur,79,50866,7868,7.01,75.5,42,75.0,7,Media,1
+EQ-066,Bomba de inyeccion,Grundfos,Aguada Pichana,18,9273,457,3.27,51.1,18,75.0,4,Baja,0
+EQ-067,Bomba de inyeccion,Grundfos,Bajada del Palo,78,49233,2730,7.61,75.7,56,80.0,5,Media,1
+EQ-068,Bomba de inyeccion,Sulzer,Rincon La Ceniza,9,4376,374,2.17,45.0,36,51.0,1,Media,0
+EQ-069,Bomba de inyeccion,Flowserve,Rincon La Ceniza,57,33697,2072,5.76,79.7,15,71.0,7,Media,1
+EQ-070,Bomba de inyeccion,Sulzer,Bandurria Sur,26,14126,662,3.46,68.7,2,71.0,5,Media,0
+EQ-071,Bomba de inyeccion,Flowserve,Loma Campana,29,15899,700,3.32,65.5,66,49.0,4,Media,0
+EQ-072,Bomba de inyeccion,Sulzer,Bandurria Sur,13,6639,775,2.06,55.0,21,67.0,0,Baja,0
+EQ-073,Bomba de inyeccion,Flowserve,Loma Campana,61,29835,1443,2.91,67.2,1,82.0,2,Baja,0
+EQ-074,Bomba de inyeccion,Grundfos,Rincon La Ceniza,21,12752,752,2.79,62.0,5,99.0,1,Media,0
+EQ-075,Bomba de inyeccion,Grundfos,Bajada del Palo,65,37910,1961,5.99,79.5,123,69.0,4,Media,1
+EQ-076,Bomba de inyeccion,Sulzer,Aguada Pichana,49,24651,1286,4.81,62.3,26,87.0,2,Media,0
+EQ-077,Bomba de inyeccion,Flowserve,Rincon La Ceniza,29,13900,1396,3.15,69.2,11,60.0,4,Media,0
+EQ-078,Bomba de inyeccion,Sulzer,Rincon La Ceniza,75,38683,2373,6.16,68.8,14,75.0,3,Media,1
+EQ-079,Bomba de inyeccion,Flowserve,Rincon La Ceniza,68,32462,1943,7.2,80.8,1,75.0,6,Media,1
+EQ-080,Bomba de inyeccion,Grundfos,Rincon La Ceniza,65,33428,1620,4.85,59.3,91,81.0,5,Media,1
+EQ-081,Bomba de inyeccion,Flowserve,El Trapial,36,17767,2377,3.51,66.9,31,67.0,3,Media,0
+EQ-082,Bomba de inyeccion,Sulzer,El Trapial,59,33902,1657,5.39,73.5,20,57.0,8,Media,1
+EQ-083,Compresor de gas,Waukesha,El Trapial,54,37614,4461,6.55,82.9,34,67.0,6,Alta,1
+EQ-084,Compresor de gas,Ariel,Bajada del Palo,37,23770,2998,5.81,69.3,6,44.0,5,Baja,0
+EQ-085,Compresor de gas,Ariel,Bajada del Palo,60,35688,3770,4.41,72.1,6,67.0,5,Alta,1
+EQ-086,Compresor de gas,Caterpillar,Rincon La Ceniza,46,31352,2259,5.49,75.1,46,72.0,2,Alta,1
+EQ-087,Compresor de gas,Ariel,El Trapial,26,17916,2876,2.19,66.0,44,76.0,2,Alta,0
+EQ-088,Compresor de gas,Caterpillar,Aguada Pichana,18,9976,896,2.42,51.2,10,98.0,5,Alta,0
+EQ-089,Compresor de gas,Ariel,Bandurria Sur,63,33524,2803,5.48,68.8,10,73.0,7,Alta,1
+EQ-090,Compresor de gas,Waukesha,Bajada del Palo,75,53835,4645,9.61,75.5,13,79.0,2,Alta,1
+EQ-091,Compresor de gas,Waukesha,Loma Campana,59,39801,2733,6.32,80.6,59,73.0,4,Alta,1
+EQ-092,Compresor de gas,Ariel,Bajada del Palo,61,36272,1585,6.36,73.7,43,50.0,5,Alta,1
+EQ-093,Compresor de gas,Caterpillar,Rincon La Ceniza,41,26381,1369,4.0,54.3,8,51.0,3,Alta,0
+EQ-094,Compresor de gas,Caterpillar,Fortin de Piedra,60,43999,4078,5.46,68.1,28,55.0,7,Baja,0
+EQ-095,Compresor de gas,Caterpillar,Rincon La Ceniza,64,43769,3022,7.22,71.9,2,73.0,1,Alta,0
+EQ-096,Compresor de gas,Caterpillar,Rincon La Ceniza,64,41187,2276,6.69,74.2,21,70.0,8,Alta,1
+EQ-097,Compresor de gas,Caterpillar,El Trapial,59,34979,2004,4.72,59.4,96,71.0,4,Alta,1
+EQ-098,Compresor de gas,Waukesha,Bandurria Sur,55,29269,2204,4.47,67.5,3,100.0,5,Alta,1
+EQ-099,Compresor de gas,Waukesha,El Trapial,23,12462,531,2.8,62.0,5,59.0,2,Alta,0
+EQ-100,Compresor de gas,Caterpillar,Fortin de Piedra,53,38851,1681,6.24,69.8,58,66.0,4,Alta,1
+EQ-101,Compresor de gas,Ariel,Bandurria Sur,78,41527,2611,5.95,64.8,51,92.0,2,Alta,1
+EQ-102,Compresor de gas,Caterpillar,Bajada del Palo,78,48079,4962,6.66,73.1,19,83.0,4,Alta,1
+EQ-103,Compresor de gas,Ariel,Bandurria Sur,13,7693,1183,1.26,58.9,1,74.0,5,Alta,0
+EQ-104,Compresor de gas,Waukesha,Loma Campana,61,36322,3028,7.51,74.7,43,74.0,8,Alta,1
+EQ-105,Compresor de gas,Ariel,Bajada del Palo,13,7536,456,3.23,57.9,84,68.0,1,Alta,0
+EQ-106,Compresor de gas,Ariel,Bandurria Sur,29,16011,866,2.81,61.9,4,57.0,1,Alta,0
+EQ-107,Compresor de gas,Waukesha,El Trapial,72,52583,5058,9.26,74.2,22,74.0,5,Alta,1
+EQ-108,Compresor de gas,Caterpillar,El Trapial,69,46549,3093,8.1,74.6,8,76.0,8,Alta,1
+EQ-109,Compresor de gas,Ariel,Bajada del Palo,15,8020,336,3.41,64.9,37,73.0,3,Alta,0
+EQ-110,Compresor de gas,Waukesha,Aguada Pichana,80,57939,7023,8.48,76.2,61,53.0,9,Alta,1
+EQ-111,Compresor de gas,Ariel,Bandurria Sur,15,10451,1671,1.92,59.3,5,89.0,2,Alta,0
+EQ-112,Compresor de gas,Waukesha,El Trapial,10,6150,343,2.77,59.9,5,65.0,0,Alta,0
+EQ-113,Bomba booster,Weir,Fortin de Piedra,83,42446,4656,6.69,77.5,33,80.0,2,Alta,1
+EQ-114,Bomba booster,Weir,El Trapial,51,23029,1214,5.72,54.0,90,81.0,2,Baja,0
+EQ-115,Bomba booster,KSB,Bajada del Palo,44,20317,2802,4.0,70.9,25,81.0,4,Media,0
+EQ-116,Bomba booster,Weir,Fortin de Piedra,16,8571,931,2.02,55.4,79,72.0,0,Baja,0
+EQ-117,Bomba booster,Goulds,Bajada del Palo,46,20124,1310,4.87,64.8,37,80.0,0,Baja,0
+EQ-118,Bomba booster,Weir,Aguada Pichana,7,3134,372,1.43,65.2,10,78.0,0,Baja,0
+EQ-119,Bomba booster,KSB,Fortin de Piedra,34,15969,1113,3.87,74.0,8,63.0,1,Alta,0
+EQ-120,Bomba booster,KSB,Fortin de Piedra,65,35562,1963,4.3,68.5,61,77.0,5,Baja,0
+EQ-121,Bomba booster,KSB,Loma Campana,80,32596,3660,4.28,58.4,76,43.0,3,Baja,0
+EQ-122,Bomba booster,KSB,Fortin de Piedra,69,36937,2291,6.14,68.4,19,80.0,3,Baja,1
+EQ-123,Bomba booster,KSB,Rincon La Ceniza,69,29221,1810,4.85,72.7,6,96.0,4,Baja,0
+EQ-124,Bomba booster,KSB,Bandurria Sur,39,18416,919,3.21,62.5,67,74.0,3,Media,0
+EQ-125,Bomba booster,Goulds,Loma Campana,42,18947,840,4.71,59.4,14,84.0,3,Alta,0
+EQ-126,Bomba booster,KSB,Fortin de Piedra,83,41749,5696,4.65,76.4,16,79.0,3,Baja,1
+EQ-127,Bomba booster,KSB,Loma Campana,74,39828,1742,5.63,65.6,1,50.0,2,Media,0
+EQ-128,Bomba booster,Weir,Fortin de Piedra,40,20428,1809,4.2,66.4,142,88.0,3,Baja,1
+EQ-129,Bomba booster,Goulds,Bajada del Palo,64,30577,3533,5.37,62.7,95,83.0,2,Media,1
+EQ-130,Bomba booster,Goulds,Loma Campana,52,29346,2055,5.3,82.8,112,69.0,0,Media,1
+EQ-131,Bomba booster,KSB,Bandurria Sur,61,26652,2471,4.41,59.7,37,59.0,1,Baja,0
+EQ-132,Bomba booster,KSB,Loma Campana,40,21501,1352,4.24,64.4,17,83.0,1,Baja,0
+EQ-133,Bomba booster,Goulds,Bajada del Palo,42,22999,1371,3.96,61.6,48,62.0,2,Baja,0
+EQ-134,Bomba booster,KSB,Loma Campana,46,21671,1271,4.18,71.6,30,53.0,2,Baja,0
+EQ-135,Bomba booster,Weir,Loma Campana,81,36512,4402,5.45,76.5,41,90.0,1,Baja,1
+EQ-136,Bomba booster,Weir,El Trapial,28,11639,497,3.14,56.2,12,73.0,0,Baja,0
+EQ-137,Bomba booster,KSB,El Trapial,15,7286,697,2.51,59.4,11,87.0,1,Baja,0
+EQ-138,Bomba booster,KSB,El Trapial,67,37875,5007,6.04,64.5,37,72.0,2,Baja,1
+EQ-139,Bomba booster,Weir,Bajada del Palo,30,16656,2213,2.73,73.3,72,67.0,1,Media,0
+EQ-140,Bomba booster,Weir,Bajada del Palo,79,35273,5867,5.65,58.5,121,60.0,2,Baja,1
+EQ-141,Bomba booster,Weir,Aguada Pichana,54,28133,1306,5.67,74.4,11,91.0,7,Baja,1
+EQ-142,Bomba booster,Weir,Loma Campana,35,19821,1232,4.17,61.4,15,48.0,1,Baja,0

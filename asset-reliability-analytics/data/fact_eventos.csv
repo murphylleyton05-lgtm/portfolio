@@ -1,0 +1,507 @@
+evento_id,activo_id,tipo,ubicacion,fecha,mes,modo_falla,downtime_h,costo_usd,criticidad
+FL-0001,EQ-001,Bomba de fractura,Rincon La Ceniza,2026-03-10,2026-03,Vibracion excesiva,112.4,68289.0,Media
+FL-0002,EQ-001,Bomba de fractura,Rincon La Ceniza,2026-06-12,2026-06,Sello mecanico,172.7,130284.0,Media
+FL-0003,EQ-002,Bomba de fractura,Rincon La Ceniza,2025-10-04,2025-10,Valvula,12.7,28813.0,Media
+FL-0004,EQ-002,Bomba de fractura,Rincon La Ceniza,2025-02-20,2025-02,Lubricacion,10.9,55214.0,Media
+FL-0005,EQ-003,Bomba de fractura,Bajada del Palo,2026-03-05,2026-03,Sello mecanico,74.1,75753.0,Alta
+FL-0006,EQ-003,Bomba de fractura,Bajada del Palo,2026-08-11,2026-08,Vibracion excesiva,39.4,74292.0,Alta
+FL-0007,EQ-003,Bomba de fractura,Bajada del Palo,2025-12-31,2025-12,Falla electrica,93.2,78245.0,Alta
+FL-0008,EQ-003,Bomba de fractura,Bajada del Palo,2025-06-14,2025-06,Sobrecalentamiento,53.6,50546.0,Alta
+FL-0009,EQ-003,Bomba de fractura,Bajada del Palo,2025-07-21,2025-07,Rodamiento,38.5,55176.0,Alta
+FL-0010,EQ-004,Bomba de fractura,Aguada Pichana,2025-07-19,2025-07,Lubricacion,21.2,65829.0,Alta
+FL-0011,EQ-004,Bomba de fractura,Aguada Pichana,2025-03-04,2025-03,Vibracion excesiva,408.9,223219.0,Alta
+FL-0012,EQ-004,Bomba de fractura,Aguada Pichana,2026-04-04,2026-04,Rodamiento,92.7,69061.0,Alta
+FL-0013,EQ-004,Bomba de fractura,Aguada Pichana,2026-01-26,2026-01,Fuga hidraulica,21.1,46990.0,Alta
+FL-0014,EQ-004,Bomba de fractura,Aguada Pichana,2024-10-15,2024-10,Falla electrica,112.6,97500.0,Alta
+FL-0015,EQ-005,Bomba de fractura,Bajada del Palo,2024-12-08,2024-12,Vibracion excesiva,163.6,89560.0,Alta
+FL-0016,EQ-005,Bomba de fractura,Bajada del Palo,2025-10-01,2025-10,Fuga hidraulica,38.5,57120.0,Alta
+FL-0017,EQ-005,Bomba de fractura,Bajada del Palo,2025-06-11,2025-06,Sobrecalentamiento,91.7,92508.0,Alta
+FL-0018,EQ-005,Bomba de fractura,Bajada del Palo,2025-04-24,2025-04,Falla electrica,44.7,57738.0,Alta
+FL-0019,EQ-005,Bomba de fractura,Bajada del Palo,2025-11-24,2025-11,Sobrecalentamiento,116.7,94914.0,Alta
+FL-0020,EQ-005,Bomba de fractura,Bajada del Palo,2025-11-18,2025-11,Rodamiento,119.2,104547.0,Alta
+FL-0021,EQ-005,Bomba de fractura,Bajada del Palo,2026-04-03,2026-04,Rodamiento,250.0,127936.0,Alta
+FL-0022,EQ-006,Bomba de fractura,Aguada Pichana,2026-06-15,2026-06,Rodamiento,147.8,133971.0,Alta
+FL-0023,EQ-006,Bomba de fractura,Aguada Pichana,2025-08-22,2025-08,Fuga hidraulica,41.3,61146.0,Alta
+FL-0024,EQ-006,Bomba de fractura,Aguada Pichana,2025-05-23,2025-05,Rodamiento,55.0,50316.0,Alta
+FL-0025,EQ-006,Bomba de fractura,Aguada Pichana,2026-07-08,2026-07,Fuga hidraulica,11.2,73075.0,Alta
+FL-0026,EQ-007,Bomba de fractura,El Trapial,2025-04-02,2025-04,Vibracion excesiva,49.3,62298.0,Alta
+FL-0027,EQ-007,Bomba de fractura,El Trapial,2026-04-16,2026-04,Falla electrica,36.0,48158.0,Alta
+FL-0028,EQ-007,Bomba de fractura,El Trapial,2024-09-17,2024-09,Falla electrica,57.9,54458.0,Alta
+FL-0029,EQ-007,Bomba de fractura,El Trapial,2025-01-27,2025-01,Falla electrica,28.0,57468.0,Alta
+FL-0030,EQ-008,Bomba de fractura,Bajada del Palo,2025-06-22,2025-06,Fuga hidraulica,4.0,60680.0,Alta
+FL-0031,EQ-008,Bomba de fractura,Bajada del Palo,2025-11-09,2025-11,Rodamiento,194.0,117046.0,Alta
+FL-0032,EQ-008,Bomba de fractura,Bajada del Palo,2026-04-29,2026-04,Rodamiento,57.3,64052.0,Alta
+FL-0033,EQ-008,Bomba de fractura,Bajada del Palo,2026-08-27,2026-08,Valvula,23.9,84289.0,Alta
+FL-0034,EQ-008,Bomba de fractura,Bajada del Palo,2025-07-05,2025-07,Rodamiento,100.2,82526.0,Alta
+FL-0035,EQ-008,Bomba de fractura,Bajada del Palo,2024-09-26,2024-09,Sello mecanico,63.5,74188.0,Alta
+FL-0036,EQ-009,Bomba de fractura,Bajada del Palo,2026-07-26,2026-07,Rodamiento,78.7,70780.0,Alta
+FL-0037,EQ-009,Bomba de fractura,Bajada del Palo,2025-06-16,2025-06,Lubricacion,20.3,75711.0,Alta
+FL-0038,EQ-009,Bomba de fractura,Bajada del Palo,2025-02-15,2025-02,Falla electrica,22.2,35679.0,Alta
+FL-0039,EQ-009,Bomba de fractura,Bajada del Palo,2026-03-20,2026-03,Rodamiento,142.2,107158.0,Alta
+FL-0040,EQ-010,Bomba de fractura,Aguada Pichana,2024-11-15,2024-11,Lubricacion,11.8,31278.0,Alta
+FL-0041,EQ-010,Bomba de fractura,Aguada Pichana,2026-02-19,2026-02,Sobrecalentamiento,68.6,62455.0,Alta
+FL-0042,EQ-010,Bomba de fractura,Aguada Pichana,2025-12-21,2025-12,Fuga hidraulica,9.5,49763.0,Alta
+FL-0043,EQ-010,Bomba de fractura,Aguada Pichana,2025-02-25,2025-02,Lubricacion,32.9,61176.0,Alta
+FL-0044,EQ-010,Bomba de fractura,Aguada Pichana,2026-01-07,2026-01,Rodamiento,259.4,138307.0,Alta
+FL-0045,EQ-011,Bomba de fractura,Fortin de Piedra,2025-09-26,2025-09,Rodamiento,396.4,214828.0,Alta
+FL-0046,EQ-011,Bomba de fractura,Fortin de Piedra,2024-10-26,2024-10,Falla electrica,15.6,44110.0,Alta
+FL-0047,EQ-011,Bomba de fractura,Fortin de Piedra,2026-03-24,2026-03,Fuga hidraulica,14.0,28404.0,Alta
+FL-0048,EQ-011,Bomba de fractura,Fortin de Piedra,2025-03-25,2025-03,Rodamiento,168.9,121042.0,Alta
+FL-0049,EQ-011,Bomba de fractura,Fortin de Piedra,2025-06-26,2025-06,Rodamiento,94.5,77409.0,Alta
+FL-0050,EQ-011,Bomba de fractura,Fortin de Piedra,2025-05-13,2025-05,Sello mecanico,57.9,90635.0,Alta
+FL-0051,EQ-011,Bomba de fractura,Fortin de Piedra,2026-05-11,2026-05,Lubricacion,8.8,67966.0,Alta
+FL-0052,EQ-011,Bomba de fractura,Fortin de Piedra,2025-11-30,2025-11,Falla electrica,77.0,86615.0,Alta
+FL-0053,EQ-011,Bomba de fractura,Fortin de Piedra,2025-04-10,2025-04,Sobrecalentamiento,108.3,89791.0,Alta
+FL-0054,EQ-012,Bomba de fractura,Loma Campana,2026-01-16,2026-01,Rodamiento,35.1,45970.0,Alta
+FL-0055,EQ-012,Bomba de fractura,Loma Campana,2025-08-28,2025-08,Rodamiento,230.1,114206.0,Alta
+FL-0056,EQ-013,Bomba de fractura,Bajada del Palo,2025-06-30,2025-06,Vibracion excesiva,22.9,75153.0,Alta
+FL-0057,EQ-013,Bomba de fractura,Bajada del Palo,2025-12-17,2025-12,Sello mecanico,55.5,79065.0,Alta
+FL-0058,EQ-013,Bomba de fractura,Bajada del Palo,2025-04-23,2025-04,Valvula,84.8,81627.0,Alta
+FL-0059,EQ-013,Bomba de fractura,Bajada del Palo,2026-03-08,2026-03,Sobrecalentamiento,70.1,67353.0,Alta
+FL-0060,EQ-014,Bomba de fractura,Loma Campana,2026-05-08,2026-05,Lubricacion,33.8,71497.0,Alta
+FL-0061,EQ-014,Bomba de fractura,Loma Campana,2026-06-05,2026-06,Sobrecalentamiento,76.0,66474.0,Alta
+FL-0062,EQ-014,Bomba de fractura,Loma Campana,2025-03-17,2025-03,Sello mecanico,22.1,69370.0,Alta
+FL-0063,EQ-014,Bomba de fractura,Loma Campana,2024-09-09,2024-09,Rodamiento,128.7,106825.0,Alta
+FL-0064,EQ-014,Bomba de fractura,Loma Campana,2024-09-05,2024-09,Vibracion excesiva,160.2,126615.0,Alta
+FL-0065,EQ-014,Bomba de fractura,Loma Campana,2025-11-26,2025-11,Sello mecanico,194.3,116799.0,Alta
+FL-0066,EQ-015,Bomba de fractura,Fortin de Piedra,2025-09-10,2025-09,Sobrecalentamiento,119.5,86948.0,Alta
+FL-0067,EQ-016,Bomba de fractura,Bajada del Palo,2025-08-21,2025-08,Falla electrica,47.4,84254.0,Alta
+FL-0068,EQ-016,Bomba de fractura,Bajada del Palo,2025-08-01,2025-08,Falla electrica,77.4,90139.0,Alta
+FL-0069,EQ-016,Bomba de fractura,Bajada del Palo,2025-05-19,2025-05,Rodamiento,13.3,27405.0,Alta
+FL-0070,EQ-016,Bomba de fractura,Bajada del Palo,2025-03-05,2025-03,Falla electrica,9.5,31836.0,Alta
+FL-0071,EQ-016,Bomba de fractura,Bajada del Palo,2024-11-03,2024-11,Fuga hidraulica,52.8,56741.0,Alta
+FL-0072,EQ-017,Bomba de fractura,Bandurria Sur,2025-12-12,2025-12,Falla electrica,94.0,98711.0,Alta
+FL-0073,EQ-017,Bomba de fractura,Bandurria Sur,2025-06-10,2025-06,Sello mecanico,28.8,47389.0,Alta
+FL-0074,EQ-017,Bomba de fractura,Bandurria Sur,2026-02-10,2026-02,Sobrecalentamiento,83.6,67979.0,Alta
+FL-0075,EQ-017,Bomba de fractura,Bandurria Sur,2025-01-19,2025-01,Rodamiento,128.4,74469.0,Alta
+FL-0076,EQ-017,Bomba de fractura,Bandurria Sur,2025-03-13,2025-03,Sobrecalentamiento,35.0,88346.0,Alta
+FL-0077,EQ-018,Bomba de fractura,Bajada del Palo,2026-06-09,2026-06,Lubricacion,9.4,45161.0,Alta
+FL-0078,EQ-018,Bomba de fractura,Bajada del Palo,2026-06-20,2026-06,Sello mecanico,39.2,78160.0,Alta
+FL-0079,EQ-018,Bomba de fractura,Bajada del Palo,2026-01-27,2026-01,Sello mecanico,201.3,139895.0,Alta
+FL-0080,EQ-019,Bomba de fractura,Rincon La Ceniza,2026-01-06,2026-01,Rodamiento,84.8,67343.0,Alta
+FL-0081,EQ-019,Bomba de fractura,Rincon La Ceniza,2025-09-13,2025-09,Sobrecalentamiento,63.0,92047.0,Alta
+FL-0082,EQ-019,Bomba de fractura,Rincon La Ceniza,2024-10-05,2024-10,Sello mecanico,27.4,80102.0,Alta
+FL-0083,EQ-020,Bomba de fractura,Aguada Pichana,2025-05-06,2025-05,Sobrecalentamiento,133.9,99846.0,Alta
+FL-0084,EQ-020,Bomba de fractura,Aguada Pichana,2025-11-02,2025-11,Sobrecalentamiento,14.7,49033.0,Alta
+FL-0085,EQ-020,Bomba de fractura,Aguada Pichana,2026-01-24,2026-01,Rodamiento,109.4,107502.0,Alta
+FL-0086,EQ-020,Bomba de fractura,Aguada Pichana,2024-12-27,2024-12,Sello mecanico,35.0,52065.0,Alta
+FL-0087,EQ-021,Bomba de fractura,Rincon La Ceniza,2026-05-16,2026-05,Falla electrica,68.7,71958.0,Alta
+FL-0088,EQ-022,Bomba de fractura,Bajada del Palo,2025-09-02,2025-09,Rodamiento,129.3,87934.0,Alta
+FL-0089,EQ-022,Bomba de fractura,Bajada del Palo,2025-03-18,2025-03,Sobrecalentamiento,167.8,136763.0,Alta
+FL-0090,EQ-022,Bomba de fractura,Bajada del Palo,2026-07-16,2026-07,Sello mecanico,66.8,99317.0,Alta
+FL-0091,EQ-022,Bomba de fractura,Bajada del Palo,2025-01-20,2025-01,Fuga hidraulica,10.7,49949.0,Alta
+FL-0092,EQ-023,Bomba de fractura,Bajada del Palo,2026-06-22,2026-06,Sello mecanico,92.3,58668.0,Alta
+FL-0093,EQ-024,Bomba de fractura,Bajada del Palo,2025-02-02,2025-02,Valvula,188.5,145572.0,Media
+FL-0094,EQ-024,Bomba de fractura,Bajada del Palo,2026-05-12,2026-05,Lubricacion,7.9,71542.0,Media
+FL-0095,EQ-024,Bomba de fractura,Bajada del Palo,2024-10-11,2024-10,Rodamiento,216.5,157788.0,Media
+FL-0096,EQ-024,Bomba de fractura,Bajada del Palo,2025-12-30,2025-12,Rodamiento,49.9,59661.0,Media
+FL-0097,EQ-024,Bomba de fractura,Bajada del Palo,2025-05-01,2025-05,Rodamiento,59.5,45167.0,Media
+FL-0098,EQ-024,Bomba de fractura,Bajada del Palo,2026-08-24,2026-08,Rodamiento,173.6,141125.0,Media
+FL-0099,EQ-024,Bomba de fractura,Bajada del Palo,2024-09-07,2024-09,Sello mecanico,141.5,115476.0,Media
+FL-0100,EQ-025,Bomba de fractura,Aguada Pichana,2026-05-03,2026-05,Valvula,55.1,80890.0,Alta
+FL-0101,EQ-025,Bomba de fractura,Aguada Pichana,2026-03-22,2026-03,Rodamiento,184.4,113404.0,Alta
+FL-0102,EQ-025,Bomba de fractura,Aguada Pichana,2025-08-24,2025-08,Vibracion excesiva,38.4,80528.0,Alta
+FL-0103,EQ-025,Bomba de fractura,Aguada Pichana,2024-10-04,2024-10,Falla electrica,26.0,84638.0,Alta
+FL-0104,EQ-026,Bomba de fractura,Aguada Pichana,2024-11-23,2024-11,Sobrecalentamiento,30.9,34288.0,Alta
+FL-0105,EQ-026,Bomba de fractura,Aguada Pichana,2026-03-10,2026-03,Rodamiento,50.2,89904.0,Alta
+FL-0106,EQ-026,Bomba de fractura,Aguada Pichana,2026-07-20,2026-07,Falla electrica,32.8,79689.0,Alta
+FL-0107,EQ-026,Bomba de fractura,Aguada Pichana,2026-02-10,2026-02,Fuga hidraulica,25.7,80232.0,Alta
+FL-0108,EQ-026,Bomba de fractura,Aguada Pichana,2025-05-19,2025-05,Sobrecalentamiento,282.7,167170.0,Alta
+FL-0109,EQ-027,Bomba de fractura,Bajada del Palo,2025-02-03,2025-02,Vibracion excesiva,85.7,78920.0,Alta
+FL-0110,EQ-027,Bomba de fractura,Bajada del Palo,2026-07-22,2026-07,Falla electrica,33.4,37072.0,Alta
+FL-0111,EQ-027,Bomba de fractura,Bajada del Palo,2026-07-12,2026-07,Falla electrica,69.8,91790.0,Alta
+FL-0112,EQ-027,Bomba de fractura,Bajada del Palo,2026-04-24,2026-04,Valvula,18.3,46556.0,Alta
+FL-0113,EQ-029,Bomba de fractura,Fortin de Piedra,2025-08-02,2025-08,Sobrecalentamiento,148.8,100195.0,Alta
+FL-0114,EQ-029,Bomba de fractura,Fortin de Piedra,2026-03-13,2026-03,Fuga hidraulica,73.1,73318.0,Alta
+FL-0115,EQ-030,Bomba de fractura,Bajada del Palo,2025-03-16,2025-03,Sobrecalentamiento,18.1,72771.0,Alta
+FL-0116,EQ-030,Bomba de fractura,Bajada del Palo,2026-08-04,2026-08,Vibracion excesiva,70.4,77967.0,Alta
+FL-0117,EQ-030,Bomba de fractura,Bajada del Palo,2024-10-14,2024-10,Valvula,40.0,58197.0,Alta
+FL-0118,EQ-030,Bomba de fractura,Bajada del Palo,2026-02-25,2026-02,Vibracion excesiva,36.6,80800.0,Alta
+FL-0119,EQ-030,Bomba de fractura,Bajada del Palo,2025-02-19,2025-02,Valvula,76.9,77073.0,Alta
+FL-0120,EQ-031,Bomba de fractura,Rincon La Ceniza,2026-02-21,2026-02,Rodamiento,31.1,48184.0,Baja
+FL-0121,EQ-031,Bomba de fractura,Rincon La Ceniza,2026-07-22,2026-07,Rodamiento,67.7,83783.0,Baja
+FL-0122,EQ-031,Bomba de fractura,Rincon La Ceniza,2026-04-24,2026-04,Valvula,47.8,80830.0,Baja
+FL-0123,EQ-031,Bomba de fractura,Rincon La Ceniza,2026-01-19,2026-01,Sobrecalentamiento,61.9,71924.0,Baja
+FL-0124,EQ-032,Bomba de fractura,Loma Campana,2025-12-08,2025-12,Fuga hidraulica,20.9,56500.0,Alta
+FL-0125,EQ-032,Bomba de fractura,Loma Campana,2024-09-13,2024-09,Fuga hidraulica,122.6,84224.0,Alta
+FL-0126,EQ-033,Bomba de fractura,Rincon La Ceniza,2024-12-16,2024-12,Sobrecalentamiento,229.6,133622.0,Alta
+FL-0127,EQ-033,Bomba de fractura,Rincon La Ceniza,2026-03-02,2026-03,Sobrecalentamiento,29.6,86089.0,Alta
+FL-0128,EQ-033,Bomba de fractura,Rincon La Ceniza,2024-10-17,2024-10,Valvula,47.2,64147.0,Alta
+FL-0129,EQ-033,Bomba de fractura,Rincon La Ceniza,2025-07-03,2025-07,Rodamiento,146.5,112294.0,Alta
+FL-0130,EQ-033,Bomba de fractura,Rincon La Ceniza,2026-04-07,2026-04,Sobrecalentamiento,55.3,88495.0,Alta
+FL-0131,EQ-033,Bomba de fractura,Rincon La Ceniza,2026-04-02,2026-04,Rodamiento,163.1,137866.0,Alta
+FL-0132,EQ-034,Bomba de fractura,Aguada Pichana,2024-09-14,2024-09,Vibracion excesiva,127.5,92927.0,Alta
+FL-0133,EQ-035,Bomba de fractura,Bajada del Palo,2025-10-16,2025-10,Sobrecalentamiento,42.1,68633.0,Alta
+FL-0134,EQ-035,Bomba de fractura,Bajada del Palo,2025-02-17,2025-02,Vibracion excesiva,19.6,47203.0,Alta
+FL-0135,EQ-035,Bomba de fractura,Bajada del Palo,2025-01-03,2025-01,Rodamiento,58.9,88086.0,Alta
+FL-0136,EQ-036,Bomba de fractura,Loma Campana,2024-11-07,2024-11,Falla electrica,65.0,66465.0,Media
+FL-0137,EQ-036,Bomba de fractura,Loma Campana,2026-03-11,2026-03,Sello mecanico,19.3,70507.0,Media
+FL-0138,EQ-036,Bomba de fractura,Loma Campana,2024-10-26,2024-10,Sello mecanico,63.7,63568.0,Media
+FL-0139,EQ-036,Bomba de fractura,Loma Campana,2025-12-04,2025-12,Rodamiento,49.9,84083.0,Media
+FL-0140,EQ-036,Bomba de fractura,Loma Campana,2025-09-08,2025-09,Sello mecanico,28.5,62930.0,Media
+FL-0141,EQ-036,Bomba de fractura,Loma Campana,2025-07-14,2025-07,Rodamiento,53.8,89020.0,Media
+FL-0142,EQ-036,Bomba de fractura,Loma Campana,2025-05-21,2025-05,Sello mecanico,96.4,60598.0,Media
+FL-0143,EQ-037,Bomba de fractura,Rincon La Ceniza,2025-04-06,2025-04,Sobrecalentamiento,217.7,112831.0,Alta
+FL-0144,EQ-037,Bomba de fractura,Rincon La Ceniza,2025-02-01,2025-02,Sello mecanico,51.5,77738.0,Alta
+FL-0145,EQ-037,Bomba de fractura,Rincon La Ceniza,2025-07-04,2025-07,Vibracion excesiva,196.3,105850.0,Alta
+FL-0146,EQ-037,Bomba de fractura,Rincon La Ceniza,2026-02-18,2026-02,Rodamiento,60.4,50947.0,Alta
+FL-0147,EQ-038,Bomba de fractura,Loma Campana,2025-04-28,2025-04,Lubricacion,52.0,86837.0,Baja
+FL-0148,EQ-038,Bomba de fractura,Loma Campana,2026-06-26,2026-06,Falla electrica,65.2,94959.0,Baja
+FL-0149,EQ-038,Bomba de fractura,Loma Campana,2026-05-19,2026-05,Sobrecalentamiento,63.0,88706.0,Baja
+FL-0150,EQ-038,Bomba de fractura,Loma Campana,2024-11-18,2024-11,Sello mecanico,147.5,86893.0,Baja
+FL-0151,EQ-038,Bomba de fractura,Loma Campana,2025-07-11,2025-07,Falla electrica,16.7,80966.0,Baja
+FL-0152,EQ-038,Bomba de fractura,Loma Campana,2025-09-19,2025-09,Vibracion excesiva,86.2,62096.0,Baja
+FL-0153,EQ-038,Bomba de fractura,Loma Campana,2025-09-23,2025-09,Falla electrica,14.2,58130.0,Baja
+FL-0154,EQ-038,Bomba de fractura,Loma Campana,2026-05-15,2026-05,Vibracion excesiva,31.4,60680.0,Baja
+FL-0155,EQ-039,Bomba de fractura,Bandurria Sur,2026-05-29,2026-05,Sello mecanico,37.9,75299.0,Alta
+FL-0156,EQ-039,Bomba de fractura,Bandurria Sur,2024-09-19,2024-09,Falla electrica,79.9,78364.0,Alta
+FL-0157,EQ-040,Bomba de fractura,Bajada del Palo,2024-12-20,2024-12,Vibracion excesiva,127.3,86035.0,Alta
+FL-0158,EQ-040,Bomba de fractura,Bajada del Palo,2024-12-19,2024-12,Falla electrica,66.7,61862.0,Alta
+FL-0159,EQ-040,Bomba de fractura,Bajada del Palo,2025-01-08,2025-01,Sobrecalentamiento,31.3,72744.0,Alta
+FL-0160,EQ-041,Bomba de fractura,Rincon La Ceniza,2026-03-04,2026-03,Vibracion excesiva,162.6,140017.0,Alta
+FL-0161,EQ-041,Bomba de fractura,Rincon La Ceniza,2025-03-08,2025-03,Sello mecanico,14.0,68246.0,Alta
+FL-0162,EQ-041,Bomba de fractura,Rincon La Ceniza,2026-04-08,2026-04,Sello mecanico,125.5,125526.0,Alta
+FL-0163,EQ-041,Bomba de fractura,Rincon La Ceniza,2026-07-09,2026-07,Sobrecalentamiento,152.8,86919.0,Alta
+FL-0164,EQ-041,Bomba de fractura,Rincon La Ceniza,2026-03-04,2026-03,Vibracion excesiva,70.2,69008.0,Alta
+FL-0165,EQ-041,Bomba de fractura,Rincon La Ceniza,2024-09-26,2024-09,Rodamiento,269.6,137303.0,Alta
+FL-0166,EQ-041,Bomba de fractura,Rincon La Ceniza,2026-07-17,2026-07,Valvula,82.4,99847.0,Alta
+FL-0167,EQ-042,Bomba de fractura,Bandurria Sur,2025-03-23,2025-03,Valvula,77.2,66923.0,Alta
+FL-0168,EQ-042,Bomba de fractura,Bandurria Sur,2026-05-25,2026-05,Sello mecanico,83.2,69555.0,Alta
+FL-0169,EQ-043,Bomba de fractura,Fortin de Piedra,2026-06-16,2026-06,Vibracion excesiva,63.3,95814.0,Alta
+FL-0170,EQ-043,Bomba de fractura,Fortin de Piedra,2025-08-19,2025-08,Lubricacion,45.9,81083.0,Alta
+FL-0171,EQ-043,Bomba de fractura,Fortin de Piedra,2025-07-03,2025-07,Sello mecanico,22.6,77938.0,Alta
+FL-0172,EQ-043,Bomba de fractura,Fortin de Piedra,2025-07-27,2025-07,Sobrecalentamiento,21.4,83411.0,Alta
+FL-0173,EQ-044,Bomba de fractura,Bajada del Palo,2025-07-25,2025-07,Sobrecalentamiento,21.4,45769.0,Alta
+FL-0174,EQ-044,Bomba de fractura,Bajada del Palo,2026-01-22,2026-01,Sello mecanico,62.2,46322.0,Alta
+FL-0175,EQ-045,Bomba de fractura,Rincon La Ceniza,2025-06-08,2025-06,Valvula,22.1,44843.0,Alta
+FL-0176,EQ-045,Bomba de fractura,Rincon La Ceniza,2026-08-10,2026-08,Lubricacion,15.1,42799.0,Alta
+FL-0177,EQ-045,Bomba de fractura,Rincon La Ceniza,2024-10-24,2024-10,Sello mecanico,77.5,62362.0,Alta
+FL-0178,EQ-045,Bomba de fractura,Rincon La Ceniza,2026-08-19,2026-08,Fuga hidraulica,60.7,55744.0,Alta
+FL-0179,EQ-045,Bomba de fractura,Rincon La Ceniza,2025-11-15,2025-11,Sello mecanico,149.6,118345.0,Alta
+FL-0180,EQ-045,Bomba de fractura,Rincon La Ceniza,2026-05-14,2026-05,Falla electrica,13.2,62579.0,Alta
+FL-0181,EQ-045,Bomba de fractura,Rincon La Ceniza,2025-05-23,2025-05,Falla electrica,29.3,37303.0,Alta
+FL-0182,EQ-045,Bomba de fractura,Rincon La Ceniza,2026-02-26,2026-02,Fuga hidraulica,5.2,23587.0,Alta
+FL-0183,EQ-046,Bomba de fractura,Rincon La Ceniza,2025-02-14,2025-02,Fuga hidraulica,19.1,81212.0,Alta
+FL-0184,EQ-046,Bomba de fractura,Rincon La Ceniza,2024-11-12,2024-11,Falla electrica,116.0,88147.0,Alta
+FL-0185,EQ-046,Bomba de fractura,Rincon La Ceniza,2026-08-11,2026-08,Rodamiento,267.1,167948.0,Alta
+FL-0186,EQ-046,Bomba de fractura,Rincon La Ceniza,2026-07-20,2026-07,Rodamiento,54.7,45382.0,Alta
+FL-0187,EQ-046,Bomba de fractura,Rincon La Ceniza,2025-03-09,2025-03,Sello mecanico,27.1,59049.0,Alta
+FL-0188,EQ-046,Bomba de fractura,Rincon La Ceniza,2025-02-11,2025-02,Rodamiento,218.2,135989.0,Alta
+FL-0189,EQ-047,Bomba de fractura,Bandurria Sur,2026-02-08,2026-02,Sello mecanico,115.8,89944.0,Alta
+FL-0190,EQ-047,Bomba de fractura,Bandurria Sur,2025-01-03,2025-01,Sello mecanico,52.2,51396.0,Alta
+FL-0191,EQ-047,Bomba de fractura,Bandurria Sur,2025-09-07,2025-09,Lubricacion,42.3,66944.0,Alta
+FL-0192,EQ-047,Bomba de fractura,Bandurria Sur,2026-08-19,2026-08,Rodamiento,115.2,100758.0,Alta
+FL-0193,EQ-047,Bomba de fractura,Bandurria Sur,2025-11-21,2025-11,Sello mecanico,21.7,67750.0,Alta
+FL-0194,EQ-048,Bomba de fractura,Bandurria Sur,2024-10-19,2024-10,Rodamiento,65.7,48645.0,Alta
+FL-0195,EQ-048,Bomba de fractura,Bandurria Sur,2025-07-24,2025-07,Fuga hidraulica,5.3,75944.0,Alta
+FL-0196,EQ-048,Bomba de fractura,Bandurria Sur,2025-01-11,2025-01,Fuga hidraulica,25.2,45770.0,Alta
+FL-0197,EQ-048,Bomba de fractura,Bandurria Sur,2026-08-27,2026-08,Fuga hidraulica,15.8,47851.0,Alta
+FL-0198,EQ-048,Bomba de fractura,Bandurria Sur,2026-08-18,2026-08,Falla electrica,38.6,37516.0,Alta
+FL-0199,EQ-048,Bomba de fractura,Bandurria Sur,2024-12-05,2024-12,Valvula,60.4,85995.0,Alta
+FL-0200,EQ-048,Bomba de fractura,Bandurria Sur,2025-04-04,2025-04,Sello mecanico,48.0,94051.0,Alta
+FL-0201,EQ-048,Bomba de fractura,Bandurria Sur,2025-03-28,2025-03,Fuga hidraulica,25.0,47148.0,Alta
+FL-0202,EQ-048,Bomba de fractura,Bandurria Sur,2025-07-21,2025-07,Falla electrica,41.1,62661.0,Alta
+FL-0203,EQ-049,Bomba de inyeccion,Loma Campana,2026-06-11,2026-06,Falla electrica,12.7,19627.0,Media
+FL-0204,EQ-050,Bomba de inyeccion,Bajada del Palo,2026-03-14,2026-03,Lubricacion,16.4,34001.0,Media
+FL-0205,EQ-050,Bomba de inyeccion,Bajada del Palo,2025-02-18,2025-02,Sobrecalentamiento,119.6,77213.0,Media
+FL-0206,EQ-050,Bomba de inyeccion,Bajada del Palo,2026-05-15,2026-05,Valvula,14.7,23805.0,Media
+FL-0207,EQ-050,Bomba de inyeccion,Bajada del Palo,2024-10-28,2024-10,Vibracion excesiva,30.1,27280.0,Media
+FL-0208,EQ-052,Bomba de inyeccion,Loma Campana,2025-07-24,2025-07,Sobrecalentamiento,61.1,43015.0,Media
+FL-0209,EQ-052,Bomba de inyeccion,Loma Campana,2026-05-03,2026-05,Vibracion excesiva,104.5,53629.0,Media
+FL-0210,EQ-052,Bomba de inyeccion,Loma Campana,2025-10-17,2025-10,Fuga hidraulica,13.9,18303.0,Media
+FL-0211,EQ-053,Bomba de inyeccion,El Trapial,2025-10-13,2025-10,Sobrecalentamiento,41.6,44541.0,Media
+FL-0212,EQ-053,Bomba de inyeccion,El Trapial,2026-05-15,2026-05,Sobrecalentamiento,53.6,48209.0,Media
+FL-0213,EQ-053,Bomba de inyeccion,El Trapial,2025-07-18,2025-07,Sello mecanico,31.8,32932.0,Media
+FL-0214,EQ-053,Bomba de inyeccion,El Trapial,2026-06-13,2026-06,Rodamiento,129.0,68504.0,Media
+FL-0215,EQ-053,Bomba de inyeccion,El Trapial,2026-01-23,2026-01,Sello mecanico,142.2,84754.0,Media
+FL-0216,EQ-053,Bomba de inyeccion,El Trapial,2025-09-10,2025-09,Falla electrica,52.6,50631.0,Media
+FL-0217,EQ-053,Bomba de inyeccion,El Trapial,2026-05-03,2026-05,Falla electrica,78.5,54576.0,Media
+FL-0218,EQ-054,Bomba de inyeccion,Fortin de Piedra,2026-07-16,2026-07,Rodamiento,205.7,92010.0,Media
+FL-0219,EQ-054,Bomba de inyeccion,Fortin de Piedra,2025-09-06,2025-09,Rodamiento,117.5,70378.0,Media
+FL-0220,EQ-055,Bomba de inyeccion,Rincon La Ceniza,2025-06-15,2025-06,Sobrecalentamiento,135.8,85818.0,Media
+FL-0221,EQ-055,Bomba de inyeccion,Rincon La Ceniza,2024-12-18,2024-12,Vibracion excesiva,166.9,96933.0,Media
+FL-0222,EQ-056,Bomba de inyeccion,Bajada del Palo,2026-05-21,2026-05,Falla electrica,43.4,45179.0,Media
+FL-0223,EQ-056,Bomba de inyeccion,Bajada del Palo,2026-06-01,2026-06,Lubricacion,17.8,16602.0,Media
+FL-0224,EQ-056,Bomba de inyeccion,Bajada del Palo,2025-07-07,2025-07,Sello mecanico,31.4,36261.0,Media
+FL-0225,EQ-057,Bomba de inyeccion,Fortin de Piedra,2025-09-28,2025-09,Rodamiento,138.6,77074.0,Media
+FL-0226,EQ-057,Bomba de inyeccion,Fortin de Piedra,2026-01-28,2026-01,Rodamiento,105.0,70510.0,Media
+FL-0227,EQ-057,Bomba de inyeccion,Fortin de Piedra,2024-11-29,2024-11,Sello mecanico,106.2,65199.0,Media
+FL-0228,EQ-057,Bomba de inyeccion,Fortin de Piedra,2025-02-02,2025-02,Valvula,55.0,34320.0,Media
+FL-0229,EQ-057,Bomba de inyeccion,Fortin de Piedra,2024-10-14,2024-10,Rodamiento,143.6,71138.0,Media
+FL-0230,EQ-058,Bomba de inyeccion,Bandurria Sur,2026-07-30,2026-07,Rodamiento,73.8,56412.0,Media
+FL-0231,EQ-058,Bomba de inyeccion,Bandurria Sur,2026-03-15,2026-03,Lubricacion,39.7,39143.0,Media
+FL-0232,EQ-058,Bomba de inyeccion,Bandurria Sur,2026-02-19,2026-02,Rodamiento,88.5,57587.0,Media
+FL-0233,EQ-058,Bomba de inyeccion,Bandurria Sur,2026-02-25,2026-02,Fuga hidraulica,22.8,38256.0,Media
+FL-0234,EQ-059,Bomba de inyeccion,Rincon La Ceniza,2026-07-05,2026-07,Rodamiento,67.8,46014.0,Media
+FL-0235,EQ-059,Bomba de inyeccion,Rincon La Ceniza,2025-11-13,2025-11,Sello mecanico,89.6,60577.0,Media
+FL-0236,EQ-059,Bomba de inyeccion,Rincon La Ceniza,2025-06-21,2025-06,Rodamiento,203.5,105064.0,Media
+FL-0237,EQ-059,Bomba de inyeccion,Rincon La Ceniza,2026-03-02,2026-03,Fuga hidraulica,18.2,25269.0,Media
+FL-0238,EQ-060,Bomba de inyeccion,Fortin de Piedra,2026-04-15,2026-04,Valvula,40.2,46989.0,Media
+FL-0239,EQ-060,Bomba de inyeccion,Fortin de Piedra,2026-02-11,2026-02,Lubricacion,15.3,20589.0,Media
+FL-0240,EQ-060,Bomba de inyeccion,Fortin de Piedra,2025-02-08,2025-02,Vibracion excesiva,229.3,101909.0,Media
+FL-0241,EQ-060,Bomba de inyeccion,Fortin de Piedra,2026-02-18,2026-02,Sello mecanico,238.4,115588.0,Media
+FL-0242,EQ-061,Bomba de inyeccion,Bajada del Palo,2024-10-03,2024-10,Rodamiento,196.1,109591.0,Media
+FL-0243,EQ-061,Bomba de inyeccion,Bajada del Palo,2025-04-03,2025-04,Rodamiento,98.4,55883.0,Media
+FL-0244,EQ-062,Bomba de inyeccion,Fortin de Piedra,2025-08-26,2025-08,Sobrecalentamiento,98.4,70871.0,Media
+FL-0245,EQ-062,Bomba de inyeccion,Fortin de Piedra,2024-12-03,2024-12,Falla electrica,11.0,21181.0,Media
+FL-0246,EQ-063,Bomba de inyeccion,Bandurria Sur,2024-09-21,2024-09,Sello mecanico,65.7,38077.0,Media
+FL-0247,EQ-063,Bomba de inyeccion,Bandurria Sur,2026-02-07,2026-02,Fuga hidraulica,69.5,46294.0,Media
+FL-0248,EQ-063,Bomba de inyeccion,Bandurria Sur,2025-11-10,2025-11,Rodamiento,110.2,63826.0,Media
+FL-0249,EQ-063,Bomba de inyeccion,Bandurria Sur,2025-08-03,2025-08,Valvula,19.7,22815.0,Media
+FL-0250,EQ-065,Bomba de inyeccion,Bandurria Sur,2024-12-08,2024-12,Vibracion excesiva,116.4,58413.0,Media
+FL-0251,EQ-065,Bomba de inyeccion,Bandurria Sur,2026-08-13,2026-08,Rodamiento,50.9,31961.0,Media
+FL-0252,EQ-065,Bomba de inyeccion,Bandurria Sur,2025-04-09,2025-04,Falla electrica,75.6,56091.0,Media
+FL-0253,EQ-065,Bomba de inyeccion,Bandurria Sur,2025-07-31,2025-07,Vibracion excesiva,35.7,28236.0,Media
+FL-0254,EQ-065,Bomba de inyeccion,Bandurria Sur,2025-12-28,2025-12,Falla electrica,66.4,41651.0,Media
+FL-0255,EQ-065,Bomba de inyeccion,Bandurria Sur,2026-01-22,2026-01,Fuga hidraulica,53.1,36641.0,Media
+FL-0256,EQ-065,Bomba de inyeccion,Bandurria Sur,2025-07-12,2025-07,Fuga hidraulica,48.1,48581.0,Media
+FL-0257,EQ-066,Bomba de inyeccion,Aguada Pichana,2025-04-17,2025-04,Fuga hidraulica,7.5,26171.0,Baja
+FL-0258,EQ-066,Bomba de inyeccion,Aguada Pichana,2026-02-01,2026-02,Sello mecanico,86.5,65508.0,Baja
+FL-0259,EQ-066,Bomba de inyeccion,Aguada Pichana,2025-10-02,2025-10,Sobrecalentamiento,128.6,79964.0,Baja
+FL-0260,EQ-066,Bomba de inyeccion,Aguada Pichana,2025-05-30,2025-05,Sobrecalentamiento,31.0,26396.0,Baja
+FL-0261,EQ-067,Bomba de inyeccion,Bajada del Palo,2025-01-11,2025-01,Lubricacion,36.9,30870.0,Media
+FL-0262,EQ-067,Bomba de inyeccion,Bajada del Palo,2024-09-03,2024-09,Sello mecanico,224.2,99101.0,Media
+FL-0263,EQ-067,Bomba de inyeccion,Bajada del Palo,2025-08-09,2025-08,Vibracion excesiva,13.6,29761.0,Media
+FL-0264,EQ-067,Bomba de inyeccion,Bajada del Palo,2026-05-25,2026-05,Vibracion excesiva,57.9,43005.0,Media
+FL-0265,EQ-067,Bomba de inyeccion,Bajada del Palo,2026-05-07,2026-05,Vibracion excesiva,42.4,39113.0,Media
+FL-0266,EQ-068,Bomba de inyeccion,Rincon La Ceniza,2026-06-27,2026-06,Sobrecalentamiento,30.1,28582.0,Media
+FL-0267,EQ-069,Bomba de inyeccion,Rincon La Ceniza,2026-01-01,2026-01,Valvula,138.2,65871.0,Media
+FL-0268,EQ-069,Bomba de inyeccion,Rincon La Ceniza,2025-04-01,2025-04,Rodamiento,20.6,19558.0,Media
+FL-0269,EQ-069,Bomba de inyeccion,Rincon La Ceniza,2025-02-19,2025-02,Vibracion excesiva,56.2,50684.0,Media
+FL-0270,EQ-069,Bomba de inyeccion,Rincon La Ceniza,2024-09-17,2024-09,Valvula,119.6,56916.0,Media
+FL-0271,EQ-069,Bomba de inyeccion,Rincon La Ceniza,2024-09-26,2024-09,Vibracion excesiva,30.9,33409.0,Media
+FL-0272,EQ-069,Bomba de inyeccion,Rincon La Ceniza,2024-12-19,2024-12,Sobrecalentamiento,111.5,59936.0,Media
+FL-0273,EQ-069,Bomba de inyeccion,Rincon La Ceniza,2025-01-19,2025-01,Sello mecanico,39.5,41483.0,Media
+FL-0274,EQ-070,Bomba de inyeccion,Bandurria Sur,2025-02-22,2025-02,Fuga hidraulica,28.8,35291.0,Media
+FL-0275,EQ-070,Bomba de inyeccion,Bandurria Sur,2025-06-08,2025-06,Vibracion excesiva,179.8,95500.0,Media
+FL-0276,EQ-070,Bomba de inyeccion,Bandurria Sur,2024-11-20,2024-11,Lubricacion,62.0,37224.0,Media
+FL-0277,EQ-070,Bomba de inyeccion,Bandurria Sur,2025-11-30,2025-11,Sobrecalentamiento,79.3,57327.0,Media
+FL-0278,EQ-070,Bomba de inyeccion,Bandurria Sur,2025-09-14,2025-09,Vibracion excesiva,35.2,38919.0,Media
+FL-0279,EQ-071,Bomba de inyeccion,Loma Campana,2024-12-03,2024-12,Fuga hidraulica,27.5,21293.0,Media
+FL-0280,EQ-071,Bomba de inyeccion,Loma Campana,2025-07-27,2025-07,Rodamiento,70.7,47209.0,Media
+FL-0281,EQ-071,Bomba de inyeccion,Loma Campana,2026-06-21,2026-06,Valvula,26.8,38487.0,Media
+FL-0282,EQ-071,Bomba de inyeccion,Loma Campana,2025-02-15,2025-02,Vibracion excesiva,46.3,41814.0,Media
+FL-0283,EQ-073,Bomba de inyeccion,Loma Campana,2025-01-11,2025-01,Vibracion excesiva,76.1,45848.0,Baja
+FL-0284,EQ-073,Bomba de inyeccion,Loma Campana,2025-03-16,2025-03,Rodamiento,98.4,56483.0,Baja
+FL-0285,EQ-074,Bomba de inyeccion,Rincon La Ceniza,2025-11-18,2025-11,Sello mecanico,12.7,19157.0,Media
+FL-0286,EQ-075,Bomba de inyeccion,Bajada del Palo,2026-04-16,2026-04,Sobrecalentamiento,65.0,47785.0,Media
+FL-0287,EQ-075,Bomba de inyeccion,Bajada del Palo,2025-03-18,2025-03,Sobrecalentamiento,76.1,55369.0,Media
+FL-0288,EQ-075,Bomba de inyeccion,Bajada del Palo,2024-10-08,2024-10,Sobrecalentamiento,184.2,84921.0,Media
+FL-0289,EQ-075,Bomba de inyeccion,Bajada del Palo,2024-12-10,2024-12,Falla electrica,27.5,29309.0,Media
+FL-0290,EQ-076,Bomba de inyeccion,Aguada Pichana,2026-04-20,2026-04,Sello mecanico,30.1,25806.0,Media
+FL-0291,EQ-076,Bomba de inyeccion,Aguada Pichana,2025-06-01,2025-06,Lubricacion,36.4,39354.0,Media
+FL-0292,EQ-077,Bomba de inyeccion,Rincon La Ceniza,2025-09-01,2025-09,Rodamiento,51.6,47656.0,Media
+FL-0293,EQ-077,Bomba de inyeccion,Rincon La Ceniza,2025-10-27,2025-10,Sello mecanico,174.5,100588.0,Media
+FL-0294,EQ-077,Bomba de inyeccion,Rincon La Ceniza,2025-10-09,2025-10,Falla electrica,75.5,58506.0,Media
+FL-0295,EQ-077,Bomba de inyeccion,Rincon La Ceniza,2025-02-05,2025-02,Sello mecanico,68.1,45636.0,Media
+FL-0296,EQ-078,Bomba de inyeccion,Rincon La Ceniza,2024-09-05,2024-09,Sello mecanico,4.0,26675.0,Media
+FL-0297,EQ-078,Bomba de inyeccion,Rincon La Ceniza,2025-05-04,2025-05,Lubricacion,49.1,37382.0,Media
+FL-0298,EQ-078,Bomba de inyeccion,Rincon La Ceniza,2026-02-21,2026-02,Rodamiento,86.2,45041.0,Media
+FL-0299,EQ-079,Bomba de inyeccion,Rincon La Ceniza,2026-04-09,2026-04,Sello mecanico,75.5,59957.0,Media
+FL-0300,EQ-079,Bomba de inyeccion,Rincon La Ceniza,2025-08-15,2025-08,Sello mecanico,35.1,30547.0,Media
+FL-0301,EQ-079,Bomba de inyeccion,Rincon La Ceniza,2026-07-09,2026-07,Valvula,97.0,55445.0,Media
+FL-0302,EQ-079,Bomba de inyeccion,Rincon La Ceniza,2025-02-04,2025-02,Vibracion excesiva,57.2,45226.0,Media
+FL-0303,EQ-079,Bomba de inyeccion,Rincon La Ceniza,2024-09-18,2024-09,Falla electrica,106.1,51680.0,Media
+FL-0304,EQ-079,Bomba de inyeccion,Rincon La Ceniza,2026-02-11,2026-02,Vibracion excesiva,83.1,64686.0,Media
+FL-0305,EQ-080,Bomba de inyeccion,Rincon La Ceniza,2025-07-18,2025-07,Sobrecalentamiento,53.4,44291.0,Media
+FL-0306,EQ-080,Bomba de inyeccion,Rincon La Ceniza,2026-07-05,2026-07,Vibracion excesiva,54.2,36322.0,Media
+FL-0307,EQ-080,Bomba de inyeccion,Rincon La Ceniza,2025-03-26,2025-03,Sobrecalentamiento,15.7,32244.0,Media
+FL-0308,EQ-080,Bomba de inyeccion,Rincon La Ceniza,2025-06-11,2025-06,Sello mecanico,76.8,42534.0,Media
+FL-0309,EQ-080,Bomba de inyeccion,Rincon La Ceniza,2025-04-01,2025-04,Sobrecalentamiento,84.6,53212.0,Media
+FL-0310,EQ-081,Bomba de inyeccion,El Trapial,2026-07-28,2026-07,Sello mecanico,82.1,52309.0,Media
+FL-0311,EQ-081,Bomba de inyeccion,El Trapial,2026-06-11,2026-06,Fuga hidraulica,9.5,31065.0,Media
+FL-0312,EQ-081,Bomba de inyeccion,El Trapial,2025-08-27,2025-08,Rodamiento,8.7,13456.0,Media
+FL-0313,EQ-082,Bomba de inyeccion,El Trapial,2025-05-10,2025-05,Rodamiento,27.3,34127.0,Media
+FL-0314,EQ-082,Bomba de inyeccion,El Trapial,2024-09-08,2024-09,Rodamiento,20.7,22611.0,Media
+FL-0315,EQ-082,Bomba de inyeccion,El Trapial,2024-11-08,2024-11,Rodamiento,195.8,103500.0,Media
+FL-0316,EQ-082,Bomba de inyeccion,El Trapial,2025-10-09,2025-10,Lubricacion,17.2,34534.0,Media
+FL-0317,EQ-082,Bomba de inyeccion,El Trapial,2025-08-02,2025-08,Sobrecalentamiento,81.0,43917.0,Media
+FL-0318,EQ-082,Bomba de inyeccion,El Trapial,2025-03-04,2025-03,Fuga hidraulica,57.1,42082.0,Media
+FL-0319,EQ-082,Bomba de inyeccion,El Trapial,2025-03-23,2025-03,Vibracion excesiva,59.7,41130.0,Media
+FL-0320,EQ-082,Bomba de inyeccion,El Trapial,2026-06-22,2026-06,Falla electrica,177.2,97459.0,Media
+FL-0321,EQ-083,Compresor de gas,El Trapial,2025-05-16,2025-05,Lubricacion,19.3,48529.0,Alta
+FL-0322,EQ-083,Compresor de gas,El Trapial,2025-01-14,2025-01,Valvula,45.8,110466.0,Alta
+FL-0323,EQ-083,Compresor de gas,El Trapial,2026-04-24,2026-04,Falla electrica,95.3,96546.0,Alta
+FL-0324,EQ-083,Compresor de gas,El Trapial,2025-07-14,2025-07,Sello mecanico,71.0,84151.0,Alta
+FL-0325,EQ-083,Compresor de gas,El Trapial,2025-04-14,2025-04,Rodamiento,9.5,81798.0,Alta
+FL-0326,EQ-083,Compresor de gas,El Trapial,2026-06-04,2026-06,Sello mecanico,17.5,63136.0,Alta
+FL-0327,EQ-084,Compresor de gas,Bajada del Palo,2026-06-17,2026-06,Sobrecalentamiento,86.6,128845.0,Baja
+FL-0328,EQ-084,Compresor de gas,Bajada del Palo,2026-06-30,2026-06,Vibracion excesiva,51.2,87379.0,Baja
+FL-0329,EQ-084,Compresor de gas,Bajada del Palo,2025-07-22,2025-07,Sello mecanico,48.7,59206.0,Baja
+FL-0330,EQ-084,Compresor de gas,Bajada del Palo,2024-09-12,2024-09,Valvula,174.0,153581.0,Baja
+FL-0331,EQ-084,Compresor de gas,Bajada del Palo,2026-01-28,2026-01,Sobrecalentamiento,51.7,74933.0,Baja
+FL-0332,EQ-085,Compresor de gas,Bajada del Palo,2025-11-28,2025-11,Valvula,82.9,140589.0,Alta
+FL-0333,EQ-085,Compresor de gas,Bajada del Palo,2026-07-05,2026-07,Rodamiento,108.8,160265.0,Alta
+FL-0334,EQ-085,Compresor de gas,Bajada del Palo,2025-03-20,2025-03,Fuga hidraulica,51.0,71242.0,Alta
+FL-0335,EQ-085,Compresor de gas,Bajada del Palo,2026-08-24,2026-08,Fuga hidraulica,9.9,57041.0,Alta
+FL-0336,EQ-085,Compresor de gas,Bajada del Palo,2026-03-04,2026-03,Sello mecanico,42.4,102540.0,Alta
+FL-0337,EQ-086,Compresor de gas,Rincon La Ceniza,2026-08-11,2026-08,Sello mecanico,18.9,51797.0,Alta
+FL-0338,EQ-086,Compresor de gas,Rincon La Ceniza,2025-03-17,2025-03,Falla electrica,75.8,117594.0,Alta
+FL-0339,EQ-087,Compresor de gas,El Trapial,2025-02-15,2025-02,Fuga hidraulica,140.1,143651.0,Alta
+FL-0340,EQ-087,Compresor de gas,El Trapial,2026-04-12,2026-04,Falla electrica,38.8,67263.0,Alta
+FL-0341,EQ-088,Compresor de gas,Aguada Pichana,2025-04-11,2025-04,Sello mecanico,49.1,133748.0,Alta
+FL-0342,EQ-088,Compresor de gas,Aguada Pichana,2026-03-13,2026-03,Valvula,69.6,129938.0,Alta
+FL-0343,EQ-088,Compresor de gas,Aguada Pichana,2026-01-01,2026-01,Vibracion excesiva,115.7,153678.0,Alta
+FL-0344,EQ-088,Compresor de gas,Aguada Pichana,2024-10-01,2024-10,Falla electrica,108.0,123167.0,Alta
+FL-0345,EQ-088,Compresor de gas,Aguada Pichana,2026-04-21,2026-04,Sello mecanico,26.0,62949.0,Alta
+FL-0346,EQ-089,Compresor de gas,Bandurria Sur,2024-09-09,2024-09,Valvula,77.1,106419.0,Alta
+FL-0347,EQ-089,Compresor de gas,Bandurria Sur,2025-03-13,2025-03,Fuga hidraulica,16.9,92346.0,Alta
+FL-0348,EQ-089,Compresor de gas,Bandurria Sur,2025-11-03,2025-11,Fuga hidraulica,55.7,55803.0,Alta
+FL-0349,EQ-089,Compresor de gas,Bandurria Sur,2026-08-03,2026-08,Sobrecalentamiento,140.4,103726.0,Alta
+FL-0350,EQ-089,Compresor de gas,Bandurria Sur,2025-12-12,2025-12,Sobrecalentamiento,71.5,76203.0,Alta
+FL-0351,EQ-089,Compresor de gas,Bandurria Sur,2025-10-30,2025-10,Valvula,53.2,102850.0,Alta
+FL-0352,EQ-089,Compresor de gas,Bandurria Sur,2026-08-08,2026-08,Sobrecalentamiento,36.7,64207.0,Alta
+FL-0353,EQ-090,Compresor de gas,Bajada del Palo,2024-11-03,2024-11,Rodamiento,129.9,124034.0,Alta
+FL-0354,EQ-090,Compresor de gas,Bajada del Palo,2025-08-20,2025-08,Valvula,64.2,82483.0,Alta
+FL-0355,EQ-091,Compresor de gas,Loma Campana,2025-08-18,2025-08,Falla electrica,47.4,76442.0,Alta
+FL-0356,EQ-091,Compresor de gas,Loma Campana,2026-03-18,2026-03,Fuga hidraulica,76.3,131269.0,Alta
+FL-0357,EQ-091,Compresor de gas,Loma Campana,2025-11-30,2025-11,Sello mecanico,71.9,141091.0,Alta
+FL-0358,EQ-091,Compresor de gas,Loma Campana,2025-11-18,2025-11,Rodamiento,36.3,83030.0,Alta
+FL-0359,EQ-092,Compresor de gas,Bajada del Palo,2025-04-08,2025-04,Sello mecanico,35.8,87823.0,Alta
+FL-0360,EQ-092,Compresor de gas,Bajada del Palo,2025-02-07,2025-02,Falla electrica,101.1,103489.0,Alta
+FL-0361,EQ-092,Compresor de gas,Bajada del Palo,2025-08-27,2025-08,Fuga hidraulica,57.8,83829.0,Alta
+FL-0362,EQ-092,Compresor de gas,Bajada del Palo,2024-12-31,2024-12,Falla electrica,56.1,118865.0,Alta
+FL-0363,EQ-092,Compresor de gas,Bajada del Palo,2025-03-25,2025-03,Vibracion excesiva,61.2,71724.0,Alta
+FL-0364,EQ-093,Compresor de gas,Rincon La Ceniza,2026-07-23,2026-07,Rodamiento,103.1,155199.0,Alta
+FL-0365,EQ-093,Compresor de gas,Rincon La Ceniza,2025-02-09,2025-02,Valvula,117.8,159978.0,Alta
+FL-0366,EQ-093,Compresor de gas,Rincon La Ceniza,2026-04-01,2026-04,Sello mecanico,16.8,106407.0,Alta
+FL-0367,EQ-094,Compresor de gas,Fortin de Piedra,2024-09-10,2024-09,Sello mecanico,43.7,126608.0,Baja
+FL-0368,EQ-094,Compresor de gas,Fortin de Piedra,2026-01-16,2026-01,Falla electrica,60.5,118392.0,Baja
+FL-0369,EQ-094,Compresor de gas,Fortin de Piedra,2026-01-08,2026-01,Rodamiento,45.8,127181.0,Baja
+FL-0370,EQ-094,Compresor de gas,Fortin de Piedra,2025-10-21,2025-10,Fuga hidraulica,24.4,125646.0,Baja
+FL-0371,EQ-094,Compresor de gas,Fortin de Piedra,2026-05-07,2026-05,Sobrecalentamiento,78.7,145770.0,Baja
+FL-0372,EQ-094,Compresor de gas,Fortin de Piedra,2026-08-24,2026-08,Vibracion excesiva,73.8,101242.0,Baja
+FL-0373,EQ-094,Compresor de gas,Fortin de Piedra,2026-04-02,2026-04,Valvula,50.9,96211.0,Baja
+FL-0374,EQ-095,Compresor de gas,Rincon La Ceniza,2026-03-30,2026-03,Vibracion excesiva,81.7,80532.0,Alta
+FL-0375,EQ-096,Compresor de gas,Rincon La Ceniza,2025-01-01,2025-01,Falla electrica,49.1,62620.0,Alta
+FL-0376,EQ-096,Compresor de gas,Rincon La Ceniza,2025-12-14,2025-12,Fuga hidraulica,31.6,52907.0,Alta
+FL-0377,EQ-096,Compresor de gas,Rincon La Ceniza,2024-11-26,2024-11,Vibracion excesiva,338.5,168129.0,Alta
+FL-0378,EQ-096,Compresor de gas,Rincon La Ceniza,2025-12-15,2025-12,Lubricacion,19.8,105373.0,Alta
+FL-0379,EQ-096,Compresor de gas,Rincon La Ceniza,2024-10-14,2024-10,Rodamiento,124.0,123328.0,Alta
+FL-0380,EQ-096,Compresor de gas,Rincon La Ceniza,2025-06-08,2025-06,Falla electrica,62.0,109994.0,Alta
+FL-0381,EQ-096,Compresor de gas,Rincon La Ceniza,2025-11-21,2025-11,Fuga hidraulica,24.9,119277.0,Alta
+FL-0382,EQ-096,Compresor de gas,Rincon La Ceniza,2025-09-07,2025-09,Fuga hidraulica,120.4,84518.0,Alta
+FL-0383,EQ-097,Compresor de gas,El Trapial,2025-06-12,2025-06,Falla electrica,73.8,139151.0,Alta
+FL-0384,EQ-097,Compresor de gas,El Trapial,2025-06-15,2025-06,Sello mecanico,120.8,95555.0,Alta
+FL-0385,EQ-097,Compresor de gas,El Trapial,2026-05-14,2026-05,Sobrecalentamiento,64.5,58738.0,Alta
+FL-0386,EQ-097,Compresor de gas,El Trapial,2025-05-13,2025-05,Sello mecanico,7.8,87181.0,Alta
+FL-0387,EQ-098,Compresor de gas,Bandurria Sur,2024-12-15,2024-12,Sello mecanico,39.0,72865.0,Alta
+FL-0388,EQ-098,Compresor de gas,Bandurria Sur,2025-02-04,2025-02,Rodamiento,88.7,133110.0,Alta
+FL-0389,EQ-098,Compresor de gas,Bandurria Sur,2025-12-15,2025-12,Vibracion excesiva,108.0,120510.0,Alta
+FL-0390,EQ-098,Compresor de gas,Bandurria Sur,2024-12-01,2024-12,Rodamiento,62.3,65054.0,Alta
+FL-0391,EQ-098,Compresor de gas,Bandurria Sur,2026-01-22,2026-01,Vibracion excesiva,78.9,137258.0,Alta
+FL-0392,EQ-099,Compresor de gas,El Trapial,2025-05-09,2025-05,Lubricacion,11.2,99858.0,Alta
+FL-0393,EQ-099,Compresor de gas,El Trapial,2024-10-31,2024-10,Sello mecanico,112.5,133077.0,Alta
+FL-0394,EQ-100,Compresor de gas,Fortin de Piedra,2026-05-13,2026-05,Valvula,35.9,64730.0,Alta
+FL-0395,EQ-100,Compresor de gas,Fortin de Piedra,2025-09-20,2025-09,Sello mecanico,175.0,182969.0,Alta
+FL-0396,EQ-100,Compresor de gas,Fortin de Piedra,2026-08-23,2026-08,Fuga hidraulica,31.3,58634.0,Alta
+FL-0397,EQ-100,Compresor de gas,Fortin de Piedra,2025-03-07,2025-03,Sello mecanico,75.1,85508.0,Alta
+FL-0398,EQ-101,Compresor de gas,Bandurria Sur,2025-06-25,2025-06,Rodamiento,132.3,119362.0,Alta
+FL-0399,EQ-101,Compresor de gas,Bandurria Sur,2026-02-05,2026-02,Rodamiento,144.4,131757.0,Alta
+FL-0400,EQ-102,Compresor de gas,Bajada del Palo,2025-09-25,2025-09,Rodamiento,26.6,78685.0,Alta
+FL-0401,EQ-102,Compresor de gas,Bajada del Palo,2025-08-01,2025-08,Fuga hidraulica,11.0,117038.0,Alta
+FL-0402,EQ-102,Compresor de gas,Bajada del Palo,2025-08-09,2025-08,Rodamiento,136.1,113376.0,Alta
+FL-0403,EQ-102,Compresor de gas,Bajada del Palo,2025-03-27,2025-03,Sello mecanico,62.1,94402.0,Alta
+FL-0404,EQ-103,Compresor de gas,Bandurria Sur,2025-02-14,2025-02,Sello mecanico,61.8,136017.0,Alta
+FL-0405,EQ-103,Compresor de gas,Bandurria Sur,2025-01-01,2025-01,Vibracion excesiva,64.9,96159.0,Alta
+FL-0406,EQ-103,Compresor de gas,Bandurria Sur,2026-08-27,2026-08,Sobrecalentamiento,54.5,109004.0,Alta
+FL-0407,EQ-103,Compresor de gas,Bandurria Sur,2025-07-02,2025-07,Sello mecanico,44.6,96154.0,Alta
+FL-0408,EQ-103,Compresor de gas,Bandurria Sur,2026-04-02,2026-04,Vibracion excesiva,66.8,92242.0,Alta
+FL-0409,EQ-104,Compresor de gas,Loma Campana,2025-11-07,2025-11,Rodamiento,22.7,88840.0,Alta
+FL-0410,EQ-104,Compresor de gas,Loma Campana,2025-11-30,2025-11,Falla electrica,22.6,74201.0,Alta
+FL-0411,EQ-104,Compresor de gas,Loma Campana,2025-11-10,2025-11,Lubricacion,20.7,52465.0,Alta
+FL-0412,EQ-104,Compresor de gas,Loma Campana,2025-03-17,2025-03,Fuga hidraulica,4.0,66547.0,Alta
+FL-0413,EQ-104,Compresor de gas,Loma Campana,2025-09-04,2025-09,Lubricacion,10.7,111314.0,Alta
+FL-0414,EQ-104,Compresor de gas,Loma Campana,2025-12-26,2025-12,Fuga hidraulica,15.1,97398.0,Alta
+FL-0415,EQ-104,Compresor de gas,Loma Campana,2025-05-29,2025-05,Lubricacion,14.5,92062.0,Alta
+FL-0416,EQ-104,Compresor de gas,Loma Campana,2026-04-30,2026-04,Fuga hidraulica,30.8,129253.0,Alta
+FL-0417,EQ-105,Compresor de gas,Bajada del Palo,2026-05-15,2026-05,Rodamiento,163.9,126019.0,Alta
+FL-0418,EQ-106,Compresor de gas,Bandurria Sur,2026-03-26,2026-03,Vibracion excesiva,116.6,155285.0,Alta
+FL-0419,EQ-107,Compresor de gas,El Trapial,2026-06-15,2026-06,Rodamiento,38.5,86527.0,Alta
+FL-0420,EQ-107,Compresor de gas,El Trapial,2025-11-26,2025-11,Rodamiento,154.7,119050.0,Alta
+FL-0421,EQ-107,Compresor de gas,El Trapial,2025-09-05,2025-09,Vibracion excesiva,55.7,123441.0,Alta
+FL-0422,EQ-107,Compresor de gas,El Trapial,2025-11-13,2025-11,Falla electrica,78.3,72626.0,Alta
+FL-0423,EQ-107,Compresor de gas,El Trapial,2026-01-12,2026-01,Sobrecalentamiento,61.5,112473.0,Alta
+FL-0424,EQ-108,Compresor de gas,El Trapial,2026-04-12,2026-04,Sello mecanico,45.7,74928.0,Alta
+FL-0425,EQ-108,Compresor de gas,El Trapial,2026-04-10,2026-04,Fuga hidraulica,37.5,56714.0,Alta
+FL-0426,EQ-108,Compresor de gas,El Trapial,2025-07-13,2025-07,Sello mecanico,123.1,161790.0,Alta
+FL-0427,EQ-108,Compresor de gas,El Trapial,2025-10-01,2025-10,Vibracion excesiva,69.8,66414.0,Alta
+FL-0428,EQ-108,Compresor de gas,El Trapial,2025-05-04,2025-05,Sobrecalentamiento,77.4,80010.0,Alta
+FL-0429,EQ-108,Compresor de gas,El Trapial,2026-04-28,2026-04,Sobrecalentamiento,143.1,130804.0,Alta
+FL-0430,EQ-108,Compresor de gas,El Trapial,2025-04-17,2025-04,Falla electrica,71.8,97623.0,Alta
+FL-0431,EQ-108,Compresor de gas,El Trapial,2026-07-09,2026-07,Sello mecanico,47.9,128787.0,Alta
+FL-0432,EQ-109,Compresor de gas,Bajada del Palo,2026-07-06,2026-07,Rodamiento,49.2,115877.0,Alta
+FL-0433,EQ-109,Compresor de gas,Bajada del Palo,2025-11-29,2025-11,Valvula,143.7,148936.0,Alta
+FL-0434,EQ-109,Compresor de gas,Bajada del Palo,2024-11-01,2024-11,Rodamiento,257.6,175944.0,Alta
+FL-0435,EQ-110,Compresor de gas,Aguada Pichana,2026-05-23,2026-05,Rodamiento,99.7,123437.0,Alta
+FL-0436,EQ-110,Compresor de gas,Aguada Pichana,2025-11-23,2025-11,Sobrecalentamiento,112.5,91770.0,Alta
+FL-0437,EQ-110,Compresor de gas,Aguada Pichana,2025-09-21,2025-09,Vibracion excesiva,127.3,126050.0,Alta
+FL-0438,EQ-110,Compresor de gas,Aguada Pichana,2025-02-21,2025-02,Falla electrica,65.7,128031.0,Alta
+FL-0439,EQ-110,Compresor de gas,Aguada Pichana,2024-11-10,2024-11,Valvula,93.5,150449.0,Alta
+FL-0440,EQ-110,Compresor de gas,Aguada Pichana,2025-05-12,2025-05,Rodamiento,47.0,128031.0,Alta
+FL-0441,EQ-110,Compresor de gas,Aguada Pichana,2025-03-17,2025-03,Lubricacion,29.7,60910.0,Alta
+FL-0442,EQ-110,Compresor de gas,Aguada Pichana,2025-12-31,2025-12,Vibracion excesiva,131.5,102170.0,Alta
+FL-0443,EQ-110,Compresor de gas,Aguada Pichana,2024-12-27,2024-12,Sobrecalentamiento,88.3,141989.0,Alta
+FL-0444,EQ-111,Compresor de gas,Bandurria Sur,2025-10-28,2025-10,Rodamiento,145.0,121024.0,Alta
+FL-0445,EQ-111,Compresor de gas,Bandurria Sur,2024-12-18,2024-12,Sobrecalentamiento,17.5,86004.0,Alta
+FL-0446,EQ-113,Bomba booster,Fortin de Piedra,2025-01-09,2025-01,Sobrecalentamiento,94.9,54916.0,Alta
+FL-0447,EQ-113,Bomba booster,Fortin de Piedra,2025-12-31,2025-12,Falla electrica,20.1,18887.0,Alta
+FL-0448,EQ-114,Bomba booster,El Trapial,2025-07-11,2025-07,Fuga hidraulica,64.9,37330.0,Baja
+FL-0449,EQ-114,Bomba booster,El Trapial,2026-07-30,2026-07,Fuga hidraulica,44.4,33881.0,Baja
+FL-0450,EQ-115,Bomba booster,Bajada del Palo,2026-03-28,2026-03,Sello mecanico,17.2,18621.0,Media
+FL-0451,EQ-115,Bomba booster,Bajada del Palo,2025-03-23,2025-03,Lubricacion,13.6,19846.0,Media
+FL-0452,EQ-115,Bomba booster,Bajada del Palo,2025-10-03,2025-10,Lubricacion,25.3,16546.0,Media
+FL-0453,EQ-115,Bomba booster,Bajada del Palo,2026-04-08,2026-04,Sello mecanico,67.9,43371.0,Media
+FL-0454,EQ-119,Bomba booster,Fortin de Piedra,2025-10-08,2025-10,Sello mecanico,42.0,35675.0,Alta
+FL-0455,EQ-120,Bomba booster,Fortin de Piedra,2026-06-11,2026-06,Sello mecanico,128.6,65858.0,Baja
+FL-0456,EQ-120,Bomba booster,Fortin de Piedra,2025-08-02,2025-08,Sello mecanico,19.1,23927.0,Baja
+FL-0457,EQ-120,Bomba booster,Fortin de Piedra,2025-08-28,2025-08,Rodamiento,12.7,15120.0,Baja
+FL-0458,EQ-120,Bomba booster,Fortin de Piedra,2026-01-27,2026-01,Rodamiento,106.0,49521.0,Baja
+FL-0459,EQ-120,Bomba booster,Fortin de Piedra,2025-09-19,2025-09,Sello mecanico,39.2,28971.0,Baja
+FL-0460,EQ-121,Bomba booster,Loma Campana,2025-01-22,2025-01,Rodamiento,95.9,53250.0,Baja
+FL-0461,EQ-121,Bomba booster,Loma Campana,2026-06-02,2026-06,Valvula,88.0,53514.0,Baja
+FL-0462,EQ-121,Bomba booster,Loma Campana,2025-08-15,2025-08,Lubricacion,27.3,17072.0,Baja
+FL-0463,EQ-122,Bomba booster,Fortin de Piedra,2025-09-19,2025-09,Valvula,50.0,31518.0,Baja
+FL-0464,EQ-122,Bomba booster,Fortin de Piedra,2024-09-12,2024-09,Rodamiento,162.1,77529.0,Baja
+FL-0465,EQ-122,Bomba booster,Fortin de Piedra,2026-03-04,2026-03,Rodamiento,53.8,38431.0,Baja
+FL-0466,EQ-123,Bomba booster,Rincon La Ceniza,2025-03-13,2025-03,Sello mecanico,69.4,35417.0,Baja
+FL-0467,EQ-123,Bomba booster,Rincon La Ceniza,2026-04-03,2026-04,Falla electrica,61.1,35307.0,Baja
+FL-0468,EQ-123,Bomba booster,Rincon La Ceniza,2025-12-23,2025-12,Rodamiento,53.8,42219.0,Baja
+FL-0469,EQ-123,Bomba booster,Rincon La Ceniza,2025-02-21,2025-02,Sobrecalentamiento,144.4,73039.0,Baja
+FL-0470,EQ-124,Bomba booster,Bandurria Sur,2024-11-01,2024-11,Rodamiento,68.5,43472.0,Media
+FL-0471,EQ-124,Bomba booster,Bandurria Sur,2025-08-19,2025-08,Rodamiento,309.1,142260.0,Media
+FL-0472,EQ-124,Bomba booster,Bandurria Sur,2025-01-20,2025-01,Sello mecanico,40.5,34144.0,Media
+FL-0473,EQ-125,Bomba booster,Loma Campana,2025-05-12,2025-05,Vibracion excesiva,71.1,37371.0,Alta
+FL-0474,EQ-125,Bomba booster,Loma Campana,2025-05-31,2025-05,Rodamiento,21.7,20045.0,Alta
+FL-0475,EQ-125,Bomba booster,Loma Campana,2025-07-08,2025-07,Vibracion excesiva,97.1,47327.0,Alta
+FL-0476,EQ-126,Bomba booster,Fortin de Piedra,2025-03-01,2025-03,Rodamiento,68.9,46273.0,Baja
+FL-0477,EQ-126,Bomba booster,Fortin de Piedra,2025-07-27,2025-07,Vibracion excesiva,31.9,33259.0,Baja
+FL-0478,EQ-126,Bomba booster,Fortin de Piedra,2025-02-18,2025-02,Rodamiento,182.3,86529.0,Baja
+FL-0479,EQ-127,Bomba booster,Loma Campana,2026-07-20,2026-07,Sobrecalentamiento,160.3,73868.0,Media
+FL-0480,EQ-127,Bomba booster,Loma Campana,2026-02-20,2026-02,Valvula,25.1,19477.0,Media
+FL-0481,EQ-128,Bomba booster,Fortin de Piedra,2026-04-22,2026-04,Fuga hidraulica,123.6,69109.0,Baja
+FL-0482,EQ-128,Bomba booster,Fortin de Piedra,2025-11-20,2025-11,Vibracion excesiva,43.8,28635.0,Baja
+FL-0483,EQ-128,Bomba booster,Fortin de Piedra,2026-07-28,2026-07,Fuga hidraulica,26.0,30101.0,Baja
+FL-0484,EQ-129,Bomba booster,Bajada del Palo,2024-12-10,2024-12,Sobrecalentamiento,123.8,62684.0,Media
+FL-0485,EQ-129,Bomba booster,Bajada del Palo,2025-06-04,2025-06,Vibracion excesiva,156.3,70839.0,Media
+FL-0486,EQ-131,Bomba booster,Bandurria Sur,2025-11-18,2025-11,Rodamiento,66.1,46503.0,Baja
+FL-0487,EQ-132,Bomba booster,Loma Campana,2026-05-28,2026-05,Sobrecalentamiento,40.2,32811.0,Baja
+FL-0488,EQ-133,Bomba booster,Bajada del Palo,2024-12-27,2024-12,Vibracion excesiva,119.7,62800.0,Baja
+FL-0489,EQ-133,Bomba booster,Bajada del Palo,2026-08-15,2026-08,Rodamiento,70.4,42099.0,Baja
+FL-0490,EQ-134,Bomba booster,Loma Campana,2026-08-19,2026-08,Falla electrica,112.7,54387.0,Baja
+FL-0491,EQ-134,Bomba booster,Loma Campana,2026-05-04,2026-05,Sello mecanico,34.5,23970.0,Baja
+FL-0492,EQ-135,Bomba booster,Loma Campana,2025-04-04,2025-04,Falla electrica,104.7,48945.0,Baja
+FL-0493,EQ-137,Bomba booster,El Trapial,2025-08-09,2025-08,Sello mecanico,51.1,32945.0,Baja
+FL-0494,EQ-138,Bomba booster,El Trapial,2026-06-01,2026-06,Sello mecanico,41.9,24899.0,Baja
+FL-0495,EQ-138,Bomba booster,El Trapial,2026-06-05,2026-06,Sobrecalentamiento,60.7,32794.0,Baja
+FL-0496,EQ-139,Bomba booster,Bajada del Palo,2026-02-11,2026-02,Rodamiento,100.3,60961.0,Media
+FL-0497,EQ-140,Bomba booster,Bajada del Palo,2026-08-08,2026-08,Fuga hidraulica,52.1,39160.0,Baja
+FL-0498,EQ-140,Bomba booster,Bajada del Palo,2025-09-01,2025-09,Sello mecanico,38.7,27792.0,Baja
+FL-0499,EQ-141,Bomba booster,Aguada Pichana,2025-10-04,2025-10,Sello mecanico,64.6,42501.0,Baja
+FL-0500,EQ-141,Bomba booster,Aguada Pichana,2024-12-17,2024-12,Falla electrica,70.0,41237.0,Baja
+FL-0501,EQ-141,Bomba booster,Aguada Pichana,2026-05-30,2026-05,Valvula,54.8,36856.0,Baja
+FL-0502,EQ-141,Bomba booster,Aguada Pichana,2025-03-09,2025-03,Sello mecanico,7.7,14861.0,Baja
+FL-0503,EQ-141,Bomba booster,Aguada Pichana,2025-11-14,2025-11,Rodamiento,50.8,27024.0,Baja
+FL-0504,EQ-141,Bomba booster,Aguada Pichana,2024-10-16,2024-10,Vibracion excesiva,56.2,39272.0,Baja
+FL-0505,EQ-141,Bomba booster,Aguada Pichana,2025-11-07,2025-11,Valvula,29.1,26516.0,Baja
+FL-0506,EQ-142,Bomba booster,Loma Campana,2026-02-09,2026-02,Rodamiento,201.9,90265.0,Baja
