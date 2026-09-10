@@ -74,9 +74,10 @@
   <!-- Insight central -->
   <section class="panel hl">
     <span class="tag">El hallazgo</span>
-    <h2>El diseño ayuda, pero la ubicación manda</h2>
-    <p class="desc">Cuánto de la variación del EUR explica cada modelo (R² sobre el test que no vio). El diseño solo
-      explica una parte; sumar el <b>área</b> (proxy de la geología) sube el R² bastante — esa diferencia es el peso de la ubicación.</p>
+    <h2>El EUR lo define la ubicación, no el diseño</h2>
+    <p class="desc">Cuánto de la variación del EUR explica cada modelo (R² sobre el test que no vio). Con los datos
+      reales, el diseño por sí solo casi no predice el EUR; sumar el <b>área</b> (proxy de la geología) sube el R²
+      de golpe — esa diferencia es el peso de la ubicación. En Vaca Muerta, dónde perforás pesa más que cómo completás.</p>
     <div id="c_r2"></div>
     <div class="legend" style="margin-top:16px">
       <span><i style="background:var(--s4);border-radius:3px"></i>Explicado por el diseño</span>
@@ -161,7 +162,7 @@ $('#banner').innerHTML = m.es_demo
 const kpis=[
   {lab:'Pozos', val:fmt(k.pozos), unit:'', sub:'con ajuste confiable'},
   {lab:'EUR mediano', val:fmt(k.eur_mediano_mbbl), unit:'Mbbl', sub:'reservas por pozo'},
-  {lab:'R² diseño', val:fmt(k.r2,2), unit:'', sub:'lo que explica el diseño'},
+  {lab:'R² diseño', val:(k.r2<0.02?'≈0':fmt(k.r2,2)), unit:'', sub:'el diseño solo casi no predice'},
   {lab:'R² +geología', val:fmt(k.r2_geo,2), unit:'', sub:'diseño + área', accent:true},
   {lab:'Aporte geología', val:'+'+fmt(k.aporte_geo,2), unit:'', sub:'sube el R² al sumar área'},
   {lab:'Error (MAPE)', val:fmt(k.mape,0), unit:'%', sub:'en test'},
