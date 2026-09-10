@@ -46,7 +46,7 @@ DESCRIPCION = (
 )
 
 ENVOLTORIO = """<!doctype html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
