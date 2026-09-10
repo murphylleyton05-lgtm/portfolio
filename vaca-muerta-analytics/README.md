@@ -101,7 +101,7 @@ Este bloque lo reescribe el workflow en cada actualización, así el README nunc
 queda con números viejos.
 
 <!-- RESULTADOS:INICIO -->
-> Última actualización: **2026-09-06** · datos oficiales de la Secretaría de Energía · período **2006-01 a 2026-07** · **2,613 pozos**, 2,463 con curva ajustada.
+> Última actualización: **2026-09-10** · datos oficiales de la Secretaría de Energía · período **2006-01 a 2026-07** · **2,613 pozos**, 2,463 con curva ajustada.
 
 | Horizonte | Error en **un pozo** | Sesgo | Dentro de ±20% | Error en el **total** | Pozos |
 |---|---:|---:|---:|---:|---:|
