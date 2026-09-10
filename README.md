@@ -4,6 +4,8 @@ Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyect
 
 ## Proyectos
 
+> 🛢️ **Hub de Data Analytics · Petróleo y Gas:** https://murphylleyton05-lgtm.github.io/portfolio/hidrocarburos/ — los 4 proyectos del sector hidrocarburos en una sola página.
+
 | Proyecto | Descripción | Stack |
 |----------|-------------|-------|
 | [🛢️ Vaca Muerta Analytics](./vaca-muerta-analytics) | Curvas de declinación y estimación de reservas (EUR) de pozos no convencionales, con datos públicos de la Secretaría de Energía. | Python · pandas · scipy · Streamlit · n8n |
