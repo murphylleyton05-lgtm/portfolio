@@ -50,6 +50,8 @@ jobs:
           cp asset-reliability-analytics/web/index.html site/confiabilidad/
           mkdir -p site/operaciones
           cp vaca-muerta-ops-intelligence/web/index.html site/operaciones/
+          mkdir -p site/hidrocarburos
+          cp portfolio-hidrocarburos/index.html site/hidrocarburos/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
