@@ -1,5 +1,5 @@
 <title>Vaca Muerta Operations Intelligence</title>
-<meta name="description" content="Tablero de operaciones de Vaca Muerta: producción de petróleo y gas, actividad de perforación y completación, acumulado, ranking de operadores. Datos simulados, modelo estrella para Power BI.">
+<meta name="description" content="Tablero de operaciones de Vaca Muerta: producción de petróleo y gas, actividad, acumulado, ranking de operadores. Datos oficiales de la Secretaría de Energía, medidas DAX para Power BI.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
@@ -95,10 +95,10 @@
       <div id="c_acum"></div>
     </section>
     <section class="panel" style="margin-top:26px">
-      <h2>Actividad: perforación y completación</h2>
-      <p class="desc">Pozos iniciados (spuds) vs. completados por mes.</p>
+      <h2>Actividad: pozos nuevos en producción</h2>
+      <p class="desc">Pozos que entran en producción cada mes (primer mes con caudal declarado).</p>
       <div id="c_act"></div>
-      <div class="legend"><span><i style="background:var(--s1)"></i>Spuds</span><span><i style="background:var(--s3)"></i>Completions</span></div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Pozos nuevos</span></div>
     </section>
   </div>
 
@@ -107,7 +107,7 @@
     <p class="desc">Por producción actual de petróleo. La barra muestra el share sobre el total de la cartera.</p>
     <div class="scroll">
       <table id="t_op">
-        <thead><tr><th>Operador</th><th>Producción (bbl/d)</th><th>Share</th><th>Pozos</th><th>bbl/d por pozo</th><th>Acum. (MMbbl)</th><th>Inversión</th></tr></thead>
+        <thead><tr><th>Operador</th><th>Producción (bbl/d)</th><th>Share</th><th>Pozos activos</th><th>bbl/d por pozo</th><th>Acum. (MMbbl)</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -135,26 +135,31 @@
   <section class="panel pbi">
     <span class="tag">Capa Power BI</span>
     <h2>El modelo de datos, listo para Power BI</h2>
-    <p class="desc">Los mismos datos que ves acá quedan en <b>esquema estrella</b> (una tabla de hechos rodeada de
-      dimensiones) en <span class="mono">/data</span>. Importás los CSV, marcás las relaciones y armás estas medidas DAX.</p>
+    <p class="desc">La fuente es la producción oficial por pozo y mes (<span class="mono">produccion.parquet</span>) más una
+      dimensión de pozos (<span class="mono">pozos.parquet</span>). Power BI importa parquet directo; marcás las relaciones
+      y armás estas medidas DAX.</p>
     <div class="pbi-cols">
       <div>
         <h3 style="font-size:13px; color:var(--ink-2); font-family:'JetBrains Mono',monospace; letter-spacing:.06em; margin-bottom:8px">ESQUEMA</h3>
-        <div class="schema">dim_operador ─┐
-dim_area ─────┤
-dim_pozo ─────┼─&lt; fact_produccion
-dim_fecha ────┤       (pozo × mes: oil, gas, agua)
-              └─&lt; fact_actividad
-                      (mes: spuds, completions)</div>
+        <div class="schema">dim_pozo (pozos.parquet)
+   id_pozo, empresa, area,
+   ventana_fluido, primer_mes
+        │  1
+        │
+        *  ▼
+fact_produccion (produccion.parquet)
+   id_pozo, fecha, empresa,
+   prod_petroleo_m3, prod_gas_mm3</div>
       </div>
       <div>
         <h3 style="font-size:13px; color:var(--ink-2); font-family:'JetBrains Mono',monospace; letter-spacing:.06em; margin-bottom:8px">MEDIDAS DAX (EJEMPLOS)</h3>
-        <div class="dax"><b>Petroleo bbl/d</b> = DIVIDE( SUM(fact_produccion[petroleo_bbl]), 30.4 )</div>
-        <div class="dax"><b>Oil acumulado</b> = CALCULATE( SUM(fact_produccion[petroleo_bbl]),
-    FILTER( ALL(dim_fecha), dim_fecha[mes] &lt;= MAX(dim_fecha[mes]) ))</div>
+        <div class="dax"><b>Petroleo bbl/d</b> = DIVIDE( SUM(fact_produccion[prod_petroleo_m3]) * 6.28981, 30.4 )</div>
+        <div class="dax"><b>Oil acumulado (MMbbl)</b> = DIVIDE( CALCULATE(
+    SUM(fact_produccion[prod_petroleo_m3]) * 6.28981,
+    FILTER( ALL(dim_fecha), dim_fecha[fecha] &lt;= MAX(dim_fecha[fecha]) )), 1e6 )</div>
         <div class="dax"><b>Var MoM %</b> = VAR ant = CALCULATE([Petroleo bbl/d], PREVIOUSMONTH(dim_fecha[fecha]))
 RETURN DIVIDE([Petroleo bbl/d] - ant, ant)</div>
-        <div class="dax"><b>Pozos activos</b> = DISTINCTCOUNT( fact_produccion[pozo_id] )</div>
+        <div class="dax"><b>Pozos activos</b> = DISTINCTCOUNT( fact_produccion[id_pozo] )</div>
       </div>
     </div>
     <p class="desc" style="margin-top:14px">El set completo de medidas está en <span class="mono">powerbi/medidas-dax.md</span>.</p>
@@ -164,16 +169,16 @@ RETURN DIVIDE([Petroleo bbl/d] - ant, ant)</div>
     <h2>Lo que este tablero no hace</h2>
     <p class="desc">Los límites, declarados.</p>
     <div class="grid limits">
-      <div class="tile"><div class="val">Los datos son simulados</div><p>Producción, actividad y operadores salen de un generador con semilla fija. El proyecto hermano <b>vaca-muerta-analytics</b> usa los datos oficiales reales de la Secretaría de Energía.</p></div>
+      <div class="tile"><div class="val">Producción real y oficial</div><p>Los datos son los de la Secretaría de Energía (producción de pozos no convencionales), los mismos que usa <b>vaca-muerta-analytics</b>. El CI los regenera automáticamente.</p></div>
       <div class="tile"><div class="val">Es una vista de operaciones, no de reservas</div><p>Muestra producción y actividad. La estimación de reservas (EUR) y la validación de curvas viven en el proyecto de analytics.</p></div>
-      <div class="tile"><div class="val">El costo es un estimado</div><p>La inversión por pozo se estima por longitud de rama y etapas; no son costos contables reales.</p></div>
-      <div class="tile"><div class="val">El .pbix no está incluido</div><p>Se entrega el modelo (CSV estrella) y las medidas DAX para reconstruir el reporte en Power BI Desktop en minutos.</p></div>
+      <div class="tile"><div class="val">"Actividad" = primera producción</div><p>El dataset no trae fecha de spud; la actividad se mide por el mes en que cada pozo entra en producción, que es un proxy fiel de la actividad de completación.</p></div>
+      <div class="tile"><div class="val">El .pbix no está incluido</div><p>Se entregan los datos (parquet) y las medidas DAX para reconstruir el reporte en Power BI Desktop en minutos.</p></div>
     </div>
   </section>
 
   <footer>
-    Proyecto de portfolio · <b>Operations Intelligence + Power BI</b> · datos simulados con Python (numpy).
-    Modelo estrella en <span class="mono">/data</span>, medidas en <span class="mono">/powerbi</span>.
+    Proyecto de portfolio · <b>Operations Intelligence + Power BI</b> · datos oficiales de la Secretaría de Energía,
+    procesados con Python (pandas). Medidas DAX en <span class="mono">powerbi/medidas-dax.md</span>.
   </footer>
 </div>
 
@@ -187,17 +192,18 @@ const fmt=(n,d=0)=>Number(n).toLocaleString('es-AR',{minimumFractionDigits:d,max
 const usd=n=>{const a=Math.abs(n); return a>=1000?'US$ '+fmt(n/1000,2)+' MMM':'US$ '+fmt(n,0)+' MM';};
 const m=D.meta,k=D.kpis,S=D.serie;
 
-$('#banner').innerHTML = `<b>Datos de demostración.</b> Cartera simulada de ${m.pozos} pozos, ${m.operadores} operadores,
-  período <span class="mono">${m.periodo}</span>. Datos sintéticos; el proyecto hermano usa los datos oficiales reales.`;
+$('#banner').innerHTML = m.es_demo
+  ? `<b>Datos de demostración.</b> Versión demo con ${m.pozos} pozos (mismo esquema que la oficial). En producción el CI regenera este tablero con los datos reales de la Secretaría de Energía.`
+  : `<b>Datos oficiales de la Secretaría de Energía.</b> ${fmt(m.pozos)} pozos no convencionales de ${m.operadores} operadores, producción real <span class="mono">${m.periodo}</span> (historia desde ${m.hist_desde}). Regenerado por CI.`;
 
 const flecha=v=>v>=0?`<span class="up">▲ ${fmt(v,1)}%</span>`:`<span class="down">▼ ${fmt(Math.abs(v),1)}%</span>`;
 const kpis=[
   {lab:'Petróleo', val:fmt(k.oil_bbl_d), unit:'bbl/d', sub:'MoM '+flecha(k.oil_var_mom)},
   {lab:'Gas', val:fmt(k.gas_mm3_d,1), unit:'Mm³/d', sub:'MoM '+flecha(k.gas_var_mom)},
-  {lab:'Pozos activos', val:fmt(k.pozos_activos), unit:'', sub:`${k.pozos_total} en la cartera`},
-  {lab:'Acumulado', val:fmt(k.acum_mmbbl,1), unit:'MMbbl', sub:'petróleo del período'},
-  {lab:'Pozos perforados', val:fmt(k.pozos_perforados), unit:'', sub:`${k.completions} completados`},
-  {lab:'Inversión', val:fmt(k.inversion_musd/1000,2), unit:'MMM US$', sub:'estimada en pozos'},
+  {lab:'Pozos activos', val:fmt(k.pozos_activos), unit:'', sub:`${fmt(k.pozos_total)} en el dataset`},
+  {lab:'Acumulado', val:fmt(k.acum_mmbbl,1), unit:'MMbbl', sub:'petróleo, histórico'},
+  {lab:'Pozos nuevos', val:fmt(k.pozos_nuevos), unit:'', sub:`en ${m.meses} meses`},
+  {lab:'Operadores', val:fmt(k.operadores), unit:'', sub:'en la cartera'},
 ];
 $('#kpis').innerHTML = kpis.map(x=>`<div class="tile"><div class="lab">${x.lab}</div>
   <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div><div class="sub">${x.sub}</div></div>`).join('');
@@ -237,16 +243,15 @@ function dibujarAcum(){
   ejeX(g,meses,iw,ih,8);box.appendChild(svg);
 }
 
-/* Actividad: spuds vs completions (barras agrupadas) */
+/* Actividad: pozos nuevos por mes (barras) */
 function dibujarAct(){
   const box=$('#c_act');box.innerHTML='';const W=470,H=250,mL=32,mR=12,mT=14,mB=32,iw=W-mL-mR,ih=H-mT-mB;
-  const meses=S.meses,sp=S.spuds,co=S.completions,max=Math.max(...sp,...co,1)*1.2;
+  const meses=S.meses,nv=S.nuevos,max=Math.max(...nv,1)*1.2;
   const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
   ejeY(g,0,ih,ih,max,v=>fmt(v,0));
-  const gw=iw/meses.length,bw=gw*0.36;
-  meses.forEach((mm,i)=>{const cx=gw*(i+0.5);
-    g.appendChild(el('rect',{x:cx-bw-1,y:ih-ih*sp[i]/max,width:bw,height:ih*sp[i]/max,rx:1.5,fill:cssVar('--s1'),opacity:.9}));
-    g.appendChild(el('rect',{x:cx+1,y:ih-ih*co[i]/max,width:bw,height:ih*co[i]/max,rx:1.5,fill:cssVar('--s3'),opacity:.9}));});
+  const bw=iw/meses.length*0.6;
+  meses.forEach((mm,i)=>{const x=iw*(i+0.5)/meses.length-bw/2,bh=ih*nv[i]/max;
+    g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:2,fill:cssVar('--s1'),opacity:.9}));});
   ejeX(g,meses,iw,ih,8);box.appendChild(svg);
 }
 
@@ -266,7 +271,7 @@ function pintarOperadores(){
     <td class="num">${fmt(r.oil_bbl_d)}</td>
     <td><span class="sharebar"><div style="width:${Math.round(100*r.oil_bbl_d/maxO)}%"></div></span><span class="num">${fmt(100*r.oil_bbl_d/tot,0)}%</span></td>
     <td class="num">${r.pozos}</td><td class="num">${fmt(r.prod_por_pozo)}</td>
-    <td class="num">${fmt(r.acum_mmbbl,1)}</td><td class="num">${usd(r.inversion_musd)}</td></tr>`).join('');
+    <td class="num">${fmt(r.acum_mmbbl,1)}</td></tr>`).join('');
 }
 function pintarPozos(){
   $('#t_pozos tbody').innerHTML=D.pozos_top.map(r=>`<tr><td class="num">${r.pozo_id}</td><td>${r.operador}</td>

@@ -1,35 +1,38 @@
 # Medidas DAX — Vaca Muerta Operations Intelligence
 
-Modelo en **esquema estrella**. Importá los CSV de `../data` a Power BI Desktop y creá estas relaciones:
+Fuente: los parquets procesados por el pipeline oficial
+(`../vaca-muerta-analytics/data/procesado/`). Power BI Desktop importa **parquet** directo
+(Obtener datos → Más → Parquet, o vía carpeta).
+
+- `produccion.parquet` → tabla de hechos (`fact_produccion`), una fila por **pozo × mes**.
+- `pozos.parquet` → dimensión de pozos (`dim_pozo`).
+- Creá una `dim_fecha` (tabla de fechas) a partir de `produccion[fecha]` con
+  `CALENDAR(MIN(fact_produccion[fecha]), MAX(fact_produccion[fecha]))` y marcala como tabla de fechas.
+
+## Relaciones
 
 ```
-dim_operador[operador]  1 ─── *  fact_produccion[operador]
-dim_area[area]          1 ─── *  fact_produccion[area]
-dim_pozo[pozo_id]       1 ─── *  fact_produccion[pozo_id]
-dim_fecha[mes]          1 ─── *  fact_produccion[mes]
-dim_fecha[mes]          1 ─── *  fact_actividad[mes]
+dim_pozo[id_pozo]   1 ─── *  fact_produccion[id_pozo]
+dim_fecha[fecha]    1 ─── *  fact_produccion[fecha]
 ```
 
-> Marcá `dim_fecha` como **tabla de fechas** (creá una columna `fecha` real con
-> `Fecha = DATE(dim_fecha[anio], dim_fecha[mes_num], 1)`) para que funcionen las
-> funciones de time intelligence (`PREVIOUSMONTH`, `DATESYTD`, etc.).
+> Nota de unidades: la producción viene en **m³** (`prod_petroleo_m3`) y en **Mm³** de gas
+> (`prod_gas_mm3`, miles de m³). Para petróleo en barriles se usa **1 m³ = 6,28981 bbl**.
 
 ---
 
 ## Producción
 
 ```DAX
-Petroleo bbl = SUM( fact_produccion[petroleo_bbl] )
+Petroleo m3 = SUM( fact_produccion[prod_petroleo_m3] )
 
-Petroleo bbl/d =
-DIVIDE( [Petroleo bbl], 30.4 )
+Petroleo bbl = [Petroleo m3] * 6.28981
 
-Gas Mm3 = SUM( fact_produccion[gas_mm3] )
+Petroleo bbl/d = DIVIDE( [Petroleo bbl], 30.4 )
 
-Gas Mm3/d =
-DIVIDE( [Gas Mm3], 30.4 )
+Gas Mm3 = SUM( fact_produccion[prod_gas_mm3] )
 
-Agua bbl = SUM( fact_produccion[agua_bbl] )
+Gas Mm3/d = DIVIDE( [Gas Mm3], 30.4 )
 ```
 
 ## Acumulado (running total)
@@ -59,32 +62,23 @@ RETURN DIVIDE( [Petroleo bbl/d] - ant, ant )
 ## Pozos y productividad
 
 ```DAX
-Pozos activos = DISTINCTCOUNT( fact_produccion[pozo_id] )
+Pozos activos = DISTINCTCOUNT( fact_produccion[id_pozo] )
 
-Pozos en cartera = DISTINCTCOUNT( dim_pozo[pozo_id] )
-
-Produccion por pozo (bbl/d) =
-DIVIDE( [Petroleo bbl/d], [Pozos activos] )
+Produccion por pozo (bbl/d) = DIVIDE( [Petroleo bbl/d], [Pozos activos] )
 ```
 
-## Actividad
+## Actividad (pozos nuevos)
 
 ```DAX
-Spuds = SUM( fact_actividad[spuds] )
-
-Completions = SUM( fact_actividad[completions] )
-
-Pozos perforados (acum) =
+-- Pozos que registran su PRIMERA producción en el período filtrado.
+Pozos nuevos =
 CALCULATE(
-    [Spuds],
-    FILTER( ALL( dim_fecha ), dim_fecha[fecha] <= MAX( dim_fecha[fecha] ) )
+    DISTINCTCOUNT( fact_produccion[id_pozo] ),
+    FILTER(
+        VALUES( fact_produccion[id_pozo] ),
+        CALCULATE( MIN( fact_produccion[fecha] ) ) IN VALUES( dim_fecha[fecha] )
+    )
 )
-```
-
-## Inversión (desde dim_pozo)
-
-```DAX
-Inversion (MM US$) = SUM( dim_pozo[costo_musd] )
 ```
 
 ## Share de operador
@@ -93,13 +87,12 @@ Inversion (MM US$) = SUM( dim_pozo[costo_musd] )
 Share operador % =
 DIVIDE(
     [Petroleo bbl/d],
-    CALCULATE( [Petroleo bbl/d], ALL( dim_operador ) )
+    CALCULATE( [Petroleo bbl/d], ALL( fact_produccion[empresa] ) )
 )
 ```
 
 ---
 
-Con estas medidas armás las visuales del tablero: un gráfico de líneas de
-**Petroleo bbl/d** y **Gas Mm3/d** por `dim_fecha[fecha]`, un área de
-**Oil acumulado (MMbbl)**, barras de **Spuds**/**Completions** por mes, una
-tabla de operadores con **Share operador %**, y tarjetas para los KPIs.
+Con estas medidas armás las visuales: líneas de **Petroleo bbl/d** y **Gas Mm3/d** por
+`dim_fecha[fecha]`, un área de **Oil acumulado (MMbbl)**, barras de **Pozos nuevos** por mes, una tabla de
+operadores (`empresa`) con **Share operador %**, y tarjetas para los KPIs.
