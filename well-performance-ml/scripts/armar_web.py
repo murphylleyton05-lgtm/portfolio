@@ -21,11 +21,11 @@ if marcador not in plantilla:
 cuerpo = plantilla.replace(marcador, "/*__DATOS__*/" + datos)
 
 # Separar <head> (title/meta/link/style) del resto del cuerpo.
-BASE = "https://murphylleyton05-lgtm.github.io/portfolio/confiabilidad/"
+BASE = "https://murphylleyton05-lgtm.github.io/portfolio/performance/"
 OG = (
-    '<meta property="og:title" content="Asset Reliability Analytics — Vaca Muerta">\n'
-    '<meta property="og:description" content="Dashboard de cadena de suministro de arena de fractura y gasoil: '
-    'OTIF, lead time, stock, quiebres y costo logístico. Datos simulados.">\n'
+    '<meta property="og:title" content="Well Performance ML — Vaca Muerta">\n'
+    '<meta property="og:description" content="Modelo de ML con datos oficiales: cuánto del EUR de un pozo explica '
+    'el diseño de fractura vs la geología. Regresión lineal en numpy, train/test.">\n'
     '<meta property="og:type" content="website">\n'
     f'<meta property="og:url" content="{BASE}">\n'
     '<meta name="twitter:card" content="summary_large_image">\n'
