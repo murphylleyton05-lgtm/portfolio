@@ -48,6 +48,8 @@ jobs:
           cp frac-sand-fuel-logistics/web/index.html site/logistica/
           mkdir -p site/confiabilidad
           cp asset-reliability-analytics/web/index.html site/confiabilidad/
+          mkdir -p site/operaciones
+          cp vaca-muerta-ops-intelligence/web/index.html site/operaciones/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
