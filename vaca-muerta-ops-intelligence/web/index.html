@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta property="og:title" content="Vaca Muerta Operations Intelligence">
-<meta property="og:description" content="Dashboard de cadena de suministro de arena de fractura y gasoil: OTIF, lead time, stock, quiebres y costo logístico. Datos simulados.">
+<meta property="og:description" content="Producción de petróleo y gas, actividad y ranking de operadores de Vaca Muerta. Datos oficiales de la Secretaría de Energía, con capa Power BI (medidas DAX).">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://murphylleyton05-lgtm.github.io/portfolio/operaciones/">
 <meta name="twitter:card" content="summary_large_image">
 <title>Vaca Muerta Operations Intelligence</title>
-<meta name="description" content="Tablero de operaciones de Vaca Muerta: producción de petróleo y gas, actividad de perforación y completación, acumulado, ranking de operadores. Datos simulados, modelo estrella para Power BI.">
+<meta name="description" content="Tablero de operaciones de Vaca Muerta: producción de petróleo y gas, actividad, acumulado, ranking de operadores. Datos oficiales de la Secretaría de Energía, medidas DAX para Power BI.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
@@ -108,10 +108,10 @@
       <div id="c_acum"></div>
     </section>
     <section class="panel" style="margin-top:26px">
-      <h2>Actividad: perforación y completación</h2>
-      <p class="desc">Pozos iniciados (spuds) vs. completados por mes.</p>
+      <h2>Actividad: pozos nuevos en producción</h2>
+      <p class="desc">Pozos que entran en producción cada mes (primer mes con caudal declarado).</p>
       <div id="c_act"></div>
-      <div class="legend"><span><i style="background:var(--s1)"></i>Spuds</span><span><i style="background:var(--s3)"></i>Completions</span></div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Pozos nuevos</span></div>
     </section>
   </div>
 
@@ -120,7 +120,7 @@
     <p class="desc">Por producción actual de petróleo. La barra muestra el share sobre el total de la cartera.</p>
     <div class="scroll">
       <table id="t_op">
-        <thead><tr><th>Operador</th><th>Producción (bbl/d)</th><th>Share</th><th>Pozos</th><th>bbl/d por pozo</th><th>Acum. (MMbbl)</th><th>Inversión</th></tr></thead>
+        <thead><tr><th>Operador</th><th>Producción (bbl/d)</th><th>Share</th><th>Pozos activos</th><th>bbl/d por pozo</th><th>Acum. (MMbbl)</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -148,26 +148,31 @@
   <section class="panel pbi">
     <span class="tag">Capa Power BI</span>
     <h2>El modelo de datos, listo para Power BI</h2>
-    <p class="desc">Los mismos datos que ves acá quedan en <b>esquema estrella</b> (una tabla de hechos rodeada de
-      dimensiones) en <span class="mono">/data</span>. Importás los CSV, marcás las relaciones y armás estas medidas DAX.</p>
+    <p class="desc">La fuente es la producción oficial por pozo y mes (<span class="mono">produccion.parquet</span>) más una
+      dimensión de pozos (<span class="mono">pozos.parquet</span>). Power BI importa parquet directo; marcás las relaciones
+      y armás estas medidas DAX.</p>
     <div class="pbi-cols">
       <div>
         <h3 style="font-size:13px; color:var(--ink-2); font-family:'JetBrains Mono',monospace; letter-spacing:.06em; margin-bottom:8px">ESQUEMA</h3>
-        <div class="schema">dim_operador ─┐
-dim_area ─────┤
-dim_pozo ─────┼─&lt; fact_produccion
-dim_fecha ────┤       (pozo × mes: oil, gas, agua)
-              └─&lt; fact_actividad
-                      (mes: spuds, completions)</div>
+        <div class="schema">dim_pozo (pozos.parquet)
+   id_pozo, empresa, area,
+   ventana_fluido, primer_mes
+        │  1
+        │
+        *  ▼
+fact_produccion (produccion.parquet)
+   id_pozo, fecha, empresa,
+   prod_petroleo_m3, prod_gas_mm3</div>
       </div>
       <div>
         <h3 style="font-size:13px; color:var(--ink-2); font-family:'JetBrains Mono',monospace; letter-spacing:.06em; margin-bottom:8px">MEDIDAS DAX (EJEMPLOS)</h3>
-        <div class="dax"><b>Petroleo bbl/d</b> = DIVIDE( SUM(fact_produccion[petroleo_bbl]), 30.4 )</div>
-        <div class="dax"><b>Oil acumulado</b> = CALCULATE( SUM(fact_produccion[petroleo_bbl]),
-    FILTER( ALL(dim_fecha), dim_fecha[mes] &lt;= MAX(dim_fecha[mes]) ))</div>
+        <div class="dax"><b>Petroleo bbl/d</b> = DIVIDE( SUM(fact_produccion[prod_petroleo_m3]) * 6.28981, 30.4 )</div>
+        <div class="dax"><b>Oil acumulado (MMbbl)</b> = DIVIDE( CALCULATE(
+    SUM(fact_produccion[prod_petroleo_m3]) * 6.28981,
+    FILTER( ALL(dim_fecha), dim_fecha[fecha] &lt;= MAX(dim_fecha[fecha]) )), 1e6 )</div>
         <div class="dax"><b>Var MoM %</b> = VAR ant = CALCULATE([Petroleo bbl/d], PREVIOUSMONTH(dim_fecha[fecha]))
 RETURN DIVIDE([Petroleo bbl/d] - ant, ant)</div>
-        <div class="dax"><b>Pozos activos</b> = DISTINCTCOUNT( fact_produccion[pozo_id] )</div>
+        <div class="dax"><b>Pozos activos</b> = DISTINCTCOUNT( fact_produccion[id_pozo] )</div>
       </div>
     </div>
     <p class="desc" style="margin-top:14px">El set completo de medidas está en <span class="mono">powerbi/medidas-dax.md</span>.</p>
@@ -177,21 +182,21 @@ RETURN DIVIDE([Petroleo bbl/d] - ant, ant)</div>
     <h2>Lo que este tablero no hace</h2>
     <p class="desc">Los límites, declarados.</p>
     <div class="grid limits">
-      <div class="tile"><div class="val">Los datos son simulados</div><p>Producción, actividad y operadores salen de un generador con semilla fija. El proyecto hermano <b>vaca-muerta-analytics</b> usa los datos oficiales reales de la Secretaría de Energía.</p></div>
+      <div class="tile"><div class="val">Producción real y oficial</div><p>Los datos son los de la Secretaría de Energía (producción de pozos no convencionales), los mismos que usa <b>vaca-muerta-analytics</b>. El CI los regenera automáticamente.</p></div>
       <div class="tile"><div class="val">Es una vista de operaciones, no de reservas</div><p>Muestra producción y actividad. La estimación de reservas (EUR) y la validación de curvas viven en el proyecto de analytics.</p></div>
-      <div class="tile"><div class="val">El costo es un estimado</div><p>La inversión por pozo se estima por longitud de rama y etapas; no son costos contables reales.</p></div>
-      <div class="tile"><div class="val">El .pbix no está incluido</div><p>Se entrega el modelo (CSV estrella) y las medidas DAX para reconstruir el reporte en Power BI Desktop en minutos.</p></div>
+      <div class="tile"><div class="val">"Actividad" = primera producción</div><p>El dataset no trae fecha de spud; la actividad se mide por el mes en que cada pozo entra en producción, que es un proxy fiel de la actividad de completación.</p></div>
+      <div class="tile"><div class="val">El .pbix no está incluido</div><p>Se entregan los datos (parquet) y las medidas DAX para reconstruir el reporte en Power BI Desktop en minutos.</p></div>
     </div>
   </section>
 
   <footer>
-    Proyecto de portfolio · <b>Operations Intelligence + Power BI</b> · datos simulados con Python (numpy).
-    Modelo estrella en <span class="mono">/data</span>, medidas en <span class="mono">/powerbi</span>.
+    Proyecto de portfolio · <b>Operations Intelligence + Power BI</b> · datos oficiales de la Secretaría de Energía,
+    procesados con Python (pandas). Medidas DAX en <span class="mono">powerbi/medidas-dax.md</span>.
   </footer>
 </div>
 
 <script>
-const D = /*__DATOS__*/{"meta":{"generado":"2026-09-01","periodo":"2023-09 a 2026-08","meses":36,"pozos":90,"operadores":10},"kpis":{"oil_bbl_d":38392.0,"oil_var_mom":-4.8,"gas_mm3_d":9.72,"gas_var_mom":-1.1,"pozos_activos":90,"pozos_total":90,"acum_mmbbl":19.54,"pozos_perforados":90,"completions":90,"inversion_musd":1386.0},"serie":{"meses":["2023-09","2023-10","2023-11","2023-12","2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10","2024-11","2024-12","2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08"],"oil_bbl_d":[0.0,0.0,0.0,1161.0,4353.0,9085.0,10067.0,10767.0,11870.0,13675.0,13471.0,13212.0,14408.0,13437.0,13788.0,16405.0,16247.0,15936.0,14708.0,17325.0,17743.0,18870.0,20567.0,21594.0,21573.0,21690.0,21567.0,23807.0,24588.0,27169.0,29527.0,34304.0,33653.0,37621.0,40335.0,38392.0],"gas_mm3_d":[0.0,0.0,0.0,0.17,1.36,2.24,2.83,3.17,3.31,4.17,3.89,3.67,4.02,3.75,3.87,4.33,4.22,4.05,3.75,4.56,4.96,5.69,5.86,5.94,6.21,6.84,6.57,6.99,7.7,7.93,7.98,9.01,8.82,9.54,9.83,9.72],"activos":[0,0,0,1,5,10,12,15,17,22,23,24,27,27,28,32,33,34,34,37,40,44,47,49,51,54,55,58,62,66,69,76,78,84,89,90],"acum_mmbbl":[0.0,0.0,0.0,0.04,0.17,0.44,0.75,1.08,1.44,1.85,2.26,2.66,3.1,3.51,3.93,4.43,4.92,5.41,5.85,6.38,6.92,7.49,8.12,8.78,9.43,10.09,10.75,11.47,12.22,13.04,13.94,14.98,16.01,17.15,18.38,19.54],"spuds":[4,5,5,2,1,5,2,2,1,0,1,2,4,0,0,2,4,3,5,2,2,1,2,2,6,3,6,4,3,3,5,3,0,0,0,0],"completions":[0,0,1,4,5,2,3,2,5,1,1,3,0,1,4,1,1,0,3,3,4,3,2,2,3,1,3,4,4,3,7,2,6,5,1,0]},"operadores":[{"operador":"YPF","pozos":22,"acum_mmbbl":5.79,"oil_bbl_d":7608.0,"prod_por_pozo":346.0,"inversion_musd":324.0},{"operador":"Vista Energy","pozos":16,"acum_mmbbl":2.66,"oil_bbl_d":7124.0,"prod_por_pozo":445.0,"inversion_musd":253.0},{"operador":"Pan American Energy","pozos":10,"acum_mmbbl":1.69,"oil_bbl_d":6083.0,"prod_por_pozo":608.0,"inversion_musd":158.0},{"operador":"Tecpetrol","pozos":8,"acum_mmbbl":2.04,"oil_bbl_d":3849.0,"prod_por_pozo":481.0,"inversion_musd":125.0},{"operador":"Shell","pozos":11,"acum_mmbbl":2.39,"oil_bbl_d":3841.0,"prod_por_pozo":349.0,"inversion_musd":168.0},{"operador":"Pluspetrol","pozos":7,"acum_mmbbl":1.85,"oil_bbl_d":2383.0,"prod_por_pozo":340.0,"inversion_musd":114.0},{"operador":"Chevron","pozos":3,"acum_mmbbl":0.39,"oil_bbl_d":2148.0,"prod_por_pozo":716.0,"inversion_musd":47.0},{"operador":"Pampa Energia","pozos":6,"acum_mmbbl":1.15,"oil_bbl_d":1987.0,"prod_por_pozo":331.0,"inversion_musd":89.0},{"operador":"ExxonMobil","pozos":3,"acum_mmbbl":0.75,"oil_bbl_d":1697.0,"prod_por_pozo":566.0,"inversion_musd":46.0},{"operador":"Total Austral","pozos":4,"acum_mmbbl":0.83,"oil_bbl_d":1673.0,"prod_por_pozo":418.0,"inversion_musd":62.0}],"ventanas":[{"ventana":"Petroleo negro","oil_bbl_d":23502.0},{"ventana":"Petroleo volatil","oil_bbl_d":12597.0},{"ventana":"Gas y condensado","oil_bbl_d":2293.0}],"pozos_top":[{"pozo_id":"VM-008","operador":"YPF","area":"Loma Campana","ventana":"Petroleo negro","primera_prod":"2024-02","rama_m":2358,"peak_bbl_d":1297.0,"acum_mbbl":615.0,"costo_musd":15.4},{"pozo_id":"VM-088","operador":"ExxonMobil","area":"Bandurria Sur","ventana":"Petroleo negro","primera_prod":"2024-02","rama_m":2695,"peak_bbl_d":1104.0,"acum_mbbl":567.0,"costo_musd":14.6},{"pozo_id":"VM-076","operador":"YPF","area":"Rincon La Ceniza","ventana":"Petroleo volatil","primera_prod":"2024-01","rama_m":3263,"peak_bbl_d":1390.0,"acum_mbbl":547.0,"costo_musd":15.6},{"pozo_id":"VM-039","operador":"Vista Energy","area":"Bajada del Palo","ventana":"Petroleo negro","primera_prod":"2024-05","rama_m":2580,"peak_bbl_d":1113.0,"acum_mbbl":482.0,"costo_musd":15.6},{"pozo_id":"VM-081","operador":"YPF","area":"Rincon La Ceniza","ventana":"Petroleo volatil","primera_prod":"2024-03","rama_m":2651,"peak_bbl_d":1263.0,"acum_mbbl":459.0,"costo_musd":14.1},{"pozo_id":"VM-005","operador":"Shell","area":"La Amarga Chica","ventana":"Petroleo negro","primera_prod":"2024-06","rama_m":3173,"peak_bbl_d":1140.0,"acum_mbbl":454.0,"costo_musd":15.8},{"pozo_id":"VM-031","operador":"Tecpetrol","area":"Los Toldos","ventana":"Petroleo volatil","primera_prod":"2024-02","rama_m":3176,"peak_bbl_d":1025.0,"acum_mbbl":451.0,"costo_musd":17.7},{"pozo_id":"VM-065","operador":"YPF","area":"El Trapial","ventana":"Petroleo volatil","primera_prod":"2024-11","rama_m":2873,"peak_bbl_d":1292.0,"acum_mbbl":449.0,"costo_musd":14.6},{"pozo_id":"VM-021","operador":"Tecpetrol","area":"El Trapial","ventana":"Petroleo volatil","primera_prod":"2024-01","rama_m":2940,"peak_bbl_d":1098.0,"acum_mbbl":444.0,"costo_musd":15.3},{"pozo_id":"VM-045","operador":"Shell","area":"Bajada del Palo","ventana":"Petroleo negro","primera_prod":"2023-12","rama_m":2846,"peak_bbl_d":1161.0,"acum_mbbl":435.0,"costo_musd":15.4},{"pozo_id":"VM-007","operador":"Pluspetrol","area":"Los Toldos","ventana":"Petroleo volatil","primera_prod":"2024-02","rama_m":3125,"peak_bbl_d":910.0,"acum_mbbl":426.0,"costo_musd":15.4},{"pozo_id":"VM-086","operador":"Tecpetrol","area":"Loma Campana","ventana":"Petroleo negro","primera_prod":"2025-08","rama_m":3241,"peak_bbl_d":1745.0,"acum_mbbl":421.0,"costo_musd":16.8},{"pozo_id":"VM-015","operador":"YPF","area":"Loma Campana","ventana":"Petroleo negro","primera_prod":"2024-02","rama_m":2143,"peak_bbl_d":936.0,"acum_mbbl":408.0,"costo_musd":13.0},{"pozo_id":"VM-064","operador":"YPF","area":"Bajada del Palo","ventana":"Petroleo negro","primera_prod":"2024-12","rama_m":2345,"peak_bbl_d":1278.0,"acum_mbbl":377.0,"costo_musd":14.1}]};
+const D = /*__DATOS__*/{"meta":{"generado":"2026-09-07","periodo":"2023-08 a 2026-07","meses":36,"pozos":150,"operadores":8,"es_demo":true,"hist_desde":"2018-09"},"kpis":{"oil_bbl_d":21676.0,"oil_var_mom":-4.2,"gas_mm3_d":548.62,"gas_var_mom":-4.3,"pozos_activos":150,"pozos_total":150,"acum_mmbbl":44.03,"gas_acum_mmm3":1101.3,"pozos_nuevos":61,"operadores":8},"serie":{"meses":["2023-08","2023-09","2023-10","2023-11","2023-12","2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10","2024-11","2024-12","2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07"],"oil_bbl_d":[22670.0,21504.0,24772.0,23497.0,24525.0,26036.0,27261.0,28262.0,28716.0,26377.0,25575.0,26047.0,23946.0,25628.0,28821.0,26222.0,28782.0,30099.0,27520.0,26446.0,27383.0,32034.0,31617.0,32865.0,32052.0,27878.0,28392.0,28103.0,26726.0,25994.0,25192.0,24780.0,23659.0,22034.0,22626.0,21676.0],"gas_mm3_d":[558.91,528.32,629.43,599.78,616.38,669.08,691.62,725.32,737.09,674.47,650.06,662.88,623.94,645.1,724.72,685.95,727.67,765.39,685.2,653.38,691.75,822.9,790.65,832.47,821.31,707.44,717.51,709.98,673.34,664.99,642.63,631.7,596.39,559.58,573.41,548.62],"activos":[91,94,98,99,102,104,108,111,112,112,113,115,115,118,123,124,129,130,131,133,137,142,145,150,150,150,150,150,150,150,150,150,150,150,150,150],"acum_mmbbl":[15.66,16.32,17.07,17.78,18.53,19.32,20.15,21.01,21.88,22.68,23.46,24.25,24.98,25.76,26.64,27.43,28.31,29.22,30.06,30.86,31.7,32.67,33.63,34.63,35.61,36.45,37.32,38.17,38.98,39.77,40.54,41.29,42.01,42.68,43.37,44.03],"nuevos":[2,3,4,1,3,2,4,3,1,0,1,2,0,3,5,1,5,1,1,2,4,5,3,5,0,0,0,0,0,0,0,0,0,0,0,0]},"operadores":[{"operador":"SHELL","oil_bbl_d":4051.0,"pozos":25,"prod_por_pozo":162.0,"acum_mmbbl":7.12},{"operador":"TECPETROL","oil_bbl_d":3800.0,"pozos":21,"prod_por_pozo":181.0,"acum_mmbbl":7.12},{"operador":"PAN AMERICAN ENERGY","oil_bbl_d":3020.0,"pozos":23,"prod_por_pozo":131.0,"acum_mmbbl":6.7},{"operador":"VISTA ENERGY","oil_bbl_d":2547.0,"pozos":18,"prod_por_pozo":142.0,"acum_mmbbl":5.16},{"operador":"CHEVRON","oil_bbl_d":2522.0,"pozos":20,"prod_por_pozo":126.0,"acum_mmbbl":5.53},{"operador":"YPF","oil_bbl_d":2088.0,"pozos":16,"prod_por_pozo":130.0,"acum_mmbbl":4.65},{"operador":"PAMPA ENERGIA","oil_bbl_d":1908.0,"pozos":13,"prod_por_pozo":147.0,"acum_mmbbl":3.71},{"operador":"PLUSPETROL","oil_bbl_d":1741.0,"pozos":14,"prod_por_pozo":124.0,"acum_mmbbl":4.03}],"ventanas":[{"ventana":"Petroleo negro","oil_bbl_d":16396.0},{"ventana":"Petroleo volatil","oil_bbl_d":5280.0}],"pozos_top":[{"pozo_id":"LA .x-100118","operador":"TECPETROL","area":"La Amarga Chica","ventana":"Petroleo negro","peak_bbl_d":1575.0,"acum_mbbl":792.0},{"pozo_id":"LA .x-100147","operador":"YPF","area":"La Amarga Chica","ventana":"Petroleo negro","peak_bbl_d":1116.0,"acum_mbbl":750.0},{"pozo_id":"BAJ.x-100042","operador":"TECPETROL","area":"Bajada Del Palo Oeste","ventana":"Petroleo volatil","peak_bbl_d":1558.0,"acum_mbbl":722.0},{"pozo_id":"BAJ.x-100141","operador":"CHEVRON","area":"Bajada Del Palo Oeste","ventana":"Petroleo negro","peak_bbl_d":1061.0,"acum_mbbl":668.0},{"pozo_id":"BAN.x-100020","operador":"TECPETROL","area":"Bandurria Sur","ventana":"Petroleo negro","peak_bbl_d":1431.0,"acum_mbbl":628.0},{"pozo_id":"BAJ.x-100011","operador":"SHELL","area":"Bajada Del Palo Oeste","ventana":"Petroleo negro","peak_bbl_d":2426.0,"acum_mbbl":622.0},{"pozo_id":"FOR.x-100108","operador":"PAMPA ENERGIA","area":"Fortin De Piedra","ventana":"Petroleo volatil","peak_bbl_d":1378.0,"acum_mbbl":614.0},{"pozo_id":"LOM.x-100142","operador":"SHELL","area":"Loma Campana","ventana":"Petroleo negro","peak_bbl_d":882.0,"acum_mbbl":594.0},{"pozo_id":"BAJ.x-100097","operador":"TECPETROL","area":"Bajada Del Palo Oeste","ventana":"Petroleo negro","peak_bbl_d":1008.0,"acum_mbbl":579.0},{"pozo_id":"BAJ.x-100012","operador":"PAN AMERICAN ENERGY","area":"Bajada Del Palo Oeste","ventana":"Petroleo negro","peak_bbl_d":949.0,"acum_mbbl":564.0},{"pozo_id":"LA .x-100070","operador":"VISTA ENERGY","area":"La Amarga Chica","ventana":"Petroleo volatil","peak_bbl_d":1600.0,"acum_mbbl":560.0},{"pozo_id":"AGU.x-100057","operador":"SHELL","area":"Aguada Pichana Este","ventana":"Petroleo volatil","peak_bbl_d":1267.0,"acum_mbbl":560.0},{"pozo_id":"BAJ.x-100046","operador":"PAN AMERICAN ENERGY","area":"Bajada Del Palo Oeste","ventana":"Petroleo negro","peak_bbl_d":936.0,"acum_mbbl":557.0},{"pozo_id":"BAJ.x-100005","operador":"PAMPA ENERGIA","area":"Bajada Del Palo Oeste","ventana":"Petroleo negro","peak_bbl_d":851.0,"acum_mbbl":528.0}]};
 const $ = s => document.querySelector(s);
 const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const NS="http://www.w3.org/2000/svg";
@@ -200,17 +205,18 @@ const fmt=(n,d=0)=>Number(n).toLocaleString('es-AR',{minimumFractionDigits:d,max
 const usd=n=>{const a=Math.abs(n); return a>=1000?'US$ '+fmt(n/1000,2)+' MMM':'US$ '+fmt(n,0)+' MM';};
 const m=D.meta,k=D.kpis,S=D.serie;
 
-$('#banner').innerHTML = `<b>Datos de demostración.</b> Cartera simulada de ${m.pozos} pozos, ${m.operadores} operadores,
-  período <span class="mono">${m.periodo}</span>. Datos sintéticos; el proyecto hermano usa los datos oficiales reales.`;
+$('#banner').innerHTML = m.es_demo
+  ? `<b>Datos de demostración.</b> Versión demo con ${m.pozos} pozos (mismo esquema que la oficial). En producción el CI regenera este tablero con los datos reales de la Secretaría de Energía.`
+  : `<b>Datos oficiales de la Secretaría de Energía.</b> ${fmt(m.pozos)} pozos no convencionales de ${m.operadores} operadores, producción real <span class="mono">${m.periodo}</span> (historia desde ${m.hist_desde}). Regenerado por CI.`;
 
 const flecha=v=>v>=0?`<span class="up">▲ ${fmt(v,1)}%</span>`:`<span class="down">▼ ${fmt(Math.abs(v),1)}%</span>`;
 const kpis=[
   {lab:'Petróleo', val:fmt(k.oil_bbl_d), unit:'bbl/d', sub:'MoM '+flecha(k.oil_var_mom)},
   {lab:'Gas', val:fmt(k.gas_mm3_d,1), unit:'Mm³/d', sub:'MoM '+flecha(k.gas_var_mom)},
-  {lab:'Pozos activos', val:fmt(k.pozos_activos), unit:'', sub:`${k.pozos_total} en la cartera`},
-  {lab:'Acumulado', val:fmt(k.acum_mmbbl,1), unit:'MMbbl', sub:'petróleo del período'},
-  {lab:'Pozos perforados', val:fmt(k.pozos_perforados), unit:'', sub:`${k.completions} completados`},
-  {lab:'Inversión', val:fmt(k.inversion_musd/1000,2), unit:'MMM US$', sub:'estimada en pozos'},
+  {lab:'Pozos activos', val:fmt(k.pozos_activos), unit:'', sub:`${fmt(k.pozos_total)} en el dataset`},
+  {lab:'Acumulado', val:fmt(k.acum_mmbbl,1), unit:'MMbbl', sub:'petróleo, histórico'},
+  {lab:'Pozos nuevos', val:fmt(k.pozos_nuevos), unit:'', sub:`en ${m.meses} meses`},
+  {lab:'Operadores', val:fmt(k.operadores), unit:'', sub:'en la cartera'},
 ];
 $('#kpis').innerHTML = kpis.map(x=>`<div class="tile"><div class="lab">${x.lab}</div>
   <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div><div class="sub">${x.sub}</div></div>`).join('');
@@ -250,16 +256,15 @@ function dibujarAcum(){
   ejeX(g,meses,iw,ih,8);box.appendChild(svg);
 }
 
-/* Actividad: spuds vs completions (barras agrupadas) */
+/* Actividad: pozos nuevos por mes (barras) */
 function dibujarAct(){
   const box=$('#c_act');box.innerHTML='';const W=470,H=250,mL=32,mR=12,mT=14,mB=32,iw=W-mL-mR,ih=H-mT-mB;
-  const meses=S.meses,sp=S.spuds,co=S.completions,max=Math.max(...sp,...co,1)*1.2;
+  const meses=S.meses,nv=S.nuevos,max=Math.max(...nv,1)*1.2;
   const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
   ejeY(g,0,ih,ih,max,v=>fmt(v,0));
-  const gw=iw/meses.length,bw=gw*0.36;
-  meses.forEach((mm,i)=>{const cx=gw*(i+0.5);
-    g.appendChild(el('rect',{x:cx-bw-1,y:ih-ih*sp[i]/max,width:bw,height:ih*sp[i]/max,rx:1.5,fill:cssVar('--s1'),opacity:.9}));
-    g.appendChild(el('rect',{x:cx+1,y:ih-ih*co[i]/max,width:bw,height:ih*co[i]/max,rx:1.5,fill:cssVar('--s3'),opacity:.9}));});
+  const bw=iw/meses.length*0.6;
+  meses.forEach((mm,i)=>{const x=iw*(i+0.5)/meses.length-bw/2,bh=ih*nv[i]/max;
+    g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:2,fill:cssVar('--s1'),opacity:.9}));});
   ejeX(g,meses,iw,ih,8);box.appendChild(svg);
 }
 
@@ -279,7 +284,7 @@ function pintarOperadores(){
     <td class="num">${fmt(r.oil_bbl_d)}</td>
     <td><span class="sharebar"><div style="width:${Math.round(100*r.oil_bbl_d/maxO)}%"></div></span><span class="num">${fmt(100*r.oil_bbl_d/tot,0)}%</span></td>
     <td class="num">${r.pozos}</td><td class="num">${fmt(r.prod_por_pozo)}</td>
-    <td class="num">${fmt(r.acum_mmbbl,1)}</td><td class="num">${usd(r.inversion_musd)}</td></tr>`).join('');
+    <td class="num">${fmt(r.acum_mmbbl,1)}</td></tr>`).join('');
 }
 function pintarPozos(){
   $('#t_pozos tbody').innerHTML=D.pozos_top.map(r=>`<tr><td class="num">${r.pozo_id}</td><td>${r.operador}</td>

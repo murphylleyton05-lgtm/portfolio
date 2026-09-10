@@ -102,10 +102,10 @@
 
     <div class="card">
       <div class="ico">🛢️</div>
-      <h3>Operations Intelligence <span class="real sim">Simulado</span></h3>
-      <p>Tablero de operaciones de la cartera de pozos: producción de petróleo y gas, actividad de perforación y
-        completación, acumulado y ranking de operadores. Con la <b>capa Power BI</b> (esquema estrella + medidas DAX).</p>
-      <div class="hi">Modelo <b>estrella</b> listo para Power BI · medidas <b>DAX</b> escritas</div>
+      <h3>Operations Intelligence <span class="real">Datos reales</span></h3>
+      <p>Tablero de operaciones con la producción <b>oficial</b> de la Secretaría de Energía: petróleo y gas por mes,
+        actividad, acumulado y ranking de operadores. Con la <b>capa Power BI</b> (modelo + medidas DAX).</p>
+      <div class="hi">Datos <b>oficiales</b> · medidas <b>DAX</b> escritas · se regenera por CI</div>
       <div class="tags"><span class="tag">Python</span><span class="tag">numpy</span><span class="tag">Power BI</span><span class="tag">DAX</span></div>
       <div class="actions">
         <a class="btn primary" href="https://murphylleyton05-lgtm.github.io/portfolio/operaciones/">Ver en vivo →</a>
@@ -145,9 +145,9 @@
   <div class="approach">
     <h2>El criterio, no solo el código</h2>
     <ul>
-      <li><b>Datos reales cuando existen, simulados cuando no</b> — y siempre declarado. El proyecto de declinación usa
-        los datos oficiales de la Secretaría de Energía; los otros tres simulan datos con lógica de negocio realista,
-        porque no hay datasets públicos de fallas de equipos o de logística.</li>
+      <li><b>Datos reales cuando existen, simulados cuando no</b> — y siempre declarado. Declinación y Operaciones usan
+        los datos oficiales de la Secretaría de Energía; confiabilidad y logística simulan con lógica de negocio realista,
+        porque no hay datasets públicos de fallas de equipos ni de la logística interna de las operadoras.</li>
       <li><b>Modelado para BI</b> — cada proyecto deja los datos en esquema estrella (dim_/fact_), listos para Power BI.</li>
       <li><b>Los límites, declarados</b> — cada tablero dice qué NO hace. Saber dónde falla el propio trabajo suma credibilidad.</li>
       <li><b>Todo reproducible</b> — Python (pandas, numpy, scipy), sin cajas negras: la regresión logística está escrita a mano.</li>

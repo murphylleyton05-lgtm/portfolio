@@ -24,8 +24,8 @@ cuerpo = plantilla.replace(marcador, "/*__DATOS__*/" + datos)
 BASE = "https://murphylleyton05-lgtm.github.io/portfolio/operaciones/"
 OG = (
     '<meta property="og:title" content="Vaca Muerta Operations Intelligence">\n'
-    '<meta property="og:description" content="Dashboard de cadena de suministro de arena de fractura y gasoil: '
-    'OTIF, lead time, stock, quiebres y costo logístico. Datos simulados.">\n'
+    '<meta property="og:description" content="Producción de petróleo y gas, actividad y ranking de operadores '
+    'de Vaca Muerta. Datos oficiales de la Secretaría de Energía, con capa Power BI (medidas DAX).">\n'
     '<meta property="og:type" content="website">\n'
     f'<meta property="og:url" content="{BASE}">\n'
     '<meta name="twitter:card" content="summary_large_image">\n'
