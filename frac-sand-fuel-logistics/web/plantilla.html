@@ -1,5 +1,5 @@
 <title>Frac Sand &amp; Fuel Logistics</title>
-<meta name="description" content="Dashboard de cadena de suministro de arena de fractura y gasoil en Vaca Muerta: OTIF, lead time, stock, quiebres y costo logístico. Datos simulados.">
+<meta name="description" content="Cadena de suministro de arena de fractura en Vaca Muerta: consumo real (Secretaría de Energía) + logística modelada — OTIF, lead time, stock, quiebres y costo logístico.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
@@ -116,14 +116,14 @@
     <div class="panel-head">
       <div>
         <h2>Consumo por mes</h2>
-        <p class="desc">Arena (barras, eje izquierdo) y gasoil (línea, eje derecho) entregados cada mes. La demanda sube
+        <p class="desc">Arena real (barras, eje izquierdo) y gasoil estimado de las etapas (línea, eje derecho) por mes. La demanda sube
           con la actividad de fractura y tiene estacionalidad.</p>
       </div>
     </div>
     <div id="c_consumo"></div>
     <div class="legend">
       <span><i style="background:var(--s4)"></i>Arena (t)</span>
-      <span><i style="background:var(--accent-2)"></i>Gasoil (m³)</span>
+      <span><i style="background:var(--accent-2)"></i>Gasoil estimado (m³)</span>
     </div>
   </section>
 
@@ -220,7 +220,7 @@
     <h2>Lo que este panel no hace</h2>
     <p class="desc">Declarar los límites es parte del trabajo: muestra que se sabe dónde termina el modelo.</p>
     <div class="grid limits">
-      <div class="tile"><div class="val">Los datos son simulados</div><p>No son operaciones reales. La lógica de negocio (demanda, lead time, quiebres, costo de flete) es realista, pero los números salen de un generador con semilla fija, no de un ERP.</p></div>
+      <div class="tile"><div class="val">Consumo real, logística modelada</div><p>La arena, el agua y las etapas por pozo son datos <b>oficiales</b> de fractura de la Secretaría de Energía. Los proveedores, entregas, stock y costo se modelan encima, porque ninguna operadora publica su logística interna. El gasoil se estima a partir de las etapas reales.</p></div>
       <div class="tile"><div class="val">Un solo yard consolidado</div><p>El stock se modela sobre un depósito único. En la realidad hay varios yards y transferencias entre ellos, que acá no se representan.</p></div>
       <div class="tile"><div class="val">Costo de standby aproximado</div><p>El costo de un set parado se toma como una tarifa fija por día. El costo real depende del contrato y de la etapa de la operación.</p></div>
       <div class="tile"><div class="val">Sin optimización de ruteo</div><p>Muestra el costo de las rutas, pero no resuelve el ruteo óptimo ni el mix de proveedores. Es diagnóstico, no prescriptivo.</p></div>
@@ -228,8 +228,8 @@
   </section>
 
   <footer>
-    Proyecto de portfolio · <b>Data Analytics aplicado a Supply Chain</b> · datos simulados con Python (librería estándar).
-    Los CSV quedan en esquema estrella (dim_/fact_), listos para modelar en Power BI.
+    Proyecto de portfolio · <b>Data Analytics aplicado a Supply Chain</b> · consumo de fractura <b>real</b>
+    (Secretaría de Energía) + capa logística modelada con Python (pandas).
   </footer>
 </div>
 
@@ -249,13 +249,19 @@ function usd(n){ const a=Math.abs(n);
 
 /* ---------- Banner + KPIs ---------- */
 const m = D.meta, k = D.kpis;
-$('#banner').innerHTML = `<b>Datos de demostración.</b> ${fmt(m.envios)} envíos simulados hacia ${m.pads} locaciones,
-  ${m.sets_fractura} sets de fractura, período <span class="mono">${m.periodo}</span>. La lógica de la cadena es
-  realista; los datos no son de una operación real.`;
+$('#banner').innerHTML = (m.es_demo
+  ? `<b>Consumo demo · logística modelada.</b> `
+  : `<b>Consumo real · logística modelada.</b> `)
+  + `El consumo —<b>${fmt(k.arena_total_t)} t de arena</b>, ${fmt(m.etapas)} etapas, ${fmt(k.agua_total_m3)} m³ de agua`
+  + ` de ${fmt(m.pozos)} pozos, período <span class="mono">${m.periodo}</span>— `
+  + (m.es_demo
+     ? `sale de la versión demo (en CI son los datos oficiales de fractura de la Secretaría de Energía). `
+     : `sale de los datos <b>oficiales de fractura</b> de la Secretaría de Energía. `)
+  + `La capa logística (proveedores, ${fmt(m.envios)} entregas, stock, costo) es un <b>modelo</b> sobre ese consumo real, porque no es información pública.`;
 
 const kpis = [
   {lab:'OTIF', val:fmt(k.otif_pct,1), unit:'%', sub:'a tiempo y completo'},
-  {lab:'Arena entregada', val:fmt(k.arena_total_t/1e6,2), unit:'M t', sub:`${fmt(k.gasoil_total_m3)} m³ de gasoil`},
+  {lab:'Arena (real)', val:fmt(k.arena_total_t/1e6,2), unit:'M t', sub:`${fmt(k.agua_total_m3/1e6,1)} M m³ de agua · ${fmt(m.etapas)} etapas`},
   {lab:'Lead time', val:fmt(k.lead_prom_dias,1), unit:'d', sub:`retraso medio ${fmt(k.retraso_prom_dias,1)} d`},
   {lab:'Cobertura de stock', val:fmt(k.cobertura_dias,1), unit:'d', sub:`seguridad ${fmt(D.stock.seguridad_t/1000,0)}k t`},
   {lab:'Días de quiebre', val:fmt(k.dias_quiebre), unit:'', sub:`${fmt(k.dias_bajo_seguridad)} d bajo seguridad`, alert:k.dias_quiebre>0},

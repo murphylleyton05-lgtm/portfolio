@@ -25,7 +25,7 @@ BASE = "https://murphylleyton05-lgtm.github.io/portfolio/logistica/"
 OG = (
     '<meta property="og:title" content="Frac Sand & Fuel Logistics — Vaca Muerta">\n'
     '<meta property="og:description" content="Dashboard de cadena de suministro de arena de fractura y gasoil: '
-    'OTIF, lead time, stock, quiebres y costo logístico. Datos simulados.">\n'
+    'OTIF, lead time, stock, quiebres y costo logístico. Consumo real (Secretaría de Energía) + logística modelada.">\n'
     '<meta property="og:type" content="website">\n'
     f'<meta property="og:url" content="{BASE}">\n'
     '<meta name="twitter:card" content="summary_large_image">\n'

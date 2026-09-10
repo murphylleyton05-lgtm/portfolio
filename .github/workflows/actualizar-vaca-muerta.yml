@@ -98,10 +98,16 @@ jobs:
               --max-pozos "${{ inputs.max_pozos || 400 }}"
           fi
 
-      # El tablero de Operaciones lee los MISMOS parquets procesados y se
-      # regenera con los datos reales (o demo, segun la corrida).
+      # Los tableros de Operaciones y Logistica leen los MISMOS parquets
+      # procesados y se regeneran con los datos reales (o demo, segun la corrida).
       - name: Regenerar tablero de Operaciones (datos reales)
         working-directory: vaca-muerta-ops-intelligence
+        run: |
+          python scripts/construir_datos.py
+          python scripts/armar_web.py
+
+      - name: Regenerar tablero de Logistica (consumo real)
+        working-directory: frac-sand-fuel-logistics
         run: |
           python scripts/construir_datos.py
           python scripts/armar_web.py
@@ -126,6 +132,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add web/index.html web/artifact.html README.md
           git add ../vaca-muerta-ops-intelligence/web/index.html ../vaca-muerta-ops-intelligence/web/artifact.html ../vaca-muerta-ops-intelligence/web/datos.json
+          git add ../frac-sand-fuel-logistics/web/index.html ../frac-sand-fuel-logistics/web/artifact.html ../frac-sand-fuel-logistics/web/datos.json ../frac-sand-fuel-logistics/data/consumo_real_mensual.csv
           if git diff --cached --quiet; then
             echo "La app no cambió: no hay nada que commitear."
             exit 0

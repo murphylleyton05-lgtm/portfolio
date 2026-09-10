@@ -1,73 +1,57 @@
 # 🏗️ Frac Sand & Fuel Logistics — Vaca Muerta
 
-Dashboard de **cadena de suministro** para una operación de fractura hidráulica en Vaca Muerta:
-el abastecimiento de **arena de fractura** (frac sand) y **gasoil** hacia las locaciones.
+Cadena de suministro de **arena de fractura** hacia las locaciones de Vaca Muerta.
 
-> **Data Analytics aplicado a Supply Chain.** Los datos son **simulados** con Python (semilla fija),
-> pero la lógica de negocio es realista: demanda de los sets de fractura, política de reposición de
-> inventario, lead time y demoras por proveedor, quiebres de stock y costo logístico.
+> **Consumo real · logística modelada.** El consumo —arena, agua y etapas por pozo— sale de los datos
+> **oficiales de fractura** de la Secretaría de Energía (los mismos parquets que procesa
+> [`vaca-muerta-analytics`](../vaca-muerta-analytics)). La capa logística (proveedores, entregas, stock,
+> transporte, costo) se **modela** sobre ese consumo real, porque ninguna operadora publica su logística interna.
 
 **🔗 Dashboard en vivo:** https://murphylleyton05-lgtm.github.io/portfolio/logistica/
 
 ---
 
+## Qué es real y qué es modelo
+
+| Real (dataset oficial) | Modelado (sobre lo real) |
+|---|---|
+| Arena bombeada por pozo (`arena_tn`) | Proveedores y su confiabilidad |
+| Agua por pozo (`agua_m3`) | Entregas, lead time y demoras |
+| Etapas por pozo (`etapas`) | Stock diario y política de reposición (s, S) |
+| Mes de completación de cada pozo | Costo logístico (flete, demoras, standby) |
+|  | Gasoil (estimado de las etapas reales) |
+
 ## Por qué importa
 
-Un set de fractura consume **cientos de toneladas de arena por etapa** y no para de quemar gasoil.
-Si la arena no llega, el equipo se detiene — y un día de *standby* cuesta más que semanas de logística.
-El cuello de botella de Vaca Muerta no siempre es geológico: muchas veces es **poner la arena en la
-locación a tiempo y a buen costo**. Este panel mide justamente eso.
-
-## Qué mide
-
-| Indicador | Qué responde |
-|---|---|
-| **OTIF** | ¿Qué % de envíos llegó a tiempo y completo? |
-| **Lead time / retraso** | ¿Cuánto tarda un proveedor y cuánto se desvía? |
-| **Stock de arena** | ¿Cuántos días de cobertura hay? ¿Cuándo se perfora el stock de seguridad? |
-| **Días de quiebre** | ¿Cuántos días paró el equipo por falta de arena? |
-| **Costo logístico** | ¿En qué se va la plata: material, flete, demoras, standby? |
-| **Performance por proveedor** | ¿Quién es confiable y quién es caro? |
+Un set de fractura consume **cientos de toneladas de arena por etapa**. Si la arena no llega, el equipo
+se detiene y cada día parado cuesta más que semanas de logística. El cuello de botella de Vaca Muerta
+muchas veces no es geológico: es **poner la arena en la locación a tiempo y a buen costo**.
 
 ## Cómo funciona
 
-1. **`scripts/simular.py`** genera los datos:
-   - Demanda mensual de arena y gasoil a partir de la actividad de fractura (sets, etapas/día, estacionalidad).
-   - El inventario de arena se modela con una **política de reposición (s, S)**: cuando el disponible + en
-     tránsito cae por debajo del punto de reorden `s`, se emite una orden para reponer hasta el objetivo `S`.
-     Las órdenes llegan tras su lead time (con demoras según el proveedor), así que **un envío demorado puede
-     hacer perforar el stock de seguridad e incluso quebrar**. Así el stock, el OTIF y el costo salen de la
-     misma realidad, no de números sueltos.
-   - Deja los datos en **esquema estrella** (`data/dim_*.csv`, `data/fact_*.csv`) listos para modelar en
-     Power BI, y un `web/datos.json` compacto para el dashboard.
-2. **`scripts/armar_web.py`** inyecta ese JSON en la plantilla y arma `web/index.html`.
+`scripts/construir_datos.py` lee `../vaca-muerta-analytics/data/procesado/ajustes_declinacion.parquet`,
+arma la **demanda mensual real** de arena/agua/etapas y corre sobre ella una **política de reposición
+(s, S)**: cuando el inventario cae por debajo del punto de reorden, se emite una orden que llega tras su
+lead time (con demoras por proveedor), así que un envío demorado puede perforar el stock de seguridad o
+quebrar. Después `scripts/armar_web.py` arma el dashboard.
+
+En CI, el workflow **Actualizar Vaca Muerta** regenera este tablero con los datos oficiales.
 
 ```bash
 cd frac-sand-fuel-logistics
-python3 scripts/simular.py     # genera CSVs + datos.json
-python3 scripts/armar_web.py   # arma el dashboard
+python3 scripts/construir_datos.py   # consumo real + logística modelada -> datos.json
+python3 scripts/armar_web.py
 ```
 
-Sin dependencias: solo la librería estándar de Python.
-
-## Modelo de datos (esquema estrella)
-
-```
-dim_proveedor ─┐
-dim_pad ───────┤
-dim_material ──┼─< fact_entregas   (un envío por fila: plan vs real, costo, estado)
-dim_fecha ─────┘
-               ├─< fact_stock      (stock diario de arena, consumo, recepción, quiebre)
-               └─< fact_consumo    (demanda mensual de arena y gasoil)
-```
+Dependencias: **pandas** (+ pyarrow) y la librería estándar.
 
 ## Lo que **no** hace
 
-- Los datos son simulados, no salen de un ERP real.
-- Modela un único yard consolidado (no transferencias entre depósitos).
-- El costo de standby es una tarifa fija aproximada.
-- Es diagnóstico, no prescriptivo: muestra el costo de las rutas pero no resuelve el ruteo óptimo.
+- La logística (proveedores, entregas, stock, costo) es un **modelo**, no datos de un ERP real: esa
+  información no es pública. El consumo sí es real.
+- El gasoil se **estima** a partir de las etapas reales (no está en el dataset).
+- Modela un único yard consolidado, no transferencias entre depósitos.
 
 ---
 
-_Proyecto de portfolio · Lleyton Murphy · datos simulados._
+_Proyecto de portfolio · Lleyton Murphy · consumo real (Secretaría de Energía) + logística modelada._
