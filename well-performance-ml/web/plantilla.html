@@ -1,0 +1,240 @@
+<title>Well Performance ML</title>
+<meta name="description" content="Modelo de ML con datos oficiales de Vaca Muerta: cuánto del EUR de un pozo explica el diseño de fractura vs la geología. Regresión lineal en numpy, train/test.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#0A0B0F; --bg-2:#0E1015; --surface:#14161C; --surface-2:#1C1F27; --surface-3:#262A34;
+    --ink:#F4F6FA; --ink-2:#A6ADBD; --ink-3:#6A7182; --rule:#23262F; --rule-strong:#333846;
+    --accent:#FF9D42; --accent-2:#45C7FF; --accent-soft:rgba(255,157,66,.13); --accent-line:rgba(255,157,66,.35);
+    --ok:#199e70; --warn:#c98500; --bad:#d95926;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+    --grid:#1E212A; --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -14px rgba(0,0,0,.7);
+    --glow:0 0 0 1px var(--accent-line), 0 0 20px -4px rgba(255,157,66,.35);
+    --tile:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,0)); --r:18px; --r-tile:14px;
+  }
+  *{box-sizing:border-box} img{max-width:100%}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',system-ui,sans-serif; font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(60vw 40vh at 12% -8%, rgba(255,157,66,.06), transparent 60%), radial-gradient(50vw 40vh at 100% 0%, rgba(69,199,255,.05), transparent 55%); background-attachment:fixed;}
+  .wrap{max-width:1180px; margin:0 auto; padding:40px 22px 72px}
+  h1,h2,h3{font-family:'Sora',sans-serif; letter-spacing:-.02em; margin:0}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); display:flex; align-items:center; gap:12px; margin-bottom:18px}
+  .eyebrow::before{content:""; width:26px; height:2px; background:var(--accent); display:inline-block; border-radius:2px}
+  h1{font-size:clamp(32px,5.2vw,54px); font-weight:800; line-height:1.03; background:linear-gradient(180deg,#fff,#c8ccd6); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .lede{max-width:660px; color:var(--ink-2); font-size:16px; margin-top:16px} .lede b{color:var(--ink)}
+  .banner{margin-top:22px; padding:14px 16px; border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:12px; background:linear-gradient(180deg,var(--accent-soft),transparent); color:var(--ink-2); font-size:13px} .banner b{color:var(--ink)}
+  .grid{display:grid; gap:14px}
+  .kpis{grid-template-columns:repeat(6,1fr); margin-top:28px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--surface-2); background-image:var(--tile); border:1px solid var(--rule); border-radius:var(--r-tile); padding:16px}
+  .tile .lab{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3)}
+  .tile .val{font-family:'Sora',sans-serif; font-weight:700; font-size:25px; margin-top:9px; line-height:1}
+  .tile .val small{font-size:13px; color:var(--ink-2); font-weight:600; margin-left:3px}
+  .tile .sub{font-size:11.5px; color:var(--ink-3); margin-top:6px}
+  .tile.accent .val{color:var(--accent)}
+  .panel{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r); padding:22px 22px 20px; margin-top:26px; box-shadow:var(--shadow); min-width:0}
+  .panel.hl{border-color:var(--accent-line); box-shadow:var(--shadow), 0 0 0 1px var(--accent-line)}
+  .panel h2{font-size:19px; font-weight:700} .panel .desc{color:var(--ink-2); font-size:13.5px; margin-top:6px; max-width:720px}
+  .tag{display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); border:1px solid var(--accent-line); background:var(--accent-soft); padding:3px 9px; border-radius:999px; margin-bottom:10px}
+  svg{display:block; width:100%; height:auto; overflow:visible}
+  .axis{fill:var(--ink-3); font-family:'JetBrains Mono',monospace; font-size:10px}
+  .axis-line{stroke:var(--grid); stroke-width:1}
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:12px; font-size:12px; color:var(--ink-2)}
+  .legend span{display:inline-flex; align-items:center; gap:7px} .legend i{width:12px; height:12px; border-radius:50%; display:inline-block}
+  table{width:100%; border-collapse:collapse; font-size:13px; margin-top:8px}
+  th,td{padding:9px 10px; text-align:right; border-bottom:1px solid var(--rule)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:500}
+  tbody tr:hover{background:var(--surface-2)} td .num{font-family:'JetBrains Mono',monospace}
+  .scroll{overflow-x:auto; max-width:100%} .scroll table{min-width:560px}
+  .badge{font-family:'JetBrains Mono',monospace; font-size:10px; padding:3px 8px; border-radius:6px; background:var(--surface-3); color:var(--ink-2)}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:26px} .two>*{min-width:0}
+  @media(max-width:820px){.two{grid-template-columns:1fr}}
+  .chip{font-family:'JetBrains Mono',monospace; font-size:11.5px; padding:6px 12px; border-radius:999px; border:1px solid var(--rule-strong); background:var(--surface-2); color:var(--ink-2); cursor:pointer}
+  .chip[aria-pressed="true"]{color:var(--ink); border-color:var(--accent-line); box-shadow:var(--glow); background:var(--accent-soft)}
+  .limits{grid-template-columns:repeat(2,1fr); margin-top:14px} @media(max-width:640px){.limits{grid-template-columns:1fr}}
+  .limits .tile .val{font-size:15px} .limits .tile p{margin:8px 0 0; color:var(--ink-2); font-size:12.5px}
+  footer{margin-top:44px; padding-top:22px; border-top:1px solid var(--rule); color:var(--ink-3); font-size:12.5px}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Vaca Muerta · Well Performance · Machine Learning</div>
+  <h1>¿Qué diseño de pozo rinde más?</h1>
+  <p class="lede">Con datos <b>oficiales</b>, un modelo de ML predice el <b>EUR</b> (las reservas estimadas de un pozo)
+    a partir de su <b>diseño de fractura</b>: longitud de rama, etapas y arena. La pregunta de fondo: ¿cuánto del
+    rendimiento explica el <b>diseño</b> —lo que una operadora controla— y cuánto la <b>geología</b>?</p>
+  <div class="banner" id="banner"></div>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <!-- Insight central -->
+  <section class="panel hl">
+    <span class="tag">El hallazgo</span>
+    <h2>El diseño ayuda, pero la ubicación manda</h2>
+    <p class="desc">Cuánto de la variación del EUR explica cada modelo (R² sobre el test que no vio). El diseño solo
+      explica una parte; sumar el <b>área</b> (proxy de la geología) sube el R² bastante — esa diferencia es el peso de la ubicación.</p>
+    <div id="c_r2"></div>
+    <div class="legend" style="margin-top:16px">
+      <span><i style="background:var(--s4);border-radius:3px"></i>Explicado por el diseño</span>
+      <span><i style="background:var(--accent-2);border-radius:3px"></i>Que agrega la geología (área)</span>
+      <span><i style="background:var(--surface-3);border-radius:3px"></i>Sin explicar (otros factores)</span>
+    </div>
+  </section>
+
+  <div class="two">
+    <section class="panel" style="margin-top:26px">
+      <h2>Qué palanca de diseño mueve el EUR</h2>
+      <p class="desc">Coeficientes estandarizados del modelo de diseño (+ = más EUR).</p>
+      <div id="c_imp"></div>
+    </section>
+    <section class="panel" style="margin-top:26px">
+      <h2>Predicho vs real (test)</h2>
+      <p class="desc">Cada punto es un pozo que el modelo no vio. La diagonal es la predicción perfecta.</p>
+      <div id="c_pvr"></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap">
+      <div>
+        <h2>EUR vs diseño</h2>
+        <p class="desc">La relación real entre una variable de diseño y el EUR. Color por ventana de fluido.</p>
+      </div>
+      <div style="display:flex; gap:8px">
+        <button class="chip" id="bRama" aria-pressed="true">Longitud de rama</button>
+        <button class="chip" id="bArena" aria-pressed="false">Arena total</button>
+      </div>
+    </div>
+    <div id="c_sc"></div>
+    <div class="legend"><span><i style="background:var(--s4)"></i>Petróleo negro</span><span><i style="background:var(--accent-2)"></i>Petróleo volátil</span></div>
+  </section>
+
+  <div class="two">
+    <section class="panel" style="margin-top:26px">
+      <h2>EUR mediano por ventana</h2>
+      <p class="desc">El tipo de fluido marca el rendimiento base.</p>
+      <div id="c_vent"></div>
+    </section>
+    <section class="panel" style="margin-top:26px">
+      <h2>Top pozos por EUR</h2>
+      <p class="desc">Los mejores, con su diseño.</p>
+      <div class="scroll">
+        <table id="t_top"><thead><tr><th>Pozo</th><th>Operador</th><th>Rama</th><th>Etapas</th><th>Arena</th><th>EUR (Mbbl)</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Lo que este modelo no hace</h2>
+    <p class="desc">Los límites, declarados.</p>
+    <div class="grid limits">
+      <div class="tile"><div class="val">Datos oficiales, EUR estimado</div><p>Las variables de diseño y producción son reales (Secretaría de Energía). El EUR es la estimación del ajuste de declinación de <b>vaca-muerta-analytics</b>, no un dato medido.</p></div>
+      <div class="tile"><div class="val">El diseño explica una parte</div><p>Justamente ese es el punto: gran parte del EUR lo define la geología y factores que el diseño no captura. El modelo lo cuantifica, no lo esconde.</p></div>
+      <div class="tile"><div class="val">Correlación, no causalidad</div><p>Que la arena suba con el EUR no prueba que más arena cause más reservas: los buenos pozos suelen completarse más agresivo. Es una señal para investigar, no una receta.</p></div>
+      <div class="tile"><div class="val">Modelo lineal simple</div><p>Regresión lineal (ridge) sobre log(EUR), elegida por interpretable. Un modelo no lineal podría capturar más, a costa de claridad.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Proyecto de portfolio · <b>Machine Learning aplicado a Well Performance</b> · datos oficiales de la Secretaría de
+    Energía · regresión lineal a mano con numpy, train/test 70/30.
+  </footer>
+</div>
+
+<script>
+const D = /*__DATOS__*/{};
+const $ = s => document.querySelector(s);
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const fmt=(n,d=0)=>Number(n).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const m=D.meta,k=D.kpis,M=D.modelo;
+
+$('#banner').innerHTML = m.es_demo
+  ? `<b>Datos demo.</b> ${m.pozos} pozos (mismo esquema que la versión oficial). En CI el modelo se entrena con los datos reales de la Secretaría de Energía.`
+  : `<b>Datos oficiales de la Secretaría de Energía.</b> Modelo entrenado sobre ${fmt(m.pozos)} pozos con ajuste confiable (train ${m.n_train} / test ${m.n_test}). Regenerado por CI.`;
+
+const kpis=[
+  {lab:'Pozos', val:fmt(k.pozos), unit:'', sub:'con ajuste confiable'},
+  {lab:'EUR mediano', val:fmt(k.eur_mediano_mbbl), unit:'Mbbl', sub:'reservas por pozo'},
+  {lab:'R² diseño', val:fmt(k.r2,2), unit:'', sub:'lo que explica el diseño'},
+  {lab:'R² +geología', val:fmt(k.r2_geo,2), unit:'', sub:'diseño + área', accent:true},
+  {lab:'Aporte geología', val:'+'+fmt(k.aporte_geo,2), unit:'', sub:'sube el R² al sumar área'},
+  {lab:'Error (MAPE)', val:fmt(k.mape,0), unit:'%', sub:'en test'},
+];
+$('#kpis').innerHTML = kpis.map(x=>`<div class="tile ${x.accent?'accent':''}"><div class="lab">${x.lab}</div>
+  <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div><div class="sub">${x.sub}</div></div>`).join('');
+
+/* Barra R²: diseño | +geología | sin explicar */
+function dibujarR2(){
+  const box=$('#c_r2'); box.innerHTML='';
+  const dis=Math.max(0,M.r2_diseno), geo=Math.max(0,M.aporte_geo), resto=Math.max(0,1-dis-geo);
+  const seg=[[dis,cssVar('--s4'),'diseño'],[geo,cssVar('--accent-2'),'geología'],[resto,cssVar('--surface-3'),'resto']];
+  let html='<div style="display:flex; height:42px; border-radius:10px; overflow:hidden; border:1px solid var(--rule)">';
+  seg.forEach(([v,c])=>{ if(v>0.001) html+=`<div style="width:${v*100}%; background:${c}; display:flex; align-items:center; justify-content:center; font-family:JetBrains Mono,monospace; font-size:12px; color:${c===cssVar('--surface-3')?'var(--ink-3)':'#0a0b0f'}">${v>=0.06?Math.round(v*100)+'%':''}</div>`;});
+  html+='</div>';
+  html+=`<p style="margin-top:14px; color:var(--ink-2); font-size:13.5px">Con solo el diseño, el modelo explica el <b style="color:var(--ink)">${Math.round(dis*100)}%</b> de la variación del EUR. Sumando el área (geología), sube a <b style="color:var(--ink)">${Math.round((dis+geo)*100)}%</b>. El resto lo definen factores que ni el diseño ni el área capturan.</p>`;
+  box.innerHTML=html;
+}
+
+/* Importancia (barras horizontales firmadas) */
+function dibujarImp(){
+  const box=$('#c_imp'); const p=M.coefs, max=Math.max(...p.map(x=>Math.abs(x.peso)));
+  box.innerHTML=p.map(x=>{const w=100*Math.abs(x.peso)/max, pos=x.peso>=0;
+    return `<div style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12px">
+      <span style="width:140px; text-align:right; color:var(--ink-2); flex:none">${x.etiqueta}</span>
+      <div style="flex:1; height:11px; background:var(--surface-2); border-radius:6px; overflow:hidden">
+        <div style="height:100%; width:${w}%; background:${pos?cssVar('--s3'):cssVar('--bad')}; border-radius:6px"></div></div>
+      <span class="mono" style="width:44px; color:var(--ink-3)">${fmt(x.peso,2)}</span></div>`;}).join('');
+}
+
+/* Predicho vs real */
+function dibujarPvr(){
+  const box=$('#c_pvr'); box.innerHTML=''; const W=460,H=300,mL=48,mR=12,mT=12,mB=40,iw=W-mL-mR,ih=H-mT-mB;
+  const d=M.pred_vs_real, max=Math.max(...d.map(p=>Math.max(p.real,p.pred)))*1.05;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
+  for(let i=0;i<=4;i++){const v=max*i/4,y=ih-ih*i/4;g.appendChild(el('line',{x1:0,y1:y,x2:iw,y2:y,class:'axis-line'}));
+    const t=el('text',{x:-8,y:y+3,'text-anchor':'end',class:'axis'});t.textContent=fmt(v/1000,1)+'k';g.appendChild(t);
+    const tx=el('text',{x:iw*i/4,y:ih+16,'text-anchor':'middle',class:'axis'});tx.textContent=fmt(max*i/4/1000,1)+'k';g.appendChild(tx);}
+  g.appendChild(el('line',{x1:0,y1:ih,x2:iw,y2:0,stroke:cssVar('--ink-3'),'stroke-width':1.2,'stroke-dasharray':'5 4'}));
+  d.forEach(p=>g.appendChild(el('circle',{cx:iw*p.real/max,cy:ih-ih*p.pred/max,r:3.5,fill:cssVar('--accent'),opacity:.7})));
+  const xl=el('text',{x:iw/2,y:ih+32,'text-anchor':'middle',class:'axis'});xl.textContent='EUR real (Mbbl)';g.appendChild(xl);
+  box.appendChild(svg);
+}
+
+/* EUR vs feature (scatter) */
+let campo='rama';
+function dibujarSc(){
+  const box=$('#c_sc'); box.innerHTML=''; const W=980,H=320,mL=52,mR=12,mT=12,mB=40,iw=W-mL-mR,ih=H-mT-mB;
+  const pts=campo==='rama'?D.scatter_rama:D.scatter_arena;
+  const maxX=Math.max(...pts.map(p=>p.x))*1.05, maxY=Math.max(...pts.map(p=>p.y))*1.05;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
+  for(let i=0;i<=4;i++){const y=ih-ih*i/4;g.appendChild(el('line',{x1:0,y1:y,x2:iw,y2:y,class:'axis-line'}));
+    const t=el('text',{x:-8,y:y+3,'text-anchor':'end',class:'axis'});t.textContent=fmt(maxY*i/4/1000,1)+'k';g.appendChild(t);}
+  for(let i=0;i<=4;i++){const tx=el('text',{x:iw*i/4,y:ih+16,'text-anchor':'middle',class:'axis'});tx.textContent=campo==='rama'?fmt(maxX*i/4,0):fmt(maxX*i/4/1000,0)+'k';g.appendChild(tx);}
+  pts.forEach(p=>g.appendChild(el('circle',{cx:iw*p.x/maxX,cy:ih-ih*p.y/maxY,r:3.5,fill:p.vol?cssVar('--accent-2'):cssVar('--s4'),opacity:.62})));
+  const xl=el('text',{x:iw/2,y:ih+32,'text-anchor':'middle',class:'axis'});xl.textContent=(campo==='rama'?'Longitud de rama (m)':'Arena total (t)')+' — eje Y: EUR (Mbbl)';g.appendChild(xl);
+  box.appendChild(svg);
+}
+$('#bRama').onclick=()=>{campo='rama';$('#bRama').setAttribute('aria-pressed','true');$('#bArena').setAttribute('aria-pressed','false');dibujarSc();};
+$('#bArena').onclick=()=>{campo='arena';$('#bArena').setAttribute('aria-pressed','true');$('#bRama').setAttribute('aria-pressed','false');dibujarSc();};
+
+/* EUR por ventana */
+function dibujarVent(){
+  const box=$('#c_vent'); const v=D.ventanas, max=Math.max(...v.map(x=>x.eur_mbbl));
+  box.innerHTML=v.map(x=>`<div style="margin:12px 0"><div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px">
+    <span>${x.ventana} <span style="color:var(--ink-3)">(${x.n})</span></span><span class="mono" style="color:var(--ink-2)">${fmt(x.eur_mbbl)} Mbbl</span></div>
+    <div style="height:14px; background:var(--surface-2); border-radius:7px; overflow:hidden"><div style="height:100%; width:${100*x.eur_mbbl/max}%; background:var(--s4); border-radius:7px"></div></div></div>`).join('');
+}
+function pintarTop(){
+  $('#t_top tbody').innerHTML=D.top.map(r=>`<tr><td class="num">${r.pozo}</td><td>${r.operador}</td>
+    <td class="num">${fmt(r.rama_m)} m</td><td class="num">${r.etapas}</td><td class="num">${fmt(r.arena_tn)} t</td>
+    <td class="num">${fmt(r.eur_mbbl)}</td></tr>`).join('');
+}
+
+dibujarR2();dibujarImp();dibujarPvr();dibujarSc();dibujarVent();pintarTop();
+</script>

@@ -112,6 +112,12 @@ jobs:
           python scripts/construir_datos.py
           python scripts/armar_web.py
 
+      - name: Regenerar modelo de Well Performance (datos reales)
+        working-directory: well-performance-ml
+        run: |
+          python scripts/construir_datos.py
+          python scripts/armar_web.py
+
       - name: Resumen
         if: always()
         run: python scripts/resumen_ci.py >> "$GITHUB_STEP_SUMMARY" || true
@@ -133,6 +139,7 @@ jobs:
           git add web/index.html web/artifact.html README.md
           git add ../vaca-muerta-ops-intelligence/web/index.html ../vaca-muerta-ops-intelligence/web/artifact.html ../vaca-muerta-ops-intelligence/web/datos.json
           git add ../frac-sand-fuel-logistics/web/index.html ../frac-sand-fuel-logistics/web/artifact.html ../frac-sand-fuel-logistics/web/datos.json ../frac-sand-fuel-logistics/data/consumo_real_mensual.csv
+          git add ../well-performance-ml/web/index.html ../well-performance-ml/web/artifact.html ../well-performance-ml/web/datos.json
           if git diff --cached --quiet; then
             echo "La app no cambió: no hay nada que commitear."
             exit 0

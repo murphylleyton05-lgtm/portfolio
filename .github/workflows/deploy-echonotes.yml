@@ -46,8 +46,8 @@ jobs:
           cp -r vaca-muerta-analytics/web/assets site/vaca-muerta/ 2>/dev/null || true
           mkdir -p site/logistica
           cp frac-sand-fuel-logistics/web/index.html site/logistica/
-          mkdir -p site/confiabilidad
-          cp asset-reliability-analytics/web/index.html site/confiabilidad/
+          mkdir -p site/performance
+          cp well-performance-ml/web/index.html site/performance/
           mkdir -p site/operaciones
           cp vaca-muerta-ops-intelligence/web/index.html site/operaciones/
           mkdir -p site/hidrocarburos
