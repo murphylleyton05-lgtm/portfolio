@@ -44,6 +44,8 @@ jobs:
           cp vaca-muerta-analytics/web/index.html site/vaca-muerta/
           # assets/ trae la imagen de preview (Open Graph) para compartir el link
           cp -r vaca-muerta-analytics/web/assets site/vaca-muerta/ 2>/dev/null || true
+          mkdir -p site/logistica
+          cp frac-sand-fuel-logistics/web/index.html site/logistica/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
