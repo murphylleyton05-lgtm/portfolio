@@ -1,0 +1,157 @@
+{
+  "name": "Checkpoint 1 - Agente Base (Tools Agent) - Calificacion de Leads",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "b1a1f6c0-0001-4a10-9c01-0a0000000001",
+      "name": "Chat Trigger - Mensaje del Usuario",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [180, 320]
+    },
+    {
+      "parameters": {
+        "promptType": "auto",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "maxIterations": 8,
+          "returnIntermediateSteps": true,
+          "systemMessage": "=# ROL\nSos un Asistente de Calificacion de Leads B2B para el area comercial de la empresa. Trabajas dentro de un flujo automatizado de n8n y tu unica funcion es analizar consultas entrantes de potenciales clientes y decidir si constituyen una oportunidad comercial valida.\n\n# AMBITO\n- Operas exclusivamente sobre informacion de prospectos comerciales (nombre, empresa, rubro, necesidad declarada, presupuesto estimado y canal de contacto).\n- Tu jurisdiccion se limita a: (a) interpretar el mensaje del prospecto, (b) clasificar la temperatura del lead (Frio / Tibio / Caliente) y (c) registrar el lead calificado usando la herramienta disponible.\n- No tenes acceso a datos internos de la empresa mas alla de los criterios de calificacion definidos en este documento.\n\n# OBJETIVO\n1. Extraer del mensaje los datos clave del prospecto.\n2. Asignar un puntaje de calificacion (0 a 100) segun: intencion de compra, ajuste al perfil de cliente ideal (ICP), urgencia y presupuesto.\n3. Clasificar: Caliente (>= 70), Tibio (40-69), Frio (< 40).\n4. Cuando el lead sea Tibio o Caliente, registrarlo de forma autonoma en la planilla de leads mediante la herramienta 'Registrar Lead en Google Sheets'.\n5. Devolver un resumen ejecutivo breve, claro y accionable para el equipo comercial.\n\n# REGLAS ESTRICTAS\n- No inventes datos que el prospecto no haya proporcionado. Si un dato falta, marcalo como 'No informado'.\n- No prometas precios, descuentos, plazos de entrega ni condiciones contractuales.\n- No respondas consultas de soporte tecnico, reclamos ni temas ajenos a la calificacion comercial.\n- No ejecutes ninguna accion fuera de las herramientas conectadas a este agente.\n- No generes contenido especulativo sobre la competencia ni sobre datos financieros internos.\n- Redacta siempre en espanol neutro y profesional, en tercera persona. Queda prohibido el uso de lenguaje inclusivo con terminaciones en @, x o e; utiliza el genero gramatical estandar del espanol.\n- Se conciso: maximo 8 lineas en el resumen final.\n\n# ESCALAMIENTO\n- Si el mensaje contiene una intencion de compra explicita superior a un ticket alto, o solicita hablar con un humano, clasifica como Caliente, registra el lead y agrega la etiqueta 'DERIVAR A EJECUTIVO COMERCIAL'.\n- Si el mensaje es ambiguo, ofensivo o esta fuera de alcance, no registres nada y devolve el motivo del no-registro para revision humana.\n- Ante cualquier duda sobre la validez del dato, prioriza no registrar y escala a supervision humana."
+        }
+      },
+      "id": "b1a1f6c0-0002-4a10-9c01-0a0000000002",
+      "name": "AI Agent - Cerebro (Tools Agent)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [480, 320]
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-sonnet-20241022",
+        "options": {
+          "temperature": 0.2,
+          "maxTokensToSample": 1024
+        }
+      },
+      "id": "b1a1f6c0-0003-4a10-9c01-0a0000000003",
+      "name": "Anthropic Chat Model - Claude 3.5 Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [360, 560],
+      "credentials": {
+        "anthropicApi": {
+          "id": "REEMPLAZAR_CREDENCIAL_ANTHROPIC",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta UNICAMENTE para registrar en la planilla comercial un lead que ya haya sido calificado como Tibio o Caliente. Debes activarla de forma autonoma en los siguientes casos de negocio: (1) cuando el prospecto exprese una necesidad concreta que encaje con el perfil de cliente ideal; (2) cuando declare un presupuesto estimado o una intencion de compra dentro de un plazo definido; (3) cuando solicite una propuesta, una demo o hablar con un ejecutivo comercial. NO la uses para leads Frios, mensajes de soporte, reclamos, consultas fuera de alcance ni cuando falten los datos minimos (nombre y empresa). Cada llamada debe escribir una unica fila con: fecha de contacto, nombre del prospecto, empresa, rubro, necesidad detectada, presupuesto estimado, puntaje de calificacion (0-100), clasificacion (Frio/Tibio/Caliente) y etiqueta de derivacion si corresponde. Si un dato no fue provisto por el prospecto, registra el texto 'No informado' en esa columna.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REEMPLAZAR_ID_GOOGLE_SHEET"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $now.format('yyyy-MM-dd HH:mm') }}",
+            "Nombre": "={{ $fromAI('nombre', 'Nombre del prospecto', 'string') }}",
+            "Empresa": "={{ $fromAI('empresa', 'Empresa del prospecto', 'string') }}",
+            "Rubro": "={{ $fromAI('rubro', 'Rubro o industria del prospecto', 'string') }}",
+            "Necesidad": "={{ $fromAI('necesidad', 'Necesidad comercial detectada', 'string') }}",
+            "Presupuesto": "={{ $fromAI('presupuesto', 'Presupuesto estimado declarado', 'string') }}",
+            "Puntaje": "={{ $fromAI('puntaje', 'Puntaje de calificacion de 0 a 100', 'number') }}",
+            "Clasificacion": "={{ $fromAI('clasificacion', 'Frio, Tibio o Caliente', 'string') }}",
+            "Etiqueta": "={{ $fromAI('etiqueta', 'Etiqueta de derivacion si aplica', 'string') }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "b1a1f6c0-0004-4a10-9c01-0a0000000004",
+      "name": "Registrar Lead en Google Sheets",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [620, 560],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REEMPLAZAR_CREDENCIAL_GOOGLE_SHEETS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "murphylleyton05@gmail.com",
+        "subject": "=[Observabilidad Agente] Calificacion de Lead - {{ $now.format('yyyy-MM-dd HH:mm') }}",
+        "emailType": "text",
+        "message": "=Reporte automatico de supervision humana (Execution Log)\n\nEntrada del usuario:\n{{ $('Chat Trigger - Mensaje del Usuario').item.json.chatInput }}\n\nSalida del agente:\n{{ $json.output }}\n\n---\nGenerado automaticamente por el Agente Base (Tools Agent) en n8n.",
+        "options": {}
+      },
+      "id": "b1a1f6c0-0005-4a10-9c01-0a0000000005",
+      "name": "Observabilidad - Reporte por Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [860, 320],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REEMPLAZAR_CREDENCIAL_GMAIL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Agente Base - Motor de Razonamiento (Checkpoint 1)\n\n**Guardrail de iteraciones:** el AI Agent esta limitado a 8 vueltas maximas (Options > Max Iterations) para blindar el presupuesto contra bucles infinitos.\n\n**Ciclo ReAct (autonomia probabilistica):** el agente decide de forma autonoma si abre la ramificacion de la herramienta de Google Sheets.\n\n**Automatizacion lineal determinista:** solo el nodo final de observabilidad por Gmail se ejecuta siempre de forma secuencial.",
+        "height": 300,
+        "width": 420
+      },
+      "id": "b1a1f6c0-0006-4a10-9c01-0a0000000006",
+      "name": "Nota - Guardrails y ReAct",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, -40]
+    }
+  ],
+  "connections": {
+    "Chat Trigger - Mensaje del Usuario": {
+      "main": [[ { "node": "AI Agent - Cerebro (Tools Agent)", "type": "main", "index": 0 } ]]
+    },
+    "Anthropic Chat Model - Claude 3.5 Sonnet": {
+      "ai_languageModel": [[ { "node": "AI Agent - Cerebro (Tools Agent)", "type": "ai_languageModel", "index": 0 } ]]
+    },
+    "Registrar Lead en Google Sheets": {
+      "ai_tool": [[ { "node": "AI Agent - Cerebro (Tools Agent)", "type": "ai_tool", "index": 0 } ]]
+    },
+    "AI Agent - Cerebro (Tools Agent)": {
+      "main": [[ { "node": "Observabilidad - Reporte por Gmail", "type": "main", "index": 0 } ]]
+    }
+  },
+  "settings": {
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "checkpoint1-agente-base"
+  },
+  "pinData": {},
+  "tags": [
+    { "name": "checkpoint" },
+    { "name": "agente-ia" }
+  ]
+}

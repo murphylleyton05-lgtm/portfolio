@@ -14,6 +14,7 @@ Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyect
 | [🛢️ Vaca Muerta Operations Intelligence](./vaca-muerta-ops-intelligence) | Tablero de operaciones con la producción **oficial** (petróleo/gas por mes, actividad, ranking de operadores) y medidas DAX para Power BI. Se regenera por CI con datos reales. | Python · pandas · Power BI (DAX) |
 | [🎙️ EchoNotes](./echonotes) | App de notas por voz con transcripción en tiempo real, 100% en el navegador. | React · Vite · Web Speech API |
 | [🟢 WhatsApp + CRM + IA](./whatsapp-crm-automation) | Stack self-hosted de atención por WhatsApp, CRM y respuestas automáticas con IA. | Chatwoot · n8n · Claude · Docker |
+| [🤖 Agente Base — Calificación de Leads](./checkpoint1-agente-base-n8n) | Agente autónomo (Tools Agent) que califica leads B2B, los registra en Google Sheets de forma autónoma y reporta el Execution Log por Gmail. | n8n · AI Agent · Claude 3.5 Sonnet |
 
 ---
 
