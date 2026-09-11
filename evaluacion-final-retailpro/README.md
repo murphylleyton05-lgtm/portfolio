@@ -13,18 +13,20 @@ transformaciones y las visualizaciones.
 
 1. **Sección 1 — Preguntas Teóricas** (datos vs. información · sublenguajes SQL · IA · storytelling).
 2. **Sección 2 — Ejercicios Prácticos**
-   - Ej. 1 — Consulta SQL (últimos 30 días, cliente/fecha/total, orden desc) — *ejecutada de verdad*.
+   - Ej. 1 — Consulta SQL sobre un **dataset real de Kaggle («Global Superstore»)**, separado en `ventas` + `clientes` (últimos 30 días, cliente/fecha/total, orden desc) — *ejecutada de verdad*.
    - Ej. 2 — Modelo de datos (diagrama ER en estrella).
    - Ej. 3 — Visualización y storytelling.
 3. **Reporte integrador RetailPro** — Contexto · Dataset · EDA · Modelo+SQL ·
    Transformación (Power Query) · Dashboard · Conclusiones e insights.
 
-## Datos y fuente
+## Datos y fuentes
 
-Las tablas provienen de
-[`../pipeline-etl-techstore-powerbi/data/Pipeline_ETL_Dataset.xlsx`](../pipeline-etl-techstore-powerbi/data/Pipeline_ETL_Dataset.xlsx)
-(ventas 50 · clientes 11 · productos 12 · categorías 4, tras limpiar). Período
-2023-01-10 → 2024-11-08.
+- **Ejercicio 1 (SQL):** dataset público de Kaggle **Global Superstore**
+  (`global_superstore.csv`, 1.000 pedidos), separado en `ventas` + `clientes`.
+- **Ejercicios 2–3 y reporte integrador:** tablas de RetailPro desde
+  [`../pipeline-etl-techstore-powerbi/data/Pipeline_ETL_Dataset.xlsx`](../pipeline-etl-techstore-powerbi/data/Pipeline_ETL_Dataset.xlsx)
+  (ventas 50 · clientes 11 · productos 12 · categorías 4, tras limpiar; período
+  2023-01-10 → 2024-11-08).
 
 ## Hallazgos clave
 
@@ -41,13 +43,15 @@ Los gráficos y la ejecución SQL se generan desde el dataset real:
 ```bash
 cd evaluacion-final-retailpro
 pip install openpyxl matplotlib pillow
-python prep.py     # carga en SQLite y corre la consulta del Ejercicio 1
-python agg.py      # calcula los agregados del dashboard -> agg.json
-python charts.py   # genera los gráficos en assets/
-python sql_er.py   # genera la captura SQL y el diagrama ER
+python kaggle_ej1.py  # Ejercicio 1: separa Global Superstore y corre la consulta (Kaggle)
+python sql_kaggle.py  # captura del resultado del Ejercicio 1
+python agg.py         # agregados del dashboard RetailPro -> agg.json
+python charts.py      # gráficos del dashboard/EDA en assets/
+python sql_er.py      # diagrama ER de RetailPro
 ```
 
 - [`ejercicio1_ultimos30dias.sql`](./ejercicio1_ultimos30dias.sql) — consulta del Ejercicio 1 (SQL Server + SQLite).
+- `global_superstore.csv` — dataset de Kaggle usado en el Ejercicio 1.
 - `assets/` — visuales embebidos en el `.docx`.
 
 > **Nota:** las capturas de SQL muestran la ejecución real sobre las tablas del
