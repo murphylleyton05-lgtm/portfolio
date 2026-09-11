@@ -1,0 +1,283 @@
+<title>Vaca Muerta Operations Intelligence</title>
+<meta name="description" content="Tablero de operaciones de Vaca Muerta: producción de petróleo y gas, actividad, acumulado, ranking de operadores. Datos oficiales de la Secretaría de Energía, medidas DAX para Power BI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0A0B0F; --bg-2:#0E1015; --surface:#14161C; --surface-2:#1C1F27; --surface-3:#262A34;
+    --ink:#F4F6FA; --ink-2:#A6ADBD; --ink-3:#6A7182; --rule:#23262F; --rule-strong:#333846;
+    --accent:#FF9D42; --accent-2:#45C7FF; --accent-soft:rgba(255,157,66,.13); --accent-line:rgba(255,157,66,.35);
+    --ok:#199e70; --warn:#c98500; --bad:#d95926;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#2f9e2f; --s7:#9085e9; --s8:#e66767;
+    --grid:#1E212A;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -14px rgba(0,0,0,.7);
+    --glow:0 0 0 1px var(--accent-line), 0 0 20px -4px rgba(255,157,66,.35);
+    --tile:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,0));
+    --r:18px; --r-tile:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(60vw 40vh at 12% -8%, rgba(255,157,66,.06), transparent 60%), radial-gradient(50vw 40vh at 100% 0%, rgba(69,199,255,.05), transparent 55%);
+    background-attachment:fixed;}
+  .wrap{max-width:1180px; margin:0 auto; padding:40px 22px 72px}
+  h1,h2,h3{font-family:'Sora',sans-serif; letter-spacing:-.02em; margin:0}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  a{color:var(--accent-2); text-decoration:none} a:hover{text-decoration:underline}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); display:flex; align-items:center; gap:12px; margin-bottom:18px}
+  .eyebrow::before{content:""; width:26px; height:2px; background:var(--accent); display:inline-block; border-radius:2px}
+  h1{font-size:clamp(32px,5.2vw,54px); font-weight:800; line-height:1.03; background:linear-gradient(180deg,#fff,#c8ccd6); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .lede{max-width:660px; color:var(--ink-2); font-size:16px; margin-top:16px} .lede b{color:var(--ink)}
+  .banner{margin-top:22px; padding:14px 16px; border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:12px; background:linear-gradient(180deg,var(--accent-soft),transparent); color:var(--ink-2); font-size:13px} .banner b{color:var(--ink)}
+  .grid{display:grid; gap:14px}
+  .kpis{grid-template-columns:repeat(6,1fr); margin-top:28px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--surface-2); background-image:var(--tile); border:1px solid var(--rule); border-radius:var(--r-tile); padding:16px}
+  .tile .lab{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3)}
+  .tile .val{font-family:'Sora',sans-serif; font-weight:700; font-size:24px; margin-top:9px; line-height:1}
+  .tile .val small{font-size:13px; color:var(--ink-2); font-weight:600; margin-left:3px}
+  .tile .sub{font-size:11.5px; color:var(--ink-3); margin-top:6px}
+  .up{color:var(--ok)} .down{color:var(--bad)}
+  .panel{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r); padding:22px 22px 20px; margin-top:26px; box-shadow:var(--shadow); min-width:0}
+  .panel h2{font-size:19px; font-weight:700} .panel .desc{color:var(--ink-2); font-size:13.5px; margin-top:6px; max-width:700px}
+  .panel.pbi{border-color:var(--accent-line); box-shadow:var(--shadow), 0 0 0 1px var(--accent-line)}
+  .tag{display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); border:1px solid var(--accent-line); background:var(--accent-soft); padding:3px 9px; border-radius:999px; margin-bottom:10px}
+  svg{display:block; width:100%; height:auto; overflow:visible}
+  .axis{fill:var(--ink-3); font-family:'JetBrains Mono',monospace; font-size:10px}
+  .axis-line{stroke:var(--grid); stroke-width:1}
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:12px; font-size:12px; color:var(--ink-2)}
+  .legend span{display:inline-flex; align-items:center; gap:7px} .legend i{width:14px; height:3px; border-radius:2px; display:inline-block}
+  table{width:100%; border-collapse:collapse; font-size:13px; margin-top:8px}
+  th,td{padding:9px 10px; text-align:right; border-bottom:1px solid var(--rule)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:500}
+  tbody tr:hover{background:var(--surface-2)} td .num{font-family:'JetBrains Mono',monospace}
+  .scroll{overflow-x:auto; max-width:100%} .scroll table{min-width:560px}
+  .sharebar{height:8px; background:var(--surface-3); border-radius:5px; overflow:hidden; width:90px; display:inline-block; vertical-align:middle; margin-right:8px} .sharebar>div{height:100%;background:var(--s1)}
+  .badge{font-family:'JetBrains Mono',monospace; font-size:10px; padding:3px 8px; border-radius:6px; white-space:nowrap; background:var(--surface-3); color:var(--ink-2)}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:26px} .two>*{min-width:0}
+  @media(max-width:820px){.two{grid-template-columns:1fr}}
+  .pbi-cols{display:grid; grid-template-columns:1.1fr 1fr; gap:24px; margin-top:14px} .pbi-cols>*{min-width:0}
+  @media(max-width:760px){.pbi-cols{grid-template-columns:1fr}}
+  .schema{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-2); background:var(--bg-2); border:1px solid var(--rule); border-radius:12px; padding:16px; white-space:pre; overflow-x:auto}
+  .dax{background:var(--bg-2); border:1px solid var(--rule); border-radius:10px; padding:12px 14px; margin:8px 0; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-2); overflow-x:auto}
+  .dax b{color:var(--accent-2)}
+  .limits{grid-template-columns:repeat(2,1fr); margin-top:14px} @media(max-width:640px){.limits{grid-template-columns:1fr}}
+  .limits .tile .val{font-size:15px} .limits .tile p{margin:8px 0 0; color:var(--ink-2); font-size:12.5px}
+  footer{margin-top:44px; padding-top:22px; border-top:1px solid var(--rule); color:var(--ink-3); font-size:12.5px}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Cuenca Neuquina · Operations Intelligence</div>
+  <h1>Vaca Muerta Operations Intelligence</h1>
+  <p class="lede">La foto de management de la cartera de pozos: cuánto <b>petróleo y gas</b> se produce, cómo evoluciona
+    la <b>actividad de perforación y completación</b>, el <b>acumulado</b> y quién produce qué. Debajo, el modelo de
+    datos en <b>esquema estrella</b> listo para armar el mismo tablero en <b>Power BI</b>.</p>
+  <div class="banner" id="banner"></div>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <section class="panel">
+    <h2>Producción de petróleo y gas</h2>
+    <p class="desc">Producción mensual de la cartera. El petróleo (barras, eje izq.) y el gas (línea, eje der.) crecen
+      a medida que se conectan pozos nuevos.</p>
+    <div id="c_prod"></div>
+    <div class="legend"><span><i style="background:var(--s4)"></i>Petróleo (bbl/d)</span><span><i style="background:var(--accent-2)"></i>Gas (Mm³/d)</span></div>
+  </section>
+
+  <div class="two">
+    <section class="panel" style="margin-top:26px">
+      <h2>Producción acumulada</h2>
+      <p class="desc">Petróleo acumulado de la cartera (MMbbl).</p>
+      <div id="c_acum"></div>
+    </section>
+    <section class="panel" style="margin-top:26px">
+      <h2>Actividad: pozos nuevos en producción</h2>
+      <p class="desc">Pozos que entran en producción cada mes (primer mes con caudal declarado).</p>
+      <div id="c_act"></div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Pozos nuevos</span></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Ranking de operadores</h2>
+    <p class="desc">Por producción actual de petróleo. La barra muestra el share sobre el total de la cartera.</p>
+    <div class="scroll">
+      <table id="t_op">
+        <thead><tr><th>Operador</th><th>Producción (bbl/d)</th><th>Share</th><th>Pozos activos</th><th>bbl/d por pozo</th><th>Acum. (MMbbl)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="two">
+    <section class="panel" style="margin-top:26px">
+      <h2>Mix por ventana de fluido</h2>
+      <p class="desc">Producción actual de petróleo por ventana.</p>
+      <div id="c_vent"></div>
+    </section>
+    <section class="panel" style="margin-top:26px">
+      <h2>Top pozos por acumulado</h2>
+      <p class="desc">Los mejores pozos de la cartera.</p>
+      <div class="scroll">
+        <table id="t_pozos">
+          <thead><tr><th>Pozo</th><th>Operador</th><th>Ventana</th><th>Peak (bbl/d)</th><th>Acum. (Mbbl)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Power BI layer -->
+  <section class="panel pbi">
+    <span class="tag">Capa Power BI</span>
+    <h2>El modelo de datos, listo para Power BI</h2>
+    <p class="desc">La fuente es la producción oficial por pozo y mes (<span class="mono">produccion.parquet</span>) más una
+      dimensión de pozos (<span class="mono">pozos.parquet</span>). Power BI importa parquet directo; marcás las relaciones
+      y armás estas medidas DAX.</p>
+    <div class="pbi-cols">
+      <div>
+        <h3 style="font-size:13px; color:var(--ink-2); font-family:'JetBrains Mono',monospace; letter-spacing:.06em; margin-bottom:8px">ESQUEMA</h3>
+        <div class="schema">dim_pozo (pozos.parquet)
+   id_pozo, empresa, area,
+   ventana_fluido, primer_mes
+        │  1
+        │
+        *  ▼
+fact_produccion (produccion.parquet)
+   id_pozo, fecha, empresa,
+   prod_petroleo_m3, prod_gas_mm3</div>
+      </div>
+      <div>
+        <h3 style="font-size:13px; color:var(--ink-2); font-family:'JetBrains Mono',monospace; letter-spacing:.06em; margin-bottom:8px">MEDIDAS DAX (EJEMPLOS)</h3>
+        <div class="dax"><b>Petroleo bbl/d</b> = DIVIDE( SUM(fact_produccion[prod_petroleo_m3]) * 6.28981, 30.4 )</div>
+        <div class="dax"><b>Oil acumulado (MMbbl)</b> = DIVIDE( CALCULATE(
+    SUM(fact_produccion[prod_petroleo_m3]) * 6.28981,
+    FILTER( ALL(dim_fecha), dim_fecha[fecha] &lt;= MAX(dim_fecha[fecha]) )), 1e6 )</div>
+        <div class="dax"><b>Var MoM %</b> = VAR ant = CALCULATE([Petroleo bbl/d], PREVIOUSMONTH(dim_fecha[fecha]))
+RETURN DIVIDE([Petroleo bbl/d] - ant, ant)</div>
+        <div class="dax"><b>Pozos activos</b> = DISTINCTCOUNT( fact_produccion[id_pozo] )</div>
+      </div>
+    </div>
+    <p class="desc" style="margin-top:14px">El set completo de medidas está en <span class="mono">powerbi/medidas-dax.md</span>.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Lo que este tablero no hace</h2>
+    <p class="desc">Los límites, declarados.</p>
+    <div class="grid limits">
+      <div class="tile"><div class="val">Producción real y oficial</div><p>Los datos son los de la Secretaría de Energía (producción de pozos no convencionales), los mismos que usa <b>vaca-muerta-analytics</b>. El CI los regenera automáticamente.</p></div>
+      <div class="tile"><div class="val">Es una vista de operaciones, no de reservas</div><p>Muestra producción y actividad. La estimación de reservas (EUR) y la validación de curvas viven en el proyecto de analytics.</p></div>
+      <div class="tile"><div class="val">"Actividad" = primera producción</div><p>El dataset no trae fecha de spud; la actividad se mide por el mes en que cada pozo entra en producción, que es un proxy fiel de la actividad de completación.</p></div>
+      <div class="tile"><div class="val">El .pbix no está incluido</div><p>Se entregan los datos (parquet) y las medidas DAX para reconstruir el reporte en Power BI Desktop en minutos.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Proyecto de portfolio · <b>Operations Intelligence + Power BI</b> · datos oficiales de la Secretaría de Energía,
+    procesados con Python (pandas). Medidas DAX en <span class="mono">powerbi/medidas-dax.md</span>.
+  </footer>
+</div>
+
+<script>
+const D = /*__DATOS__*/{};
+const $ = s => document.querySelector(s);
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const fmt=(n,d=0)=>Number(n).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usd=n=>{const a=Math.abs(n); return a>=1000?'US$ '+fmt(n/1000,2)+' MMM':'US$ '+fmt(n,0)+' MM';};
+const m=D.meta,k=D.kpis,S=D.serie;
+
+$('#banner').innerHTML = m.es_demo
+  ? `<b>Datos de demostración.</b> Versión demo con ${m.pozos} pozos (mismo esquema que la oficial). En producción el CI regenera este tablero con los datos reales de la Secretaría de Energía.`
+  : `<b>Datos oficiales de la Secretaría de Energía.</b> ${fmt(m.pozos)} pozos no convencionales de ${m.operadores} operadores, producción real <span class="mono">${m.periodo}</span> (historia desde ${m.hist_desde}). Regenerado por CI.`;
+
+const flecha=v=>v>=0?`<span class="up">▲ ${fmt(v,1)}%</span>`:`<span class="down">▼ ${fmt(Math.abs(v),1)}%</span>`;
+const kpis=[
+  {lab:'Petróleo', val:fmt(k.oil_bbl_d), unit:'bbl/d', sub:'MoM '+flecha(k.oil_var_mom)},
+  {lab:'Gas', val:fmt(k.gas_mm3_d,1), unit:'Mm³/d', sub:'MoM '+flecha(k.gas_var_mom)},
+  {lab:'Pozos activos', val:fmt(k.pozos_activos), unit:'', sub:`${fmt(k.pozos_total)} en el dataset`},
+  {lab:'Acumulado', val:fmt(k.acum_mmbbl,1), unit:'MMbbl', sub:'petróleo, histórico'},
+  {lab:'Pozos nuevos', val:fmt(k.pozos_nuevos), unit:'', sub:`en ${m.meses} meses`},
+  {lab:'Operadores', val:fmt(k.operadores), unit:'', sub:'en la cartera'},
+];
+$('#kpis').innerHTML = kpis.map(x=>`<div class="tile"><div class="lab">${x.lab}</div>
+  <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div><div class="sub">${x.sub}</div></div>`).join('');
+
+function ejeY(g,x0,y0,h,max,fn,ticks=4){for(let i=0;i<=ticks;i++){const v=max*i/ticks,y=y0-h*i/ticks;
+  g.appendChild(el('line',{x1:x0,y1:y,x2:x0+1,y2:y,class:'axis-line'}));
+  const t=el('text',{x:x0-8,y:y+3,'text-anchor':'end',class:'axis'});t.textContent=fn(v);g.appendChild(t);}}
+const ejeX=(g,meses,iw,ih,cada=6)=>meses.forEach((mm,i)=>{if(i%cada===0||i===meses.length-1){
+  const t=el('text',{x:iw*(i+0.5)/meses.length,y:ih+16,'text-anchor':'middle',class:'axis'});t.textContent=mm.slice(2);g.appendChild(t);}});
+
+/* Produccion oil (barras) + gas (linea) */
+function dibujarProd(){
+  const box=$('#c_prod');box.innerHTML='';const W=980,H=300,mL=54,mR=54,mT=14,mB=40,iw=W-mL-mR,ih=H-mT-mB;
+  const meses=S.meses,oil=S.oil_bbl_d,gas=S.gas_mm3_d,maxO=Math.max(...oil)*1.1,maxG=Math.max(...gas)*1.25;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
+  ejeY(g,0,ih,ih,maxO,v=>fmt(v/1000,0)+'k');
+  const bw=iw/meses.length*0.62;
+  oil.forEach((v,i)=>{const x=iw*(i+0.5)/meses.length-bw/2,bh=ih*v/maxO;g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:2,fill:cssVar('--s4'),opacity:.9}));});
+  const pts=gas.map((v,i)=>[iw*(i+0.5)/meses.length,ih-ih*v/maxG]);
+  g.appendChild(el('path',{d:'M'+pts.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--accent-2'),'stroke-width':2.4}));
+  for(let i=0;i<=4;i++){const y=ih-ih*i/4;const t=el('text',{x:iw+8,y:y+3,'text-anchor':'start',class:'axis'});t.textContent=fmt(maxG*i/4,0);g.appendChild(t);}
+  ejeX(g,meses,iw,ih);box.appendChild(svg);
+}
+
+/* Acumulado (area) */
+function dibujarAcum(){
+  const box=$('#c_acum');box.innerHTML='';const W=470,H=250,mL=44,mR=12,mT=14,mB=32,iw=W-mL-mR,ih=H-mT-mB;
+  const meses=S.meses,ac=S.acum_mmbbl,max=Math.max(...ac)*1.1;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
+  ejeY(g,0,ih,ih,max,v=>fmt(v,0));
+  const X=i=>iw*i/(ac.length-1),Y=v=>ih-ih*v/max,line=ac.map((v,i)=>[X(i),Y(v)]);
+  const grad=el('linearGradient',{id:'ga',x1:0,y1:0,x2:0,y2:1});
+  grad.appendChild(el('stop',{offset:'0%','stop-color':cssVar('--s3'),'stop-opacity':.34}));
+  grad.appendChild(el('stop',{offset:'100%','stop-color':cssVar('--s3'),'stop-opacity':0}));svg.appendChild(grad);
+  g.appendChild(el('path',{d:'M'+line.map(p=>p.join(',')).join(' L')+` L${X(ac.length-1)},${ih} L0,${ih} Z`,fill:'url(#ga)'}));
+  g.appendChild(el('path',{d:'M'+line.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--s3'),'stroke-width':2.2}));
+  ejeX(g,meses,iw,ih,8);box.appendChild(svg);
+}
+
+/* Actividad: pozos nuevos por mes (barras) */
+function dibujarAct(){
+  const box=$('#c_act');box.innerHTML='';const W=470,H=250,mL=32,mR=12,mT=14,mB=32,iw=W-mL-mR,ih=H-mT-mB;
+  const meses=S.meses,nv=S.nuevos,max=Math.max(...nv,1)*1.2;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
+  ejeY(g,0,ih,ih,max,v=>fmt(v,0));
+  const bw=iw/meses.length*0.6;
+  meses.forEach((mm,i)=>{const x=iw*(i+0.5)/meses.length-bw/2,bh=ih*nv[i]/max;
+    g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:2,fill:cssVar('--s1'),opacity:.9}));});
+  ejeX(g,meses,iw,ih,8);box.appendChild(svg);
+}
+
+/* Mix por ventana (barras horizontales) */
+function dibujarVent(){
+  const box=$('#c_vent');const v=D.ventanas,total=v.reduce((s,x)=>s+x.oil_bbl_d,0),max=Math.max(...v.map(x=>x.oil_bbl_d));
+  const cols=[cssVar('--s4'),cssVar('--s1'),cssVar('--accent-2')];
+  box.innerHTML=v.map((x,i)=>{const w=100*x.oil_bbl_d/max,p=100*x.oil_bbl_d/total;
+    return `<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+      <span>${x.ventana}</span><span class="mono" style="color:var(--ink-2)">${fmt(x.oil_bbl_d)} bbl/d · ${fmt(p,0)}%</span></div>
+      <div style="height:14px;background:var(--surface-2);border-radius:7px;overflow:hidden"><div style="height:100%;width:${w}%;background:${cols[i%3]};border-radius:7px"></div></div></div>`;}).join('');
+}
+
+function pintarOperadores(){
+  const maxO=Math.max(...D.operadores.map(r=>r.oil_bbl_d)),tot=D.operadores.reduce((s,r)=>s+r.oil_bbl_d,0);
+  $('#t_op tbody').innerHTML=D.operadores.map(r=>`<tr><td>${r.operador}</td>
+    <td class="num">${fmt(r.oil_bbl_d)}</td>
+    <td><span class="sharebar"><div style="width:${Math.round(100*r.oil_bbl_d/maxO)}%"></div></span><span class="num">${fmt(100*r.oil_bbl_d/tot,0)}%</span></td>
+    <td class="num">${r.pozos}</td><td class="num">${fmt(r.prod_por_pozo)}</td>
+    <td class="num">${fmt(r.acum_mmbbl,1)}</td></tr>`).join('');
+}
+function pintarPozos(){
+  $('#t_pozos tbody').innerHTML=D.pozos_top.map(r=>`<tr><td class="num">${r.pozo_id}</td><td>${r.operador}</td>
+    <td><span class="badge">${r.ventana.replace('Petroleo','Pet.')}</span></td>
+    <td class="num">${fmt(r.peak_bbl_d)}</td><td class="num">${fmt(r.acum_mbbl)}</td></tr>`).join('');
+}
+
+dibujarProd();dibujarAcum();dibujarAct();dibujarVent();pintarOperadores();pintarPozos();
+</script>

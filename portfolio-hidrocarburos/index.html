@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lleyton Murphy · Data Analytics · Petróleo y Gas</title>
+<meta name="description" content="Portfolio de análisis de datos aplicado al sector hidrocarburos (Vaca Muerta): declinación de pozos, operaciones, confiabilidad de activos y supply chain.">
+<meta property="og:title" content="Lleyton Murphy — Data Analytics · Petróleo y Gas">
+<meta property="og:description" content="Cuatro proyectos de análisis de datos para el sector hidrocarburos de Vaca Muerta.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://murphylleyton05-lgtm.github.io/portfolio/hidrocarburos/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#0A0B0F; --bg-2:#0E1015; --surface:#14161C; --surface-2:#1C1F27; --surface-3:#262A34;
+    --ink:#F4F6FA; --ink-2:#A6ADBD; --ink-3:#6A7182; --rule:#23262F; --rule-strong:#333846;
+    --accent:#FF9D42; --accent-2:#45C7FF; --accent-soft:rgba(255,157,66,.13); --accent-line:rgba(255,157,66,.35);
+    --ok:#199e70; --s1:#3987e5; --s3:#199e70; --s4:#c98500;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -14px rgba(0,0,0,.7);
+    --glow:0 0 0 1px var(--accent-line), 0 0 20px -4px rgba(255,157,66,.35);
+    --tile:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,0));
+  }
+  *{box-sizing:border-box} img{max-width:100%}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(65vw 45vh at 10% -10%, rgba(255,157,66,.07), transparent 60%), radial-gradient(55vw 45vh at 100% 0%, rgba(69,199,255,.06), transparent 55%);
+    background-attachment:fixed;}
+  .wrap{max-width:1080px; margin:0 auto; padding:56px 22px 80px}
+  h1,h2,h3{font-family:'Sora',sans-serif; letter-spacing:-.02em; margin:0}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  a{color:inherit; text-decoration:none}
+
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); display:flex; align-items:center; gap:12px; margin-bottom:20px}
+  .eyebrow::before{content:""; width:26px; height:2px; background:var(--accent); display:inline-block; border-radius:2px}
+  h1{font-size:clamp(34px,6vw,60px); font-weight:800; line-height:1.02; background:linear-gradient(180deg,#fff,#c6cad4); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .lede{max-width:640px; color:var(--ink-2); font-size:17px; margin-top:20px} .lede b{color:var(--ink)}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:22px}
+  .pill{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-2); border:1px solid var(--rule-strong); background:var(--surface-2); padding:6px 12px; border-radius:999px; display:inline-flex; align-items:center; gap:7px}
+  .pill.link:hover{border-color:var(--accent-line); box-shadow:var(--glow); color:var(--ink)}
+
+  .section-label{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin:52px 0 4px}
+
+  .cards{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:20px}
+  @media(max-width:760px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--surface); border:1px solid var(--rule); border-radius:18px; padding:24px 22px; box-shadow:var(--shadow); display:flex; flex-direction:column; min-width:0; transition:border-color .15s, transform .15s}
+  .card:hover{border-color:var(--accent-line); transform:translateY(-2px)}
+  .card .ico{font-size:26px; margin-bottom:14px}
+  .card h3{font-size:20px; font-weight:700}
+  .card .real{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ok); border:1px solid rgba(25,158,112,.4); background:rgba(25,158,112,.12); padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle}
+  .card .sim{color:var(--ink-3); border-color:var(--rule-strong); background:var(--surface-2)}
+  .card p{color:var(--ink-2); font-size:13.5px; margin:10px 0 0}
+  .card .hi{margin-top:14px; padding:11px 13px; background:var(--surface-2); background-image:var(--tile); border:1px solid var(--rule); border-radius:12px; font-size:12.5px; color:var(--ink-2)}
+  .card .hi b{color:var(--accent); font-family:'Sora',sans-serif}
+  .tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:14px}
+  .tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--ink-3); border:1px solid var(--rule); border-radius:6px; padding:3px 8px}
+  .card .actions{display:flex; gap:10px; margin-top:18px; padding-top:16px; border-top:1px solid var(--rule)}
+  .btn{flex:1; text-align:center; font-size:13px; font-weight:600; padding:10px 12px; border-radius:10px; border:1px solid var(--rule-strong); color:var(--ink-2)}
+  .btn.primary{background:var(--accent); color:#1a1206; border-color:transparent}
+  .btn.primary:hover{filter:brightness(1.06)} .btn:hover{color:var(--ink); border-color:var(--accent-line)}
+
+  .approach{background:var(--surface); border:1px solid var(--rule); border-radius:18px; padding:24px; margin-top:20px}
+  .approach h2{font-size:19px} .approach ul{margin:14px 0 0; padding-left:18px; color:var(--ink-2)}
+  .approach li{margin:8px 0} .approach li b{color:var(--ink)}
+
+  footer{margin-top:52px; padding-top:24px; border-top:1px solid var(--rule); color:var(--ink-3); font-size:13px; display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between}
+  footer a{color:var(--accent-2)} footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Data Analytics · Petróleo y Gas · Vaca Muerta</div>
+  <h1>Lleyton Murphy</h1>
+  <p class="lede">Analista de datos, en camino a la <b>Tecnicatura en Petróleo y Gas</b>. Construyo herramientas de
+    análisis para el sector hidrocarburos: tomo el problema real de una operación de Vaca Muerta —producción,
+    logística, equipos— y lo convierto en <b>datos, modelos y tableros</b> que ayudan a decidir.</p>
+  <div class="meta-row">
+    <span class="pill">📍 La Plata, Argentina</span>
+    <a class="pill link" href="https://linkedin.com/in/lleyton-murphy-3716093a3">in · LinkedIn</a>
+    <a class="pill link" href="mailto:murphylleyton05@gmail.com">✉ murphylleyton05@gmail.com</a>
+    <a class="pill link" href="https://github.com/murphylleyton05-lgtm/portfolio">◇ GitHub</a>
+  </div>
+
+  <div class="section-label">Proyectos · 4</div>
+  <div class="cards">
+
+    <div class="card">
+      <div class="ico">🛢️</div>
+      <h3>Vaca Muerta Analytics <span class="real">Datos reales</span></h3>
+      <p>Curvas de declinación (Arps) y estimación de reservas (EUR) de pozos no convencionales, con validación
+        por backtest y normalización por rama lateral. Datos <b>oficiales</b> de la Secretaría de Energía.</p>
+      <div class="hi"><b>2.463</b> pozos ajustados · error a 36 meses ~<b>9%</b> por pozo, ~1% en el total</div>
+      <div class="tags"><span class="tag">Python</span><span class="tag">pandas</span><span class="tag">scipy</span><span class="tag">CI/CD</span></div>
+      <div class="actions">
+        <a class="btn primary" href="https://murphylleyton05-lgtm.github.io/portfolio/vaca-muerta/">Ver en vivo →</a>
+        <a class="btn" href="https://github.com/murphylleyton05-lgtm/portfolio/tree/main/vaca-muerta-analytics">Código</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ico">🛢️</div>
+      <h3>Operations Intelligence <span class="real">Datos reales</span></h3>
+      <p>Tablero de operaciones con la producción <b>oficial</b> de la Secretaría de Energía: petróleo y gas por mes,
+        actividad, acumulado y ranking de operadores. Con la <b>capa Power BI</b> (modelo + medidas DAX).</p>
+      <div class="hi">Datos <b>oficiales</b> · medidas <b>DAX</b> escritas · se regenera por CI</div>
+      <div class="tags"><span class="tag">Python</span><span class="tag">numpy</span><span class="tag">Power BI</span><span class="tag">DAX</span></div>
+      <div class="actions">
+        <a class="btn primary" href="https://murphylleyton05-lgtm.github.io/portfolio/operaciones/">Ver en vivo →</a>
+        <a class="btn" href="https://github.com/murphylleyton05-lgtm/portfolio/tree/main/vaca-muerta-ops-intelligence">Código</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ico">📈</div>
+      <h3>Well Performance ML <span class="real">Datos reales</span></h3>
+      <p>Un modelo de <b>machine learning</b> predice el <b>EUR</b> de un pozo a partir de su diseño de fractura, y
+        cuantifica cuánto del rendimiento explica el diseño vs. la <b>geología</b>. Datos oficiales, ML honesto (train/test).</p>
+      <div class="hi">El diseño explica una parte; sumar la geología <b>sube el R²</b> — la ubicación manda</div>
+      <div class="tags"><span class="tag">Python</span><span class="tag">numpy</span><span class="tag">Machine Learning</span></div>
+      <div class="actions">
+        <a class="btn primary" href="https://murphylleyton05-lgtm.github.io/portfolio/performance/">Ver en vivo →</a>
+        <a class="btn" href="https://github.com/murphylleyton05-lgtm/portfolio/tree/main/well-performance-ml">Código</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ico">🏗️</div>
+      <h3>Frac Sand &amp; Fuel Logistics <span class="real">Consumo real</span></h3>
+      <p>El <b>consumo</b> de arena, agua y etapas sale del dataset <b>oficial</b> de fractura; sobre eso se modela la
+        logística (entregas, <b>stock</b> con política de reposición, quiebres, costo) que no es pública.</p>
+      <div class="hi">Consumo <b>real</b> + logística modelada · OTIF, lead time, stock, costo/t</div>
+      <div class="tags"><span class="tag">Python</span><span class="tag">Supply Chain</span><span class="tag">Inventario</span></div>
+      <div class="actions">
+        <a class="btn primary" href="https://murphylleyton05-lgtm.github.io/portfolio/logistica/">Ver en vivo →</a>
+        <a class="btn" href="https://github.com/murphylleyton05-lgtm/portfolio/tree/main/frac-sand-fuel-logistics">Código</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label">Cómo están hechos</div>
+  <div class="approach">
+    <h2>El criterio, no solo el código</h2>
+    <ul>
+      <li><b>Los 4 con datos oficiales de la Secretaría de Energía.</b> Declinación y Operaciones son producción real;
+        Well Performance entrena ML sobre el diseño de fractura real; Logística usa el consumo real de fractura y solo
+        modela la capa logística que no es pública (y lo declara).</li>
+      <li><b>Se regeneran solos</b> — un pipeline en CI baja los datos oficiales cada mes y reconstruye los tableros.</li>
+      <li><b>Modelado para BI</b> — Operaciones deja el modelo y las medidas DAX listas para Power BI.</li>
+      <li><b>Los límites, declarados</b> — cada tablero dice qué NO hace. Saber dónde falla el propio trabajo suma credibilidad.</li>
+      <li><b>Todo reproducible</b> — Python (pandas, numpy, scipy), sin cajas negras: las regresiones están escritas a mano.</li>
+    </ul>
+  </div>
+
+  <footer>
+    <span>Lleyton Murphy · Analista de datos · Petróleo y Gas</span>
+    <span><a href="mailto:murphylleyton05@gmail.com">murphylleyton05@gmail.com</a> · <a href="https://linkedin.com/in/lleyton-murphy-3716093a3">LinkedIn</a></span>
+  </footer>
+</div>
+</body>
+</html>

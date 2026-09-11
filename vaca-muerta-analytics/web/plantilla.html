@@ -1,185 +1,226 @@
 <title>Vaca Muerta Analytics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
+  /* ===================== sistema de diseño: dashboard oscuro ===================== */
+  /* Oscuro por defecto (la identidad). Variante clara para quien tenga el sistema
+     en claro o use el toggle. */
   :root {
-    color-scheme: light;
-    --bg:          #E9E7E2;
-    --surface:     #FAF9F7;
-    --surface-2:   #F2F0EC;
-    --surface-3:   #E4E1DA;
-    --ink:         #16181A;
-    --ink-2:       #57554F;
-    --ink-3:       #8A867D;
-    --rule:        #D6D2C9;
-    --rule-strong: #BDB8AD;
-    --accent:      #1F4D3D;
-    --accent-soft: #DCE7E1;
-    --s1: #2a78d6;  --s2: #eb6834;  --s3: #1baf7a;  --s4: #eda100;
-    --s5: #e87ba4;  --s6: #008300;  --s7: #4a3aa7;  --s8: #e34948;
-    --grid: #E0DCD3;
-    --shadow: 0 1px 2px rgba(22,24,26,.06), 0 8px 24px -12px rgba(22,24,26,.18);
+    color-scheme: dark;
+    --bg:          #0A0B0F;
+    --bg-2:        #0E1015;
+    --surface:     #14161C;
+    --surface-2:   #1C1F27;
+    --surface-3:   #262A34;
+    --ink:         #F4F6FA;
+    --ink-2:       #A6ADBD;
+    --ink-3:       #6A7182;
+    --rule:        #23262F;
+    --rule-strong: #333846;
+    --accent:      #FF9D42;
+    --accent-2:    #45C7FF;
+    --accent-soft: rgba(255,157,66,.13);
+    --accent-line: rgba(255,157,66,.35);
+    --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;  --s4: #c98500;
+    --s5: #d55181;  --s6: #2f9e2f;  --s7: #9085e9;  --s8: #e66767;
+    --grid: #1E212A;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 12px 32px -14px rgba(0,0,0,.7);
+    --glow: 0 0 0 1px var(--accent-line), 0 0 20px -4px rgba(255,157,66,.35);
+    --tile: linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,0));
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --bg:          #131312;
-      --surface:     #212020;
-      --surface-2:   #292827;
-      --surface-3:   #333130;
-      --ink:         #F1EFEA;
-      --ink-2:       #B2AEA5;
-      --ink-3:       #86827A;
-      --rule:        #383634;
-      --rule-strong: #4A4744;
-      --accent:      #5FB394;
-      --accent-soft: #23332D;
-      --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;  --s4: #c98500;
-      --s5: #d55181;  --s6: #008300;  --s7: #9085e9;  --s8: #e66767;
-      --grid: #302E2C;
-      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  :root[data-theme="light"],
+  :root:where(:not([data-theme="dark"])) {
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      color-scheme: light;
+      --bg:          #ECEEF3;
+      --bg-2:        #F2F4F8;
+      --surface:     #FFFFFF;
+      --surface-2:   #F5F7FA;
+      --surface-3:   #E9ECF2;
+      --ink:         #10131A;
+      --ink-2:       #545B6B;
+      --ink-3:       #8A91A1;
+      --rule:        #E3E6EC;
+      --rule-strong: #CDD2DC;
+      --accent:      #E67514;
+      --accent-2:    #1E8FCC;
+      --accent-soft: rgba(230,117,20,.10);
+      --accent-line: rgba(230,117,20,.30);
+      --s1: #2a78d6;  --s2: #eb6834;  --s3: #1baf7a;  --s4: #eda100;
+      --s5: #e87ba4;  --s6: #008300;  --s7: #4a3aa7;  --s8: #e34948;
+      --grid: #E7EAF0;
+      --shadow: 0 1px 2px rgba(16,19,26,.05), 0 10px 28px -14px rgba(16,19,26,.18);
+      --glow: 0 0 0 1px var(--accent-line), 0 0 18px -6px rgba(230,117,20,.30);
+      --tile: linear-gradient(180deg, rgba(16,19,26,.015), rgba(16,19,26,0));
     }
   }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --bg:          #131312;
-    --surface:     #212020;
-    --surface-2:   #292827;
-    --surface-3:   #333130;
-    --ink:         #F1EFEA;
-    --ink-2:       #B2AEA5;
-    --ink-3:       #86827A;
-    --rule:        #383634;
-    --rule-strong: #4A4744;
-    --accent:      #5FB394;
-    --accent-soft: #23332D;
-    --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;  --s4: #c98500;
-    --s5: #d55181;  --s6: #008300;  --s7: #9085e9;  --s8: #e66767;
-    --grid: #302E2C;
-    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
-  }
+  :root[data-theme="dark"] { color-scheme: dark; }
 
   * { box-sizing: border-box; }
 
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(1100px 520px at 78% -8%, rgba(255,157,66,.055), transparent 60%),
+      radial-gradient(900px 480px at 8% 4%, rgba(69,199,255,.045), transparent 55%),
+      var(--bg);
+    background-attachment: fixed;
     color: var(--ink);
-    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
     font-size: 15px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: -.003em;
   }
 
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 72px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 40px 22px 90px; }
 
   /* ---------- encabezado ---------- */
   .eyebrow {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 11px; font-weight: 500;
-    letter-spacing: .14em; text-transform: uppercase;
-    color: var(--ink-3);
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 16px;
+  }
+  .eyebrow::before {
+    content: ""; width: 22px; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
   }
   h1 {
-    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-    font-weight: 700; font-size: clamp(34px, 6vw, 52px);
-    letter-spacing: -.015em; line-height: 1.02;
-    margin: 6px 0 0; text-wrap: balance;
+    font-family: "Sora", sans-serif;
+    font-weight: 800; font-size: clamp(38px, 6.2vw, 62px);
+    letter-spacing: -.03em; line-height: .98;
+    margin: 0; text-wrap: balance;
+    background: linear-gradient(180deg, var(--ink), color-mix(in oklab, var(--ink) 68%, var(--ink-3)));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .lede { color: var(--ink-2); max-width: 62ch; margin: 10px 0 0; }
+  .lede { color: var(--ink-2); max-width: 60ch; margin: 16px 0 0; font-size: 16.5px; }
 
-  .head-top { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; justify-content: space-between; }
+  .head-top { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; justify-content: space-between; }
 
   .chip-demo {
-    display: inline-flex; align-items: center; gap: 8px;
+    display: inline-flex; align-items: flex-start; gap: 9px;
     background: var(--surface); border: 1px solid var(--rule-strong);
-    border-left: 3px solid var(--s4);
-    border-radius: 3px; padding: 9px 13px; max-width: 330px;
-    font-size: 12.5px; line-height: 1.4; color: var(--ink-2);
+    border-radius: 12px; padding: 12px 15px; max-width: 340px;
+    font-size: 12.5px; line-height: 1.45; color: var(--ink-2);
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .chip-demo::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--s4);
   }
   .chip-demo b { color: var(--ink); font-weight: 600; }
-  .chip-real { border-left-color: var(--accent); }
+  .chip-real::before { background: var(--accent); }
 
-  /* ---------- tira de indicadores ---------- */
-  .kpis {
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    gap: 1px; background: var(--rule);
-    border: 1px solid var(--rule); border-radius: 4px;
-    margin: 30px 0 0; overflow: hidden;
+  /* ---------- tiles reutilizables (matan el look de planilla) ---------- */
+  .kpis, .hallazgo, .params, .limites {
+    display: grid; gap: 12px; background: transparent; border: 0;
+    margin: 34px 0 0; overflow: visible;
   }
-  .kpi { background: var(--surface); padding: 15px 16px 14px; }
-  .kpi-label {
-    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; font-weight: 500;
-    letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
+  .kpis { grid-template-columns: repeat(5, 1fr); }
+  .hallazgo { grid-template-columns: repeat(4, 1fr); }
+  .hallazgo-5 { grid-template-columns: repeat(5, 1fr); }
+  .params { grid-template-columns: repeat(5, 1fr); }
+  .limites { grid-template-columns: repeat(3, 1fr); }
+
+  .kpi, .hallazgo > div, .param, .limite {
+    background: var(--surface-2) var(--tile); border: 1px solid var(--rule);
+    border-radius: 14px; padding: 16px 18px; transition: border-color .15s, transform .15s;
+  }
+  .kpi:hover, .hallazgo > div:hover { border-color: var(--rule-strong); }
+
+  /* dentro de un panel, los tiles van con gap y padding propios */
+  .panel .hallazgo, .panel .params { padding: 16px 20px; margin: 0; border-top: 1px solid var(--rule); }
+
+  .kpi-label, .hallazgo .h-l, .param-l {
+    font-family: "JetBrains Mono", monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
   }
   .kpi-val {
-    font-family: "IBM Plex Sans Condensed", sans-serif; font-weight: 600;
-    font-size: 27px; line-height: 1.15; margin-top: 5px;
-    font-variant-numeric: tabular-nums;
+    font-family: "Sora", sans-serif; font-weight: 700;
+    font-size: 30px; line-height: 1.05; margin-top: 8px;
+    font-variant-numeric: tabular-nums; letter-spacing: -.02em;
   }
-  .kpi-unit { font-size: 13px; color: var(--ink-2); font-weight: 500; margin-left: 3px; }
+  .kpi-unit { font-size: 13px; color: var(--ink-2); font-weight: 500; margin-left: 4px; }
+  .hallazgo .h-v {
+    font-family: "Sora", sans-serif; font-size: 27px;
+    font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 8px; letter-spacing: -.02em;
+  }
+  .hallazgo .h-h { font-size: 11.5px; color: var(--ink-3); line-height: 1.4; margin-top: 4px; }
+  .param-v { font-family: "Sora", sans-serif; font-size: 23px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 6px; letter-spacing: -.02em; }
+  .param-v small { font-size: 12px; color: var(--ink-2); font-weight: 500; margin-left: 3px; }
+  .param-h { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; line-height: 1.4; }
 
   /* ---------- paneles ---------- */
   .panel {
     background: var(--surface); border: 1px solid var(--rule);
-    border-radius: 4px; margin-top: 26px; box-shadow: var(--shadow);
+    border-radius: 18px; margin-top: 22px; box-shadow: var(--shadow);
+    overflow: hidden;
   }
   .panel-head {
-    padding: 16px 20px 14px; border-bottom: 1px solid var(--rule);
-    display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between;
+    padding: 20px 22px 18px;
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; justify-content: space-between;
   }
   .panel-head h2 {
-    font-family: "IBM Plex Sans Condensed", sans-serif;
-    font-size: 21px; font-weight: 600; margin: 0; letter-spacing: -.005em;
+    font-family: "Sora", sans-serif;
+    font-size: 23px; font-weight: 700; margin: 0; letter-spacing: -.02em;
   }
-  .panel-head p { margin: 4px 0 0; font-size: 13px; color: var(--ink-2); max-width: 68ch; }
+  .panel-head p { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-2); max-width: 70ch; line-height: 1.55; }
 
   /* ---------- filtros ---------- */
-  .filters { display: flex; flex-wrap: wrap; gap: 7px; padding: 14px 20px; border-bottom: 1px solid var(--rule); align-items: center; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 22px 16px; align-items: center; }
   .filters .flabel {
-    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .1em;
+    font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .12em;
     text-transform: uppercase; color: var(--ink-3); margin-right: 4px;
   }
   .chip {
-    font: inherit; font-size: 12.5px; cursor: pointer;
+    font: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer;
     background: var(--surface-2); color: var(--ink-2);
-    border: 1px solid var(--rule); border-radius: 999px; padding: 4px 11px;
-    display: inline-flex; align-items: center; gap: 6px;
-    transition: background .12s, border-color .12s, color .12s;
+    border: 1px solid var(--rule); border-radius: 999px; padding: 6px 13px;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: background .14s, border-color .14s, color .14s, box-shadow .14s;
   }
   .chip:hover { border-color: var(--rule-strong); color: var(--ink); }
-  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); font-weight: 500; }
+  .chip[aria-pressed="true"] {
+    background: var(--accent-soft); border-color: var(--accent-line); color: var(--ink); font-weight: 600;
+    box-shadow: 0 0 14px -4px rgba(255,157,66,.28);
+  }
   .chip .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
   .chip-ghost { background: transparent; }
-  :is(.chip, .toggle, .well-item, .link):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  :is(.chip, .toggle, .well-item, .link):focus-visible,
+  .ctrl input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  /* ---------- panel principal ---------- */
-  .split { display: grid; grid-template-columns: 268px 1fr; }
+  /* ---------- panel principal (curva) ---------- */
+  .split { display: grid; grid-template-columns: 276px 1fr; border-top: 1px solid var(--rule); }
   .well-list { border-right: 1px solid var(--rule); max-height: 520px; overflow-y: auto; }
   .well-item {
     display: block; width: 100%; text-align: left; font: inherit; cursor: pointer;
     background: none; border: 0; border-bottom: 1px solid var(--rule);
-    border-left: 3px solid transparent; padding: 9px 14px;
+    border-left: 2px solid transparent; padding: 11px 16px; transition: background .12s;
   }
   .well-item:hover { background: var(--surface-2); }
   .well-item[aria-current="true"] { background: var(--accent-soft); border-left-color: var(--accent); }
-  .well-name { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; font-weight: 500; }
-  .well-meta { font-size: 11.5px; color: var(--ink-3); display: flex; justify-content: space-between; gap: 8px; }
-  .well-meta b { color: var(--ink-2); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .well-name { font-family: "JetBrains Mono", monospace; font-size: 12.5px; font-weight: 600; }
+  .well-meta { font-size: 11.5px; color: var(--ink-3); display: flex; justify-content: space-between; gap: 8px; margin-top: 2px; }
+  .well-meta b { color: var(--ink-2); font-weight: 600; font-variant-numeric: tabular-nums; }
 
-  .chart-area { padding: 14px 18px 18px; min-width: 0; }
-  .chart-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--ink-2); }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .swatch { width: 13px; height: 3px; border-radius: 2px; flex: none; }
+  .chart-area { padding: 16px 20px 20px; min-width: 0; }
+  .chart-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 15px; font-size: 12.5px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 14px; height: 3px; border-radius: 2px; flex: none; }
   .swatch.dot { width: 9px; height: 9px; border-radius: 50%; }
 
   .toggle {
-    font: inherit; font-size: 12px; cursor: pointer; color: var(--ink-2);
+    font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--ink-2);
     background: var(--surface-2); border: 1px solid var(--rule);
-    border-radius: 3px; padding: 4px 10px;
+    border-radius: 8px; padding: 6px 12px; transition: background .14s, border-color .14s, color .14s;
   }
-  .toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+  .toggle:hover { border-color: var(--rule-strong); color: var(--ink); }
+  .toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent-line); color: var(--ink); font-weight: 600; }
 
   svg.chart { display: block; width: 100%; height: auto; }
   .chart-wrap { position: relative; }
@@ -187,135 +228,120 @@
   .tip {
     position: absolute; pointer-events: none; opacity: 0;
     transition: opacity .1s; z-index: 5;
-    background: var(--surface); border: 1px solid var(--rule-strong);
-    border-radius: 3px; box-shadow: var(--shadow);
-    padding: 8px 10px; font-size: 12px; min-width: 130px;
+    background: var(--surface-2); border: 1px solid var(--rule-strong);
+    border-radius: 10px; box-shadow: var(--shadow);
+    padding: 9px 11px; font-size: 12px; min-width: 140px;
+    backdrop-filter: blur(6px);
   }
-  .tip .tip-t { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-  .tip .tip-r { display: flex; justify-content: space-between; gap: 14px; margin-top: 3px; }
+  .tip .tip-t { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .tip .tip-r { display: flex; justify-content: space-between; gap: 14px; margin-top: 4px; }
   .tip .tip-r b { font-variant-numeric: tabular-nums; font-weight: 600; }
 
-  /* ---------- lectura de parametros ---------- */
-  .params {
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    gap: 1px; background: var(--rule); border-top: 1px solid var(--rule);
-  }
-  .param { background: var(--surface); padding: 12px 16px; }
-  .param-l { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); }
-  .param-v { font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 3px; }
-  .param-v small { font-size: 12px; color: var(--ink-2); font-weight: 500; margin-left: 2px; }
-  .param-h { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; line-height: 1.35; }
-
-  /* ---------- roca o largo ---------- */
-  .hallazgo {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1px; background: var(--rule);
-    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
-  }
-  .hallazgo-5 { grid-template-columns: repeat(5, 1fr); }
-  .hallazgo > div { background: var(--surface); padding: 13px 18px; }
-  .hallazgo .h-l {
-    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .09em;
-    text-transform: uppercase; color: var(--ink-3);
-  }
-  .hallazgo .h-v {
-    font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 25px;
-    font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 3px;
-  }
-  .hallazgo .h-h { font-size: 11.5px; color: var(--ink-3); line-height: 1.35; margin-top: 2px; }
-
-  .split-rama { display: grid; grid-template-columns: minmax(0, 1fr) 400px; }
-  /* Esta tabla mete cinco columnas en un panel angosto: apretamos el padding y
-     achicamos la tipografía para que entre entera sin scroll horizontal. */
-  .tabla-rama table th, .tabla-rama table td { padding: 6px 9px; }
+  /* ---------- split roca/economía ---------- */
+  .split-rama { display: grid; grid-template-columns: minmax(0, 1fr) 400px; border-top: 1px solid var(--rule); }
+  .tabla-rama table th, .tabla-rama table td { padding: 7px 10px; }
   .tabla-rama table { font-size: 12px; }
   .tabla-rama .mono { font-size: 11px; }
-  /* Los nombres reales de pozo (YPF.Nq.LLL-1689(h)) son mucho más largos que
-     los de prueba y desbordaban la tabla. Se recortan con puntos suspensivos
-     y el nombre completo queda en el tooltip. */
   .tabla-rama td.pozo {
     max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .tabla-rama { border-left: 1px solid var(--rule); display: flex; flex-direction: column; }
   .tabla-rama-head {
-    padding: 14px 16px 10px; font-family: "IBM Plex Sans Condensed", sans-serif;
-    font-size: 15px; font-weight: 600;
+    padding: 16px 18px 10px; font-family: "Sora", sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: -.01em;
   }
   .nota-rama {
-    margin: 0; padding: 11px 16px; border-top: 1px solid var(--rule);
-    font-size: 12px; color: var(--ink-2); line-height: 1.45;
+    margin: 0; padding: 13px 18px; border-top: 1px solid var(--rule);
+    font-size: 12px; color: var(--ink-2); line-height: 1.5;
   }
-  .movio { color: var(--s2); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+  .movio { color: var(--s2); font-family: "JetBrains Mono", monospace; font-size: 11px; }
   .op-norm { border-top: 1px solid var(--rule); }
 
-  /* Controles de los supuestos económicos. Van arriba de los números para que
-     quede claro que los números dependen de ellos. */
+  /* ---------- controles económicos ---------- */
   .controles {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 18px;
-    padding: 16px 20px; border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule); background: var(--surface-2);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 20px;
+    padding: 18px 22px; border-top: 1px solid var(--rule);
+    background: var(--bg-2);
   }
   .ctrl label {
-    display: block; font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
-    letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+    display: block; font-family: "JetBrains Mono", monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
     margin-bottom: 5px;
   }
   .ctrl .valor {
-    font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 17px;
-    font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink);
+    font-family: "Sora", sans-serif; font-size: 18px;
+    font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); letter-spacing: -.01em;
   }
-  .ctrl input[type=range] { width: 100%; margin-top: 3px; accent-color: var(--accent); }
+  .ctrl input[type=range] {
+    width: 100%; margin-top: 6px; accent-color: var(--accent);
+    height: 4px;
+  }
   @media (max-width: 900px) { .controles { grid-template-columns: repeat(2, 1fr); } }
-  .sube { color: var(--s3); font-family: "IBM Plex Mono", monospace; }
-  .baja { color: var(--s2); font-family: "IBM Plex Mono", monospace; }
-  .igual { color: var(--ink-3); font-family: "IBM Plex Mono", monospace; }
+  .sube { color: var(--s3); font-family: "JetBrains Mono", monospace; }
+  .baja { color: var(--s2); font-family: "JetBrains Mono", monospace; }
+  .igual { color: var(--ink-3); font-family: "JetBrains Mono", monospace; }
 
   /* ---------- tabla ---------- */
-  .table-scroll { overflow-x: auto; max-height: 460px; overflow-y: auto; }
+  .table-scroll { overflow-x: auto; max-height: 460px; overflow-y: auto; border-top: 1px solid var(--rule); }
   table { border-collapse: collapse; width: 100%; font-size: 13px; }
   thead th {
     position: sticky; top: 0; z-index: 1; background: var(--surface-2);
-    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; font-weight: 500;
+    font-family: "JetBrains Mono", monospace; font-size: 10px; font-weight: 600;
     letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
-    text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule-strong);
+    text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--rule-strong);
     white-space: nowrap;
   }
-  tbody td { padding: 7px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  tbody td { padding: 8px 15px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
   tbody tr:hover { background: var(--surface-2); }
   .num { text-align: right; font-variant-numeric: tabular-nums; }
-  .mono { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  .mono { font-family: "JetBrains Mono", monospace; font-size: 12px; }
   .bar-cell { width: 130px; }
-  .bar-track { background: var(--surface-3); border-radius: 2px; height: 9px; width: 100%; }
-  .bar-fill { background: var(--s1); border-radius: 2px; height: 9px; }
-  .rank-n { color: var(--ink-3); font-family: "IBM Plex Mono", monospace; font-size: 11.5px; }
+  .bar-track { background: var(--surface-3); border-radius: 3px; height: 8px; width: 100%; overflow: hidden; }
+  .bar-fill { background: linear-gradient(90deg, var(--s1), color-mix(in oklab, var(--s1) 70%, var(--accent))); border-radius: 3px; height: 8px; }
+  .rank-n { color: var(--ink-3); font-family: "JetBrains Mono", monospace; font-size: 11.5px; }
 
-  .panel-foot { padding: 12px 20px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
-  .link { color: var(--accent); font-weight: 500; background: none; border: 0; font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .panel-foot { padding: 14px 22px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+  .link { color: var(--accent); font-weight: 600; background: none; border: 0; font: inherit; cursor: pointer; text-decoration: none; border-bottom: 1px solid var(--accent-line); }
+  .link:hover { border-bottom-color: var(--accent); }
 
-  /* ---------- metodo / pie ---------- */
-  .method { margin-top: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-  .method h3 {
-    font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 16px; font-weight: 600;
-    margin: 0 0 5px; padding-top: 11px; border-top: 2px solid var(--ink);
+  /* ---------- método ---------- */
+  .method { margin-top: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .method > div {
+    background: var(--surface) var(--tile); border: 1px solid var(--rule);
+    border-radius: 14px; padding: 18px 20px;
   }
-  .method p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
-  .method code { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--ink); }
+  .method h3 {
+    font-family: "Sora", sans-serif; font-size: 16px; font-weight: 700;
+    margin: 0 0 8px; padding-top: 0; border-top: 0; letter-spacing: -.01em;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .method h3::before {
+    content: ""; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); flex: none;
+    box-shadow: 0 0 8px -1px var(--accent);
+  }
+  .method p { margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+  .method code { font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--accent); }
 
-  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-3); }
+  /* ---------- limitaciones ---------- */
+  .panel .limites { padding: 16px 20px; margin: 0; border-top: 1px solid var(--rule); }
+  .limite h3 { font-family: "Sora", sans-serif; font-size: 15px; font-weight: 700;
+    margin: 0 0 6px; letter-spacing: -.01em; }
+  .limite p { margin: 0; font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+  .limite em { color: var(--ink); font-style: normal; font-weight: 600; }
+
+  footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-3); }
 
   @media (max-width: 900px) {
-    .kpis { grid-template-columns: repeat(2, 1fr); }
-    /* Con 5 tarjetas en 2 columnas la última queda sola y deja un hueco gris
-       que parece un error de carga. Que ocupe el ancho completo. */
+    .wrap { padding: 28px 16px 70px; }
+    .kpis, .hallazgo, .hallazgo-5, .params { grid-template-columns: repeat(2, 1fr); }
     .kpis > .kpi:last-child:nth-child(odd),
     .hallazgo > div:last-child:nth-child(odd) { grid-column: 1 / -1; }
-    .params { grid-template-columns: repeat(2, 1fr); }
     .split { grid-template-columns: 1fr; }
     .split-rama { grid-template-columns: minmax(0, 1fr); }
     .tabla-rama { border-left: 0; border-top: 1px solid var(--rule); }
-    .hallazgo, .hallazgo-5 { grid-template-columns: repeat(2, 1fr); }
     .well-list { border-right: 0; border-bottom: 1px solid var(--rule); max-height: 240px; }
-    .method { grid-template-columns: 1fr; gap: 16px; }
+    .method, .limites { grid-template-columns: 1fr; }
+    h1 { font-size: 40px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -677,12 +703,59 @@
       </p>
     </div>
     <div>
-      <h3>Qué no hace este modelo</h3>
+      <h3>El EUR es una proyección, no un dato</h3>
       <p>
-        No corrige por longitud de rama lateral ni por etapas de fractura: un pozo más largo
-        produce más aunque la roca sea idéntica. Tampoco describe pozos con paradas largas o
-        intervenciones — esos quedan con R² bajo.
+        Es la producción total esperada a 30 años, extrapolada desde la historia disponible.
+        Los pozos con pocos meses tienen un EUR mucho más incierto — están marcados en el
+        ranking. Qué tan creíble es la proyección se mide en la sección de validación.
       </p>
+    </div>
+  </section>
+
+  <section class="panel" id="secLimites">
+    <div class="panel-head">
+      <div>
+        <h2>Lo que esta app no hace</h2>
+        <p>
+          Un análisis sin límites declarados es un análisis en el que no conviene
+          confiar. Estos son los de este, en orden de importancia.
+        </p>
+      </div>
+    </div>
+    <div class="limites">
+      <div class="limite">
+        <h3>No sirve para pronosticar un pozo suelto</h3>
+        <p>El backtest lo muestra: el error típico por pozo es alto y solo una minoría cae
+        dentro de ±20%. Úsese para comparar conjuntos, no para decidir sobre un pozo.</p>
+      </div>
+      <div class="limite">
+        <h3>Los pozos con paradas largas quedan distorsionados</h3>
+        <p>Un reacondicionamiento (workover) o una parada extensa rompe la curva de Arps:
+        esos pozos dan R² bajo y se filtran del ranking, pero no se corrigen de forma
+        automática. Son el ruido inevitable de datos declarados, no medidos.</p>
+      </div>
+      <div class="limite">
+        <h3>Normaliza por rama, no por completación</h3>
+        <p>Corrige el EUR por longitud de rama lateral, pero no cruza con las etapas de
+        fractura ni el agente de sostén (proppant) —variables que hoy definen gran parte
+        del éxito en Vaca Muerta—. Los datos se descargan; el cruce es el próximo paso.</p>
+      </div>
+      <div class="limite">
+        <h3>La ventana de fluido es un proxy</h3>
+        <p>Clasifica por GOR de producción, no por tipificación PVT de laboratorio. Un pozo
+        puede subir su GOR con el tiempo por depletación.</p>
+      </div>
+      <div class="limite">
+        <h3>El breakeven es de boca de pozo, antes de impuestos</h3>
+        <p>Incluye un diferencial de precio pero no impuesto a las ganancias, retenciones ni
+        costos completos de transporte. Sirve para comparar pozos con la misma regla, no
+        para una decisión de inversión.</p>
+      </div>
+      <div class="limite">
+        <h3>No modela interferencia entre pozos</h3>
+        <p>El efecto <em>parent-child</em> —un pozo nuevo perforado al lado de uno en
+        producción rinde menos— se ve en las curvas crudas pero no se modela.</p>
+      </div>
     </div>
   </section>
 
@@ -1303,7 +1376,10 @@ function dibujarEconomia() {
   if (poblacion.length < 10) { seccion.hidden = true; return; }
   seccion.hidden = false;
 
-  const pozos = poblacion.filter(w => opsActivas.has(w.op));
+  // Respeta AMBOS filtros, igual que el resto de la app: si filtrás por ventana
+  // de fluido, la economía se recalcula sobre esa ventana, no sobre todas.
+  const pozos = poblacion.filter(
+    w => opsActivas.has(w.op) && ventanasActivas.has(w.ventana || "Sin dato"));
 
   // --- controles ---
   const defs = [

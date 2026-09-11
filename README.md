@@ -4,9 +4,14 @@ Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyect
 
 ## Proyectos
 
+> 🛢️ **Hub de Data Analytics · Petróleo y Gas:** https://murphylleyton05-lgtm.github.io/portfolio/hidrocarburos/ — los 4 proyectos del sector hidrocarburos en una sola página.
+
 | Proyecto | Descripción | Stack |
 |----------|-------------|-------|
 | [🛢️ Vaca Muerta Analytics](./vaca-muerta-analytics) | Curvas de declinación y estimación de reservas (EUR) de pozos no convencionales, con datos públicos de la Secretaría de Energía. | Python · pandas · scipy · Streamlit · n8n |
+| [🏗️ Frac Sand & Fuel Logistics](./frac-sand-fuel-logistics) | Cadena de suministro de arena de fractura: **consumo real** (arena/agua/etapas oficiales) + logística modelada (OTIF, lead time, stock, quiebres, costo). | Python · pandas · Supply Chain |
+| [📈 Well Performance ML](./well-performance-ml) | Modelo de ML (datos oficiales) que predice el EUR de un pozo desde su diseño de fractura y cuantifica cuánto explica el diseño vs. la geología. | Python · numpy · Machine Learning |
+| [🛢️ Vaca Muerta Operations Intelligence](./vaca-muerta-ops-intelligence) | Tablero de operaciones con la producción **oficial** (petróleo/gas por mes, actividad, ranking de operadores) y medidas DAX para Power BI. Se regenera por CI con datos reales. | Python · pandas · Power BI (DAX) |
 | [🎙️ EchoNotes](./echonotes) | App de notas por voz con transcripción en tiempo real, 100% en el navegador. | React · Vite · Web Speech API |
 | [🟢 WhatsApp + CRM + IA](./whatsapp-crm-automation) | Stack self-hosted de atención por WhatsApp, CRM y respuestas automáticas con IA. | Chatwoot · n8n · Claude · Docker |
 

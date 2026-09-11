@@ -42,6 +42,16 @@ jobs:
           cp -r vuelto/* site/vuelto/
           mkdir -p site/vaca-muerta
           cp vaca-muerta-analytics/web/index.html site/vaca-muerta/
+          # assets/ trae la imagen de preview (Open Graph) para compartir el link
+          cp -r vaca-muerta-analytics/web/assets site/vaca-muerta/ 2>/dev/null || true
+          mkdir -p site/logistica
+          cp frac-sand-fuel-logistics/web/index.html site/logistica/
+          mkdir -p site/performance
+          cp well-performance-ml/web/index.html site/performance/
+          mkdir -p site/operaciones
+          cp vaca-muerta-ops-intelligence/web/index.html site/operaciones/
+          mkdir -p site/hidrocarburos
+          cp portfolio-hidrocarburos/index.html site/hidrocarburos/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

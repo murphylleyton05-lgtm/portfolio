@@ -1,0 +1,446 @@
+<title>Frac Sand &amp; Fuel Logistics</title>
+<meta name="description" content="Cadena de suministro de arena de fractura en Vaca Muerta: consumo real (Secretaría de Energía) + logística modelada — OTIF, lead time, stock, quiebres y costo logístico.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0A0B0F; --bg-2:#0E1015; --surface:#14161C; --surface-2:#1C1F27; --surface-3:#262A34;
+    --ink:#F4F6FA; --ink-2:#A6ADBD; --ink-3:#6A7182; --rule:#23262F; --rule-strong:#333846;
+    --accent:#FF9D42; --accent-2:#45C7FF; --accent-soft:rgba(255,157,66,.13); --accent-line:rgba(255,157,66,.35);
+    --ok:#199e70; --warn:#c98500; --bad:#d95926;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#2f9e2f; --s7:#9085e9; --s8:#e66767;
+    --grid:#1E212A;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px -14px rgba(0,0,0,.7);
+    --glow:0 0 0 1px var(--accent-line), 0 0 20px -4px rgba(255,157,66,.35);
+    --tile:linear-gradient(180deg, rgba(255,255,255,.024), rgba(255,255,255,0));
+    --r:18px; --r-tile:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(60vw 40vh at 12% -8%, rgba(255,157,66,.06), transparent 60%),
+      radial-gradient(50vw 40vh at 100% 0%, rgba(69,199,255,.05), transparent 55%);
+    background-attachment:fixed;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:40px 22px 72px}
+  h1,h2,h3{font-family:'Sora',sans-serif; letter-spacing:-.02em; margin:0}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  a{color:var(--accent-2); text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--ink-3); display:flex; align-items:center; gap:12px; margin-bottom:18px}
+  .eyebrow::before{content:""; width:26px; height:2px; background:var(--accent); display:inline-block; border-radius:2px}
+  h1{font-size:clamp(34px,5.5vw,58px); font-weight:800; line-height:1.02;
+    background:linear-gradient(180deg,#fff, #c8ccd6); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .lede{max-width:640px; color:var(--ink-2); font-size:16px; margin-top:16px}
+  .lede b{color:var(--ink)}
+
+  .banner{margin-top:22px; padding:14px 16px; border:1px solid var(--rule); border-left:3px solid var(--accent);
+    border-radius:12px; background:linear-gradient(180deg, var(--accent-soft), transparent); color:var(--ink-2); font-size:13px}
+  .banner b{color:var(--ink)}
+
+  .grid{display:grid; gap:14px}
+  .kpis{grid-template-columns:repeat(6,1fr); margin-top:28px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--surface-2); background-image:var(--tile); border:1px solid var(--rule);
+    border-radius:var(--r-tile); padding:16px 16px 15px}
+  .tile .lab{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3)}
+  .tile .val{font-family:'Sora',sans-serif; font-weight:700; font-size:26px; margin-top:9px; line-height:1}
+  .tile .val small{font-size:13px; color:var(--ink-2); font-weight:600; margin-left:3px}
+  .tile .sub{font-size:11.5px; color:var(--ink-3); margin-top:6px}
+  .tile.alert .val{color:var(--accent)}
+
+  .panel{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r);
+    padding:22px 22px 20px; margin-top:26px; box-shadow:var(--shadow); min-width:0}
+  .panel h2{font-size:19px; font-weight:700}
+  .panel .desc{color:var(--ink-2); font-size:13.5px; margin-top:6px; max-width:680px}
+  .panel-head{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap}
+
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .chip{font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:.04em; padding:6px 12px; border-radius:999px;
+    border:1px solid var(--rule-strong); background:var(--surface-2); color:var(--ink-2); cursor:pointer; display:inline-flex; align-items:center; gap:7px}
+  .chip .dot{width:8px; height:8px; border-radius:50%}
+  .chip[aria-pressed="true"]{color:var(--ink); border-color:var(--accent-line); box-shadow:var(--glow); background:var(--accent-soft)}
+
+  svg{display:block; width:100%; height:auto; overflow:visible}
+  .axis{fill:var(--ink-3); font-family:'JetBrains Mono',monospace; font-size:10px}
+  .axis-line{stroke:var(--grid); stroke-width:1}
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:12px; font-size:12px; color:var(--ink-2)}
+  .legend span{display:inline-flex; align-items:center; gap:7px}
+  .legend i{width:14px; height:3px; border-radius:2px; display:inline-block}
+
+  table{width:100%; border-collapse:collapse; font-size:13px; margin-top:8px}
+  th,td{padding:9px 10px; text-align:right; border-bottom:1px solid var(--rule)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:500}
+  tbody tr:hover{background:var(--surface-2)}
+  td .num{font-family:'JetBrains Mono',monospace}
+  .scroll{overflow-x:auto; max-width:100%}
+  .scroll table{min-width:440px}
+
+  .badge{font-family:'JetBrains Mono',monospace; font-size:10.5px; padding:3px 8px; border-radius:6px; white-space:nowrap}
+  .b-ok{background:rgba(25,158,112,.16); color:#5fd6aa}
+  .b-warn{background:rgba(201,133,0,.18); color:#e7b64d}
+  .b-bad{background:rgba(217,89,38,.18); color:#f0916b}
+
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:26px}
+  .two>*{min-width:0}
+  @media(max-width:820px){.two{grid-template-columns:1fr}}
+  .limits{grid-template-columns:repeat(2,1fr); margin-top:14px}
+  @media(max-width:640px){.limits{grid-template-columns:1fr}}
+  .limits .tile .val{font-size:15px; font-family:'Sora',sans-serif}
+  .limits .tile p{margin:8px 0 0; color:var(--ink-2); font-size:12.5px}
+
+  footer{margin-top:44px; padding-top:22px; border-top:1px solid var(--rule); color:var(--ink-3); font-size:12.5px}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Cuenca Neuquina · Logística de fractura</div>
+  <h1>Frac Sand &amp; Fuel Logistics</h1>
+  <p class="lede">Un set de fractura consume <b>cientos de toneladas de arena por etapa</b> y gasoil sin parar. Si la arena
+    no llega, el equipo se detiene y cada día parado cuesta una fortuna. Este panel sigue la cadena de suministro de
+    <b>arena</b> y <b>gasoil</b> hacia las locaciones: cumplimiento de entregas, tiempos, <b>stock</b> y <b>costo logístico</b>.</p>
+  <div class="banner" id="banner"></div>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <!-- Consumo mensual -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Consumo por mes</h2>
+        <p class="desc">Arena real (barras, eje izquierdo) y gasoil estimado de las etapas (línea, eje derecho) por mes. La demanda sube
+          con la actividad de fractura y tiene estacionalidad.</p>
+      </div>
+    </div>
+    <div id="c_consumo"></div>
+    <div class="legend">
+      <span><i style="background:var(--s4)"></i>Arena (t)</span>
+      <span><i style="background:var(--accent-2)"></i>Gasoil estimado (m³)</span>
+    </div>
+  </section>
+
+  <!-- Stock -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Stock de arena en el yard</h2>
+        <p class="desc">Nivel diario de arena disponible. La línea punteada es el <b>stock de seguridad</b>; cuando el
+          stock lo perfora, el riesgo de quiebre es alto. Los puntos marcan <b>días de quiebre</b> (equipo parado).</p>
+      </div>
+    </div>
+    <div id="c_stock"></div>
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>Stock de arena (t)</span>
+      <span><i style="background:var(--ink-3)"></i>Stock de seguridad</span>
+      <span><i style="background:var(--bad); width:10px; height:10px; border-radius:50%"></i>Día de quiebre</span>
+    </div>
+  </section>
+
+  <div class="two">
+    <!-- OTIF -->
+    <section class="panel" style="margin-top:26px">
+      <h2>Cumplimiento (OTIF) por mes</h2>
+      <p class="desc">% de envíos entregados <b>a tiempo y completos</b>.</p>
+      <div id="c_otif"></div>
+    </section>
+    <!-- Lead time hist -->
+    <section class="panel" style="margin-top:26px">
+      <h2>Distribución de lead time — arena</h2>
+      <p class="desc">Días desde la orden hasta la entrega. La cola larga es el riesgo.</p>
+      <div id="c_hist"></div>
+    </section>
+  </div>
+
+  <!-- Ranking proveedores -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Performance de proveedores</h2>
+        <p class="desc">Ordenados por OTIF. El lead time y el retraso muestran quién es confiable; el costo, quién es caro.</p>
+      </div>
+    </div>
+    <div class="scroll">
+      <table id="t_ranking">
+        <thead><tr>
+          <th>Proveedor</th><th>Material</th><th>Origen</th><th>Envíos</th><th>Volumen</th>
+          <th>OTIF</th><th>Lead (d)</th><th>Retraso (d)</th><th>Costo log.</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Costo -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>¿En qué se va el costo?</h2>
+        <p class="desc">Desglose del costo total de abastecimiento. El <b>flete</b> suele pesar tanto como la arena misma
+          cuando el yard está a cientos de kilómetros.</p>
+      </div>
+    </div>
+    <div id="c_costo"></div>
+  </section>
+
+  <div class="two">
+    <!-- Rutas -->
+    <section class="panel" style="margin-top:26px">
+      <h2>Rutas de abastecimiento</h2>
+      <p class="desc">Origen del proveedor y costo de flete acumulado.</p>
+      <div class="scroll">
+        <table id="t_rutas">
+          <thead><tr><th>Origen</th><th>Proveedor</th><th>Dist.</th><th>Envíos</th><th>US$/envío</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+    <!-- Recientes -->
+    <section class="panel" style="margin-top:26px">
+      <h2>Últimos envíos</h2>
+      <p class="desc">Las entregas más recientes y su estado.</p>
+      <div class="scroll">
+        <table id="t_recientes">
+          <thead><tr><th>Fecha</th><th>Material</th><th>Pad</th><th>Cant.</th><th>Estado</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Limitaciones -->
+  <section class="panel">
+    <h2>Lo que este panel no hace</h2>
+    <p class="desc">Declarar los límites es parte del trabajo: muestra que se sabe dónde termina el modelo.</p>
+    <div class="grid limits">
+      <div class="tile"><div class="val">Consumo real, logística modelada</div><p>La arena, el agua y las etapas por pozo son datos <b>oficiales</b> de fractura de la Secretaría de Energía. Los proveedores, entregas, stock y costo se modelan encima, porque ninguna operadora publica su logística interna. El gasoil se estima a partir de las etapas reales.</p></div>
+      <div class="tile"><div class="val">Un solo yard consolidado</div><p>El stock se modela sobre un depósito único. En la realidad hay varios yards y transferencias entre ellos, que acá no se representan.</p></div>
+      <div class="tile"><div class="val">Costo de standby aproximado</div><p>El costo de un set parado se toma como una tarifa fija por día. El costo real depende del contrato y de la etapa de la operación.</p></div>
+      <div class="tile"><div class="val">Sin optimización de ruteo</div><p>Muestra el costo de las rutas, pero no resuelve el ruteo óptimo ni el mix de proveedores. Es diagnóstico, no prescriptivo.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Proyecto de portfolio · <b>Data Analytics aplicado a Supply Chain</b> · consumo de fractura <b>real</b>
+    (Secretaría de Energía) + capa logística modelada con Python (pandas).
+  </footer>
+</div>
+
+<script>
+const D = /*__DATOS__*/{};
+
+const $ = s => document.querySelector(s);
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+const fmt = (n,d=0) => Number(n).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+function usd(n){ const a=Math.abs(n);
+  if(a>=1e6) return 'US$ '+fmt(n/1e6,1)+' M';
+  if(a>=1e3) return 'US$ '+fmt(n/1e3,0)+' k';
+  return 'US$ '+fmt(n,0);
+}
+
+/* ---------- Banner + KPIs ---------- */
+const m = D.meta, k = D.kpis;
+$('#banner').innerHTML = (m.es_demo
+  ? `<b>Consumo demo · logística modelada.</b> `
+  : `<b>Consumo real · logística modelada.</b> `)
+  + `El consumo —<b>${fmt(k.arena_total_t)} t de arena</b>, ${fmt(m.etapas)} etapas, ${fmt(k.agua_total_m3)} m³ de agua`
+  + ` de ${fmt(m.pozos)} pozos, período <span class="mono">${m.periodo}</span>— `
+  + (m.es_demo
+     ? `sale de la versión demo (en CI son los datos oficiales de fractura de la Secretaría de Energía). `
+     : `sale de los datos <b>oficiales de fractura</b> de la Secretaría de Energía. `)
+  + `La capa logística (proveedores, ${fmt(m.envios)} entregas, stock, costo) es un <b>modelo</b> sobre ese consumo real, porque no es información pública.`;
+
+const kpis = [
+  {lab:'OTIF', val:fmt(k.otif_pct,1), unit:'%', sub:'a tiempo y completo'},
+  {lab:'Arena (real)', val:fmt(k.arena_total_t/1e6,2), unit:'M t', sub:`${fmt(k.agua_total_m3/1e6,1)} M m³ de agua · ${fmt(m.etapas)} etapas`},
+  {lab:'Lead time', val:fmt(k.lead_prom_dias,1), unit:'d', sub:`retraso medio ${fmt(k.retraso_prom_dias,1)} d`},
+  {lab:'Cobertura de stock', val:fmt(k.cobertura_dias,1), unit:'d', sub:`seguridad ${fmt(D.stock.seguridad_t/1000,0)}k t`},
+  {lab:'Días de quiebre', val:fmt(k.dias_quiebre), unit:'', sub:`${fmt(k.dias_bajo_seguridad)} d bajo seguridad`, alert:k.dias_quiebre>0},
+  {lab:'Costo logístico', val:fmt(k.costo_logistico_usd/1e6,0), unit:'M US$', sub:`${fmt(k.costo_log_por_t,1)} US$/t de arena`},
+];
+$('#kpis').innerHTML = kpis.map(x=>`
+  <div class="tile ${x.alert?'alert':''}">
+    <div class="lab">${x.lab}</div>
+    <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div>
+    <div class="sub">${x.sub}</div>
+  </div>`).join('');
+
+/* ---------- helpers de ejes ---------- */
+function ejeY(g, x0, y0, h, max, fmtFn, ticks=4){
+  for(let i=0;i<=ticks;i++){
+    const v = max*i/ticks, y = y0 - h*i/ticks;
+    g.appendChild(el('line',{x1:x0,y1:y,x2:x0+1,y2:y,class:'axis-line'}));
+    const t=el('text',{x:x0-8,y:y+3,'text-anchor':'end',class:'axis'}); t.textContent=fmtFn(v); g.appendChild(t);
+  }
+}
+
+/* ---------- Consumo mensual: barras arena + linea gasoil (dual eje) ---------- */
+function dibujarConsumo(){
+  const box=$('#c_consumo'); box.innerHTML='';
+  const W=980,H=300, mL=54,mR=54,mT=14,mB=42;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const meses=D.serie.meses, arena=D.serie.arena_t, gas=D.serie.gasoil_m3;
+  const maxA=Math.max(...arena)*1.1, maxG=Math.max(...gas)*1.2;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const g=el('g',{transform:`translate(${mL},${mT})`}); svg.appendChild(g);
+  ejeY(g,0,ih,ih,maxA, v=>fmt(v/1000,0)+'k');
+  // barras arena
+  const bw=iw/meses.length*0.6;
+  meses.forEach((mm,i)=>{
+    const x=iw*(i+0.5)/meses.length - bw/2;
+    const bh=ih*arena[i]/maxA;
+    g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:3,fill:cssVar('--s4'),opacity:.9}));
+    if(i%3===0 || i===meses.length-1){
+      const t=el('text',{x:iw*(i+0.5)/meses.length,y:ih+16,'text-anchor':'middle',class:'axis'});
+      t.textContent=mm.slice(2); g.appendChild(t);
+    }
+  });
+  // linea gasoil
+  const pts=gas.map((v,i)=>[iw*(i+0.5)/meses.length, ih-ih*v/maxG]);
+  g.appendChild(el('path',{d:'M'+pts.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--accent-2'),'stroke-width':2.4}));
+  pts.forEach(p=>g.appendChild(el('circle',{cx:p[0],cy:p[1],r:2.6,fill:cssVar('--accent-2')})));
+  // eje derecho gasoil
+  for(let i=0;i<=4;i++){ const v=maxG*i/4, y=ih-ih*i/4;
+    const t=el('text',{x:iw+8,y:y+3,'text-anchor':'start',class:'axis'}); t.textContent=fmt(v/1000,1)+'k'; g.appendChild(t);
+  }
+  box.appendChild(svg);
+}
+
+/* ---------- Stock diario con umbral y quiebres ---------- */
+function dibujarStock(){
+  const box=$('#c_stock'); box.innerHTML='';
+  const W=980,H=320, mL=56,mR=16,mT=14,mB=34;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const st=D.stock.stock_t, seg=D.stock.seguridad_t, fechas=D.stock.fechas;
+  const max=Math.max(...st, seg)*1.1;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const g=el('g',{transform:`translate(${mL},${mT})`}); svg.appendChild(g);
+  ejeY(g,0,ih,ih,max, v=>fmt(v/1000,0)+'k');
+  const X=i=>iw*i/(st.length-1), Y=v=>ih-ih*Math.max(0,v)/max;
+  // area
+  const line=st.map((v,i)=>[X(i),Y(v)]);
+  const area='M'+line.map(p=>p.join(',')).join(' L')+` L${X(st.length-1)},${ih} L0,${ih} Z`;
+  const grad=el('linearGradient',{id:'gst',x1:0,y1:0,x2:0,y2:1});
+  grad.appendChild(el('stop',{offset:'0%','stop-color':cssVar('--accent'),'stop-opacity':.28}));
+  grad.appendChild(el('stop',{offset:'100%','stop-color':cssVar('--accent'),'stop-opacity':0}));
+  svg.appendChild(grad);
+  g.appendChild(el('path',{d:area,fill:'url(#gst)'}));
+  g.appendChild(el('path',{d:'M'+line.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--accent'),'stroke-width':2}));
+  // umbral seguridad
+  g.appendChild(el('line',{x1:0,y1:Y(seg),x2:iw,y2:Y(seg),stroke:cssVar('--ink-3'),'stroke-width':1.3,'stroke-dasharray':'6 5'}));
+  // quiebres
+  D.stock.quiebres.forEach(i=>{
+    g.appendChild(el('circle',{cx:X(i),cy:ih,r:4.5,fill:cssVar('--bad')}));
+  });
+  // eje X (meses)
+  fechas.forEach((f,i)=>{ if(f.slice(8)==='01' && f.slice(5,7)%3===1){
+    const t=el('text',{x:X(i),y:ih+18,'text-anchor':'middle',class:'axis'}); t.textContent=f.slice(2,7); g.appendChild(t);
+  }});
+  box.appendChild(svg);
+}
+
+/* ---------- OTIF por mes ---------- */
+function dibujarOtif(){
+  const box=$('#c_otif'); box.innerHTML='';
+  const W=460,H=240, mL=40,mR=12,mT=12,mB=32;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const v=D.serie.otif_pct, meses=D.serie.meses;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const g=el('g',{transform:`translate(${mL},${mT})`}); svg.appendChild(g);
+  ejeY(g,0,ih,ih,100, x=>fmt(x,0)+'%',5);
+  const X=i=>iw*i/(v.length-1), Y=x=>ih-ih*x/100;
+  const line=v.map((x,i)=>[X(i),Y(x)]);
+  g.appendChild(el('path',{d:'M'+line.map(p=>p.join(',')).join(' L'),fill:'none',stroke:cssVar('--s3'),'stroke-width':2.4}));
+  line.forEach(p=>g.appendChild(el('circle',{cx:p[0],cy:p[1],r:2.4,fill:cssVar('--s3')})));
+  meses.forEach((mm,i)=>{ if(i%4===0||i===meses.length-1){
+    const t=el('text',{x:X(i),y:ih+16,'text-anchor':'middle',class:'axis'}); t.textContent=mm.slice(2); g.appendChild(t);}});
+  box.appendChild(svg);
+}
+
+/* ---------- Histograma lead time ---------- */
+function dibujarHist(){
+  const box=$('#c_hist'); box.innerHTML='';
+  const W=460,H=240, mL=40,mR=12,mT=12,mB=36;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const h=D.hist_lead, max=Math.max(...h.map(x=>x.n))*1.1;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const g=el('g',{transform:`translate(${mL},${mT})`}); svg.appendChild(g);
+  ejeY(g,0,ih,ih,max, x=>fmt(x,0));
+  const bw=iw/h.length*0.7;
+  h.forEach((b,i)=>{
+    const x=iw*(i+0.5)/h.length-bw/2, bh=ih*b.n/max;
+    const col = i>=4 ? cssVar('--bad') : cssVar('--s1');
+    g.appendChild(el('rect',{x,y:ih-bh,width:bw,height:bh,rx:3,fill:col,opacity:.9}));
+    const t=el('text',{x:iw*(i+0.5)/h.length,y:ih+16,'text-anchor':'middle',class:'axis'}); t.textContent=b.rango; g.appendChild(t);
+  });
+  const cap=el('text',{x:iw/2,y:ih+30,'text-anchor':'middle',class:'axis'}); cap.textContent='días'; g.appendChild(cap);
+  box.appendChild(svg);
+}
+
+/* ---------- Costo desglose (barras horizontales) ---------- */
+function dibujarCosto(){
+  const box=$('#c_costo'); box.innerHTML='';
+  const d=D.costo_desglose.filter(x=>x.usd>0).sort((a,b)=>b.usd-a.usd);
+  const total=d.reduce((s,x)=>s+x.usd,0);
+  const max=Math.max(...d.map(x=>x.usd));
+  const cols=[cssVar('--s4'),cssVar('--s1'),cssVar('--accent-2'),cssVar('--s3'),cssVar('--s5'),cssVar('--bad')];
+  box.innerHTML = d.map((x,i)=>{
+    const w=100*x.usd/max, p=100*x.usd/total;
+    return `<div style="margin:11px 0">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+        <span>${x.concepto}</span>
+        <span class="mono" style="color:var(--ink-2)">${usd(x.usd)} · ${fmt(p,0)}%</span>
+      </div>
+      <div style="height:12px;background:var(--surface-2);border-radius:6px;overflow:hidden">
+        <div style="height:100%;width:${w}%;background:${cols[i%cols.length]};border-radius:6px"></div>
+      </div></div>`;
+  }).join('') + `<div style="margin-top:14px;font-size:12.5px;color:var(--ink-3)" class="mono">Total abastecimiento: ${usd(total)}</div>`;
+}
+
+/* ---------- Tablas ---------- */
+function badge(estado){
+  if(estado==='OTIF') return '<span class="badge b-ok">OTIF</span>';
+  if(estado==='Incompleto') return '<span class="badge b-warn">Incompleto</span>';
+  return '<span class="badge b-bad">'+estado+'</span>';
+}
+function pintarRanking(){
+  $('#t_ranking tbody').innerHTML = D.ranking.map(r=>`<tr>
+    <td>${r.proveedor}</td><td>${r.material}</td><td>${r.origen}</td>
+    <td class="num">${fmt(r.envios)}</td>
+    <td class="num">${fmt(r.volumen)} ${r.unidad}</td>
+    <td class="num" style="color:${r.otif>=85?'var(--ok)':r.otif>=75?'var(--warn)':'var(--bad)'}">${fmt(r.otif,1)}%</td>
+    <td class="num">${fmt(r.lead_dias,1)}</td>
+    <td class="num">${fmt(r.retraso_dias,2)}</td>
+    <td class="num">${usd(r.costo_log_usd)}</td></tr>`).join('');
+}
+function pintarRutas(){
+  $('#t_rutas tbody').innerHTML = D.rutas.slice(0,8).map(r=>`<tr>
+    <td>${r.origen}</td><td>${r.proveedor}</td>
+    <td class="num">${fmt(r.distancia_km)} km</td>
+    <td class="num">${fmt(r.envios)}</td>
+    <td class="num">${usd(r.costo_prom_envio_usd)}</td></tr>`).join('');
+}
+function pintarRecientes(){
+  $('#t_recientes tbody').innerHTML = D.recientes.map(r=>`<tr>
+    <td class="num">${r.fecha_real.slice(2)}</td>
+    <td>${r.material.replace(' (100 mesh)','').replace(' (40/70)','').replace(' grado 2','')}</td>
+    <td>${r.pad}</td>
+    <td class="num">${fmt(r.cant_real)} ${r.unidad}</td>
+    <td>${badge(r.estado)}</td></tr>`).join('');
+}
+
+function render(){
+  dibujarConsumo(); dibujarStock(); dibujarOtif(); dibujarHist(); dibujarCosto();
+  pintarRanking(); pintarRutas(); pintarRecientes();
+}
+render();
+</script>
