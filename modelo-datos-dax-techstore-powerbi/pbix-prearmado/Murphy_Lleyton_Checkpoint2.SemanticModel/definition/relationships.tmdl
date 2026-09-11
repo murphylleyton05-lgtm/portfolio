@@ -1,15 +1,15 @@
-relationship b52f9645-32d5-4c9f-a2a0-e4132e22afdb
+relationship 6c2c9084-5292-4b86-9210-fae1f2240a69
 	fromColumn: Fact_Ventas.id_cliente
 	toColumn: Dim_Clientes.id_cliente
 
-relationship e6ddafe1-9ae4-4ccc-89d7-53dfb93a1e91
+relationship e7d4e48f-8ad3-4547-9f38-2adb1812a71c
 	fromColumn: Fact_Ventas.id_producto
 	toColumn: Dim_Productos.id_producto
 
-relationship 6b685344-9121-4705-91a3-f09d3d770341
+relationship af1e53de-5def-479c-b020-f31064e334bc
 	fromColumn: Fact_Ventas.fecha_venta
 	toColumn: Dim_Fechas.Date
 
-relationship 37df6cc9-7ab4-4591-8a1d-f1c21fd96f74
+relationship 43532b06-d2e7-4a0a-b4c1-85f1626bcdf5
 	fromColumn: Dim_Productos.categoria
 	toColumn: Dim_Categorias.nombre_categoria

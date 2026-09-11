@@ -30,4 +30,4 @@ table Dim_Fechas
 
 	partition Dim_Fechas = calculated
 		mode: import
-		source = CALENDAR(MIN(Fact_Ventas[fecha_venta]), MAX(Fact_Ventas[fecha_venta]))
+		source = CALENDAR(DATE(2023, 1, 1), DATE(2024, 12, 31))
