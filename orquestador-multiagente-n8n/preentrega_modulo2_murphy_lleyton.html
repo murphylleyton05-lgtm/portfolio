@@ -134,7 +134,7 @@
 
     <rect class="box" x="575" y="150" width="155" height="44" rx="8"/>
     <text x="652" y="170" text-anchor="middle" class="lbl-svg">🗒️ Log Trazabilidad</text>
-    <text x="652" y="184" text-anchor="middle" class="lbl-sub">Google Sheets</text>
+    <text x="652" y="184" text-anchor="middle" class="lbl-sub">Data Table (n8n)</text>
 
     <!-- flows manager -->
     <path class="flow" d="M120,69 L140,69"/>
@@ -191,7 +191,7 @@
     <tr><td><b>Workflow Manager</b> con trigger + AI Agent / clasificador semántico</td><td>Manual Trigger → nodo <b>Router de Triaje (IA)</b> (AI Agent) que interpreta la intención dentro de una taxonomía cerrada.</td></tr>
     <tr><td><b>≥ 2 Workers</b> como sub-workflows en lienzos separados, iniciando con <code>Execute Workflow Trigger</code></td><td>Worker 1 (extracción/análisis de datos) y Worker 2 (redacción de correos), cada uno en su propio archivo/lienzo y con su <code>Execute Workflow Trigger</code>.</td></tr>
     <tr><td><b>Handoff de datos</b>: <code>Execute Workflow</code> con JSON limpio + <b>Wait for child to finish</b></td><td>Dos nodos <code>Execute Workflow</code> en el Manager con <code>waitForSubWorkflow: true</code>; un <b>Set de limpieza</b> arma el payload mínimo antes de delegar.</td></tr>
-    <tr><td><b>Persistencia visual</b>: log de trazabilidad (Slack / Sheets / Gmail)</td><td>Nodo <b>Google Sheets (append)</b> que registra fecha, worker invocado, parámetros enviados, status y respuesta.</td></tr>
+    <tr><td><b>Persistencia visual</b>: log de trazabilidad (Slack / Sheets / Gmail)</td><td>Nodo <b>Data Table (nativa de n8n)</b> — persistencia sin credenciales — que registra fecha, worker invocado, parámetros enviados, status y respuesta. Intercambiable por Google Sheets / Gmail / Slack conectando una credencial.</td></tr>
   </table>
 
   <h2>3 · Esquema de datos (Contrato de Interfaz)</h2>
@@ -264,6 +264,7 @@
     <li class="ok"><b>Pasillo de la Muerte (data stuffing):</b> un nodo <b>Set de limpieza</b> transfiere sólo el mínimo producto viable (IDs, términos), nunca binarios ni metadatos pesados.</li>
     <li class="ok"><b>Time-outs sin control:</b> HTTP Request con <code>timeout: 15000</code> y sub-workflows con <code>executionTimeout</code>; el Manager pausa con <i>Wait for child to finish</i>.</li>
     <li class="ok"><b>Fallos silenciosos del Worker:</b> cada Worker termina devolviendo un <b>JSON de contingencia</b> (<code>status:"error"</code>) — el Manager nunca se bloquea.</li>
+    <li class="ok"><b>Router IA resiliente:</b> el AI Agent corre con <code>onError: continueRegularOutput</code>; si el modelo falla, el <b>Parser aplica un fallback determinista</b> (0 tokens) y el ruteo sigue sin cortarse (comprobado en ejecución real).</li>
   </ul>
 
   <h2>6 · Testing de regresión (validación previa)</h2>
