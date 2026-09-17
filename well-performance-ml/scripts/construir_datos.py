@@ -93,6 +93,52 @@ real_te = np.exp(y[te]); pred_te = pred_te_b   # el mejor modelo para predicho-v
 # cuánto del "gap a explicar" agrega la geología
 aporte_geo = round(max(0.0, r2_b - r2), 3)
 
+# --- Chequeo de robustez: RANDOM FOREST hecho a mano (numpy) ---
+# Si un modelo NO lineal y flexible tampoco predice el EUR con el diseño solo,
+# el hallazgo "la geología manda" no es culpa de haber usado un modelo lineal.
+rf_rng = np.random.default_rng(9)
+def _arbol(Xa, ya, prof, max_prof=7, min_hoja=15):
+    if prof >= max_prof or len(ya) < 2 * min_hoja or ya.std() < 1e-9:
+        return ("hoja", float(ya.mean()))
+    p = Xa.shape[1]
+    feats = rf_rng.choice(p, size=max(1, int(np.sqrt(p))), replace=False)
+    mejor = (None, None, np.inf)
+    for f in feats:
+        xf = Xa[:, f]; orden = np.argsort(xf, kind="mergesort")
+        xs, ys = xf[orden], ya[orden]; n = len(ys)
+        cs, cs2 = np.cumsum(ys), np.cumsum(ys ** 2)
+        nl = np.arange(1, n); nr = n - nl
+        sl = cs[:-1]; sr = cs[-1] - sl
+        sse = (cs2[:-1] - sl ** 2 / nl) + ((cs2[-1] - cs2[:-1]) - sr ** 2 / nr)
+        valido = (xs[1:] != xs[:-1]) & (nl >= min_hoja) & (nr >= min_hoja)
+        if not valido.any():
+            continue
+        sse = np.where(valido, sse, np.inf); i = int(np.argmin(sse))
+        if sse[i] < mejor[2]:
+            mejor = (int(f), (xs[i] + xs[i + 1]) / 2, float(sse[i]))
+    if mejor[0] is None:
+        return ("hoja", float(ya.mean()))
+    f, t, _ = mejor; izq = Xa[:, f] <= t
+    return ("nodo", f, t, _arbol(Xa[izq], ya[izq], prof + 1, max_prof, min_hoja),
+            _arbol(Xa[~izq], ya[~izq], prof + 1, max_prof, min_hoja))
+
+def _pred1(arbol, x):
+    while arbol[0] == "nodo":
+        arbol = arbol[3] if x[arbol[1]] <= arbol[2] else arbol[4]
+    return arbol[1]
+
+def rf_r2(Xtr, Xte, n_arb=40):
+    bosque = []
+    for _ in range(n_arb):
+        idx = rf_rng.integers(0, len(Xtr), len(Xtr))  # bootstrap
+        bosque.append(_arbol(Xtr[idx], y[tr][idx], 0))
+    pred_log = np.clip(np.array([np.mean([_pred1(a, x) for a in bosque]) for x in Xte]), YLO, YHI)
+    real, pred = np.exp(y[te]), np.exp(pred_log)
+    return float(1 - np.sum((real - pred) ** 2) / np.sum((real - real.mean()) ** 2))
+
+rf_r2_dis = round(rf_r2(X[tr], X[te]), 3)          # RF solo diseño
+rf_r2_geo = round(rf_r2(Xb[tr], Xb[te]), 3)        # RF diseño + área
+
 # Importancia = coeficientes estandarizados (sin el intercepto)
 coefs = sorted([{"feature": f, "etiqueta": ETIQ[f], "peso": round(float(w[i + 1]), 3)}
                 for i, f in enumerate(FEATS)], key=lambda d: abs(d["peso"]), reverse=True)
@@ -126,6 +172,7 @@ datos = {
     "modelo": {"modelo": "Regresión lineal (ridge) sobre log(EUR), numpy",
                "r2_diseno": round(float(r2), 3), "r2_geo": round(float(r2_b), 3),
                "r2_log": round(float(r2_log), 3), "mape": round(mape_b, 1), "aporte_geo": aporte_geo,
+               "rf_r2_diseno": rf_r2_dis, "rf_r2_geo": rf_r2_geo,
                "coefs": coefs, "pred_vs_real": pvr},
     "scatter_rama": scatter("rama_m"),
     "scatter_arena": scatter("arena_tn"),

@@ -45,6 +45,14 @@
   .panel h2{font-size:19px; font-weight:700} .panel .desc{color:var(--ink-2); font-size:13.5px; margin-top:6px; max-width:700px}
   .panel.pbi{border-color:var(--accent-line); box-shadow:var(--shadow), 0 0 0 1px var(--accent-line)}
   .tag{display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); border:1px solid var(--accent-line); background:var(--accent-soft); padding:3px 9px; border-radius:999px; margin-bottom:10px}
+  .insight{margin-top:16px; padding:15px 18px; border-radius:14px; border:1px solid var(--accent-line);
+    background:linear-gradient(180deg, var(--accent-soft), transparent); font-size:15px; color:var(--ink); line-height:1.5}
+  .insight b{color:var(--accent)} .insight .tag{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:5px}
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin:14px 0 4px}
+  .chip{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.03em; padding:5px 11px; border-radius:999px;
+    border:1px solid var(--rule-strong); background:var(--surface-2); color:var(--ink-2); cursor:pointer; display:inline-flex; align-items:center; gap:6px}
+  .chip .dot{width:8px; height:8px; border-radius:50%}
+  .chip[aria-pressed="true"]{color:var(--ink); border-color:var(--accent-line); box-shadow:var(--glow); background:var(--accent-soft)}
   svg{display:block; width:100%; height:auto; overflow:visible}
   .axis{fill:var(--ink-3); font-family:'JetBrains Mono',monospace; font-size:10px}
   .axis-line{stroke:var(--grid); stroke-width:1}
@@ -79,13 +87,23 @@
   <div class="banner" id="banner"></div>
 
   <div class="grid kpis" id="kpis"></div>
+  <div class="insight" id="insight"></div>
 
   <section class="panel">
-    <h2>Producción de petróleo y gas</h2>
-    <p class="desc">Producción mensual de la cartera. El petróleo (barras, eje izq.) y el gas (línea, eje der.) crecen
-      a medida que se conectan pozos nuevos.</p>
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap">
+      <div>
+        <h2>Producción de petróleo y gas</h2>
+        <p class="desc">Producción mensual. Filtrá por operadora y período — el gráfico y los KPIs de arriba se recalculan.</p>
+      </div>
+      <div style="display:flex; gap:6px" id="perctrl">
+        <button class="chip" data-per="12">12m</button>
+        <button class="chip" data-per="24">24m</button>
+        <button class="chip" data-per="36" aria-pressed="true">36m</button>
+      </div>
+    </div>
+    <div class="chips" id="opctrl"></div>
     <div id="c_prod"></div>
-    <div class="legend"><span><i style="background:var(--s4)"></i>Petróleo (bbl/d)</span><span><i style="background:var(--accent-2)"></i>Gas (Mm³/d)</span></div>
+    <div class="legend"><span><i style="background:var(--s4)"></i>Petróleo (bbl/d)</span><span><i style="background:var(--accent-2)"></i>Gas (Mm³/d)</span><span id="selcap" style="color:var(--ink-3)"></span></div>
   </section>
 
   <div class="two">
@@ -197,16 +215,37 @@ $('#banner').innerHTML = m.es_demo
   : `<b>Datos oficiales de la Secretaría de Energía.</b> ${fmt(m.pozos)} pozos no convencionales de ${m.operadores} operadores, producción real <span class="mono">${m.periodo}</span> (historia desde ${m.hist_desde}). Regenerado por CI.`;
 
 const flecha=v=>v>=0?`<span class="up">▲ ${fmt(v,1)}%</span>`:`<span class="down">▼ ${fmt(Math.abs(v),1)}%</span>`;
-const kpis=[
-  {lab:'Petróleo', val:fmt(k.oil_bbl_d), unit:'bbl/d', sub:'MoM '+flecha(k.oil_var_mom)},
-  {lab:'Gas', val:fmt(k.gas_mm3_d,1), unit:'Mm³/d', sub:'MoM '+flecha(k.gas_var_mom)},
-  {lab:'Pozos activos', val:fmt(k.pozos_activos), unit:'', sub:`${fmt(k.pozos_total)} en el dataset`},
-  {lab:'Acumulado', val:fmt(k.acum_mmbbl,1), unit:'MMbbl', sub:'petróleo, histórico'},
-  {lab:'Pozos nuevos', val:fmt(k.pozos_nuevos), unit:'', sub:`en ${m.meses} meses`},
-  {lab:'Operadores', val:fmt(k.operadores), unit:'', sub:'en la cartera'},
-];
-$('#kpis').innerHTML = kpis.map(x=>`<div class="tile"><div class="lab">${x.lab}</div>
-  <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div><div class="sub">${x.sub}</div></div>`).join('');
+const varp=(a,b)=>b?100*(a-b)/b:0;
+
+/* ---- estado de filtros (operadora + período) ---- */
+const OPS = D.operadores_serie || [];
+const COLORS = ['--s1','--s3','--s4','--accent-2','--s5','--s2','--s7','--s6','--s8','--warn','--ink-3'];
+let sel = new Set(OPS.map(o=>o.operador));
+let period = 36;
+
+function activa(){ // suma de las operadoras seleccionadas, mes a mes (36m)
+  const n=S.meses.length, oil=Array(n).fill(0), gas=Array(n).fill(0), act=Array(n).fill(0);
+  OPS.forEach(o=>{ if(!sel.has(o.operador)) return;
+    for(let i=0;i<n;i++){ oil[i]+=o.oil_bbl_d[i]||0; gas[i]+=o.gas_mm3_d[i]||0; act[i]+=o.activos[i]||0; }});
+  return {meses:S.meses, oil, gas, act};
+}
+const corte=arr=>arr.slice(arr.length-period);
+
+function pintarKpis(a){
+  const oilN=a.oil[a.oil.length-1]||0, oilP=a.oil[a.oil.length-2]||0;
+  const gasN=a.gas[a.gas.length-1]||0, gasP=a.gas[a.gas.length-2]||0;
+  const actN=a.act[a.act.length-1]||0;
+  const kpis=[
+    {lab:'Petróleo', val:fmt(oilN), unit:'bbl/d', sub:'MoM '+flecha(varp(oilN,oilP))},
+    {lab:'Gas', val:fmt(gasN,1), unit:'Mm³/d', sub:'MoM '+flecha(varp(gasN,gasP))},
+    {lab:'Pozos activos', val:fmt(actN), unit:'', sub:`${sel.size} de ${OPS.length} operadoras`},
+    {lab:'Acumulado', val:fmt(k.acum_mmbbl,1), unit:'MMbbl', sub:'histórico, toda la cartera'},
+    {lab:'Pozos nuevos', val:fmt(k.pozos_nuevos), unit:'', sub:`en ${m.meses} meses`},
+    {lab:'Operadores', val:fmt(k.operadores), unit:'', sub:'en la cartera'},
+  ];
+  $('#kpis').innerHTML = kpis.map(x=>`<div class="tile"><div class="lab">${x.lab}</div>
+    <div class="val">${x.val}${x.unit?`<small>${x.unit}</small>`:''}</div><div class="sub">${x.sub}</div></div>`).join('');
+}
 
 function ejeY(g,x0,y0,h,max,fn,ticks=4){for(let i=0;i<=ticks;i++){const v=max*i/ticks,y=y0-h*i/ticks;
   g.appendChild(el('line',{x1:x0,y1:y,x2:x0+1,y2:y,class:'axis-line'}));
@@ -215,9 +254,9 @@ const ejeX=(g,meses,iw,ih,cada=6)=>meses.forEach((mm,i)=>{if(i%cada===0||i===mes
   const t=el('text',{x:iw*(i+0.5)/meses.length,y:ih+16,'text-anchor':'middle',class:'axis'});t.textContent=mm.slice(2);g.appendChild(t);}});
 
 /* Produccion oil (barras) + gas (linea) */
-function dibujarProd(){
+function dibujarProd(sd){
   const box=$('#c_prod');box.innerHTML='';const W=980,H=300,mL=54,mR=54,mT=14,mB=40,iw=W-mL-mR,ih=H-mT-mB;
-  const meses=S.meses,oil=S.oil_bbl_d,gas=S.gas_mm3_d,maxO=Math.max(...oil)*1.1,maxG=Math.max(...gas)*1.25;
+  const meses=sd.meses,oil=sd.oil,gas=sd.gas,maxO=Math.max(...oil,1)*1.1,maxG=Math.max(...gas,0.1)*1.25;
   const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});const g=el('g',{transform:`translate(${mL},${mT})`});svg.appendChild(g);
   ejeY(g,0,ih,ih,maxO,v=>fmt(v/1000,0)+'k');
   const bw=iw/meses.length*0.62;
@@ -279,5 +318,39 @@ function pintarPozos(){
     <td class="num">${fmt(r.peak_bbl_d)}</td><td class="num">${fmt(r.acum_mbbl)}</td></tr>`).join('');
 }
 
-dibujarProd();dibujarAcum();dibujarAct();dibujarVent();pintarOperadores();pintarPozos();
+/* ---- controles de filtro ---- */
+function refrescar(){
+  const a=activa();
+  pintarKpis(a);
+  dibujarProd({meses:corte(a.meses), oil:corte(a.oil), gas:corte(a.gas)});
+  const oilN=a.oil[a.oil.length-1]||0;
+  $('#selcap').textContent = sel.size===OPS.length ? '· todas las operadoras' : `· ${sel.size} operadora(s): ${fmt(oilN)} bbl/d`;
+}
+function pintarChipsOps(){
+  const todas = `<button class="chip" data-op="__all" aria-pressed="${sel.size===OPS.length}">Todas</button>`;
+  $('#opctrl').innerHTML = todas + OPS.map((o,i)=>`<button class="chip" data-op="${o.operador}" aria-pressed="${sel.has(o.operador)}">
+    <span class="dot" style="background:var(${COLORS[i%COLORS.length]})"></span>${o.operador}</button>`).join('');
+  $('#opctrl').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+    const op=b.dataset.op;
+    if(op==='__all'){ sel = new Set(OPS.map(o=>o.operador)); }
+    else { if(sel.has(op)) sel.delete(op); else sel.add(op); if(sel.size===0) sel.add(op); }
+    pintarChipsOps(); refrescar();
+  });
+}
+$('#perctrl').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+  period=+b.dataset.per; $('#perctrl').querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  refrescar();
+});
+
+// insight: concentración de las top operadoras
+(function(){
+  const tot=D.operadores.reduce((s,r)=>s+r.oil_bbl_d,0);
+  const top3=D.operadores.slice(0,3);
+  const sh=Math.round(100*top3.reduce((s,r)=>s+r.oil_bbl_d,0)/tot);
+  $('#insight').innerHTML=`<span class="tag">El dato</span> Las 3 operadoras más grandes —<b>${top3.map(r=>r.operador).join(', ')}</b>—
+    concentran el <b>${sh}%</b> de la producción de petróleo de la cartera. Probá filtrarlas abajo para ver el resto.`;
+})();
+
+pintarChipsOps(); refrescar();
+dibujarAcum();dibujarAct();dibujarVent();pintarOperadores();pintarPozos();
 </script>

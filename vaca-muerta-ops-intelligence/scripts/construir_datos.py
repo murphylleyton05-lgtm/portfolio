@@ -56,6 +56,24 @@ mens["nuevos"] = mens["ym"].map(nuevos_por_mes).fillna(0).astype(int)
 serie = mens.tail(N_SERIE).reset_index(drop=True)
 meses = serie["ym"].tolist()
 
+# --- series por operadora (para filtrar en el cliente) ---
+# Top operadoras por producción del último mes; el resto se agrupa en "Otras".
+ranking_prod = prod[prod["ym"] == mens["ym"].iloc[-1]].groupby("empresa")["oil_bbl"].sum().sort_values(ascending=False)
+TOP_OPS = list(ranking_prod.head(10).index)
+pm = prod[prod["ym"].isin(meses)].copy()
+pm["op"] = pm["empresa"].where(pm["empresa"].isin(TOP_OPS), "Otras")
+grid = pm.groupby(["op", "ym"]).agg(oil_bbl=("oil_bbl", "sum"), gas_mm3=("prod_gas_mm3", "sum"),
+                                    activos=("id_pozo", "nunique")).reset_index()
+operadores_serie = []
+for op in TOP_OPS + (["Otras"] if (pm["op"] == "Otras").any() else []):
+    g = grid[grid["op"] == op].set_index("ym")
+    operadores_serie.append({
+        "operador": op,
+        "oil_bbl_d": [round(float(g["oil_bbl"].get(mm, 0)) / DIAS, 0) for mm in meses],
+        "gas_mm3_d": [round(float(g["gas_mm3"].get(mm, 0)) / DIAS, 2) for mm in meses],
+        "activos": [int(g["activos"].get(mm, 0)) for mm in meses],
+    })
+
 # --- KPIs (ultimo mes vs anterior) ---
 ult, ant = mens.iloc[-1], mens.iloc[-2]
 def var(a, b): return round(100 * (a - b) / b, 1) if b else 0.0
@@ -106,6 +124,7 @@ datos = {
     "serie": {"meses": meses, "oil_bbl_d": serie["oil_bbl_d"].tolist(),
               "gas_mm3_d": serie["gas_mm3_d"].tolist(), "activos": serie["activos"].tolist(),
               "acum_mmbbl": serie["acum_mmbbl"].tolist(), "nuevos": serie["nuevos"].tolist()},
+    "operadores_serie": operadores_serie,
     "operadores": op_rows, "ventanas": vent_rows, "pozos_top": pozo_rows,
 }
 

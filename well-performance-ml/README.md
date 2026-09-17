@@ -19,8 +19,12 @@ está** (la roca). Este proyecto lo pone en números:
 - **Modelo A — solo diseño:** predice log(EUR) con rama, etapas, arena, agua e intensidad.
 - **Modelo B — diseño + área:** agrega el área como proxy de la geología.
 
-La diferencia de R² entre A y B es **el peso de la ubicación**. El hallazgo típico: el diseño explica una
-parte, pero sumar la geología sube bastante el R² — *el diseño ayuda, pero la ubicación manda*.
+La diferencia de R² entre A y B es **el peso de la ubicación**. El hallazgo con datos reales: el diseño por sí
+solo casi no predice el EUR (R² ≈ 0) y sumar la geología lo sube de golpe — *la ubicación manda, no el diseño*.
+
+**Chequeo de robustez:** para descartar que el resultado sea culpa del modelo lineal, se entrena también un
+**random forest** (no lineal, hecho a mano con numpy). Con el diseño solo, el RF también da R² ≈ 0: la
+conclusión no depende del modelo elegido.
 
 ## Cómo funciona
 

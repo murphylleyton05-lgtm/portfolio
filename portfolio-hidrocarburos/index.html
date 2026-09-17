@@ -48,6 +48,9 @@
   @media(max-width:760px){.cards{grid-template-columns:1fr}}
   .card{background:var(--surface); border:1px solid var(--rule); border-radius:18px; padding:24px 22px; box-shadow:var(--shadow); display:flex; flex-direction:column; min-width:0; transition:border-color .15s, transform .15s}
   .card:hover{border-color:var(--accent-line); transform:translateY(-2px)}
+  .card .thumb{display:block; margin:-24px -22px 16px; border-radius:18px 18px 0 0; overflow:hidden; border-bottom:1px solid var(--rule); line-height:0; background:var(--bg-2)}
+  .card .thumb img{width:100%; aspect-ratio:1200/560; object-fit:cover; object-position:top center; opacity:.92; transition:opacity .15s, transform .3s}
+  .card:hover .thumb img{opacity:1; transform:scale(1.02)}
   .card .ico{font-size:26px; margin-bottom:14px}
   .card h3{font-size:20px; font-weight:700}
   .card .real{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ok); border:1px solid rgba(25,158,112,.4); background:rgba(25,158,112,.12); padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle}
@@ -88,6 +91,7 @@
   <div class="cards">
 
     <div class="card">
+      <a class="thumb" href="https://murphylleyton05-lgtm.github.io/portfolio/vaca-muerta/"><img src="img/declinacion.png" alt="Vaca Muerta Analytics" loading="lazy"></a>
       <div class="ico">🛢️</div>
       <h3>Vaca Muerta Analytics <span class="real">Datos reales</span></h3>
       <p>Curvas de declinación (Arps) y estimación de reservas (EUR) de pozos no convencionales, con validación
@@ -101,6 +105,7 @@
     </div>
 
     <div class="card">
+      <a class="thumb" href="https://murphylleyton05-lgtm.github.io/portfolio/operaciones/"><img src="img/operaciones.png" alt="Operations Intelligence" loading="lazy"></a>
       <div class="ico">🛢️</div>
       <h3>Operations Intelligence <span class="real">Datos reales</span></h3>
       <p>Tablero de operaciones con la producción <b>oficial</b> de la Secretaría de Energía: petróleo y gas por mes,
@@ -114,6 +119,7 @@
     </div>
 
     <div class="card">
+      <a class="thumb" href="https://murphylleyton05-lgtm.github.io/portfolio/performance/"><img src="img/performance.png" alt="Well Performance ML" loading="lazy"></a>
       <div class="ico">📈</div>
       <h3>Well Performance ML <span class="real">Datos reales</span></h3>
       <p>Un modelo de <b>machine learning</b> predice el <b>EUR</b> de un pozo a partir de su diseño de fractura, y
@@ -127,6 +133,7 @@
     </div>
 
     <div class="card">
+      <a class="thumb" href="https://murphylleyton05-lgtm.github.io/portfolio/logistica/"><img src="img/logistica.png" alt="Frac Sand & Fuel Logistics" loading="lazy"></a>
       <div class="ico">🏗️</div>
       <h3>Frac Sand &amp; Fuel Logistics <span class="real">Consumo real</span></h3>
       <p>El <b>consumo</b> de arena, agua y etapas sale del dataset <b>oficial</b> de fractura; sobre eso se modela la
@@ -151,7 +158,7 @@
       <li><b>Se regeneran solos</b> — un pipeline en CI baja los datos oficiales cada mes y reconstruye los tableros.</li>
       <li><b>Modelado para BI</b> — Operaciones deja el modelo y las medidas DAX listas para Power BI.</li>
       <li><b>Los límites, declarados</b> — cada tablero dice qué NO hace. Saber dónde falla el propio trabajo suma credibilidad.</li>
-      <li><b>Todo reproducible</b> — Python (pandas, numpy, scipy), sin cajas negras: las regresiones están escritas a mano.</li>
+      <li><b>Todo reproducible y testeado</b> — Python (pandas, numpy, scipy), sin cajas negras: las regresiones (lineal y random forest) están escritas a mano, y cada proyecto trae sus pruebas automáticas.</li>
     </ul>
   </div>
 
