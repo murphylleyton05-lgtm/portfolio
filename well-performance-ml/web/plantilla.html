@@ -84,6 +84,7 @@
       <span><i style="background:var(--accent-2);border-radius:3px"></i>Que agrega la geología (área)</span>
       <span><i style="background:var(--surface-3);border-radius:3px"></i>Sin explicar (otros factores)</span>
     </div>
+    <div id="robustez" style="margin-top:16px; padding:12px 14px; background:var(--bg-2); border:1px solid var(--rule); border-radius:12px; font-size:12.5px; color:var(--ink-2)"></div>
   </section>
 
   <div class="two">
@@ -237,5 +238,13 @@ function pintarTop(){
     <td class="num">${fmt(r.eur_mbbl)}</td></tr>`).join('');
 }
 
-dibujarR2();dibujarImp();dibujarPvr();dibujarSc();dibujarVent();pintarTop();
+function robustez(){
+  const rd=M.rf_r2_diseno, rg=M.rf_r2_geo, ld=M.r2_diseno;
+  const p=v=>v<0.02?'≈0':Math.round(Math.max(0,v)*100)+'%';
+  $('#robustez').innerHTML = `<b style="color:var(--ink)">Chequeo de robustez.</b> Para descartar que el resultado sea culpa del
+    modelo lineal, se entrenó también un <b>random forest</b> (no lineal, hecho a mano con numpy). Con el diseño solo, el RF
+    explica <b style="color:var(--ink)">${p(rd)}</b> del EUR (el lineal, ${p(ld)}) — misma conclusión: el diseño por sí solo
+    casi no predice. El hallazgo no depende del modelo elegido.`;
+}
+dibujarR2();robustez();dibujarImp();dibujarPvr();dibujarSc();dibujarVent();pintarTop();
 </script>

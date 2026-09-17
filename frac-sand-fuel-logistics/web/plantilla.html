@@ -41,6 +41,9 @@
   .lede{max-width:640px; color:var(--ink-2); font-size:16px; margin-top:16px}
   .lede b{color:var(--ink)}
 
+  .insight{margin-top:16px; padding:15px 18px; border-radius:14px; border:1px solid var(--accent-line);
+    background:linear-gradient(180deg, var(--accent-soft), transparent); font-size:15px; color:var(--ink); line-height:1.5}
+  .insight b{color:var(--accent)} .insight .itag{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:5px}
   .banner{margin-top:22px; padding:14px 16px; border:1px solid var(--rule); border-left:3px solid var(--accent);
     border-radius:12px; background:linear-gradient(180deg, var(--accent-soft), transparent); color:var(--ink-2); font-size:13px}
   .banner b{color:var(--ink)}
@@ -110,6 +113,7 @@
   <div class="banner" id="banner"></div>
 
   <div class="grid kpis" id="kpis"></div>
+  <div class="insight" id="insight"></div>
 
   <!-- Consumo mensual -->
   <section class="panel">
@@ -438,7 +442,17 @@ function pintarRecientes(){
     <td>${badge(r.estado)}</td></tr>`).join('');
 }
 
+function pintarInsight(){
+  const tot=D.costo_desglose.reduce((s,x)=>s+x.usd,0);
+  const flete=(D.costo_desglose.find(x=>x.concepto.startsWith('Transporte'))||{usd:0}).usd;
+  const arena=(D.costo_desglose.find(x=>x.concepto.startsWith('Arena'))||{usd:0}).usd;
+  const sh=Math.round(100*flete/tot);
+  $('#insight').innerHTML=`<span class="itag">El dato</span> Poner la arena en la locación cuesta casi tanto como la arena misma:
+    el <b>flete pesa ${sh}%</b> del costo total de abastecimiento (${usd(flete)} vs ${usd(arena)} de arena). Por eso la
+    distancia al yard y la eficiencia logística mueven tanto el número.`;
+}
 function render(){
+  pintarInsight();
   dibujarConsumo(); dibujarStock(); dibujarOtif(); dibujarHist(); dibujarCosto();
   pintarRanking(); pintarRutas(); pintarRecientes();
 }
