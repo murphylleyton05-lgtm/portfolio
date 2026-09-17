@@ -1,0 +1,114 @@
+{
+  "name": "Checkpoint 1 - Agente Base (Tools Agent) - Lleyton Murphy",
+  "nodes": [
+    {
+      "id": "aca9aae4-30d8-45e0-948e-320069b356d4",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [0, 112],
+      "parameters": { "options": { "responseMode": "lastNode" } },
+      "webhookId": "d2c6f2fa-d864-4867-863f-a9a1e4aa7cea"
+    },
+    {
+      "id": "d7f3a162-7f0c-425f-9b9b-faa6a98148d1",
+      "name": "AI Agent (Tools Agent)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [224, 112],
+      "parameters": {
+        "promptType": "auto",
+        "options": {
+          "maxIterations": 6,
+          "systemMessage": "ROL:\nSos \"Asistente de Busqueda Laboral Remota\" de Lleyton IA Automation. Tu especialidad es ayudar a un candidato a descubrir y evaluar vacantes remotas.\n\nAMBITO:\n- Actuas solo sobre busqueda y calificacion de oportunidades laborales remotas (IA/Automation, Data, Partnerships, Sales).\n- Trabajas dentro de una unica sesion de chat; no tenes acceso a datos personales fuera de lo que el usuario te comparte.\n\nOBJETIVO:\n- Entender el rol o area que busca el usuario y devolver una lista breve, rankeada y accionable de vacantes reales, con empresa, ubicacion, salario (si existe) y link de postulacion.\n- Cuando corresponda, invocar la herramienta buscar_vacantes_remotas para traer datos reales; nunca inventes vacantes.\n\nREGLAS Y RESTRICCIONES:\n- Redacta siempre en espanol neutro y profesional; no uses giros de lenguaje inclusivo (evita terminaciones con -e/-x/@).\n- NO inventes vacantes, empresas, salarios ni URLs: si no tenes datos de la herramienta, decilo con honestidad.\n- NO redactes correos completos ni realices postulaciones (eso corresponde a otro especialista/modulo).\n- NO brindes asesoramiento legal, migratorio ni financiero.\n- Se conciso: maximo 5 vacantes por respuesta.\n\nESCALAMIENTO:\n- Si el pedido es ambiguo, pedi una aclaracion breve (rol, area o tecnologia).\n- Si el pedido queda fuera de tu ambito (por ejemplo, redactar el correo de postulacion o negociar sueldo), indicalo y sugeri derivarlo al especialista correspondiente."
+        }
+      }
+    },
+    {
+      "id": "01658ce6-286e-44ff-a966-34125dae6a34",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [240, 336],
+      "parameters": {
+        "model": { "__rl": true, "mode": "list", "value": "gpt-4o", "cachedResultName": "gpt-4o" },
+        "responsesApiEnabled": false,
+        "options": { "temperature": 0 }
+      }
+    },
+    {
+      "id": "ae20c8bc-ba67-45a7-92fa-616b7c023422",
+      "name": "buscar_vacantes_remotas",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.5,
+      "position": [368, 336],
+      "parameters": {
+        "toolDescription": "Consulta en tiempo real el board de empleos remotos Remotive. USALA cuando el usuario pida buscar, listar o descubrir vacantes/puestos/oportunidades laborales remotas por rol, tecnologia o area (por ejemplo: data analyst, automation, sales, partnerships). NO la uses para redactar correos, ni para preguntas de opinion o small talk. Devuelve titulo, empresa, ubicacion, salario y URL de postulacion de hasta 5 vacantes.",
+        "method": "GET",
+        "url": "https://remotive.com/api/remote-jobs",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "queryParameters": {
+          "parameters": [
+            { "name": "search", "value": "={{ $fromAI('termino_busqueda', 'Rol o palabra clave a buscar, ej: data analyst, automation, sales') }}" },
+            { "name": "limit", "value": "5" }
+          ]
+        },
+        "optimizeResponse": true,
+        "responseType": "json",
+        "dataField": "jobs"
+      }
+    },
+    {
+      "id": "c73eff85-0e58-4999-8dea-acc1b4963e21",
+      "name": "Log de Observabilidad",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [576, 112],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": { "__rl": true, "mode": "id", "value": "WfBPSRYW6YhkNszG", "cachedResultName": "Log Observabilidad M1" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $now.toISO() }}",
+            "session_id": "={{ $('Chat Trigger').item.json.sessionId }}",
+            "mensaje_usuario": "={{ $('Chat Trigger').item.json.chatInput }}",
+            "respuesta_agente": "={{ $json.output }}",
+            "herramienta_disponible": "buscar_vacantes_remotas"
+          },
+          "matchingColumns": [],
+          "schema": [
+            { "id": "fecha", "displayName": "fecha", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "session_id", "displayName": "session_id", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "mensaje_usuario", "displayName": "mensaje_usuario", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "respuesta_agente", "displayName": "respuesta_agente", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "herramienta_disponible", "displayName": "herramienta_disponible", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dfcfcee0-95bd-480e-8818-36774c8c6dda",
+      "name": "Respuesta al usuario",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [800, 112],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"output\": $('AI Agent (Tools Agent)').item.json.output } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Chat Trigger": { "main": [[{ "node": "AI Agent (Tools Agent)", "type": "main", "index": 0 }]] },
+    "AI Agent (Tools Agent)": { "main": [[{ "node": "Log de Observabilidad", "type": "main", "index": 0 }]] },
+    "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "AI Agent (Tools Agent)", "type": "ai_languageModel", "index": 0 }]] },
+    "buscar_vacantes_remotas": { "ai_tool": [[{ "node": "AI Agent (Tools Agent)", "type": "ai_tool", "index": 0 }]] },
+    "Log de Observabilidad": { "main": [[{ "node": "Respuesta al usuario", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "meta": { "templateId": "checkpoint1-agente-base" }
+}
