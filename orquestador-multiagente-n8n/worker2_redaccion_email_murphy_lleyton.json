@@ -1,0 +1,32 @@
+{
+  "name": "Worker 2 — Redaccion de Correos",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "wf2-trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [220, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// === CONTRATO DE ENTRADA (lo que manda el Manager) ===\n// { requestId, intencion:'REDACCION_EMAIL', destinatario, vacantes:[...], tono }\ntry {\n  const inp = $input.first().json || {};\n  const requestId = inp.requestId || ('REQ-' + Date.now());\n  const destinatario = inp.destinatario || 'destinatario@ejemplo.com';\n  const tono = inp.tono || 'profesional';\n  const vacantes = Array.isArray(inp.vacantes) ? inp.vacantes : [];\n\n  if (!vacantes.length) {\n    // === MANEJO DE FALLOS: sin insumos no puedo redactar ===\n    return [{ json: {\n      status: 'error',\n      worker: 'worker2_redaccion_email',\n      requestId,\n      data: null,\n      error: { code: 'SIN_VACANTES', message: 'No llegaron vacantes para redactar el correo.' }\n    }}];\n  }\n\n  const saludo = tono === 'formal' ? 'Estimado equipo de reclutamiento:' : 'Hola equipo:';\n  let lista = '';\n  for (const v of vacantes) {\n    lista += '<li><a href=\"' + (v.url || '#') + '\" style=\"color:#7c5cff\">' + (v.titulo || 'Vacante') + '</a> &mdash; ' + (v.empresa || '') + '</li>';\n  }\n  const asunto = 'Postulacion a ' + vacantes.length + ' vacante(s) remota(s)';\n  const cuerpo_html = '<div style=\"font-family:Arial;max-width:600px\">' +\n    '<p>' + saludo + '</p>' +\n    '<p>Mi nombre es Lleyton Murphy y quiero postularme a las siguientes posiciones remotas que encajan con mi perfil en IA Automation y Data:</p>' +\n    '<ul>' + lista + '</ul>' +\n    '<p>Adjunto mi perfil y quedo a disposicion para una entrevista. Muchas gracias.</p>' +\n    '<p>Saludos,<br>Lleyton Murphy</p></div>';\n\n  return [{ json: {\n    status: 'success',\n    worker: 'worker2_redaccion_email',\n    requestId,\n    data: { destinatario, asunto, cuerpo_html },\n    error: null\n  }}];\n} catch (e) {\n  return [{ json: {\n    status: 'error',\n    worker: 'worker2_redaccion_email',\n    requestId: 'REQ-desconocido',\n    data: null,\n    error: { code: 'EXCEPCION', message: String(e && e.message || e) }\n  }}];\n}"
+      },
+      "id": "wf2-draft",
+      "name": "Redactar correo y armar CONTRATO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 380]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[ { "node": "Redactar correo y armar CONTRATO", "type": "main", "index": 0 } ]] }
+  },
+  "settings": {
+    "executionTimeout": 60,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

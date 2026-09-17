@@ -1,0 +1,61 @@
+{
+  "name": "Worker 1 — Extraccion y Analisis de Datos (Empleos)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "wf1-trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [220, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// === CONTRATO DE ENTRADA (lo que manda el Manager) ===\n// { requestId, intencion:'BUSQUEDA_EMPLEOS', terminos:[...], limite:N }\nconst inp = $input.first().json || {};\nconst terminos = Array.isArray(inp.terminos) && inp.terminos.length ? inp.terminos : ['automation'];\nconst requestId = inp.requestId || ('REQ-' + Date.now());\nconst limite = Number(inp.limite) || 12;\n\n// Una fila por termino -> el HTTP Request se ejecuta una vez por cada uno.\nreturn terminos.map(t => ({\n  json: {\n    requestId,\n    limite,\n    termino: t,\n    searchUrl: 'https://remotive.com/api/remote-jobs?search=' + encodeURIComponent(t) + '&limit=30'\n  }\n}));"
+      },
+      "id": "wf1-prep",
+      "name": "Preparar busquedas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 380]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.searchUrl }}",
+        "options": { "timeout": 15000 }
+      },
+      "id": "wf1-http",
+      "name": "Consultar Remotive API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 380],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// === CONSOLIDA, RANKEA Y ARMA EL CONTRATO DE SALIDA ===\n// Recibe TODAS las respuestas (exito y error) del HTTP anterior.\nconst items = $input.all();\nlet requestId = 'REQ-desconocido';\nlet limite = 12;\nlet huboAlgunExito = false;\n\nconst EXCL = ['clearance','principal','vice president',' vp ','head of engineering','staff engineer'];\nconst KW = ['automation','automat','ai ','artificial','partnership','sales','account','growth','data','analyst','no-code','nocode','zapier','make','workflow','crm','integration'];\n\nconst byUrl = new Set();\nconst fresh = [];\n\nfor (const it of items) {\n  const j = it.json || {};\n  requestId = j.requestId || requestId;\n  limite = Number(j.limite) || limite;\n  const jobs = (j && j.jobs) || [];\n  if (jobs.length) huboAlgunExito = true;\n  for (const job of jobs) {\n    if (!job.url || byUrl.has(job.url)) continue;\n    byUrl.add(job.url);\n    const t = (job.title || '').toLowerCase();\n    if (EXCL.some(e => t.includes(e))) continue;\n    const score = KW.reduce((s, k) => s + (t.includes(k) ? 1 : 0), 0);\n    fresh.push({\n      titulo: job.title,\n      empresa: job.company_name,\n      ubicacion: job.candidate_required_location || 'Remoto',\n      url: job.url,\n      salario: job.salary || null,\n      score\n    });\n  }\n}\n\n// === MANEJO DE FALLOS: si NINGUNA busqueda respondio, devuelvo contrato de contingencia ===\nif (!huboAlgunExito) {\n  return [{ json: {\n    status: 'error',\n    worker: 'worker1_extraccion_datos',\n    requestId,\n    data: null,\n    error: { code: 'API_UNREACHABLE', message: 'No se pudo contactar la API de Remotive en ninguna busqueda.' }\n  }}];\n}\n\nfresh.sort((a, b) => (b.score - a.score) || 0);\nconst vacantes = fresh.slice(0, limite);\n\n// Email HTML listo para reutilizar aguas abajo\nlet rows = '';\nfor (const v of vacantes) {\n  const sal = v.salario ? ' &middot; ' + v.salario : '';\n  const fire = v.score >= 3 ? '\\uD83D\\uDD25 ' : '';\n  rows += '<tr><td style=\"padding:10px 0;border-bottom:1px solid #eee\"><a href=\"' + v.url + '\" style=\"color:#7c5cff;font-weight:bold;text-decoration:none\">' + fire + v.titulo + '</a><br><span style=\"color:#555;font-size:13px\">' + v.empresa + ' &middot; ' + v.ubicacion + sal + '</span></td></tr>';\n}\nconst html = '<table style=\"width:100%;border-collapse:collapse;font-family:Arial\">' + rows + '</table>';\n\nreturn [{ json: {\n  status: 'success',\n  worker: 'worker1_extraccion_datos',\n  requestId,\n  data: { count: vacantes.length, vacantes, html },\n  error: null\n}}];"
+      },
+      "id": "wf1-out",
+      "name": "Consolidar, rankear y armar CONTRATO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 380]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[ { "node": "Preparar busquedas", "type": "main", "index": 0 } ]] },
+    "Preparar busquedas": { "main": [[ { "node": "Consultar Remotive API", "type": "main", "index": 0 } ]] },
+    "Consultar Remotive API": {
+      "main": [
+        [ { "node": "Consolidar, rankear y armar CONTRATO", "type": "main", "index": 0 } ],
+        [ { "node": "Consolidar, rankear y armar CONTRATO", "type": "main", "index": 0 } ]
+      ]
+    }
+  },
+  "settings": {
+    "executionTimeout": 120,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}
