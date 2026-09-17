@@ -1,0 +1,235 @@
+{
+  "name": "Manager — Orquestador Multi-Agente (Modulo 2)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "mg-trigger",
+      "name": "Ejecutar (prueba manual)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [180, 420]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"consulta\": \"Busca vacantes remotas de data analyst y automation para aplicar\", \"destinatario\": \"murphylleyton05@gmail.com\" } }}",
+        "options": {}
+      },
+      "id": "mg-input",
+      "name": "Consulta del usuario",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [400, 420]
+    },
+    {
+      "parameters": {
+        "model": { "__rl": true, "mode": "list", "value": "gpt-4o-mini", "cachedResultName": "gpt-4o-mini" },
+        "options": {}
+      },
+      "id": "mg-llm",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [620, 620],
+      "notes": "Opcional: conecta tu credencial. Si no hay credencial, el nodo continua por error y el Parser usa el fallback determinista."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.consulta }}",
+        "options": {
+          "systemMessage": "Eres un Router de Triaje. Clasifica la intencion del usuario en UNA sola categoria de esta taxonomia CERRADA de negocio:\n- BUSQUEDA_EMPLEOS: pedir, buscar o listar vacantes/puestos/oportunidades.\n- REDACCION_EMAIL: redactar, escribir o preparar un correo/postulacion.\n- ESCALAR_HUMANO: cualquier intencion dudosa, ambigua o fuera de la taxonomia.\nResponde EXCLUSIVAMENTE con un JSON valido, sin texto extra: {\"intencion\":\"BUSQUEDA_EMPLEOS\"} o {\"intencion\":\"REDACCION_EMAIL\"} o {\"intencion\":\"ESCALAR_HUMANO\"}."
+        }
+      },
+      "id": "mg-agent",
+      "name": "Router de Triaje (IA)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [640, 420],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Lee la salida del Router IA; si falta o es invalida, usa fallback determinista (0 tokens).\nconst item = $input.first().json || {};\nlet intencion = null;\nconst raw = item.output || item.text || '';\nif (raw) {\n  try { const m = String(raw).match(/\\{[^}]*\\}/); if (m) intencion = JSON.parse(m[0]).intencion; } catch (e) {}\n  if (!intencion) { const up = String(raw).toUpperCase(); ['BUSQUEDA_EMPLEOS','REDACCION_EMAIL','ESCALAR_HUMANO'].forEach(c => { if (up.includes(c)) intencion = c; }); }\n}\nconst consulta = String(item.consulta || '').toLowerCase();\nif (!intencion) {\n  if (/(busc|vacante|empleo|puesto|trabajo|oportunidad)/.test(consulta)) intencion = 'BUSQUEDA_EMPLEOS';\n  else if (/(redact|escrib|correo|email|mail|postul|carta)/.test(consulta)) intencion = 'REDACCION_EMAIL';\n  else intencion = 'ESCALAR_HUMANO';\n}\nconst validos = ['BUSQUEDA_EMPLEOS','REDACCION_EMAIL','ESCALAR_HUMANO'];\nif (!validos.includes(intencion)) intencion = 'ESCALAR_HUMANO';\nreturn [{ json: {\n  consulta: item.consulta,\n  destinatario: item.destinatario || 'murphylleyton05@gmail.com',\n  intencion,\n  requestId: 'REQ-' + Date.now()\n}}];"
+      },
+      "id": "mg-parse",
+      "name": "Parsear intencion (+ fallback)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 420]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "combinator": "and",
+                "conditions": [
+                  { "leftValue": "={{ $json.intencion }}", "rightValue": "BUSQUEDA_EMPLEOS", "operator": { "type": "string", "operation": "equals" } }
+                ]
+              },
+              "outputKey": "BUSQUEDA_EMPLEOS"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "combinator": "and",
+                "conditions": [
+                  { "leftValue": "={{ $json.intencion }}", "rightValue": "REDACCION_EMAIL", "operator": { "type": "string", "operation": "equals" } }
+                ]
+              },
+              "outputKey": "REDACCION_EMAIL"
+            }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      },
+      "id": "mg-switch",
+      "name": "Enrutar por intencion",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1140, 420]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"requestId\": $json.requestId, \"intencion\": \"BUSQUEDA_EMPLEOS\", \"terminos\": [\"automation\", \"data analyst\", \"partnerships\", \"sales\"], \"limite\": 12 } }}",
+        "options": {}
+      },
+      "id": "mg-pay1",
+      "name": "Payload W1 (limpieza)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1400, 220],
+      "notes": "Contrato minimo viable: solo terminos y limite. Evita el 'Pasillo de la Muerte' por data stuffing."
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"requestId\": $json.requestId, \"intencion\": \"REDACCION_EMAIL\", \"destinatario\": $json.destinatario, \"tono\": \"profesional\", \"vacantes\": [ { \"titulo\": \"Automation Engineer\", \"empresa\": \"Remote Co\", \"url\": \"https://ejemplo.com/1\" }, { \"titulo\": \"Data Analyst\", \"empresa\": \"DataCorp\", \"url\": \"https://ejemplo.com/2\" } ] } }}",
+        "options": {}
+      },
+      "id": "mg-pay2",
+      "name": "Payload W2 (limpieza)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1400, 420]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"requestId\": $json.requestId, \"intencion\": \"ESCALAR_HUMANO\", \"mensaje\": \"Intencion dudosa o fuera de taxonomia. Derivar a supervisor humano.\", \"consulta_original\": $json.consulta } }}",
+        "options": {}
+      },
+      "id": "mg-esc",
+      "name": "Escalar a humano",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1400, 620]
+    },
+    {
+      "parameters": {
+        "workflowId": { "__rl": true, "mode": "list", "value": "", "cachedResultName": "Worker 1 — Extraccion y Analisis de Datos (Empleos)" },
+        "options": { "waitForSubWorkflow": true }
+      },
+      "id": "mg-exec1",
+      "name": "Execute Workflow: Worker 1",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [1660, 220],
+      "notes": "Wait for child to finish = ON. Selecciona el Worker 1 importado en 'workflowId'."
+    },
+    {
+      "parameters": {
+        "workflowId": { "__rl": true, "mode": "list", "value": "", "cachedResultName": "Worker 2 — Redaccion de Correos" },
+        "options": { "waitForSubWorkflow": true }
+      },
+      "id": "mg-exec2",
+      "name": "Execute Workflow: Worker 2",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [1660, 420],
+      "notes": "Wait for child to finish = ON. Selecciona el Worker 2 importado en 'workflowId'."
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"fecha\": $now.toISO(), \"requestId\": $json.requestId, \"worker_invocado\": \"worker1_extraccion_datos\", \"parametros_enviados\": JSON.stringify($('Payload W1 (limpieza)').item.json), \"status\": $json.status, \"respuesta\": JSON.stringify($json) } }}",
+        "options": {}
+      },
+      "id": "mg-log1",
+      "name": "Registro W1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1920, 220]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"fecha\": $now.toISO(), \"requestId\": $json.requestId, \"worker_invocado\": \"worker2_redaccion_email\", \"parametros_enviados\": JSON.stringify($('Payload W2 (limpieza)').item.json), \"status\": $json.status, \"respuesta\": JSON.stringify($json) } }}",
+        "options": {}
+      },
+      "id": "mg-log2",
+      "name": "Registro W2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1920, 420]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"fecha\": $now.toISO(), \"requestId\": $json.requestId, \"worker_invocado\": \"NINGUNO_ESCALADO_HUMANO\", \"parametros_enviados\": JSON.stringify($json), \"status\": \"escalado\", \"respuesta\": $json.mensaje } }}",
+        "options": {}
+      },
+      "id": "mg-log3",
+      "name": "Registro Escalado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1920, 620]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "mode": "list", "value": "", "cachedResultName": "Selecciona tu Google Sheet de trazabilidad" },
+        "sheetName": { "__rl": true, "mode": "list", "value": "", "cachedResultName": "Hoja 1" },
+        "columns": { "mappingMode": "autoMapInputData", "value": {}, "matchingColumns": [] },
+        "options": {}
+      },
+      "id": "mg-sheet",
+      "name": "Log de Trazabilidad (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [2200, 420],
+      "notes": "Registra: fecha, requestId, worker_invocado, parametros_enviados, status, respuesta. Alternativa: Gmail o Slack."
+    }
+  ],
+  "connections": {
+    "Ejecutar (prueba manual)": { "main": [[ { "node": "Consulta del usuario", "type": "main", "index": 0 } ]] },
+    "Consulta del usuario": { "main": [[ { "node": "Router de Triaje (IA)", "type": "main", "index": 0 } ]] },
+    "OpenAI Chat Model": { "ai_languageModel": [[ { "node": "Router de Triaje (IA)", "type": "ai_languageModel", "index": 0 } ]] },
+    "Router de Triaje (IA)": { "main": [[ { "node": "Parsear intencion (+ fallback)", "type": "main", "index": 0 } ]] },
+    "Parsear intencion (+ fallback)": { "main": [[ { "node": "Enrutar por intencion", "type": "main", "index": 0 } ]] },
+    "Enrutar por intencion": {
+      "main": [
+        [ { "node": "Payload W1 (limpieza)", "type": "main", "index": 0 } ],
+        [ { "node": "Payload W2 (limpieza)", "type": "main", "index": 0 } ],
+        [ { "node": "Escalar a humano", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Payload W1 (limpieza)": { "main": [[ { "node": "Execute Workflow: Worker 1", "type": "main", "index": 0 } ]] },
+    "Payload W2 (limpieza)": { "main": [[ { "node": "Execute Workflow: Worker 2", "type": "main", "index": 0 } ]] },
+    "Escalar a humano": { "main": [[ { "node": "Registro Escalado", "type": "main", "index": 0 } ]] },
+    "Execute Workflow: Worker 1": { "main": [[ { "node": "Registro W1", "type": "main", "index": 0 } ]] },
+    "Execute Workflow: Worker 2": { "main": [[ { "node": "Registro W2", "type": "main", "index": 0 } ]] },
+    "Registro W1": { "main": [[ { "node": "Log de Trazabilidad (Google Sheets)", "type": "main", "index": 0 } ]] },
+    "Registro W2": { "main": [[ { "node": "Log de Trazabilidad (Google Sheets)", "type": "main", "index": 0 } ]] },
+    "Registro Escalado": { "main": [[ { "node": "Log de Trazabilidad (Google Sheets)", "type": "main", "index": 0 } ]] }
+  },
+  "settings": {
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

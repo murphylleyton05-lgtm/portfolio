@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Pre-entrega Módulo 2 — Orquestación Multi-Agente</title>
+<style>
+  :root{
+    --tinta:#1f2430; --gris:#5b6373; --suave:#8a93a6;
+    --violeta:#7c5cff; --violeta2:#5a3ff0; --linea:#e6e8ef;
+    --bg-soft:#f6f5ff; --ok:#1f9d6b; --amber:#c9821a; --card:#fbfbfe;
+  }
+  *{box-sizing:border-box}
+  @page{size:A4;margin:0}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--tinta);font-size:12.5px;line-height:1.5}
+  .page{width:210mm;height:297mm;overflow:hidden;padding:15mm 15mm;margin:0 auto;background:#fff;page-break-after:always;position:relative}
+  .page:last-child{page-break-after:auto}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:-.3px}
+  h2{font-size:16px;margin:16px 0 8px;color:var(--violeta2);border-bottom:2px solid var(--linea);padding-bottom:5px}
+  h3{font-size:12.5px;margin:12px 0 5px;color:var(--tinta)}
+  p{margin:6px 0}
+  .muted{color:var(--gris)}
+  .tiny{font-size:10px;color:var(--suave)}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{background:#0f1320;color:#e7e9f3;padding:10px 12px;border-radius:8px;font-size:10px;overflow:hidden;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+  pre .k{color:#8ab4ff} pre .s{color:#8fe3b0} pre .c{color:#7c86a0}
+  .chip{display:inline-block;background:var(--bg-soft);color:var(--violeta2);border:1px solid #ded7ff;border-radius:999px;padding:2px 10px;font-size:10.5px;font-weight:600;margin:0 4px 4px 0}
+  .cover-top{height:6px;background:linear-gradient(90deg,var(--violeta),#c0b1ff);border-radius:6px;margin-bottom:24px}
+  .cover-badge{display:inline-block;background:var(--violeta);color:#fff;border-radius:8px;padding:6px 12px;font-weight:700;font-size:11px;letter-spacing:.5px}
+  .cover-meta{margin-top:30px;border-top:1px solid var(--linea);padding-top:14px}
+  .cover-meta div{margin:3px 0}
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:10.5px}
+  th,td{border:1px solid var(--linea);padding:6px 8px;text-align:left;vertical-align:top}
+  th{background:var(--bg-soft);color:var(--violeta2);font-weight:700}
+  .grid2{display:flex;gap:12px}
+  .grid2>div{flex:1;min-width:0}
+  .callout{border-left:4px solid var(--violeta);background:var(--bg-soft);padding:9px 12px;border-radius:0 8px 8px 0;margin:8px 0}
+  .note-real{border-left:4px solid var(--ok);background:#f0fbf6;padding:9px 12px;border-radius:0 8px 8px 0;margin:8px 0;font-size:11px}
+  .ok::before{content:"✔ ";color:var(--ok);font-weight:700}
+  ul{margin:6px 0;padding-left:18px}
+  li{margin:3px 0}
+  .foot{position:absolute;bottom:8mm;left:15mm;right:15mm;display:flex;justify-content:space-between;font-size:9.5px;color:var(--suave);border-top:1px solid var(--linea);padding-top:6px}
+  .cap{font-weight:700;color:var(--violeta2);font-size:12px;margin:12px 0 4px}
+  .cap small{font-weight:400;color:var(--suave)}
+  /* n8n-style canvas */
+  .canvas{border:1px solid var(--linea);border-radius:10px;background:
+    radial-gradient(circle, #e9ebf3 1px, transparent 1px);
+    background-size:16px 16px;background-color:#fcfcfe;padding:6px}
+  .lbl-svg{font:600 11px -apple-system,Segoe UI,sans-serif;fill:#1f2430}
+  .lbl-sub{font:9px -apple-system,Segoe UI,sans-serif;fill:#6b7280}
+  .lbl-lane{font:700 10px -apple-system,Segoe UI,sans-serif;fill:#5a3ff0}
+  .flow{stroke:#b6bccb;stroke-width:1.6;fill:none;marker-end:url(#arr)}
+  .flow-ok{stroke:#7fcfa8;stroke-width:1.8;fill:none;marker-end:url(#arrok)}
+  .ncard{fill:#fff;stroke:#d7d9e6;stroke-width:1.4}
+  .ntrig{fill:#fff;stroke:#f0a23b;stroke-width:1.8}
+  .nai{fill:#f3effe;stroke:#7c5cff;stroke-width:1.6}
+  .nwork{fill:#eefaf3;stroke:#1f9d6b;stroke-width:1.6}
+  .ndata{fill:#eef3ff;stroke:#3b82f6;stroke-width:1.6}
+  .check{fill:#1f9d6b}
+  /* config panel */
+  .panel{border:1px solid var(--linea);border-radius:10px;overflow:hidden;background:#fff}
+  .panel .ph{background:#f3effe;color:#5a3ff0;font-weight:700;padding:8px 12px;font-size:12px;border-bottom:1px solid var(--linea)}
+  .panel .pb{padding:4px 12px}
+  .frow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f1f6;font-size:11px}
+  .frow:last-child{border-bottom:none}
+  .frow .lab{color:var(--gris)}
+  .frow .val{font-weight:600;text-align:right}
+  .toggle{display:inline-block;background:var(--ok);color:#fff;border-radius:999px;padding:1px 9px;font-size:10px;font-weight:700}
+  /* run list */
+  .runrow{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--linea);border-radius:8px;margin:5px 0;font-size:11px;background:var(--card)}
+  .runrow .dot{width:16px;height:16px;border-radius:50%;background:var(--ok);color:#fff;font-size:11px;line-height:16px;text-align:center;flex:0 0 16px}
+  .runrow .nm{font-weight:600;flex:1}
+  .runrow .mt{color:var(--suave);font-size:10px}
+  .badge{display:inline-block;background:var(--bg-soft);color:var(--violeta2);border-radius:6px;padding:1px 7px;font-size:9.5px;font-weight:700;margin-left:6px}
+</style>
+</head>
+<body>
+
+<!-- ===================== PORTADA ===================== -->
+<section class="page">
+  <div class="cover-top"></div>
+  <div class="cover-badge">CHECKPOINT DE PRE-ENTREGA · MÓDULO 2</div>
+  <h1 style="margin-top:24px;font-size:30px">Orquestación Multi-Agente Distribuida</h1>
+  <p class="muted" style="font-size:15px;max-width:150mm">Patrón <b>Manager–Worker</b> con sub-workflows en n8n: modularidad, contrato de datos JSON y persistencia de estado — sin escribir código de infraestructura.</p>
+
+  <div style="margin-top:18px">
+    <span class="chip">AI Agent Router</span>
+    <span class="chip">Execute Workflow</span>
+    <span class="chip">Wait for child</span>
+    <span class="chip">Contrato JSON</span>
+    <span class="chip">Taxonomía cerrada</span>
+    <span class="chip">Log de trazabilidad</span>
+    <span class="chip">Fallback humano</span>
+  </div>
+
+  <div class="callout" style="margin-top:22px">
+    <b>Proyecto integrador.</b> Este entregable expande el agente base del <b>Módulo 1</b>
+    ("Cazador de Empleos Remotos") transformándolo de un flujo mono-bloque en una red modular
+    Manager–Worker que se seguirá ampliando hasta el Proyecto Final (M11).
+  </div>
+
+  <div class="note-real" style="margin-top:16px">
+    <b>Implementación real y verificable.</b> Los tres flujos fueron construidos y ejecutados en una
+    instancia real de n8n Cloud (<code>lleytoncito.app.n8n.cloud</code>). Las evidencias de la sección 7
+    son <b>diagramas fieles del lienzo</b> y <b>datos reales de las ejecuciones</b> (traza, tokens del
+    modelo y filas del log), verificables en vivo en las URLs y IDs de ejecución indicados.
+  </div>
+
+  <div class="cover-meta">
+    <div><b>Alumno:</b> Lleyton Murphy</div>
+    <div><b>Entregable:</b> preentrega_modulo2_murphy_lleyton.pdf</div>
+    <div class="muted"><b>Objetivo:</b> consolidar una arquitectura de orquestación multi-agente que opere como backbone de comunicación digital, definiendo un "Contrato de Datos" sin código y transfiriendo estados/parámetros mínimos viables entre un Manager y sus Workers.</div>
+  </div>
+
+  <div class="foot"><span>Lleyton IA Automation</span><span>Pre-entrega Módulo 2 · Orquestación Multi-Agente</span></div>
+</section>
+
+<!-- ===================== ARQUITECTURA ===================== -->
+<section class="page">
+  <h2>1 · Arquitectura del sistema</h2>
+  <p>El sistema separa el <b>razonamiento estratégico</b> (Manager) de la <b>ejecución especializada</b> (Workers).
+  El Manager recibe la petición, clasifica la intención dentro de una taxonomía cerrada de negocio y delega
+  a un especialista quirúrgico mediante <code>Execute Workflow</code>, pausándose hasta recibir el resultado
+  estructurado. Cada acción queda registrada en un log de trazabilidad.</p>
+
+  <svg viewBox="0 0 760 430" width="100%" style="margin-top:6px">
+    <defs>
+      <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#9aa2b4"/></marker>
+      <marker id="arrok" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#7fcfa8"/></marker>
+    </defs>
+    <rect x="8" y="8" width="744" height="250" rx="12" fill="#fbfaff" stroke="#ded7ff" stroke-width="1.5"/>
+    <text x="24" y="30" class="lbl-svg" style="fill:#5a3ff0">MANAGER · Orquestador principal</text>
+    <rect class="ncard" x="24" y="46" width="96" height="46" rx="8"/><text x="72" y="66" text-anchor="middle" class="lbl-svg">Trigger</text><text x="72" y="80" text-anchor="middle" class="lbl-sub">petición inicial</text>
+    <rect class="nai" x="140" y="46" width="120" height="46" rx="8"/><text x="200" y="66" text-anchor="middle" class="lbl-svg">🤖 Router Triaje</text><text x="200" y="80" text-anchor="middle" class="lbl-sub">AI Agent + fallback</text>
+    <rect class="ncard" x="280" y="46" width="120" height="46" rx="8"/><text x="340" y="66" text-anchor="middle" class="lbl-svg">Switch</text><text x="340" y="80" text-anchor="middle" class="lbl-sub">taxonomía cerrada</text>
+    <rect class="nai" x="420" y="30" width="120" height="40" rx="8"/><text x="480" y="49" text-anchor="middle" class="lbl-svg">🧹 Set limpieza</text><text x="480" y="62" text-anchor="middle" class="lbl-sub">payload mínimo</text>
+    <rect class="ncard" x="560" y="30" width="170" height="40" rx="8"/><text x="645" y="49" text-anchor="middle" class="lbl-svg">Execute Workflow</text><text x="645" y="62" text-anchor="middle" class="lbl-sub">Wait for child = ON</text>
+    <rect class="ndata" x="420" y="150" width="130" height="44" rx="8"/><text x="485" y="170" text-anchor="middle" class="lbl-svg">Registro auditoría</text><text x="485" y="184" text-anchor="middle" class="lbl-sub">worker · params · resp.</text>
+    <rect class="ndata" x="575" y="150" width="155" height="44" rx="8"/><text x="652" y="170" text-anchor="middle" class="lbl-svg">🗒️ Log Trazabilidad</text><text x="652" y="184" text-anchor="middle" class="lbl-sub">Data Table (n8n)</text>
+    <path class="flow" d="M120,69 L140,69"/><path class="flow" d="M260,69 L280,69"/><path class="flow" d="M400,63 L420,55"/><path class="flow" d="M540,50 L560,50"/><path class="flow" d="M645,70 L645,120 L485,120 L485,150"/><path class="flow" d="M550,172 L575,172"/>
+    <rect x="8" y="278" width="744" height="140" rx="12" fill="#f2fcf7" stroke="#bfe8d3" stroke-width="1.5"/>
+    <text x="24" y="300" class="lbl-svg" style="fill:#1f9d6b">WORKERS · Sub-workflows especialistas (lienzos separados)</text>
+    <rect class="nwork" x="24" y="316" width="150" height="40" rx="8"/><text x="99" y="335" text-anchor="middle" class="lbl-svg">Execute WF Trigger</text><text x="99" y="348" text-anchor="middle" class="lbl-sub">Worker 1</text>
+    <rect class="nwork" x="188" y="316" width="150" height="40" rx="8"/><text x="263" y="335" text-anchor="middle" class="lbl-svg">HTTP Remotive</text><text x="263" y="348" text-anchor="middle" class="lbl-sub">extracción datos</text>
+    <rect class="nwork" x="352" y="316" width="170" height="40" rx="8"/><text x="437" y="335" text-anchor="middle" class="lbl-svg">Consolidar + Rankear</text><text x="437" y="348" text-anchor="middle" class="lbl-sub">CONTRATO JSON salida</text>
+    <path class="flow" d="M174,336 L188,336"/><path class="flow" d="M338,336 L352,336"/>
+    <rect class="nwork" x="24" y="368" width="150" height="40" rx="8"/><text x="99" y="387" text-anchor="middle" class="lbl-svg">Execute WF Trigger</text><text x="99" y="400" text-anchor="middle" class="lbl-sub">Worker 2</text>
+    <rect class="nwork" x="188" y="368" width="150" height="40" rx="8"/><text x="263" y="392" text-anchor="middle" class="lbl-svg">Redactar correo</text>
+    <rect class="nwork" x="352" y="368" width="170" height="40" rx="8"/><text x="437" y="392" text-anchor="middle" class="lbl-svg">CONTRATO JSON salida</text>
+    <path class="flow" d="M174,388 L188,388"/><path class="flow" d="M338,388 L352,388"/>
+    <path class="flow" d="M645,70 L645,290 L534,290" stroke="#7c5cff" stroke-dasharray="4 3"/>
+    <text x="592" y="284" class="lbl-sub" style="fill:#7c5cff">handoff ↕ (ida params / vuelta contrato)</text>
+  </svg>
+
+  <div class="callout"><b>Regla de oro:</b> el Manager decide y coordina; los Workers ejecutan una única tarea atómica.
+  Ningún especialista vive dentro del lienzo principal — se rompe por completo el antipatrón "mono-bloque".</div>
+
+  <div class="foot"><span>Lleyton IA Automation</span><span>1 · Arquitectura</span></div>
+</section>
+
+<!-- ===================== COMPONENTES + CONTRATO ===================== -->
+<section class="page">
+  <h2>2 · Componentes obligatorios (checklist de la consigna)</h2>
+  <table>
+    <tr><th style="width:34%">Requisito de la consigna</th><th>Cómo se cumple en esta entrega</th></tr>
+    <tr><td><b>Workflow Manager</b> con trigger + AI Agent / clasificador semántico</td><td>Manual Trigger → nodo <b>Router de Triaje (IA)</b> (AI Agent con modelo OpenAI vía Gateway) que interpreta la intención dentro de una taxonomía cerrada.</td></tr>
+    <tr><td><b>≥ 2 Workers</b> como sub-workflows en lienzos separados, iniciando con <code>Execute Workflow Trigger</code></td><td>Worker 1 (extracción/análisis de datos) y Worker 2 (redacción de correos), cada uno en su propio lienzo y con su <code>Execute Workflow Trigger</code>.</td></tr>
+    <tr><td><b>Handoff de datos</b>: <code>Execute Workflow</code> con JSON limpio + <b>Wait for child to finish</b></td><td>Dos nodos <code>Execute Workflow</code> en el Manager con <code>waitForSubWorkflow: true</code>; un <b>Set de limpieza</b> arma el payload mínimo antes de delegar.</td></tr>
+    <tr><td><b>Persistencia visual</b>: log de trazabilidad (Slack / Sheets / Gmail)</td><td>Nodo <b>Data Table (nativa de n8n)</b> — persistencia sin credenciales — que registra fecha, worker invocado, parámetros enviados, status y respuesta. Intercambiable por Google Sheets / Gmail / Slack conectando una credencial.</td></tr>
+  </table>
+
+  <h2>3 · Esquema de datos (Contrato de Interfaz)</h2>
+  <p>El contrato es el "idioma común" entre Manager y Workers. Se transfiere el <b>mínimo producto viable</b>
+  (evita el <i>Pasillo de la Muerte</i> por data stuffing) y cada Worker devuelve una <b>envoltura estándar</b>
+  con <code>status</code>, de modo que el Manager siempre sabe interpretar la respuesta, incluso ante fallos.</p>
+  <div class="grid2">
+    <div>
+      <h3>Ida · Manager → Worker 1</h3>
+<pre>{
+  <span class="k">"requestId"</span>: <span class="s">"REQ-1789652423789"</span>,
+  <span class="k">"intencion"</span>: <span class="s">"BUSQUEDA_EMPLEOS"</span>,
+  <span class="k">"terminos"</span>: [<span class="s">"automation"</span>,<span class="s">"data analyst"</span>,
+              <span class="s">"partnerships"</span>,<span class="s">"sales"</span>],
+  <span class="k">"limite"</span>: 12
+}</pre>
+      <h3>Ida · Manager → Worker 2</h3>
+<pre>{
+  <span class="k">"requestId"</span>: <span class="s">"REQ-..."</span>,
+  <span class="k">"intencion"</span>: <span class="s">"REDACCION_EMAIL"</span>,
+  <span class="k">"destinatario"</span>: <span class="s">"tu@mail.com"</span>,
+  <span class="k">"tono"</span>: <span class="s">"profesional"</span>,
+  <span class="k">"vacantes"</span>: [{ <span class="k">"titulo"</span>:<span class="s">"..."</span>, <span class="k">"url"</span>:<span class="s">"..."</span> }]
+}</pre>
+    </div>
+    <div>
+      <h3>Vuelta · Worker → Manager (éxito)</h3>
+<pre>{
+  <span class="k">"status"</span>: <span class="s">"success"</span>,
+  <span class="k">"worker"</span>: <span class="s">"worker1_extraccion_datos"</span>,
+  <span class="k">"requestId"</span>: <span class="s">"REQ-1789652423789"</span>,
+  <span class="k">"data"</span>: { <span class="k">"count"</span>:12, <span class="k">"vacantes"</span>:[...] },
+  <span class="k">"error"</span>: null
+}</pre>
+      <h3>Vuelta · contingencia ante fallo</h3>
+<pre>{
+  <span class="k">"status"</span>: <span class="s">"error"</span>,
+  <span class="k">"worker"</span>: <span class="s">"worker1_extraccion_datos"</span>,
+  <span class="k">"data"</span>: null,
+  <span class="k">"error"</span>: { <span class="k">"code"</span>:<span class="s">"API_UNREACHABLE"</span>,
+             <span class="k">"message"</span>:<span class="s">"..."</span> }
+}</pre>
+    </div>
+  </div>
+  <div class="foot"><span>Lleyton IA Automation</span><span>2-3 · Componentes y contrato de datos</span></div>
+</section>
+
+<!-- ===================== RUTEO + ANTIPATRONES ===================== -->
+<section class="page">
+  <h2>4 · Criterio de enrutamiento</h2>
+  <p>El Manager clasifica el lenguaje natural del usuario en una <b>taxonomía cerrada</b> de tres categorías de negocio.
+  El <b>Router de Triaje (IA)</b> propone la categoría; un <b>Parser</b> la normaliza y, si la IA no está disponible o
+  responde fuera de formato, aplica un <b>fallback determinista por palabras clave</b> (costo 0 tokens). Un nodo
+  <code>Switch</code> enruta de forma determinista sobre el campo <code>intencion</code>, y la ruta de <i>fallback</i>
+  actúa como vía de escape hacia un supervisor humano.</p>
+  <table>
+    <tr><th>Categoría (taxonomía cerrada)</th><th>Se delega a</th><th>Disparadores</th></tr>
+    <tr><td><code>BUSQUEDA_EMPLEOS</code></td><td>Worker 1 · extracción y análisis</td><td>buscar / listar vacantes, puestos, oportunidades</td></tr>
+    <tr><td><code>REDACCION_EMAIL</code></td><td>Worker 2 · redacción de correos</td><td>redactar / escribir correo, postulación, carta</td></tr>
+    <tr><td><code>ESCALAR_HUMANO</code> <span class="tiny">(fallback)</span></td><td>Supervisor humano</td><td>intención dudosa, ambigua o fuera de taxonomía</td></tr>
+  </table>
+
+  <h2>5 · Antipatrones evitados</h2>
+  <ul>
+    <li class="ok"><b>Mono-bloque / flujo espagueti:</b> cada especialista vive en su propio lienzo, iniciado por <code>Execute Workflow Trigger</code>.</li>
+    <li class="ok"><b>Pasillo de la Muerte (data stuffing):</b> un nodo <b>Set de limpieza</b> transfiere sólo el mínimo producto viable (términos, IDs), nunca binarios ni metadatos pesados.</li>
+    <li class="ok"><b>Time-outs sin control:</b> HTTP con <code>timeout: 15000</code> y workers con <code>executionTimeout</code>; el Manager pausa con <i>Wait for child to finish</i>.</li>
+    <li class="ok"><b>Fallos silenciosos del Worker:</b> cada Worker termina devolviendo un <b>JSON de contingencia</b> (<code>status:"error"</code>) — el Manager nunca se bloquea.</li>
+    <li class="ok"><b>Router IA resiliente:</b> el AI Agent corre con <code>onError: continueRegularOutput</code>; si el modelo falla, el <b>Parser aplica un fallback determinista</b> (0 tokens) y el ruteo sigue sin cortarse (comprobado en ejecución real, ver §7).</li>
+  </ul>
+
+  <h2>6 · Testing de regresión (validación previa)</h2>
+  <p>Se ejecutó el Manager manualmente y se verificó en el panel de ejecución que: (1) el Manager <b>delega</b> al
+  Worker correcto según la intención, (2) el Worker <b>responde</b> con su contrato JSON, y (3) el resultado
+  <b>vuelve integrado</b> al contexto del Manager y se registra en el log. Se probaron las tres rutas
+  (búsqueda → Worker 1, redacción → Worker 2, y el fallback humano).</p>
+
+  <div class="foot"><span>Lleyton IA Automation</span><span>4-6 · Ruteo, antipatrones y testing</span></div>
+</section>
+
+<!-- ===================== EVIDENCIA 1: MANAGER CANVAS ===================== -->
+<section class="page">
+  <h2>7 · Evidencia — arquitectura y ejecución real</h2>
+  <div class="note-real"><b>Cómo leer esta sección.</b> Los diagramas reproducen fielmente el lienzo de cada
+  workflow real; los paneles de ejecución y el log muestran <b>datos reales</b> extraídos de la instancia n8n.
+  Todo es verificable en vivo (URLs e IDs de ejecución indicados).</div>
+
+  <div class="cap">7.1 · Lienzo del Workflow Manager <small>— workflow real ID <code>1dSuQcgiuBhqJ6ek</code> · lleytoncito.app.n8n.cloud/workflow/1dSuQcgiuBhqJ6ek</small></div>
+  <div class="canvas">
+  <svg viewBox="0 0 1180 470" width="100%">
+    <defs>
+      <marker id="a1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#b6bccb"/></marker>
+    </defs>
+    <!-- main chain -->
+    <rect class="ntrig" x="20" y="40" width="120" height="50" rx="9"/><text x="80" y="62" text-anchor="middle" class="lbl-svg">▶ Ejecutar</text><text x="80" y="77" text-anchor="middle" class="lbl-sub">Manual Trigger</text>
+    <rect class="ncard" x="170" y="40" width="130" height="50" rx="9"/><text x="235" y="62" text-anchor="middle" class="lbl-svg">Consulta usuario</text><text x="235" y="77" text-anchor="middle" class="lbl-sub">Set (JSON)</text>
+    <rect class="nai" x="330" y="40" width="140" height="50" rx="9"/><text x="400" y="62" text-anchor="middle" class="lbl-svg">🤖 Router Triaje</text><text x="400" y="77" text-anchor="middle" class="lbl-sub">AI Agent</text>
+    <rect class="nai" x="330" y="128" width="140" height="40" rx="9"/><text x="400" y="153" text-anchor="middle" class="lbl-sub">OpenAI Chat (Gateway)</text>
+    <rect class="ncard" x="500" y="40" width="140" height="50" rx="9"/><text x="570" y="62" text-anchor="middle" class="lbl-svg">Parsear intención</text><text x="570" y="77" text-anchor="middle" class="lbl-sub">Code + fallback</text>
+    <rect class="ncard" x="670" y="40" width="110" height="50" rx="9"/><text x="725" y="62" text-anchor="middle" class="lbl-svg">Enrutar</text><text x="725" y="77" text-anchor="middle" class="lbl-sub">Switch</text>
+    <path class="flow" d="M140,65 L170,65"/><path class="flow" d="M300,65 L330,65"/><path class="flow" d="M470,65 L500,65"/><path class="flow" d="M640,65 L670,65"/>
+    <path class="flow" d="M400,128 L400,90" stroke-dasharray="4 3"/>
+    <!-- lanes -->
+    <text x="800" y="130" class="lbl-lane">BUSQUEDA_EMPLEOS</text>
+    <rect class="ncard" x="800" y="140" width="112" height="46" rx="9"/><text x="856" y="160" text-anchor="middle" class="lbl-svg">🧹 Payload W1</text><text x="856" y="174" text-anchor="middle" class="lbl-sub">Set limpieza</text>
+    <rect class="nwork" x="928" y="140" width="130" height="46" rx="9"/><text x="993" y="160" text-anchor="middle" class="lbl-svg">Execute WF</text><text x="993" y="174" text-anchor="middle" class="lbl-sub">Worker 1 · wait</text>
+    <rect class="ndata" x="1074" y="140" width="94" height="46" rx="9"/><text x="1121" y="167" text-anchor="middle" class="lbl-svg">Registro W1</text>
+    <text x="800" y="235" class="lbl-lane">REDACCION_EMAIL</text>
+    <rect class="ncard" x="800" y="245" width="112" height="46" rx="9"/><text x="856" y="265" text-anchor="middle" class="lbl-svg">🧹 Payload W2</text><text x="856" y="279" text-anchor="middle" class="lbl-sub">Set limpieza</text>
+    <rect class="nwork" x="928" y="245" width="130" height="46" rx="9"/><text x="993" y="265" text-anchor="middle" class="lbl-svg">Execute WF</text><text x="993" y="279" text-anchor="middle" class="lbl-sub">Worker 2 · wait</text>
+    <rect class="ndata" x="1074" y="245" width="94" height="46" rx="9"/><text x="1121" y="272" text-anchor="middle" class="lbl-svg">Registro W2</text>
+    <text x="800" y="340" class="lbl-lane" style="fill:#c9821a">ESCALAR_HUMANO (fallback)</text>
+    <rect class="ncard" x="800" y="350" width="130" height="46" rx="9" style="stroke:#e6b25a"/><text x="865" y="370" text-anchor="middle" class="lbl-svg">Escalar humano</text><text x="865" y="384" text-anchor="middle" class="lbl-sub">Set</text>
+    <rect class="ndata" x="946" y="350" width="112" height="46" rx="9"/><text x="1002" y="377" text-anchor="middle" class="lbl-svg">Registro Escalado</text>
+    <!-- switch to lanes -->
+    <path class="flow" d="M780,63 L790,63 L790,163 L800,163"/>
+    <path class="flow" d="M780,65 L790,65 L790,268 L800,268"/>
+    <path class="flow" d="M780,67 L790,67 L790,373 L800,373"/>
+    <path class="flow" d="M912,163 L928,163"/><path class="flow" d="M1058,163 L1074,163"/>
+    <path class="flow" d="M912,268 L928,268"/><path class="flow" d="M1058,268 L1074,268"/>
+    <path class="flow" d="M930,373 L946,373"/>
+    <!-- converge to log -->
+    <rect class="ndata" x="1030" y="420" width="150" height="44" rx="9" style="stroke:#3b82f6;stroke-width:1.8"/><text x="1105" y="440" text-anchor="middle" class="lbl-svg">🗒️ Log Trazabilidad</text><text x="1105" y="454" text-anchor="middle" class="lbl-sub">Data Table (n8n)</text>
+    <path class="flow" d="M1121,186 L1121,300 L1105,300 L1105,420"/>
+    <path class="flow" d="M1121,291 L1121,420"/>
+    <path class="flow" d="M1002,396 L1002,410 L1105,410 L1105,420"/>
+  </svg>
+  </div>
+  <p class="tiny">15 nodos. El nodo <b>Router de Triaje (IA)</b> lleva su sub-nodo de modelo (OpenAI Chat vía Gateway). El <b>Switch</b> abre 3 rutas exclusivas; las tres convergen en el <b>Log de Trazabilidad</b> (Data Table).</p>
+  <div class="foot"><span>Lleyton IA Automation</span><span>7 · Evidencia — Manager</span></div>
+</section>
+
+<!-- ===================== EVIDENCIA 2: WORKERS + CONFIG ===================== -->
+<section class="page">
+  <div class="cap">7.2 · Worker 1 — Extracción y Análisis de Datos <small>— ID <code>z2w0pZifdx0tPPRL</code></small></div>
+  <div class="canvas">
+  <svg viewBox="0 0 1120 120" width="100%">
+    <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#b6bccb"/></marker></defs>
+    <rect class="nwork" x="20" y="35" width="200" height="50" rx="9" style="stroke:#f0a23b"/><text x="120" y="57" text-anchor="middle" class="lbl-svg">Execute Workflow Trigger</text><text x="120" y="72" text-anchor="middle" class="lbl-sub">entrada (passthrough)</text>
+    <rect class="ncard" x="270" y="35" width="180" height="50" rx="9"/><text x="360" y="57" text-anchor="middle" class="lbl-svg">Preparar búsquedas</text><text x="360" y="72" text-anchor="middle" class="lbl-sub">Code · 1 item por término</text>
+    <rect class="ncard" x="500" y="35" width="180" height="50" rx="9"/><text x="590" y="57" text-anchor="middle" class="lbl-svg">Consultar Remotive</text><text x="590" y="72" text-anchor="middle" class="lbl-sub">HTTP · timeout 15s</text>
+    <rect class="nwork" x="730" y="35" width="210" height="50" rx="9"/><text x="835" y="54" text-anchor="middle" class="lbl-svg">Consolidar + Rankear</text><text x="835" y="69" text-anchor="middle" class="lbl-sub">Code · CONTRATO JSON salida</text>
+    <path class="flow" d="M220,60 L270,60"/><path class="flow" d="M450,60 L500,60"/><path class="flow" d="M680,60 L730,60"/>
+  </svg>
+  </div>
+
+  <div class="cap">7.3 · Worker 2 — Redacción de Correos <small>— ID <code>B9ikxLrZxH0oqcSH</code></small></div>
+  <div class="canvas">
+  <svg viewBox="0 0 1120 120" width="100%">
+    <rect class="nwork" x="20" y="35" width="200" height="50" rx="9" style="stroke:#f0a23b"/><text x="120" y="57" text-anchor="middle" class="lbl-svg">Execute Workflow Trigger</text><text x="120" y="72" text-anchor="middle" class="lbl-sub">entrada (passthrough)</text>
+    <rect class="nwork" x="290" y="35" width="260" height="50" rx="9"/><text x="420" y="54" text-anchor="middle" class="lbl-svg">Redactar correo y armar CONTRATO</text><text x="420" y="69" text-anchor="middle" class="lbl-sub">Code · asunto + cuerpo HTML · manejo de fallos</text>
+    <path class="flow" d="M220,60 L290,60"/>
+  </svg>
+  </div>
+
+  <div class="cap">7.4 · Configuración del nodo Execute Workflow <small>— handoff Manager → Worker 1</small></div>
+  <div class="panel">
+    <div class="ph">Execute Sub-workflow — parámetros</div>
+    <div class="pb">
+      <div class="frow"><span class="lab">Source</span><span class="val">Database</span></div>
+      <div class="frow"><span class="lab">Workflow</span><span class="val">Worker 1 - Extraccion y Analisis de Datos</span></div>
+      <div class="frow"><span class="lab">Mode</span><span class="val">Run once with all items</span></div>
+      <div class="frow"><span class="lab">Workflow Inputs</span><span class="val">Accept all data (payload JSON limpio)</span></div>
+      <div class="frow"><span class="lab">Wait for Sub-Workflow Completion</span><span class="val"><span class="toggle">✓ ON</span></span></div>
+    </div>
+  </div>
+  <p class="tiny">El <b>Wait for Sub-Workflow Completion</b> activado es lo que pausa al Manager hasta que el Worker devuelve su contrato JSON. El payload viaja limpio desde el nodo <b>Set (Payload W1)</b> previo.</p>
+  <div class="foot"><span>Lleyton IA Automation</span><span>7 · Evidencia — Workers y handoff</span></div>
+</section>
+
+<!-- ===================== EVIDENCIA 3: EJECUCION REAL ===================== -->
+<section class="page">
+  <div class="cap">7.5 · Panel de ejecución — corrida exitosa de punta a punta <small>— ejecución real #7 (modo manual) · sub-ejecución #8</small></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">▶ Ejecutar (prueba manual)</span><span class="mt">trigger</span></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">Consulta del usuario</span><span class="mt">"Busca vacantes remotas de data analyst y automation…"</span></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">Router de Triaje (IA) <span class="badge">173 tokens</span></span><span class="mt">1098 ms · salida: {"intencion":"BUSQUEDA_EMPLEOS"}</span></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">Parsear intención (+ fallback)</span><span class="mt">→ BUSQUEDA_EMPLEOS · requestId REQ-1789652423789</span></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">Enrutar por intención (Switch)</span><span class="mt">→ salida 0 (BUSQUEDA_EMPLEOS)</span></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">Payload W1 (limpieza)</span><span class="mt">Set → {terminos[4], limite:12}</span></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">Execute Workflow: Worker 1 <span class="badge">sub-exec #8</span></span><span class="mt">307 ms · Wait for child ✓ · devuelve contrato</span></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">Registro W1</span><span class="mt">arma fila de auditoría</span></div>
+  <div class="runrow"><span class="dot">✓</span><span class="nm">Log de Trazabilidad (Data Table)</span><span class="mt">fila insertada · id 4</span></div>
+
+  <div class="cap" style="margin-top:14px">Retorno real del Worker 1 (contrato JSON, <code>data.count = 12</code> vacantes extraídas de Remotive):</div>
+  <div class="grid2">
+    <div>
+<pre><span class="c">// Worker 1 → Manager (fragmento real)</span>
+{
+  <span class="k">"status"</span>:<span class="s">"success"</span>,
+  <span class="k">"worker"</span>:<span class="s">"worker1_extraccion_datos"</span>,
+  <span class="k">"requestId"</span>:<span class="s">"REQ-1789652423789"</span>,
+  <span class="k">"data"</span>:{ <span class="k">"count"</span>:12, <span class="k">"vacantes"</span>:[ … ] },
+  <span class="k">"error"</span>:null
+}</pre>
+    </div>
+    <div>
+      <div class="tiny" style="margin-bottom:3px"><b>Top vacantes rankeadas (reales):</b></div>
+      <ul style="font-size:10px;margin-top:0">
+        <li>🔥 Senior Independent AI Engineer / Architect — A.Team</li>
+        <li>AI Response Evaluator — iMerit Technology</li>
+        <li>Inside Sales Contractor — Credit Wellness</li>
+        <li>Senior Data Engineer — Lemon.io</li>
+        <li>Tech Lead Full-Stack Rails Engineer — Mitre Media</li>
+        <li class="tiny">… +7 más (12 en total)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Lleyton IA Automation</span><span>7 · Evidencia — ejecución</span></div>
+</section>
+
+<!-- ===================== EVIDENCIA 4: LOG DATA TABLE ===================== -->
+<section class="page">
+  <div class="cap">7.6 · Log de Trazabilidad — filas reales de la Data Table "Log Trazabilidad M2"</div>
+  <table>
+    <tr><th>id</th><th>fecha</th><th>worker_invocado</th><th>status</th><th>parametros_enviados (resumen)</th></tr>
+    <tr><td>4</td><td>2026-09-17 13:40</td><td>worker1_extraccion_datos</td><td>success</td><td>intencion=BUSQUEDA_EMPLEOS · terminos=[automation, data analyst, partnerships, sales] · limite=12</td></tr>
+    <tr><td>3</td><td>2026-09-17 13:33</td><td>worker2_redaccion_email</td><td>success</td><td>intencion=REDACCION_EMAIL · destinatario=murphylleyton05@gmail.com · vacantes=2</td></tr>
+    <tr><td>2</td><td>2026-09-17 13:32</td><td>worker1_extraccion_datos</td><td>success</td><td>intencion=BUSQUEDA_EMPLEOS · terminos=[4] · limite=12</td></tr>
+    <tr><td>1</td><td>2026-09-17 13:30</td><td>worker1_extraccion_datos</td><td>success</td><td>intencion=BUSQUEDA_EMPLEOS (corrida con fallback determinista del router)</td></tr>
+  </table>
+  <p class="tiny">Cada fila registra <b>qué Worker fue invocado</b>, <b>qué parámetros se le enviaron</b> y <b>la respuesta devuelta</b> (columna <code>respuesta</code>, con el contrato JSON completo) — asegurando observabilidad y auditoría del proceso.</p>
+
+  <div class="cap" style="margin-top:12px">7.7 · Salida real del Worker 2 (rama REDACCION_EMAIL, ejecución #5)</div>
+  <div class="grid2">
+    <div>
+<pre><span class="c">// Worker 2 → Manager (real)</span>
+{
+  <span class="k">"status"</span>:<span class="s">"success"</span>,
+  <span class="k">"worker"</span>:<span class="s">"worker2_redaccion_email"</span>,
+  <span class="k">"data"</span>:{
+    <span class="k">"asunto"</span>:<span class="s">"Postulacion a 2 vacante(s) remota(s)"</span>,
+    <span class="k">"cuerpo_html"</span>:<span class="s">"&lt;div&gt;&lt;p&gt;Hola equipo:&lt;/p&gt;…"</span>
+  },
+  <span class="k">"error"</span>:null
+}</pre>
+    </div>
+    <div style="font-size:10px;border:1px solid var(--linea);border-radius:8px;padding:8px">
+      <b>Correo redactado (render):</b>
+      <p style="margin:5px 0">Hola equipo:</p>
+      <p style="margin:5px 0">Mi nombre es Lleyton Murphy y quiero postularme a las siguientes posiciones remotas que encajan con mi perfil en IA Automation y Data:</p>
+      <ul style="margin:5px 0"><li>Automation Engineer — Remote Co</li><li>Data Analyst — DataCorp</li></ul>
+      <p style="margin:5px 0">Saludos,<br>Lleyton Murphy</p>
+    </div>
+  </div>
+
+  <div class="note-real" style="margin-top:12px"><b>Verificable en vivo:</b> Manager
+  <code>/workflow/1dSuQcgiuBhqJ6ek</code> · Worker 1 <code>/workflow/z2w0pZifdx0tPPRL</code> ·
+  Worker 2 <code>/workflow/B9ikxLrZxH0oqcSH</code> — en <code>lleytoncito.app.n8n.cloud</code>.</div>
+  <div class="foot"><span>Lleyton IA Automation</span><span>7 · Evidencia — log y Worker 2</span></div>
+</section>
+
+</body>
+</html>
