@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Pre-entrega Módulo 3 — Memoria Persistente</title>
+<style>
+  :root{
+    --tinta:#1f2430; --gris:#5b6373; --suave:#8a93a6;
+    --violeta:#7c5cff; --violeta2:#5a3ff0; --linea:#e6e8ef;
+    --bg-soft:#f6f5ff; --ok:#1f9d6b; --amber:#c9821a; --card:#fbfbfe;
+  }
+  *{box-sizing:border-box}
+  @page{size:A4;margin:0}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--tinta);font-size:12px;line-height:1.5}
+  .page{width:210mm;height:297mm;overflow:hidden;padding:14mm 15mm;margin:0 auto;background:#fff;page-break-after:always;position:relative}
+  .page:last-child{page-break-after:auto}
+  h1{font-size:22px;margin:0 0 2px;letter-spacing:-.3px}
+  h2{font-size:15px;margin:14px 0 7px;color:var(--violeta2);border-bottom:2px solid var(--linea);padding-bottom:5px}
+  h3{font-size:12px;margin:11px 0 5px}
+  p{margin:6px 0}
+  .muted{color:var(--gris)} .tiny{font-size:10px;color:var(--suave)}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{background:#0f1320;color:#e7e9f3;padding:11px 13px;border-radius:8px;font-size:10.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+  pre .k{color:#8ab4ff} pre .s{color:#8fe3b0} pre .c{color:#7c86a0} pre .t{color:#f0a23b}
+  .badge{display:inline-block;background:var(--violeta);color:#fff;border-radius:8px;padding:5px 11px;font-weight:700;font-size:10.5px;letter-spacing:.4px}
+  .chip{display:inline-block;background:var(--bg-soft);color:var(--violeta2);border:1px solid #ded7ff;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:600;margin:0 3px 3px 0}
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:10.5px}
+  th,td{border:1px solid var(--linea);padding:6px 8px;text-align:left;vertical-align:top}
+  th{background:var(--bg-soft);color:var(--violeta2);font-weight:700}
+  .note-real{border-left:4px solid var(--ok);background:#f0fbf6;padding:8px 11px;border-radius:0 8px 8px 0;margin:8px 0;font-size:10.5px}
+  .callout{border-left:4px solid var(--violeta);background:var(--bg-soft);padding:8px 11px;border-radius:0 8px 8px 0;margin:8px 0;font-size:11px}
+  .foot{position:absolute;bottom:8mm;left:15mm;right:15mm;display:flex;justify-content:space-between;font-size:9px;color:var(--suave);border-top:1px solid var(--linea);padding-top:6px}
+  .canvas{border:1px solid var(--linea);border-radius:10px;background:radial-gradient(circle,#e9ebf3 1px,transparent 1px);background-size:15px 15px;background-color:#fcfcfe;padding:6px;margin-top:8px}
+  .lbl{font:600 10.5px -apple-system,Segoe UI,sans-serif;fill:#1f2430}
+  .sub{font:8.5px -apple-system,Segoe UI,sans-serif;fill:#6b7280}
+  .lane{font:700 9.5px -apple-system,Segoe UI,sans-serif}
+  .flow{stroke:#b6bccb;stroke-width:1.5;fill:none;marker-end:url(#ar)}
+  .ncard{fill:#fff;stroke:#d7d9e6;stroke-width:1.3}
+  .ntrig{fill:#fff;stroke:#f0a23b;stroke-width:1.7}
+  .nai{fill:#f3effe;stroke:#7c5cff;stroke-width:1.5}
+  .ndata{fill:#eef3ff;stroke:#3b82f6;stroke-width:1.5}
+  .nif{fill:#fff7ed;stroke:#c9821a;stroke-width:1.5}
+  .kv{display:flex;gap:8px;font-size:10.5px;margin:3px 0}
+  .kv .kk{color:var(--gris);min-width:120px}
+</style>
+</head>
+<body>
+
+<!-- ============ PÁGINA 1: LIENZO ============ -->
+<section class="page">
+  <span class="badge">PRE-ENTREGA · MÓDULO 3</span>
+  <h1 style="margin-top:12px">Memoria Persistente y Resumen Automático del Agente</h1>
+  <p class="muted" style="font-size:13px">Capa de persistencia de largo plazo por <code>Session_ID</code> sobre la arquitectura del M2 — lectura de contexto, inyección semántica y summarization automática. · <b>Lleyton Murphy</b></p>
+  <div style="margin-top:4px">
+    <span class="chip">Chat Trigger</span><span class="chip">Data Table (memoria)</span><span class="chip">IF nuevo/recurrente</span>
+    <span class="chip">Inyección de contexto</span><span class="chip">Tools Agent</span><span class="chip">Summarization &gt;5 msgs</span><span class="chip">JSON estructurado</span>
+  </div>
+
+  <h2>Página 1 · Arquitectura completa del lienzo (n8n)</h2>
+  <div class="canvas">
+  <svg viewBox="0 0 1180 560" width="100%">
+    <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#b6bccb"/></marker></defs>
+
+    <!-- main read row -->
+    <rect class="ntrig" x="20" y="40" width="120" height="48" rx="9"/><text x="80" y="60" text-anchor="middle" class="lbl">Chat Trigger</text><text x="80" y="74" text-anchor="middle" class="sub">Session_ID + msg</text>
+    <rect class="ndata" x="165" y="40" width="130" height="48" rx="9"/><text x="230" y="60" text-anchor="middle" class="lbl">Leer Memoria</text><text x="230" y="74" text-anchor="middle" class="sub">Data Table · get by ID</text>
+    <rect class="nif" x="320" y="40" width="120" height="48" rx="9"/><text x="380" y="60" text-anchor="middle" class="lbl">¿Existe?</text><text x="380" y="74" text-anchor="middle" class="sub">IF registro</text>
+    <path class="flow" d="M140,64 L165,64"/><path class="flow" d="M295,64 L320,64"/>
+
+    <!-- true: recurrente -->
+    <text x="470" y="34" class="lane" style="fill:#1f9d6b">SÍ · recurrente</text>
+    <rect class="ncard" x="470" y="40" width="150" height="48" rx="9"/><text x="545" y="60" text-anchor="middle" class="lbl">Set Contexto Recurrente</text><text x="545" y="74" text-anchor="middle" class="sub">inyecta user/summary/estado</text>
+    <!-- false: nuevo -->
+    <text x="470" y="126" class="lane" style="fill:#c9821a">NO · usuario nuevo</text>
+    <rect class="ndata" x="470" y="132" width="150" height="46" rx="9"/><text x="545" y="151" text-anchor="middle" class="lbl">Crear Registro Inicial</text><text x="545" y="165" text-anchor="middle" class="sub">Data Table · insert</text>
+    <rect class="ncard" x="470" y="188" width="150" height="44" rx="9"/><text x="545" y="214" text-anchor="middle" class="lbl">Set Contexto Nuevo</text>
+    <path class="flow" d="M440,58 L470,58"/><path class="flow" d="M440,70 L455,70 L455,155 L470,155"/>
+    <path class="flow" d="M545,178 L545,188"/>
+
+    <!-- contexto listo -->
+    <rect class="ncard" x="660" y="92" width="120" height="46" rx="9"/><text x="720" y="112" text-anchor="middle" class="lbl">Contexto listo</text><text x="720" y="126" text-anchor="middle" class="sub">merge de ramas</text>
+    <path class="flow" d="M620,64 L640,64 L640,112 L660,112"/>
+    <path class="flow" d="M620,210 L640,210 L640,120 L660,120"/>
+
+    <!-- agent -->
+    <rect class="nai" x="820" y="88" width="150" height="52" rx="9"/><text x="895" y="108" text-anchor="middle" class="lbl">🤖 AI Agent</text><text x="895" y="122" text-anchor="middle" class="sub">Tools Agent · maxIter 6</text><text x="895" y="134" text-anchor="middle" class="sub">System Prompt + memoria</text>
+    <rect class="nai" x="820" y="176" width="150" height="38" rx="9"/><text x="895" y="199" text-anchor="middle" class="sub">OpenAI GPT-4o (Gateway)</text>
+    <rect class="nai" x="820" y="222" width="150" height="38" rx="9"/><text x="895" y="245" text-anchor="middle" class="sub">buscar_vacantes (tool)</text>
+    <path class="flow" d="M780,114 L820,114"/>
+    <path class="flow" d="M895,176 L895,140" stroke-dasharray="4 3"/><path class="flow" d="M895,222 L895,140" stroke-dasharray="4 3"/>
+
+    <!-- if >5 -->
+    <rect class="nif" x="1010" y="88" width="130" height="52" rx="9"/><text x="1075" y="112" text-anchor="middle" class="lbl">¿Supera 5 msgs?</text><text x="1075" y="126" text-anchor="middle" class="sub">IF message_count &gt; 5</text>
+    <path class="flow" d="M970,114 L1010,114"/>
+
+    <!-- summarization branch (row 2) -->
+    <text x="40" y="320" class="lane" style="fill:#5a3ff0">SÍ · summarization (limpieza de contexto)</text>
+    <rect class="nai" x="40" y="330" width="150" height="52" rx="9"/><text x="115" y="350" text-anchor="middle" class="lbl">Summarization</text><text x="115" y="364" text-anchor="middle" class="sub">LLM Chain · JSON estricto</text>
+    <rect class="nai" x="40" y="392" width="150" height="34" rx="9"/><text x="115" y="413" text-anchor="middle" class="sub">GPT-4o-mini + Output Parser</text>
+    <rect class="ncard" x="230" y="330" width="140" height="52" rx="9"/><text x="300" y="350" text-anchor="middle" class="lbl">Preparar Resumen</text><text x="300" y="364" text-anchor="middle" class="sub">Code · normaliza JSON</text>
+    <rect class="ndata" x="410" y="330" width="160" height="52" rx="9"/><text x="490" y="350" text-anchor="middle" class="lbl">Actualizar Memoria</text><text x="490" y="364" text-anchor="middle" class="sub">Data Table · update idempotente</text>
+    <path class="flow" d="M190,356 L230,356"/><path class="flow" d="M370,356 L410,356"/>
+    <path class="flow" d="M115,392 L115,382" stroke-dasharray="4 3"/>
+    <path class="flow" d="M1075,140 L1075,300 L115,300 L115,330"/>
+
+    <!-- false branch -->
+    <text x="640" y="320" class="lane" style="fill:#c9821a">NO (≤5)</text>
+    <rect class="ndata" x="640" y="330" width="160" height="52" rx="9"/><text x="720" y="350" text-anchor="middle" class="lbl">Actualizar Contador</text><text x="720" y="364" text-anchor="middle" class="sub">Data Table · update msg_count</text>
+    <path class="flow" d="M1075,140 L1075,290 L720,290 L720,330"/>
+
+    <!-- respuesta -->
+    <rect class="ncard" x="850" y="330" width="150" height="52" rx="9"/><text x="925" y="350" text-anchor="middle" class="lbl">Respuesta al usuario</text><text x="925" y="364" text-anchor="middle" class="sub">Set · output al chat</text>
+    <path class="flow" d="M570,356 L610,356 L610,300 L640,300"/>
+    <path class="flow" d="M570,356 L850,356"/>
+    <path class="flow" d="M800,356 L850,356"/>
+  </svg>
+  </div>
+
+  <div class="callout"><b>Circuito híbrido de persistencia (Lectura → Filtro → Escritura), aislado por <code>Session_ID</code>:</b>
+  se lee la memoria por ID; un <code>IF</code> separa usuarios nuevos (crea registro limpio, sin variables vacías) de recurrentes
+  (inyecta el contexto en el System Prompt). Al superar 5 mensajes, un LLM económico consolida la charla en un JSON limpio
+  que sobrescribe el registro de forma idempotente. Nunca se vuelcan HTML, logs ni transcripciones completas a la base.</div>
+
+  <div class="note-real"><b>Implementación real y probada.</b> Flujo construido y ejecutado en n8n Cloud (workflow ID
+  <code>P2rHab3kLg3SmlbI</code>). Los diagramas son fieles al lienzo real y los datos de las páginas 2–3 provienen de
+  ejecuciones reales. La base de memoria se implementó con la <b>Data Table nativa de n8n</b> (persistencia sin credenciales),
+  equivalente 1:1 a Airtable en columnas y tipos.</div>
+
+  <div class="foot"><span>Lleyton IA Automation · Módulo 3</span><span>Página 1 · Lienzo</span></div>
+</section>
+
+<!-- ============ PÁGINA 2: PROMPT SUMMARIZATION ============ -->
+<section class="page">
+  <h2>Página 2 · Prompt de summarization (salida JSON forzada)</h2>
+  <p>Nodo <b>Summarization (Resumen JSON)</b> — <code>Basic LLM Chain</code> con modelo económico <b>GPT-4o-mini</b> (temperatura 0)
+  y un <b>Structured Output Parser</b> que obliga el esquema. Se activa solo cuando <code>message_count &gt; 5</code>.</p>
+
+  <h3>System Message (prompt exacto usado en el modelo mini)</h3>
+<pre>Sos un modulo de summarization de contexto. Recibis el resumen previo de una
+sesion y el ultimo intercambio (usuario + asistente). Tu UNICA tarea es devolver
+un objeto JSON valido, sin texto adicional, sin markdown y sin comillas de codigo,
+con EXACTAMENTE esta forma:
+{ <span class="k">"asunto_principal"</span>: string, <span class="k">"puntos_clave"</span>: array de strings, <span class="k">"accion_requerida"</span>: string }
+REGLAS ESTRICTAS:
+- <span class="k">"asunto_principal"</span>: una frase que consolide el estado actual del caso del usuario.
+- <span class="k">"puntos_clave"</span>: entre 2 y 5 hechos duros, accionables y no redundantes.
+- <span class="k">"accion_requerida"</span>: el proximo paso concreto a realizar.
+- PROHIBIDO incluir HTML, logs tecnicos, payloads o transcripciones completas.
+- Se breve, factual y en espanol neutro.</pre>
+
+  <h3>User Message (historial que se envía, con expresiones nativas de n8n)</h3>
+<pre><span class="c">Resumen previo de la sesion:</span>
+{{ $('Contexto listo').item.json.last_summary }}
+
+<span class="c">Nuevo intercambio a integrar:</span>
+Usuario: {{ $('Contexto listo').item.json.chatInput }}
+Asistente: {{ $json.output }}</pre>
+
+  <h3>Esquema de salida forzado (Structured Output Parser)</h3>
+<pre>{
+  <span class="k">"asunto_principal"</span>: <span class="s">"string"</span>,
+  <span class="k">"puntos_clave"</span>: [ <span class="s">"string"</span>, <span class="s">"..."</span> ],
+  <span class="k">"accion_requerida"</span>: <span class="s">"string"</span>
+}</pre>
+
+  <div class="note-real"><b>Salida real generada en una ejecución</b> (guardada en la columna <code>resumen_consolidado</code>,
+  sobrescribiendo el registro de forma idempotente):</div>
+<pre>{
+  <span class="k">"asunto_principal"</span>: <span class="s">"Lleyton busca roles de Data Analyst remoto en LATAM con salario publicado."</span>,
+  <span class="k">"puntos_clave"</span>: [
+    <span class="s">"Interés en roles de Data Analyst remoto"</span>,
+    <span class="s">"Preferencia por zona horaria LATAM"</span>,
+    <span class="s">"Salario publicado es un requisito"</span>
+  ],
+  <span class="k">"accion_requerida"</span>: <span class="s">"Revisar las vacantes proporcionadas y seleccionar las de interés."</span>
+}</pre>
+
+  <div class="foot"><span>Lleyton IA Automation · Módulo 3</span><span>Página 2 · Prompt de summarization</span></div>
+</section>
+
+<!-- ============ PÁGINA 3: ESQUEMA DE DATOS ============ -->
+<section class="page">
+  <h2>Página 3 · Esquema de la base de memoria</h2>
+  <p>Base relacional de memoria de largo plazo, aislada por <code>Session_ID</code>. Implementada como <b>Data Table de n8n</b>
+  (portable a Airtable con idénticas columnas y tipos). Un registro por sesión; se lee al inicio y se sobrescribe al cierre.</p>
+
+  <h3>Columnas y tipos</h3>
+  <table>
+    <tr><th style="width:20%">Columna</th><th style="width:12%">Tipo</th><th>Descripción / metadato</th></tr>
+    <tr><td><code>session_id</code></td><td>string</td><td>Identificador único de sesión. <b>Clave de aislamiento</b>: filtra el registro exacto y blinda contra la amnesia cruzada.</td></tr>
+    <tr><td><code>user_name</code></td><td>string</td><td>Nombre del usuario, recuperado e inyectado en el System Prompt.</td></tr>
+    <tr><td><code>fecha_actualizacion</code></td><td>string (ISO&nbsp;8601)</td><td>Timestamp de la última escritura (para auditoría / orden).</td></tr>
+    <tr><td><code>resumen_consolidado</code></td><td>string (JSON)</td><td>Objeto <code>{asunto_principal, puntos_clave, accion_requerida}</code> de la summarization. Es el "last_summary" que se reinyecta.</td></tr>
+    <tr><td><code>estado_del_caso</code></td><td>string</td><td>Estado / próxima acción del caso (Status).</td></tr>
+    <tr><td><code>datos_clave</code></td><td>string (JSON)</td><td>Array de hechos duros y accionables (puntos_clave). Nunca transcripciones ni payloads pesados.</td></tr>
+    <tr><td><code>message_count</code></td><td>number</td><td>Contador de intercambios de la sesión. <b>Dispara la summarization</b> al superar 5.</td></tr>
+    <tr><td class="tiny"><code>id</code> · <code>createdAt</code> · <code>updatedAt</code></td><td class="tiny">system</td><td class="tiny">Metadatos automáticos de la Data Table (clave primaria y timestamps de fila).</td></tr>
+  </table>
+
+  <h3>Registro real de ejemplo (fila persistida)</h3>
+<pre><span class="k">session_id</span>: <span class="s">"mcp-session-1789738870554"</span>
+<span class="k">user_name</span>: <span class="s">"Lleyton"</span>
+<span class="k">fecha_actualizacion</span>: <span class="s">"2026-09-18T13:41:22.035Z"</span>
+<span class="k">resumen_consolidado</span>: <span class="s">"{\"asunto_principal\":\"Lleyton busca roles de Data Analyst remoto en LATAM...\",\"puntos_clave\":[...],\"accion_requerida\":\"...\"}"</span>
+<span class="k">estado_del_caso</span>: <span class="s">"Revisar las vacantes proporcionadas y seleccionar las de interés."</span>
+<span class="k">datos_clave</span>: <span class="s">"[\"Interés en Data Analyst remoto\",\"Preferencia LATAM\",\"Salario publicado\"]"</span>
+<span class="k">message_count</span>: <span class="t">1</span></pre>
+
+  <h3>Inyección de contexto en el System Prompt del agente</h3>
+  <p class="tiny">Los datos recuperados se insertan con delimitadores rígidos (protección anti prompt-injection):</p>
+<pre>CONFIGURACION DE IDENTIDAD Y MEMORIA DE LARGO PLAZO
+<span class="t">[INICIO DE CONTEXTO COMPARTIDO]</span>
+Nombre del usuario: {{ $json.user_name }}
+Estado del caso: {{ $json.estado }}
+Resumen de la ultima charla: {{ $json.last_summary }}
+<span class="t">[FIN DEL CONTEXTO COMPARTIDO]</span>
+... (rol, objetivo y reglas del agente) ...</pre>
+
+  <div class="note-real">Verificable en vivo: workflow <code>lleytoncito.app.n8n.cloud/workflow/P2rHab3kLg3SmlbI</code> ·
+  Data Table "Memoria Agente M3". JSON exportado: <code>checkpoint3_memoria_lleyton_murphy.json</code>.</div>
+
+  <div class="foot"><span>Lleyton IA Automation · Módulo 3</span><span>Página 3 · Esquema de datos</span></div>
+</section>
+
+</body>
+</html>
