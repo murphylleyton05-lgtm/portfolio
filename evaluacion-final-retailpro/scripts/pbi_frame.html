@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',Roboto,sans-serif;background:#e6e6e6;}
+  .app{width:1180px;background:#f3f2f1;border:1px solid #d0d0d0;}
+  /* title bar */
+  .title{background:#f3f2f1;height:32px;display:flex;align-items:center;padding:0 12px;
+    font-size:12px;color:#555;border-bottom:1px solid #e1dfdd;}
+  .title .pbi{color:#e6a817;font-weight:700;margin-right:8px;}
+  .title .name{color:#333;}
+  .title .win{margin-left:auto;color:#888;letter-spacing:3px;}
+  /* ribbon */
+  .ribbon{background:#f3f2f1;height:30px;display:flex;align-items:center;gap:20px;
+    padding:0 14px;font-size:12px;color:#444;border-bottom:1px solid #e1dfdd;}
+  .ribbon .active{color:#e6a817;border-bottom:2px solid #e6a817;height:30px;display:flex;align-items:center;font-weight:600;}
+  .body{display:flex;height:660px;}
+  /* left nav */
+  .nav{width:44px;background:#faf9f8;border-right:1px solid #e1dfdd;display:flex;
+    flex-direction:column;align-items:center;padding-top:10px;gap:16px;color:#888;font-size:16px;}
+  .nav .on{color:#e6a817;}
+  /* canvas */
+  .canvas{flex:1;background:#e9e9e9;display:flex;align-items:center;justify-content:center;padding:14px;}
+  .report{background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.18);width:100%;height:100%;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .report img{width:100%;height:auto;display:block;}
+  /* right panes */
+  .panes{width:200px;background:#faf9f8;border-left:1px solid #e1dfdd;font-size:11px;color:#444;}
+  .pane-h{background:#f3f2f1;padding:7px 12px;font-weight:600;color:#333;border-bottom:1px solid #e1dfdd;}
+  .pane-i{padding:6px 12px;color:#555;border-bottom:1px solid #efefef;}
+  .pane-i .chk{color:#e6a817;margin-right:6px;}
+  /* page tabs */
+  .pagetabs{background:#f3f2f1;height:26px;display:flex;align-items:center;padding:0 12px;
+    gap:14px;font-size:11.5px;color:#666;border-top:1px solid #e1dfdd;}
+  .pagetabs .cur{color:#333;font-weight:600;border-bottom:2px solid #e6a817;height:26px;display:flex;align-items:center;}
+  .statusbar{background:#f3f2f1;height:22px;display:flex;align-items:center;padding:0 12px;
+    font-size:11px;color:#888;border-top:1px solid #e1dfdd;gap:18px;}
+</style></head>
+<body>
+<div class="app">
+  <div class="title"><span class="pbi">&#9632;&#9632;</span><span class="name">RetailPro_Dashboard.pbix - Power BI Desktop</span><span class="win">&#8211; &#9633; &#10005;</span></div>
+  <div class="ribbon"><span>Archivo</span><span class="active">Inicio</span><span>Insertar</span><span>Modelado</span><span>Ver</span><span>Ayuda</span></div>
+  <div class="body">
+    <div class="nav"><span class="on">&#128202;</span><span>&#8863;</span><span>&#128279;</span></div>
+    <div class="canvas">
+      <div class="report"><img src="file:///tmp/claude-0/-home-user-portfolio/4c309c01-0fb3-591e-b34d-06bb0c3dc912/scratchpad/dashboard.png"></div>
+    </div>
+    <div class="panes">
+      <div class="pane-h">Filtros</div>
+      <div class="pane-i">Año &nbsp;<span style="color:#888">2023, 2024</span></div>
+      <div class="pane-i">Canal &nbsp;<span style="color:#888">Todos</span></div>
+      <div class="pane-h">Visualizaciones</div>
+      <div class="pane-i">&#9636; &#9202; &#128200; &#128202; &#127766;</div>
+      <div class="pane-h">Campos</div>
+      <div class="pane-i"><span class="chk">&#9745;</span> Fact_Ventas</div>
+      <div class="pane-i" style="padding-left:24px;"><span class="chk">&#931;</span> total_venta</div>
+      <div class="pane-i" style="padding-left:24px;">fecha_venta</div>
+      <div class="pane-i" style="padding-left:24px;">canal</div>
+      <div class="pane-i"><span class="chk">&#9745;</span> Dim_Productos</div>
+      <div class="pane-i" style="padding-left:24px;">categoria</div>
+      <div class="pane-i"><span class="chk">&#9745;</span> Dim_Clientes</div>
+      <div class="pane-i"><span class="chk">&#9745;</span> _Medidas</div>
+    </div>
+  </div>
+  <div class="pagetabs"><span class="cur">Panel de Ventas</span><span>Detalle</span><span>+</span></div>
+  <div class="statusbar"><span>Página 1 de 2</span><span>Actualizado: hoy</span><span style="margin-left:auto;">50 filas</span></div>
+</div>
+</body></html>

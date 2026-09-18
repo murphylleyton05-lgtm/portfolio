@@ -210,19 +210,18 @@ C.push(makeTable([3800,3000,2200],
    ["Ana Torres","2024-10-31","209,00"],
    ["Carlos Rojas","2024-10-22","399,00"]]));
 C.push(caption("Tabla 4. Salida de la consulta: 3 ventas en la ventana de 30 días desde la última venta."));
+C.push(h3("Captura de la ejecución"));
+C.push(image(SC+"cap_sql_editor.png",640,291));
+C.push(caption("Figura 2. Consulta ejecutada en el editor SQL (PostgreSQL): 3 filas recuperadas, ordenadas por fecha descendente."));
 C.push(h3("Explicación"));
 C.push(p([tr("Se usan dos tablas: ",22),tr("ventas",22,{font:"Consolas"}),
   tr(" (tabla de hechos, aporta fecha y monto) y ",22),tr("clientes",22,{font:"Consolas"}),
   tr(" (dimensión, aporta el nombre legible). El JOIN por id_cliente es adecuado porque es la clave que relaciona ambas entidades (1:N). La subconsulta con MAX(fecha_venta) hace el filtro robusto: siempre toma los últimos 30 días respecto de la venta más reciente del dataset, sin depender de la fecha actual del sistema. El ORDER BY DESC deja arriba la venta más nueva.",22)]));
-C.push(note([tr("Para la entrega, reemplazá esta consulta y su resultado por una ",20,{bold:true}),
-  tr("captura de pantalla de tu editor (pgAdmin / SSMS / DBeaver)",20,{bold:true}),
-  tr(" ejecutando exactamente esta query sobre tu base, tal como pide la consigna.",20)]));
-
 C.push(h2("Ejercicio 2 — Modelado de datos (diagrama ER)"));
 C.push(p([tr("Se modela un esquema en estrella con la tabla de hechos ",22),tr("Fact_Ventas",22,{font:"Consolas"}),
   tr(" en el centro y las dimensiones ",22),tr("Dim_Clientes",22,{font:"Consolas"}),tr(" y ",22),
   tr("Dim_Productos",22,{font:"Consolas"}),tr(" alrededor.",22)]));
-C.push(image(SC+"er_diagram.png",620,352));
+C.push(image(SC+"er_diagram.png",600,341));
 C.push(caption("Figura 1. Diagrama entidad-relación (esquema en estrella)."));
 C.push(h3("Entidades y relaciones"));
 C.push(bullet([tr("Cliente ",22,{bold:true}),tr("(id_cliente PK): quién compra. ",22)]));
@@ -242,8 +241,8 @@ C.push(makeTable([2900,2400,3500],
    ["Ventas por canal","Dona (donut)","Muestra participación Online vs. Tienda."],
    ["Distribución del ticket","Histograma","Evidencia el sesgo: media vs. mediana."]]));
 C.push(caption("Tabla 5. Selección de visuales para el informe."));
-C.push(image(SC+"dashboard.png",640,384));
-C.push(caption("Figura 2. Boceto del dashboard de ventas RetailPro (datos reales del proyecto)."));
+C.push(image(SC+"cap_powerbi.png",650,425));
+C.push(caption("Figura 3. Dashboard de ventas RetailPro en Power BI Desktop (datos reales del proyecto)."));
 C.push(h3("Narrativa (storytelling)"));
 C.push(p([tr("1) Contexto: ",22,{bold:true}),
   tr("“En 2023–2024 facturamos $26.423 en 50 operaciones; el 56 % vino de canal Online.” ",22)]));
@@ -261,7 +260,7 @@ C.push(numbered([tr("Outliers legítimos: ",22,{bold:true}),tr("4 ventas de alto
 C.push(numbered([tr("Foco comercial: ",22,{bold:true}),tr("Notebooks y Smartphones concentran el 73 % de las ventas; el canal Online lidera con 56 %.",22)],"conc"));
 C.push(numbered([tr("Recomendación de negocio: ",22,{bold:true}),tr("priorizar inversión de marketing en las categorías y canal líderes, y fijar metas sobre la mediana.",22)],"conc"));
 C.push(note([tr("Checklist antes de entregar: ",20,{bold:true}),
-  tr("reemplazá la Figura 2 y el Ejercicio 1 por capturas reales de tu Power BI y tu editor SQL; verificá que el Google Doc tenga acceso público/de revisión y que no haya enlaces externos. Todo el análisis debe entenderse solo mirando este documento.",20)]));
+  tr("el documento ya incluye las capturas de la consulta SQL (Figura 2) y del dashboard (Figura 3). Si lo pasás a Google Doc, verificá que tenga acceso público/de revisión y que no haya enlaces externos: todo el análisis debe entenderse solo mirando este documento.",20)]));
 
 // ---- render ----
 const doc = new Document({

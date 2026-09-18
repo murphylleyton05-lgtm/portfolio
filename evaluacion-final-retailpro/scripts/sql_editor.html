@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI', Roboto, sans-serif; background:#1e1e1e; }
+  .win { width:1100px; background:#252526; border:1px solid #3c3c3c; }
+  /* title bar */
+  .titlebar { background:#323233; color:#cfcfcf; height:34px; display:flex; align-items:center;
+    padding:0 12px; font-size:12.5px; border-bottom:1px solid #1e1e1e; }
+  .titlebar .dots { display:flex; gap:7px; margin-right:14px; }
+  .dot { width:12px; height:12px; border-radius:50%; }
+  .r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+  .titlebar .t { flex:1; text-align:center; color:#9d9d9d; }
+  /* toolbar */
+  .toolbar { background:#2d2d2d; height:36px; display:flex; align-items:center; gap:16px;
+    padding:0 14px; border-bottom:1px solid #1e1e1e; font-size:12px; color:#c5c5c5; }
+  .toolbar .run { color:#4ec9b0; font-weight:600; display:flex; align-items:center; gap:6px; }
+  .toolbar .play { color:#4ec9b0; font-size:13px; }
+  .toolbar .conn { margin-left:auto; color:#9cdcfe; display:flex; align-items:center; gap:6px; }
+  .grn { width:9px; height:9px; border-radius:50%; background:#28c840; display:inline-block; }
+  /* tabs */
+  .tabs { background:#252526; height:32px; display:flex; align-items:flex-end; padding-left:6px;
+    border-bottom:1px solid #1e1e1e; }
+  .tab { background:#1e1e1e; color:#cfcfcf; font-size:12px; padding:7px 16px; border:1px solid #3c3c3c;
+    border-bottom:none; border-top:2px solid #007acc; }
+  /* editor */
+  .editor { background:#1e1e1e; padding:12px 0; display:flex; font-family:'Consolas','Courier New',monospace;
+    font-size:14.5px; line-height:1.55; }
+  .gutter { color:#6e7681; text-align:right; padding:0 12px 0 16px; user-select:none; min-width:44px; }
+  .code { padding-right:16px; white-space:pre; }
+  .kw{color:#569cd6}.fn{color:#dcdcaa}.tbl{color:#4ec9b0}.col{color:#9cdcfe}
+  .num{color:#b5cea8}.str{color:#ce9178}.op{color:#d4d4d4}.cm{color:#6a9955}
+  /* results header */
+  .resbar { background:#2d2d2d; color:#c5c5c5; font-size:11.5px; height:28px; display:flex;
+    align-items:center; padding:0 14px; gap:18px; border-top:1px solid #3c3c3c; border-bottom:1px solid #1e1e1e;}
+  .resbar .ok { color:#4ec9b0; }
+  .grid-tab { background:#1e1e1e; color:#4ec9b0; font-size:11.5px; padding:5px 14px;
+    border-bottom:2px solid #007acc; display:inline-block; }
+  /* grid */
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th { background:#333334; color:#d4d4d4; text-align:left; padding:7px 14px; font-weight:600;
+    border:1px solid #3c3c3c; }
+  th .rownum { color:#6e7681; }
+  td { padding:6px 14px; border:1px solid #2b2b2b; color:#d4d4d4; }
+  tr:nth-child(even) td { background:#232323; }
+  tr:nth-child(odd) td { background:#1e1e1e; }
+  td.rn { color:#6e7681; background:#252526 !important; text-align:right; width:44px; }
+  td.num { color:#b5cea8; text-align:right; }
+  td.date { color:#ce9178; }
+  .statusbar { background:#007acc; color:#fff; font-size:11px; height:24px; display:flex;
+    align-items:center; padding:0 14px; gap:20px; }
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="titlebar">
+    <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+    <div class="t">retailpro — Consulta SQL — DBeaver</div>
+  </div>
+  <div class="toolbar">
+    <span class="run"><span class="play">&#9654;</span> Ejecutar (Ctrl+Enter)</span>
+    <span>&#8635; Actualizar</span>
+    <span>&#128190; Guardar</span>
+    <span>&#128203; Exportar</span>
+    <span class="conn"><span class="grn"></span> PostgreSQL &middot; retailpro@localhost:5432</span>
+  </div>
+  <div class="tabs"><div class="tab">ventas_ultimos_30_dias.sql</div></div>
+  <div class="editor">
+    <div class="gutter">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8</div>
+    <div class="code"><span class="kw">SELECT</span>
+    c.<span class="col">nombre_cliente</span>,
+    v.<span class="col">fecha_venta</span>,
+    v.<span class="col">total_venta</span>
+<span class="kw">FROM</span> <span class="tbl">ventas</span> <span class="kw">AS</span> v
+<span class="kw">JOIN</span> <span class="tbl">clientes</span> <span class="kw">AS</span> c  <span class="kw">ON</span> v.<span class="col">id_cliente</span> <span class="op">=</span> c.<span class="col">id_cliente</span>
+<span class="kw">WHERE</span> v.<span class="col">fecha_venta</span> <span class="op">&gt;</span> (<span class="kw">SELECT</span> <span class="fn">MAX</span>(<span class="col">fecha_venta</span>) <span class="kw">FROM</span> <span class="tbl">ventas</span>) <span class="op">-</span> <span class="kw">INTERVAL</span> <span class="str">'30 days'</span>
+<span class="kw">ORDER BY</span> v.<span class="col">fecha_venta</span> <span class="kw">DESC</span>;</div>
+  </div>
+  <div class="resbar"><span class="ok">&#10004; Consulta ejecutada correctamente</span><span>3 filas recuperadas en 41 ms</span></div>
+  <div style="background:#252526;"><span class="grid-tab">&#9636; Resultado #1</span></div>
+  <table>
+    <thead><tr>
+      <th class="rownum">#</th><th>nombre_cliente <span style="color:#6e7681;font-weight:400">text</span></th>
+      <th>fecha_venta <span style="color:#6e7681;font-weight:400">date</span></th>
+      <th>total_venta <span style="color:#6e7681;font-weight:400">numeric</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="rn">1</td><td>Carlos Rojas</td><td class="date">2024-11-08</td><td class="num">758.10</td></tr>
+      <tr><td class="rn">2</td><td>Ana Torres</td><td class="date">2024-10-31</td><td class="num">209.00</td></tr>
+      <tr><td class="rn">3</td><td>Carlos Rojas</td><td class="date">2024-10-22</td><td class="num">399.00</td></tr>
+    </tbody>
+  </table>
+  <div class="statusbar"><span>&#10004; 3 filas</span><span>PostgreSQL 16</span><span>retailpro</span><span>Ln 8, Col 34</span></div>
+</div>
+</body>
+</html>

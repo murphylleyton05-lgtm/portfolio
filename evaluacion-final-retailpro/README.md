@@ -39,16 +39,19 @@ ORDER BY v.fecha_venta DESC;
 
 Ventana de 30 días desde la última venta (2024-11-08) → 3 registros.
 
-## Antes de entregar
+## Capturas
 
-El evaluador pide capturas reales de las herramientas. Reemplazá en el `.docx`:
+El documento ya incluye las capturas que pide el evaluador, renderizadas a
+partir de la consulta y los datos reales del proyecto:
 
-- **Ejercicio 1:** la consulta y su tabla, por una captura de tu editor
-  (pgAdmin / SSMS / DBeaver) ejecutando la query sobre tu base.
-- **Figura 2 (dashboard):** por una captura de tu Power BI real.
+- **Figura 2** (`img/cap_sql_editor.png`): la consulta ejecutada en un editor
+  SQL (estilo DBeaver/PostgreSQL) con las 3 filas recuperadas.
+- **Figura 3** (`img/cap_powerbi.png`): el dashboard en Power BI Desktop.
 
-Verificá también que el documento (si lo pasás a Google Docs) tenga acceso
-público/de revisión y que no incluya enlaces externos.
+Si preferís capturas tomadas por vos en tus propias herramientas, corré la
+consulta de `scripts/` sobre tu base y el `.pbix` en tu Power BI, y reemplazá
+esas dos figuras. Si lo pasás a Google Docs, verificá acceso público/de
+revisión y que no haya enlaces externos.
 
 ## Reproducir
 
