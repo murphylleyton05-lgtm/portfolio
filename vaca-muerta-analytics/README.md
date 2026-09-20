@@ -101,21 +101,21 @@ Este bloque lo reescribe el workflow en cada actualización, así el README nunc
 queda con números viejos.
 
 <!-- RESULTADOS:INICIO -->
-> Última actualización: **2026-09-17** · datos oficiales de la Secretaría de Energía · período **2006-01 a 2026-07** · **2,613 pozos**, 2,463 con curva ajustada.
+> Última actualización: **2026-09-20** · datos oficiales de la Secretaría de Energía · período **2006-01 a 2026-08** · **2,643 pozos**, 2,503 con curva ajustada.
 
 | Horizonte | Error en **un pozo** | Sesgo | Dentro de ±20% | Error en el **total** | Pozos |
 |---|---:|---:|---:|---:|---:|
-| 12 meses | 23.3% | -8.9% | 44% | -5.9% | 1,424 |
-| 24 meses | 27.3% | -11.3% | 38% | -5.9% | 1,225 |
-| 36 meses | 30.1% | -14.5% | 35% | -8.6% | 978 |
+| 12 meses | 23.3% | -8.9% | 44% | -5.9% | 1,439 |
+| 24 meses | 27.2% | -11.3% | 38% | -5.8% | 1,241 |
+| 36 meses | 30.2% | -14.3% | 35% | -8.7% | 996 |
 
-**En una línea:** a 36 meses el modelo se equivoca **30% en un pozo individual** pero solo **9% en el total** de 978 pozos — los errores se compensan. Y subestima de forma sistemática, lo que es corregible.
+**En una línea:** a 36 meses el modelo se equivoca **30% en un pozo individual** pero solo **9% en el total** de 996 pozos — los errores se compensan. Y subestima de forma sistemática, lo que es corregible.
 
-**Economía de pozo**: precio de equilibrio mediano de **US$ 58/bbl** (P10 40 · P90 365), sobre 1,775 pozos. A US$ 65/bbl cierra el **58%**, con un repago mediano de 23 meses. Breakeven de wellhead antes de impuestos. Supuestos: pozo US$ 12.0M · opex US$ 12.0/bbl · diferencial Brent→boca US$ 10.0/bbl · regalías 12.0% · descuento 10.0% anual. **Son supuestos, no datos medidos.**
+**Economía de pozo**: precio de equilibrio mediano de **US$ 58/bbl** (P10 39 · P90 364), sobre 1,807 pozos. A US$ 65/bbl cierra el **58%**, con un repago mediano de 23 meses. Breakeven de wellhead antes de impuestos. Supuestos: pozo US$ 12.0M · opex US$ 12.0/bbl · diferencial Brent→boca US$ 10.0/bbl · regalías 12.0% · descuento 10.0% anual. **Son supuestos, no datos medidos.**
 
-**Ventanas de fluido** (por GOR de producción, 2,613 pozos): petróleo negro 1409 (54%) · petróleo volatil 689 (26%) · Gas y condensado 515 (20%). GOR mediano 180 m³/m³. Es un proxy, no una tipificación PVT.
+**Ventanas de fluido** (por GOR de producción, 2,643 pozos): petróleo negro 1423 (54%) · petróleo volatil 701 (26%) · Gas y condensado 519 (20%). GOR mediano 179 m³/m³. Es un proxy, no una tipificación PVT.
 
-**Normalización por rama lateral** (1,302 pozos con longitud declarada, mediana 2,514 m): la longitud explica el **6%** de la diferencia de EUR entre pozos, pero al normalizar el ranking se mueve **95 puestos** en la mediana y del top 10 por EUR crudo sobreviven solo **3**.
+**Normalización por rama lateral** (1,330 pozos con longitud declarada, mediana 2,516 m): la longitud explica el **5%** de la diferencia de EUR entre pozos, pero al normalizar el ranking se mueve **98 puestos** en la mediana y del top 10 por EUR crudo sobreviven solo **5**.
 <!-- RESULTADOS:FIN -->
 
 ---
