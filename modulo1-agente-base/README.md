@@ -22,7 +22,7 @@ Agente de razonamiento base (Módulo 1) del proyecto integrador. Construido y **
 | **Guardrail de iteraciones** | `maxIterations = 6` (dentro del rango 5–10). |
 | **System Prompt modular** | Rol → Ámbito → Objetivo → Reglas/Restricciones → Escalamiento, con límites explícitos de lo que **NO** debe hacer. |
 | **Herramienta lateral funcional** | `buscar_vacantes_remotas` (HTTP Request Tool → API pública de Remotive) conectada como **extensión (`ai_tool`)**, no como nodo secuencial. Con **descripción semántica extensa** de cuándo activarla. |
-| **Observabilidad** | Nodo `Log de Observabilidad` (Data Table de n8n) que registra fecha, session_id, mensaje del usuario, respuesta del agente y herramienta disponible. |
+| **Observabilidad** | Nodo final **Gmail** (`Reporte de Observabilidad`) que envía el Execution Log (mensaje del usuario, respuesta del agente y herramienta) al mail del supervisor humano. Además, un `Log de Observabilidad` (Data Table) deja registro interno auditable. |
 
 ## Prueba realizada (en verde)
 

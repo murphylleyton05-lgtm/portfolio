@@ -90,11 +90,29 @@
       }
     },
     {
+      "id": "bcab0580-8cda-4003-ba12-756821200ba9",
+      "name": "Reporte de Observabilidad (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [800, 112],
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "murphylleyton05@gmail.com",
+        "subject": "=Log de observabilidad — Agente IA (sesion {{ $('Chat Trigger').item.json.sessionId }})",
+        "emailType": "html",
+        "message": "=<h3>Reporte de observabilidad del agente</h3><p><b>Mensaje del usuario:</b> {{ $('Chat Trigger').item.json.chatInput }}</p><p><b>Respuesta del agente:</b><br>{{ $('AI Agent (Tools Agent)').item.json.output }}</p><p><b>Herramienta disponible:</b> buscar_vacantes_remotas</p><p><b>Fecha:</b> {{ $now.toISO() }}</p>",
+        "options": { "appendAttribution": false }
+      },
+      "webhookId": "fd1aa18b-a1bf-4c58-8c49-c18793ceff44"
+    },
+    {
       "id": "dfcfcee0-95bd-480e-8818-36774c8c6dda",
       "name": "Respuesta al usuario",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [800, 112],
+      "position": [1040, 112],
       "parameters": {
         "mode": "raw",
         "jsonOutput": "={{ { \"output\": $('AI Agent (Tools Agent)').item.json.output } }}"
@@ -106,7 +124,8 @@
     "AI Agent (Tools Agent)": { "main": [[{ "node": "Log de Observabilidad", "type": "main", "index": 0 }]] },
     "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "AI Agent (Tools Agent)", "type": "ai_languageModel", "index": 0 }]] },
     "buscar_vacantes_remotas": { "ai_tool": [[{ "node": "AI Agent (Tools Agent)", "type": "ai_tool", "index": 0 }]] },
-    "Log de Observabilidad": { "main": [[{ "node": "Respuesta al usuario", "type": "main", "index": 0 }]] }
+    "Log de Observabilidad": { "main": [[{ "node": "Reporte de Observabilidad (Gmail)", "type": "main", "index": 0 }]] },
+    "Reporte de Observabilidad (Gmail)": { "main": [[{ "node": "Respuesta al usuario", "type": "main", "index": 0 }]] }
   },
   "settings": { "executionOrder": "v1" },
   "pinData": {},
