@@ -2,6 +2,14 @@
 
 Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyecto vive en su propia carpeta con su README.
 
+## 🤖 Checkpoints n8n (Bootcamp Agentes IA)
+
+| Módulo | Entregable | Archivo |
+|---|---|---|
+| **M1 · Agente base (Tools Agent)** | Flujo n8n exportado | [`checkpoint1_lleyton_murphy.json`](./modulo1-agente-base/checkpoint1_lleyton_murphy.json) · [carpeta](./modulo1-agente-base) |
+| **M2 · Orquestación multi-agente** | Manager + Workers + PDF | [carpeta](./orquestador-multiagente-n8n) |
+| **M3 · Memoria persistente** | Flujo + PDF | [carpeta](./modulo3-memoria) |
+
 ## Proyectos
 
 > 🛢️ **Hub de Data Analytics · Petróleo y Gas:** https://murphylleyton05-lgtm.github.io/portfolio/hidrocarburos/ — los 4 proyectos del sector hidrocarburos en una sola página.
