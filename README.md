@@ -9,6 +9,7 @@ Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyect
 | **M1 · Agente base (Tools Agent)** | Flujo n8n exportado | [`checkpoint1_lleyton_murphy.json`](./modulo1-agente-base/checkpoint1_lleyton_murphy.json) · [carpeta](./modulo1-agente-base) |
 | **M2 · Orquestación multi-agente** | Manager + Workers + PDF | [carpeta](./orquestador-multiagente-n8n) |
 | **M3 · Memoria persistente** | Flujo + PDF | [carpeta](./modulo3-memoria) |
+| **M4 · Integraciones (Gmail + HubSpot + Slack)** | Flujo n8n exportado | [`checkpoint4_lleyton_murphy.json`](./modulo4-integraciones/checkpoint4_lleyton_murphy.json) · [carpeta](./modulo4-integraciones) |
 
 ## Proyectos
 
