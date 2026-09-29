@@ -16,6 +16,6 @@ with DESTINO.open("w", newline="", encoding="utf-8") as f:
     for op in datos["operadores_serie"]:
         for i, mes in enumerate(meses):
             w.writerow([f"{mes}-01", op["operador"].title() if op["operador"] != "YPF" else "YPF",
-                        op["oil_bbl_d"][i], op["gas_mm3_d"][i], op["activos"][i]])
+                        round(op["oil_bbl_d"][i]), round(op["gas_mm3_d"][i]), int(op["activos"][i])])
 
 print(f"{DESTINO.name}: {len(meses) * len(datos['operadores_serie'])} filas ({meses[0]} a {meses[-1]})")
