@@ -22,6 +22,7 @@ Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyect
 | [📈 Well Performance ML](./well-performance-ml) | Modelo de ML (datos oficiales) que predice el EUR de un pozo desde su diseño de fractura y cuantifica cuánto explica el diseño vs. la geología. | Python · numpy · Machine Learning |
 | [🛢️ Vaca Muerta Operations Intelligence](./vaca-muerta-ops-intelligence) | Tablero de operaciones con la producción **oficial** (petróleo/gas por mes, actividad, ranking de operadores) y medidas DAX para Power BI. Se regenera por CI con datos reales. | Python · pandas · Power BI (DAX) |
 | [🎙️ EchoNotes](./echonotes) | App de notas por voz con transcripción en tiempo real, 100% en el navegador. | React · Vite · Web Speech API |
+| [📊 Pre-entrega 4 · Tableau](./tableau-preentrega4) | Dashboard prototipo de Vaca Muerta para Tableau Public: parámetros, storytelling, paleta e íconos. | Tableau Public · Python |
 | [🟢 WhatsApp + CRM + IA](./whatsapp-crm-automation) | Stack self-hosted de atención por WhatsApp, CRM y respuestas automáticas con IA. | Chatwoot · n8n · Claude · Docker |
 
 ---
