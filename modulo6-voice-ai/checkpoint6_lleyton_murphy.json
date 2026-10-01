@@ -1244,8 +1244,8 @@
             },
             {
               "id": "tv3",
-              "leftValue": "={{ String($json.text ?? '').toLowerCase() }}",
-              "rightValue": "amara\\.org|subtítulos realizados|subtitulos realizados|gracias por ver el video",
+              "leftValue": "={{ String($json.text ?? '').trim().toLowerCase() }}",
+              "rightValue": "^[\\[(*♪].*[\\])*♪]$|amara\\.org|subt[ií]tulos realizados|gracias por ver el video|(\\S+(?:\\s+\\S+){0,4})(?:\\s+\\1){4,}",
               "operator": {
                 "type": "string",
                 "operation": "notRegex"
@@ -1449,7 +1449,7 @@
       ],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// COMPLIANCE · destruccion binaria\n// El audio del cliente (Telegram) y el audio generado (ElevenLabs) solo viven en la\n// memoria volatil de esta ejecucion. Este nodo corta la cadena: no devuelve binarios,\n// ni la transcripcion, ni el chat_id. Con \"Save successful/failed executions = Do not save\"\n// n8n descarta los datos de la ejecucion al cerrarse el flujo.\nconst ruta = $prevNode.name === 'Telegram · Send Audio (respuesta)'\n  ? 'respuesta_de_voz'\n  : 'contingencia_audio_invalido';\n\nreturn $input.all().map(() => ({\n  json: {\n    canal: 'telegram_voz',\n    ruta,\n    binarios_retenidos: 0,\n    transcripcion_retenida: false,\n    cerrado_en: $now.toISO(),\n  },\n}));"
+        "jsCode": "// COMPLIANCE · destruccion binaria\n// El audio del cliente (Telegram) y el audio generado (ElevenLabs) solo viven dentro de\n// esta ejecucion. Este nodo corta la cadena: no devuelve binarios, ni la transcripcion,\n// ni el chat_id. Con \"Save executions = Do not save\" n8n borra la ejecucion al cerrar el\n// flujo; con N8N_DEFAULT_BINARY_DATA_MODE=default + EXECUTIONS_DATA_HARD_DELETE_BUFFER=0\n// los binarios quedan solo en RAM y la purga fisica ocurre en menos de 1 minuto.\nconst ruta = $prevNode.name === 'Telegram · Send Audio (respuesta)'\n  ? 'respuesta_de_voz'\n  : 'contingencia_audio_invalido';\n\nreturn $input.all().map(() => ({\n  json: {\n    canal: 'telegram_voz',\n    ruta,\n    binarios_retenidos: 0,\n    transcripcion_retenida: false,\n    cerrado_en: $now.toISO(),\n  },\n}));"
       }
     },
     {
@@ -1462,10 +1462,10 @@
         2220
       ],
       "parameters": {
-        "content": "## Módulo 6 · Capa de Voz (Voice AI) sobre el RAG del M5\n**Circuito cerrado:** Telegram Trigger → Get File (descarga la nota de voz al binario `data`) → **Whisper** (Input Binary Property `data`, idioma `es`) → **IF** transcripción válida → **AI Agent Voz** (Tools Agent + `consultar_manual_politicas` del M5) → **Tope 200 caracteres** → **ElevenLabs** (Eleven Multilingual v2 · Stability 0.60 · Clarity 0.80) → **Telegram Send Audio**.\n**Contingencia:** audio corrupto, vacío, con ruido extremo o alucinación típica de Whisper (\"subtítulos de Amara.org\") → aviso por texto, sin gastar LLM ni ElevenLabs.\n**Contención financiera:** System Message ≤ 200 caracteres + Max Tokens 120 + guardrail que recorta en la última oración completa.",
+        "content": "## Módulo 6 · Capa de Voz (Voice AI) sobre el RAG del M5\n**Circuito cerrado:** Telegram Trigger → Get File (descarga la nota de voz al binario `data`) → **Whisper** (Input Binary Property `data`, idioma `es`) → **IF** transcripción válida → **AI Agent Voz** (Tools Agent + `consultar_manual_politicas` del M5) → **Tope 200 caracteres** → **ElevenLabs** (Eleven Multilingual v2 · Stability 0.60 · Clarity 0.80) → **Telegram Send Audio**.\n**Contingencia:** audio corrupto, vacío, con ruido extremo o alucinaciones típicas de Whisper (\"[ruido]\", \"(música)\", \"Amara.org\", frases repetidas en bucle) → aviso por texto, sin gastar LLM ni ElevenLabs.\n**Contención financiera:** System Message ≤ 200 caracteres + Max Tokens 120 + guardrail que recorta en la última oración completa.",
         "color": 4,
         "width": 1180,
-        "height": 250
+        "height": 270
       }
     },
     {
@@ -1478,10 +1478,10 @@
         2220
       ],
       "parameters": {
-        "content": "## 🔒 Compliance · Privacidad de audios\n1. **Memoria volátil:** los binarios de voz no se escriben en Drive, S3 ni en bases: viven solo dentro de la ejecución.\n2. **Settings del workflow:** Save successful = *Do not save* · Save failed = *Do not save* · Save manual = *No* · Save progress = *No* → al cerrar el flujo n8n descarta datos y binarios.\n3. **Purga explícita:** el nodo final devuelve solo un registro técnico anónimo (sin audio, sin transcripción, sin chat_id).\n4. **Sin memoria de chat:** el agente de voz no guarda historial de transcripciones.\n5. **Minimización:** el prompt prohíbe pedir o repetir tarjeta, códigos, contraseñas o DNI.",
+        "content": "## 🔒 Compliance · Privacidad de audios\n1. **Sin persistencia de negocio:** los audios no se escriben en Drive, S3, Data Tables ni CRM: viven solo dentro de la ejecución.\n2. **Settings:** Save successful / failed / manual / progress = *Do not save* → al cerrar el flujo la ejecución se borra y no queda en *Executions* ni en la API.\n3. **Destrucción física (instancia):** `N8N_DEFAULT_BINARY_DATA_MODE=default` (binarios solo en RAM) + `EXECUTIONS_DATA_HARD_DELETE_BUFFER=0` + `EXECUTIONS_DATA_PRUNE_HARD_DELETE_INTERVAL=1` → 0 archivos en disco y purga en ≤ 1 min (probado).\n4. **Purga explícita:** el nodo final devuelve solo un registro técnico anónimo (sin audio, sin transcripción, sin chat_id).\n5. **Sin memoria de chat y minimización:** el agente no guarda transcripciones; el prompt prohíbe pedir tarjeta, códigos, contraseñas o DNI.",
         "color": 3,
-        "width": 980,
-        "height": 250
+        "width": 1020,
+        "height": 270
       }
     }
   ],
