@@ -11,7 +11,7 @@ Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyect
 | **M3 · Memoria persistente** | Flujo + PDF | [carpeta](./modulo3-memoria) |
 | **M4 · Integraciones (Gmail + HubSpot + Slack)** | Flujo n8n exportado | [`checkpoint4_lleyton_murphy.json`](./modulo4-integraciones/checkpoint4_lleyton_murphy.json) · [carpeta](./modulo4-integraciones) |
 | **M5 · RAG (LlamaParse + Vector Store)** | Flujo + pre-entrega | [`checkpoint5_lleyton_murphy.json`](./modulo5-rag/checkpoint5_lleyton_murphy.json) · [carpeta](./modulo5-rag) |
-| **M6 · Voice AI (Telegram + Whisper + ElevenLabs)** | Flujo + PDF | [`checkpoint6_lleyton_murphy.json`](./modulo6-voice-ai/checkpoint6_lleyton_murphy.json) · [PDF](./modulo6-voice-ai/PreEntrega_Modulo6_LleytonMurphy.pdf) · [carpeta](./modulo6-voice-ai) |
+| **M6 · Voice AI (Telegram + Whisper + ElevenLabs)** | Flujo + PDF | [`checkpoint6_lleyton_murphy.json`](./modulo6-voice-ai/checkpoint6_lleyton_murphy.json) · [PDF](./modulo6-voice-ai/PreEntrega_Modulo6_LleytonMurphy.pdf) · [carpeta](./modulo6-voice-ai) · [repo de la entrega](https://github.com/murphylleyton05-lgtm/preentrega-m6-voice-ai-n8n) |
 
 ## Proyectos
 

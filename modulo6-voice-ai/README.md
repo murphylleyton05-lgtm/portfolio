@@ -1,5 +1,7 @@
 # 🎙️ Checkpoint 6 · Ecosistemas Multimedia de Audio (Voice AI) en n8n
 
+**Repo dedicado de la entrega:** https://github.com/murphylleyton05-lgtm/preentrega-m6-voice-ai-n8n
+
 **Entregables:**
 - 📄 [`PreEntrega_Modulo6_LleytonMurphy.pdf`](./PreEntrega_Modulo6_LleytonMurphy.pdf): capturas de la configuración visual en n8n, diagnóstico de viabilidad (ROI y fatiga cognitiva) y extracto del flujo en formato texto.
 - ⚙️ [`checkpoint6_lleyton_murphy.json`](./checkpoint6_lleyton_murphy.json): flujo exportado de n8n (*Import from File*).
