@@ -114,6 +114,16 @@ el centro), **treemap** de distribución y una **acción de filtro con reseteo**
 | Eje doble | 16 meses (sep-2024 → dic-2025); dic-2025: barra 601.990 vs línea 455.502 |
 | Treemap | 10 rectángulos; el más grande es YPF (334.587); el más oscuro es Pampa (677 bbl/d por pozo) |
 
+### Si al abrirlo sale el error `D2E8DA72` ("missing required attribute…", "worksheet-number")
+
+Significa que **tu Tableau es anterior a 2026.1**: el libro usa el formato 2026.1 y las versiones
+anteriores lo validan contra su esquema viejo y lo rechazan (no es que el archivo esté roto).
+
+1. Fijate tu versión en **Ayuda → Acerca de Tableau Public**.
+2. Si es 2025.x o anterior: desinstalala, bajá la última de
+   <https://public.tableau.com/app/discover/download> (2026.1 o posterior) y volvé a abrir el `.twbx`.
+3. Si no podés actualizar, usá el **Plan B** de la sección 6 (armarlo a mano con el CSV, ~40 minutos).
+
 ### Si algo se ve distinto (ajustes de 1 minuto)
 
 - **El hueco de la dona es muy chico o muy grande**: en la hoja Dona, tarjeta *Marcas* → pestaña
