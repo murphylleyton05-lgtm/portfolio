@@ -8,8 +8,23 @@ el centro), **treemap** de distribución y una **acción de filtro con reseteo**
 > (datos abiertos de la Secretaría de Energía, procesados por el pipeline de
 > [`vaca-muerta-analytics`](../vaca-muerta-analytics)).
 
+## ▶ Empezá acá
+
+**[`GUIA_PASO_A_PASO.md`](GUIA_PASO_A_PASO.md)** + **[`data/VacaMuerta_Tableau.xlsx`](data/VacaMuerta_Tableau.xlsx)**:
+armado click a click en ~30 min, funciona en **cualquier versión** de Tableau Public.
+Así tiene que quedar: [`img/referencia_dashboard.png`](img/referencia_dashboard.png).
+
+![Referencia](img/referencia_dashboard.png)
+
 | Archivo | Qué es |
 |---|---|
+| [`data/VacaMuerta_Tableau.xlsx`](data/VacaMuerta_Tableau.xlsx) | Dataset listo para Tableau: mes × operador, con el grupo de la dona y la marca de último mes ya calculados. |
+| [`GUIA_PASO_A_PASO.md`](GUIA_PASO_A_PASO.md) | Guía click a click (conectar → hojas → dashboard → acción → publicar). |
+| [`img/`](img) | Los 4 íconos de los KPIs y la imagen de referencia. |
+| `tableau/*.twbx` | Libro generado automáticamente. **Solo abre en Tableau 2026.1/2026.2**; en otras versiones tira `D2E8DA72`, por eso el camino recomendado es la guía. |
+| `scripts/` | `construir_csv.py`, `construir_excel.py`, `generar_iconos.py`, `generar_referencia.py`, `generar_twb.py`. |
+
+---|---|
 | [`tableau/VacaMuerta_Dashboard_Murphy_Lleyton.twbx`](tableau/VacaMuerta_Dashboard_Murphy_Lleyton.twbx) | **Libro empaquetado** (datos + íconos adentro). Es lo que abrís y publicás. |
 | [`tableau/VacaMuerta_Dashboard_Murphy_Lleyton.twb`](tableau/VacaMuerta_Dashboard_Murphy_Lleyton.twb) | El mismo libro en XML, para revisar en Git. |
 | [`data/vaca_muerta_operadores_mensual.csv`](data/vaca_muerta_operadores_mensual.csv) | Dataset: 280 filas, mes × operador (sep-2023 a dic-2025). |
