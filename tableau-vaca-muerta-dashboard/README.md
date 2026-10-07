@@ -1,5 +1,7 @@
 # 🛢️ Pre-entrega 5 · Gráficos avanzados y dashboard en Tableau (Vaca Muerta)
 
+**🔗 Dashboard publicado en Tableau Public:** https://public.tableau.com/app/profile/lleyton.murphy/viz/VacaMuertaPreentrega5/DashboardVacaMuerta
+
 Dashboard de Tableau sobre la **producción oficial de petróleo y gas no convencional de Vaca Muerta**
 (Secretaría de Energía): KPIs, **eje doble con ejes sincronizados**, **dona** (6 segmentos con el total en
 el centro), **treemap** de distribución y una **acción de filtro con reseteo**.

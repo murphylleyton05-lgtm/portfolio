@@ -21,7 +21,7 @@ Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyect
 | [🏗️ Frac Sand & Fuel Logistics](./frac-sand-fuel-logistics) | Cadena de suministro de arena de fractura: **consumo real** (arena/agua/etapas oficiales) + logística modelada (OTIF, lead time, stock, quiebres, costo). | Python · pandas · Supply Chain |
 | [📈 Well Performance ML](./well-performance-ml) | Modelo de ML (datos oficiales) que predice el EUR de un pozo desde su diseño de fractura y cuantifica cuánto explica el diseño vs. la geología. | Python · numpy · Machine Learning |
 | [🛢️ Vaca Muerta Operations Intelligence](./vaca-muerta-ops-intelligence) | Tablero de operaciones con la producción **oficial** (petróleo/gas por mes, actividad, ranking de operadores) y medidas DAX para Power BI. Se regenera por CI con datos reales. | Python · pandas · Power BI (DAX) |
-| [📊 Tableau · Vaca Muerta (Pre-entrega 5)](./tableau-vaca-muerta-dashboard) | Dashboard de Tableau con producción oficial: eje doble sincronizado, dona, treemap, KPIs con íconos y acción de filtro con reseteo. | Tableau Public · Python |
+| [📊 Tableau · Vaca Muerta (Pre-entrega 5)](./tableau-vaca-muerta-dashboard) | [Dashboard publicado](https://public.tableau.com/app/profile/lleyton.murphy/viz/VacaMuertaPreentrega5/DashboardVacaMuerta) en Tableau con producción oficial: eje doble sincronizado, dona, treemap, KPIs con íconos y acción de filtro con reseteo. | Tableau Public · Python |
 | [🎙️ EchoNotes](./echonotes) | App de notas por voz con transcripción en tiempo real, 100% en el navegador. | React · Vite · Web Speech API |
 | [🟢 WhatsApp + CRM + IA](./whatsapp-crm-automation) | Stack self-hosted de atención por WhatsApp, CRM y respuestas automáticas con IA. | Chatwoot · n8n · Claude · Docker |
 
