@@ -2,7 +2,7 @@
   "name": "Checkpoint 8 - Supervisor QA (AI-as-a-Judge) + Test A/B - Lleyton Murphy",
   "nodes": [
     {
-      "id": "bc4459b9-1d14-41a7-8ede-67f255d9cf18",
+      "id": "822c80ff-3156-4549-b82c-d5b736adaf4c",
       "name": "▶ Ejecutar Test A/B (10 corridas)",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
@@ -13,7 +13,7 @@
       "parameters": {}
     },
     {
-      "id": "6763ca1d-6ca5-4ebd-b64d-a92e24d5818d",
+      "id": "30bc8a8b-cbcb-464e-a845-921fad9b93ec",
       "name": "Crear tabla Base de Conocimiento",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -51,7 +51,7 @@
       }
     },
     {
-      "id": "73f6b612-4550-44a2-b466-6ef92becd3c1",
+      "id": "9b647619-9967-43e2-8d23-f38ff34c440b",
       "name": "Crear tabla Auditoría del Juez",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -169,7 +169,7 @@
       }
     },
     {
-      "id": "91f607ee-3ce5-494b-b9b7-ea2acdf9fb1b",
+      "id": "8f21a912-ab61-4d80-a8dd-63984e98c864",
       "name": "Secciones del Manual (seed de la base)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -183,7 +183,7 @@
       }
     },
     {
-      "id": "314ae877-6edf-4853-977f-ef4d998f8cbd",
+      "id": "74da3ba8-0173-4fab-bedd-653099d6cbc0",
       "name": "Cargar Base de Conocimiento (upsert)",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -219,7 +219,7 @@
       }
     },
     {
-      "id": "b28e36eb-a90b-43ac-86f4-9dd52bd4c534",
+      "id": "a708a4af-08c4-481f-990d-d5029e076d54",
       "name": "Casos de prueba A/B (5 × 2 arquitecturas)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -234,7 +234,7 @@
       "executeOnce": true
     },
     {
-      "id": "4209903a-50a5-4c75-ade7-94be7f502121",
+      "id": "ca654134-283d-405c-96f9-867ae36a5166",
       "name": "Loop Over Items (1 corrida por vez)",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
@@ -248,7 +248,7 @@
       }
     },
     {
-      "id": "6a693847-c65e-470d-8200-6194f57c5b53",
+      "id": "2b96771d-3e5a-400f-9807-d03892cfd8cd",
       "name": "Recuperar contexto (Base de Conocimiento)",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -270,7 +270,7 @@
       }
     },
     {
-      "id": "209f48dd-0f02-46d3-a717-7309f6640337",
+      "id": "5a5502e9-b926-473d-b09f-9a18cb9cfaed",
       "name": "Armar contexto + estado de la corrida",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -284,7 +284,7 @@
       }
     },
     {
-      "id": "013aba12-ebef-4179-a1d4-f6cbc64ec381",
+      "id": "e5e24777-53ba-42fa-ac7b-e60bf7f64b98",
       "name": "Estado del intento",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
@@ -295,7 +295,7 @@
       "parameters": {}
     },
     {
-      "id": "a0d4e0b0-3697-48ec-88ef-afc7ba25c4bc",
+      "id": "1616086e-ab41-43fa-8752-4cafb81d865f",
       "name": "Agente Soporte (Arquitectura A / B)",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
@@ -333,7 +333,7 @@
       }
     },
     {
-      "id": "6f65531b-1afd-4837-8081-e4cccce6f9d9",
+      "id": "476c32aa-11f1-417a-a2d6-272b78a8b9f5",
       "name": "Capturar respuesta del agente",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -347,7 +347,7 @@
       }
     },
     {
-      "id": "0377d2a3-4bea-4c34-9381-9509d27bdcbd",
+      "id": "63473455-588c-429b-842e-d0f2234f5f11",
       "name": "Payload JSON para el Juez",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -361,7 +361,7 @@
         "assignments": {
           "assignments": [
             {
-              "id": "1ec75898-80ef-4263-849b-61af54ebcbf9",
+              "id": "6edf87a8-0487-47d4-a746-c03d44ea141a",
               "name": "payload_juez",
               "type": "object",
               "value": "={{ { \"query_usuario\": $json.pregunta, \"contexto_recuperado\": $json.contexto, \"respuesta_propuesta\": $json.respuesta } }}"
@@ -372,7 +372,7 @@
       }
     },
     {
-      "id": "b4d86190-0b23-4f04-b338-6e525a605922",
+      "id": "661ca1d8-54ce-4425-808d-7565805d7a71",
       "name": "Juez (AI-as-a-Judge · JSON Schema)",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
@@ -421,7 +421,7 @@
       }
     },
     {
-      "id": "e89fd168-7533-449e-9666-2c53656e7ac2",
+      "id": "1c0217b9-a7f3-4e74-a961-53ec027909f6",
       "name": "Procesar veredicto + costo",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -431,11 +431,11 @@
       ],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const estado = $('Payload JSON para el Juez').first().json;\nconst r = $input.first().json;\nconst msg = (r.output || []).find(o => o.type === 'message');\nconst part = msg && (msg.content || []).find(c => c.type === 'output_text');\nlet v = part ? part.text : null;\nif (typeof v === 'string') { try { v = JSON.parse(v); } catch (e) { v = null; } }\nconst valido = v && Number.isInteger(v.exactitud_factual) && ['ACEPTADO', 'CORREGIR', 'RECHAZADO'].includes(v.estado_veredicto);\n// Guardrail: si el Juez no devuelve el JSON valido, se escala a humano (el Switch nunca recibe texto libre)\nconst ver = valido ? v : { exactitud_factual: 1, estado_veredicto: 'RECHAZADO', categoria_error: 'tono_o_formato', critica: 'El Juez no devolvio un JSON valido: revision humana.' };\nconst tj_in = estado.tokens_juez_in + (r.usage?.input_tokens || 0);\nconst tj_out = estado.tokens_juez_out + (r.usage?.output_tokens || 0);\nconst costo_agente = (estado.tokens_agente_in * estado.precio_in + estado.tokens_agente_out * estado.precio_out) / 1e6;\nconst costo_juez = (tj_in * estado.juez_precio_in + tj_out * estado.juez_precio_out) / 1e6;\nconst { payload_juez, ...resto } = estado;\nreturn [{ json: { ...resto,\n  exactitud_factual: ver.exactitud_factual, estado_veredicto: ver.estado_veredicto,\n  categoria_error: ver.categoria_error || 'ninguno', critica: ver.critica || '',\n  exactitud_inicial: estado.intento === 1 ? ver.exactitud_factual : estado.exactitud_inicial,\n  estado_inicial: estado.intento === 1 ? ver.estado_veredicto : estado.estado_inicial,\n  categoria_error_inicial: estado.intento === 1 ? (ver.categoria_error || 'ninguno') : estado.categoria_error_inicial,\n  tokens_juez_in: tj_in, tokens_juez_out: tj_out,\n  costo_agente_usd: costo_agente, costo_juez_usd: costo_juez, costo_total_usd: costo_agente + costo_juez } }];"
+        "jsCode": "const estado = $('Payload JSON para el Juez').first().json;\nconst r = $input.first().json;\n// Extrae el texto del Juez sin importar el formato de salida del nodo OpenAI\nfunction textoJuez(r) {\n  const outs = Array.isArray(r.output) ? r.output : [];\n  for (const o of outs) for (const c of (o.content || [])) if (c.text !== undefined) return c.text;\n  if (r.output_text !== undefined) return r.output_text;\n  if (r.text !== undefined) return r.text;\n  if (r.message?.content !== undefined) return r.message.content;\n  if (r.exactitud_factual !== undefined) return r;\n  return r.output ?? r;\n}\nconst raw = textoJuez(r);\nlet v = raw;\nif (typeof v === 'string') {\n  const limpio = v.replace(/```json/gi, '').replace(/```/g, '');\n  const m = limpio.match(/\\{[\\s\\S]*\\}/);\n  try { v = JSON.parse(m ? m[0] : limpio); } catch (e) { v = null; }\n}\nif (v && typeof v === 'object') {\n  v.exactitud_factual = parseInt(v.exactitud_factual, 10);\n  v.estado_veredicto = String(v.estado_veredicto || '').trim().toUpperCase();\n}\nconst valido = v && Number.isInteger(v.exactitud_factual) && ['ACEPTADO', 'CORREGIR', 'RECHAZADO'].includes(v.estado_veredicto);\n// Guardrail: si el Juez no devuelve el JSON valido, se escala a humano (el Switch nunca recibe texto libre)\nconst ver = valido ? v : { exactitud_factual: 1, estado_veredicto: 'RECHAZADO', categoria_error: 'tono_o_formato',\n  critica: 'El Juez no devolvio un JSON valido: ' + String(typeof raw === 'string' ? raw : JSON.stringify(raw)).slice(0, 300) };\nconst tj_in = estado.tokens_juez_in + (r.usage?.input_tokens || 0);\nconst tj_out = estado.tokens_juez_out + (r.usage?.output_tokens || 0);\nconst costo_agente = (estado.tokens_agente_in * estado.precio_in + estado.tokens_agente_out * estado.precio_out) / 1e6;\nconst costo_juez = (tj_in * estado.juez_precio_in + tj_out * estado.juez_precio_out) / 1e6;\nconst { payload_juez, ...resto } = estado;\nreturn [{ json: { ...resto,\n  exactitud_factual: ver.exactitud_factual, estado_veredicto: ver.estado_veredicto,\n  categoria_error: ver.categoria_error || 'ninguno', critica: ver.critica || '',\n  exactitud_inicial: estado.intento === 1 ? ver.exactitud_factual : estado.exactitud_inicial,\n  estado_inicial: estado.intento === 1 ? ver.estado_veredicto : estado.estado_inicial,\n  categoria_error_inicial: estado.intento === 1 ? (ver.categoria_error || 'ninguno') : estado.categoria_error_inicial,\n  tokens_juez_in: tj_in, tokens_juez_out: tj_out,\n  costo_agente_usd: costo_agente, costo_juez_usd: costo_juez, costo_total_usd: costo_agente + costo_juez } }];"
       }
     },
     {
-      "id": "9cdc957c-f7a6-4fb5-9f9e-febd0b6493c5",
+      "id": "b20a380b-7713-4bf7-91dc-337d2cdd6e6c",
       "name": "Switch · Ruta según estado_veredicto",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
@@ -457,7 +457,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "2b2dfc0a-7b22-4c87-9f03-9a3628415786",
+                    "id": "9c52e025-2cec-4b4a-aab7-ea71871d5110",
                     "leftValue": "={{ $json.estado_veredicto }}",
                     "rightValue": "ACEPTADO",
                     "operator": {
@@ -466,7 +466,7 @@
                     }
                   },
                   {
-                    "id": "a5ec345a-f923-4464-9ac0-cf8e9bf942c6",
+                    "id": "2ddee32d-80c9-4c07-9df6-e50ab341e15b",
                     "leftValue": "={{ $json.exactitud_factual }}",
                     "rightValue": 4,
                     "operator": {
@@ -490,7 +490,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "b714650b-6a5d-45d7-833a-fdbce41d4ed9",
+                    "id": "97fee0b6-f469-49f6-8f35-739f0b7e5a8e",
                     "leftValue": "={{ $json.estado_veredicto }}",
                     "rightValue": "RECHAZADO",
                     "operator": {
@@ -499,7 +499,7 @@
                     }
                   },
                   {
-                    "id": "3b7737ff-235a-4bf7-aec0-21dd58dcb3a2",
+                    "id": "e909f70a-ed6b-478a-be1d-532caa069d43",
                     "leftValue": "={{ $json.intento }}",
                     "rightValue": 2,
                     "operator": {
@@ -523,7 +523,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "2412a379-dac0-452d-b4e0-b95ecf157012",
+                    "id": "f51192af-ba9d-4397-a20d-e195c52cfc85",
                     "leftValue": "={{ $json.estado_veredicto }}",
                     "rightValue": "RECHAZADO",
                     "operator": {
@@ -546,7 +546,7 @@
       }
     },
     {
-      "id": "c544dbd2-8e95-465f-b18b-d44431754ee2",
+      "id": "c18ae4b5-7855-411f-ac03-4ed6d06e5635",
       "name": "Preparar reintento con crítica del Juez",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -560,7 +560,7 @@
       }
     },
     {
-      "id": "d0a05709-dd87-47a3-9dbe-085b6f843476",
+      "id": "c2180f3d-976d-4cbf-9eed-b040f37a1515",
       "name": "Gmail · Enviar respuesta al cliente",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
@@ -581,10 +581,10 @@
         }
       },
       "disabled": true,
-      "webhookId": "d19ccdfe-cefe-4aa5-8462-ae59a53325e5"
+      "webhookId": "c3359737-8aaf-4421-b256-f8ca309fc660"
     },
     {
-      "id": "3dab317a-7227-41a4-9ed7-7777b7b9fa14",
+      "id": "ae585efc-8a68-4129-af7d-9ba7a0da9e27",
       "name": "Slack · Alerta con botones Aprobar / Editar",
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
@@ -607,10 +607,10 @@
         "otherOptions": {}
       },
       "disabled": true,
-      "webhookId": "a1b02ba8-0a60-4e85-b299-9a88694cac91"
+      "webhookId": "0ec94e79-8688-45dc-a2e9-3688caf009f5"
     },
     {
-      "id": "f66ef0ca-cb3b-43ec-a160-b63cffb80b2b",
+      "id": "ca495fa5-91e7-4a05-a9e7-af0cb942af45",
       "name": "Wait · Pausa hasta decisión humana",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -628,10 +628,10 @@
         "options": {}
       },
       "disabled": true,
-      "webhookId": "2114a68a-959e-479d-af2f-2f787b4f4ba6"
+      "webhookId": "4b5d2e53-28ec-425c-9146-ef753cbf0b8e"
     },
     {
-      "id": "5fd93bb1-ca33-4fd6-a6ca-e3e7fc34e81f",
+      "id": "cf326bda-7f3f-4378-b4a6-d7f5086b1731",
       "name": "Fila de auditoría del veredicto",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -645,7 +645,7 @@
       }
     },
     {
-      "id": "88d235e4-b6d1-49e3-87a2-f93d8757e4f2",
+      "id": "cc726fb5-d692-4fd5-8850-20b25dbcd6f7",
       "name": "Registrar veredicto (Data Table · auditoría)",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -671,7 +671,7 @@
       }
     },
     {
-      "id": "66459ee9-6cd3-4d1e-bee2-76f5ed569177",
+      "id": "837ab64d-eb98-48d1-8067-f94581f233ab",
       "name": "Leer auditoría del lote",
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
@@ -702,7 +702,7 @@
       "executeOnce": true
     },
     {
-      "id": "6cc5fad9-d6d8-4403-8def-def1feef50bf",
+      "id": "a0e2af3d-141d-48d6-88bd-6db8599a1b6a",
       "name": "Dashboard A/B + proyección a 1.000",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -716,7 +716,7 @@
       }
     },
     {
-      "id": "281ffb5b-458f-46ae-9d35-338221ce56f4",
+      "id": "32e38d56-5e87-4217-a107-bb97075124af",
       "name": "Nota · Supervisor QA",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -732,7 +732,7 @@
       }
     },
     {
-      "id": "57e2664f-9301-4947-bded-77f2296ba6ae",
+      "id": "20ac9495-eef4-4d50-a737-0c152d506272",
       "name": "Nota · Test A/B",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
