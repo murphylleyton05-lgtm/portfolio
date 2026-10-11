@@ -51,7 +51,7 @@ Puntuá estas ofertas:
 
 También sirve con el email que manda el [cazador de empleos de n8n](../cazador-empleos-n8n): te llegan las ofertas nuevas, las pegás y Head Hunter te dice a cuáles mandar el CV.
 
-La primera vez te pregunta lo que falta en `perfil.md` (seniority, ubicación, piso salarial, inglés). Copiá tus respuestas al archivo para que no vuelva a preguntar.
+`perfil.md` ya está completo con mi CV: seniority, ubicación, modalidad, piso salarial, inglés y la evidencia de cada skill. Si algo cambia, se edita ahí.
 
 ## Mantener el perfil al día
 
