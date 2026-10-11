@@ -53,6 +53,19 @@ También sirve con el email que manda el [cazador de empleos de n8n](../cazador-
 
 `perfil.md` ya está completo con mi CV: seniority, ubicación, modalidad, piso salarial, inglés y la evidencia de cada skill. Si algo cambia, se edita ahí.
 
+## Usarla en Claude en Chrome para que aplique por vos
+
+La extensión de Chrome usa las mismas skills que tu cuenta de claude.ai, así que alcanza con subirla una vez.
+
+1. Abrí el panel de Claude en Chrome y **adjuntá tu CV en PDF** en el chat (lo necesita para subirlo en los formularios).
+2. Abrí la oferta y pedile: *"Puntuá esta oferta con Head Hunter y si da 60 o más, aplicá"*.
+3. Head Hunter puntúa primero. Si da menos de 60, no aplica y te dice por qué. Si da 60 o más, completa el formulario con tu perfil, responde el screening con la verdad y **te muestra todo antes de enviar**.
+4. Al final de la tanda te deja una tabla con lo que aplicó y lo que no.
+
+Si querés que envíe sin preguntarte, decíselo explícitamente en esa conversación.
+
+> En LinkedIn, la automatización puede hacer que te restrinjan la cuenta. Usá el modo aplicar en los sitios de cada empresa (Greenhouse, Lever, Workday, etc.) y en LinkedIn dejá que Claude puntúe y te prepare las respuestas, pero hacé los clics vos.
+
 ## Mantener el perfil al día
 
 El puntaje es tan bueno como `perfil.md`. Cuando publiques un proyecto nuevo o consigas un cliente, movés la skill de fila: de **Solo curso** a **Proyecto publicado**, o de ahí a **Producción**.

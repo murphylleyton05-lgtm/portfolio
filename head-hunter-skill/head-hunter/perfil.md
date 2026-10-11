@@ -17,6 +17,19 @@
 | Formación | Coderhouse: Data Analytics (2024–2025) · Automatización con IA (2025) |
 | No puedo cumplir (bloqueantes) | Presencial o híbrido fuera de La Plata / CABA · inglés C1 o nativo exigido explícitamente · permiso de trabajo o ciudadanía de otro país (sacalo si tenés otra ciudadanía) |
 
+## Datos de contacto · para completar formularios
+
+| Campo | Valor |
+|---|---|
+| Nombre | Lleyton Murphy |
+| Email | murphylleyton05@gmail.com |
+| LinkedIn | https://linkedin.com/in/lleyton-murphy-3716093a3 |
+| GitHub | https://github.com/murphylleyton05-lgtm |
+| Portfolio Oil & Gas | https://murphylleyton05-lgtm.github.io/portfolio/hidrocarburos/ |
+| Web | https://lleyton-ia-page.netlify.app |
+| Teléfono y CV en PDF | En el CV que se adjunta en el chat (el teléfono no va en este repo público) |
+| Disponibilidad para empezar | [completar] |
+
 ## Roles que busco
 
 - Data Analyst

@@ -110,3 +110,16 @@ Después, por cada oferta (las descartadas, en una línea):
 Cerrá con una sola línea: cuál conviene mandar primero y por qué.
 
 Respondé en español. Si son más de 10 ofertas, hacé la tabla completa y el detalle solo de las que sacan 60 o más.
+
+## Modo aplicar · cuando postulás por el usuario desde el navegador
+
+Si el usuario te pide aplicar a ofertas (por ejemplo, desde Claude en Chrome), seguí este orden con cada una:
+
+1. **Puntuá antes de tocar el formulario.** Leé el aviso en la página y calculá el puntaje con los pasos 2 y 3. Si da **menos de 60**, no apliques: decí el puntaje y el motivo en una línea y pasá a la siguiente.
+2. **Usá solo datos del perfil.** Contacto, links y CV salen de `perfil.md` y del CV en PDF que el usuario adjuntó en el chat. Si falta un dato, preguntalo. No lo inventes.
+3. **Respondé el screening con la verdad, aunque deje afuera.** Años de experiencia, años con una herramienta, nivel de inglés, permiso de trabajo y títulos salen del perfil tal cual. Si piden años de experiencia profesional y el perfil dice 0, es 0; los proyectos van en la carta o en los campos abiertos.
+4. **Pretensión salarial.** Nunca por debajo del piso del perfil. Si el aviso publica un rango por encima del piso, usá ese rango.
+5. **Carta y campos abiertos.** Usá lo que salió en "Cómo aplicar": el proyecto que tapa el hueco más grande, con su link. Máximo 120 palabras, en el idioma del aviso.
+6. **Pará y preguntá** si el sitio pide crear una cuenta, una contraseña, un pago, un test técnico o aceptar términos.
+7. **Confirmá antes de enviar.** Mostrá puesto, empresa, puntaje y las respuestas cargadas, y esperá el "dale". Solo enviás sin preguntar si el usuario lo pidió explícitamente en esa conversación.
+8. **Cerrá la tanda con un registro:** tabla con puesto, empresa, puntaje, aplicado (sí / no / por qué no) y link.
