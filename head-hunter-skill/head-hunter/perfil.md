@@ -12,7 +12,7 @@
 | Años de experiencia laboral | 0 en relación de dependencia · proyectos propios desde 2024 |
 | Ubicación y zona horaria | La Plata (City Bell), Buenos Aires, Argentina · GMT-3 |
 | Modalidad que busco | Remoto, o híbrido en La Plata / CABA |
-| Piso salarial | USD 1.500/mes |
+| Piso salarial | USD 1.000/mes |
 | Idiomas | Español nativo · Inglés **B2** (Cambridge B2 First, 2023 · ICAO Nivel 5) |
 | Formación | Coderhouse: Data Analytics (2024–2025) · Automatización con IA (2025) |
 | No puedo cumplir (bloqueantes) | Presencial o híbrido fuera de La Plata / CABA · inglés C1 o nativo exigido explícitamente · permiso de trabajo o ciudadanía de otro país (sacalo si tenés otra ciudadanía) |
@@ -27,8 +27,9 @@
 | GitHub | https://github.com/murphylleyton05-lgtm |
 | Portfolio Oil & Gas | https://murphylleyton05-lgtm.github.io/portfolio/hidrocarburos/ |
 | Web | https://lleyton-ia-page.netlify.app |
-| Teléfono y CV en PDF | En el CV que se adjunta en el chat (el teléfono no va en este repo público) |
-| Disponibilidad para empezar | [completar] |
+| Teléfono | Solo en el zip que se sube a Claude (no va en este repo público) |
+| CV en PDF | Se adjunta en el chat de Claude |
+| Disponibilidad para empezar | Inmediata |
 
 ## Roles que busco
 
