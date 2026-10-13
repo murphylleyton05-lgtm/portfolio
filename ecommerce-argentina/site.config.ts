@@ -123,6 +123,20 @@ export const siteConfig = {
     /** Debajo de este stock se marca "últimas unidades" y se resalta en el admin. */
     lowStockThreshold: 3,
   },
+
+  // ── Legales (Argentina) ──────────────────────────────────────────────────
+  legal: {
+    /** Razón social y CUIT que se muestran en el pie. */
+    businessName: "Pampa Store S.R.L.", // CAMBIAR
+    cuit: "30-00000000-0", // CAMBIAR
+    /**
+     * Link del QR "Data Fiscal" de AFIP/ARCA (obligatorio para vender online).
+     * Lo generás en arca.gob.ar → "Data Fiscal". Dejalo en "" hasta tenerlo.
+     */
+    dataFiscalUrl: "", // CAMBIAR
+    /** Días para arrepentirse de una compra online (Ley 24.240, art. 34). */
+    withdrawalDays: 10,
+  },
 } as const;
 
 export type SiteConfig = typeof siteConfig;

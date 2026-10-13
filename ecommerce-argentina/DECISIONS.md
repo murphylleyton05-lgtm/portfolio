@@ -180,3 +180,16 @@ shipping.zones` (rangos de CP numéricos). Por defecto: CABA (1000–1499),
   admin un link para escribirle al cliente (convierte teléfonos argentinos al
   formato 549… con una heurística simple).
 - **Cotizador de envío** por CP en la página de producto y en el carrito.
+
+## Legales (Argentina)
+
+- **Botón de arrepentimiento** (`/arrepentimiento`, Res. 424/2020): link en el
+  pie de todas las páginas. Pide número de pedido + email (tiene que coincidir
+  con un pedido real, así no se puede usar para mandar spam), avisa a la tienda
+  y le manda al cliente un código de constancia (`ARR-<pedido>-<código>`). No
+  cambia el pedido: la devolución se coordina y se cancela desde el admin.
+- **Link a Defensa de las y los Consumidores** (Res. 271/2020) en el pie.
+- **Razón social, CUIT y QR de Data Fiscal** se cargan en `site.config.ts →
+  legal`. El link de Data Fiscal se muestra cuando lo completás.
+- **No se incluyen términos y condiciones ni política de privacidad**: dependen
+  de cada negocio y conviene que los redacte un profesional.

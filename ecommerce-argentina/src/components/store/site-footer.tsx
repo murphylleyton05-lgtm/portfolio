@@ -103,9 +103,37 @@ export async function SiteFooter() {
           </p>
         </div>
       </div>
-      <p className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        © {siteConfig.name} · Precios en pesos argentinos con IVA incluido.
-      </p>
+      <div className="border-t border-border">
+        <div className="container-page flex flex-col items-center gap-3 pt-6 pb-24 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between sm:text-left">
+          <p>
+            © {siteConfig.legal.businessName} · CUIT {siteConfig.legal.cuit} · Precios en pesos argentinos con IVA
+            incluido.
+          </p>
+          <nav aria-label="Legales" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <Link href="/arrepentimiento" className="font-medium text-foreground underline underline-offset-4">
+              Botón de arrepentimiento
+            </Link>
+            <a
+              href="https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4"
+            >
+              Defensa de las y los Consumidores. Para reclamos ingrese aquí
+            </a>
+            {siteConfig.legal.dataFiscalUrl && (
+              <a
+                href={siteConfig.legal.dataFiscalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-4"
+              >
+                Data Fiscal
+              </a>
+            )}
+          </nav>
+        </div>
+      </div>
     </footer>
   );
 }
