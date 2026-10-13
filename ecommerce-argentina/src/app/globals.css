@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
+ * Los colores reales vienen de site.config.ts: el layout raíz los inyecta como
+ * variables --brand-* en <html>. Acá solo se mapean a tokens de Tailwind
+ * (bg-primary, text-muted-foreground, border-border, etc.).
+ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--brand-background, #ffffff);
+  --color-foreground: var(--brand-foreground, #18181b);
+  --color-primary: var(--brand-primary, #18181b);
+  --color-primary-foreground: var(--brand-primary-foreground, #ffffff);
+  --color-accent: var(--brand-accent, #c2410c);
+  --color-accent-foreground: var(--brand-accent-foreground, #ffffff);
+  --color-muted: var(--brand-muted, #f4f4f5);
+  --color-muted-foreground: var(--brand-muted-foreground, #71717a);
+  --color-border: var(--brand-border, #e4e4e7);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
 }
