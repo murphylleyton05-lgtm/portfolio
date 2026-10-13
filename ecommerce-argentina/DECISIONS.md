@@ -193,3 +193,16 @@ shipping.zones` (rangos de CP numéricos). Por defecto: CABA (1000–1499),
 legal`. El link de Data Fiscal se muestra cuando lo completás.
 - **No se incluyen términos y condiciones ni política de privacidad**: dependen
   de cada negocio y conviene que los redacte un profesional.
+
+## Límites conocidos (para una próxima versión)
+
+- **Sin rate limiting propio** en checkout, login y Botón de arrepentimiento.
+  Supabase limita los intentos de login; para el resto conviene activar el
+  Firewall / BotID de Vercel si aparece tráfico abusivo.
+- **Los datos de `customers` se pisan con el último checkout** del mismo email
+  (es un registro de contacto; cada pedido guarda su propia copia).
+- **Sin CSP estricta** (ver "Proyecto").
+- **Tests end-to-end**: el flujo completo (checkout → pago → webhook → admin)
+  se probó contra Postgres + PostgREST locales con la API de Mercado Pago
+  simulada; no hay una suite e2e versionada porque depende de esos binarios.
+  El CI corre lint, tipos, tests unitarios, build y los tests SQL.
