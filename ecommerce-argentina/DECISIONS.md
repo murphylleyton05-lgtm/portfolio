@@ -114,3 +114,25 @@ cambiarla.
   igual como "pendiente de pago" para cobrar por otro medio (transferencia).
 - **Credenciales `TEST-…`** usan `sandbox_init_point`; las de producción (o de
   usuarios de prueba `APP_USR-…`) usan `init_point`.
+
+## Panel admin
+
+- **Login con Supabase Auth (email + contraseña)**. No hay registro público: los
+  admins se crean con `npm run admin:create -- email "contraseña"` (o con el SQL
+  del README). Quien inicia sesión sin estar en `admin_users` es rechazado.
+- **Tres capas de protección**: `src/proxy.ts` manda al login a quien no tiene
+  sesión (chequeo optimista), cada página y server action vuelve a verificar
+  `is_admin()` (`requireAdmin`), y RLS en la base solo deja escribir a admins.
+- **Las imágenes se suben directo del navegador a Supabase Storage** (bucket
+  `product-images`, máx. 5 MB, JPG/PNG/WebP/AVIF/GIF) con la sesión del admin.
+  Así no pasan por las funciones de Vercel (límite de 4,5 MB). Al quitar una
+  imagen y guardar, se borra del bucket.
+- **Guardar producto no es transaccional** (producto + variantes son varias
+  llamadas). Si falla a mitad, se muestra el error y se puede volver a guardar.
+- **Borrar producto es definitivo**; para ocultarlo está "Pausar". Los pedidos
+  viejos conservan nombre y precio (copia en `order_items`).
+- **El stock se edita** en el producto o en la pantalla "Stock" (con filtro de
+  stock bajo). Cambiar el estado de un pedido repone o descuenta stock solo.
+- **Pedidos sin borrar**: solo se cambian de estado (historial completo).
+- **Miniaturas del admin sin optimizar** (`unoptimized`) para no gastar cuota
+  de optimización de imágenes de Vercel en pantallas internas.

@@ -32,6 +32,9 @@ entrar al admin hasta que configures Supabase.
 | `npm run typecheck` | Genera tipos de rutas y corre TypeScript              |
 | `npm run test`      | Tests unitarios (Vitest)                              |
 | `npm run check`     | Todo lo anterior junto (lo mismo que corre el CI)     |
+| `npm run admin:create -- email "clave"` | Crea un usuario admin del panel |
+| `npm run db:test`   | Tests SQL (migraciones, pagos, stock, RLS)            |
+| `npm run demo:generate` | Regenera `seed.sql` e imágenes demo               |
 
 ## Estructura
 
@@ -74,3 +77,28 @@ DATABASE_URL=postgres://postgres@localhost:5432/postgres npm run db:test
 
 Si editás `src/data/demo-catalog.ts`, regenerá seed e imágenes con
 `npm run demo:generate`.
+
+## Panel admin
+
+Entrá a `/admin` (te pide login). Desde ahí:
+
+- **Pedidos**: listado con filtros por estado y búsqueda, detalle con datos del
+  cliente, entrega y pago, y cambio de estado (repone/descuenta stock solo).
+- **Productos**: alta, edición y borrado; imágenes (subida a Supabase Storage),
+  variantes con stock, precio tachado, destacado y pausar.
+- **Stock**: todas las variantes con edición rápida y filtro de stock bajo.
+- **Categorías**: alta, edición, orden y borrado.
+
+Para crear tu usuario admin (con `.env.local` completo):
+
+```bash
+npm run admin:create -- vos@tumail.com "una-clave-segura"
+```
+
+O desde el SQL Editor de Supabase, después de crear el usuario en
+*Authentication → Users → Add user*:
+
+```sql
+insert into public.admin_users (user_id)
+select id from auth.users where email = 'vos@tumail.com';
+```

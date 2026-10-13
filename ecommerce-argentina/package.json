@@ -11,7 +11,8 @@
     "test": "vitest run",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "demo:generate": "tsx scripts/generate-demo-assets.ts",
-    "db:test": "bash supabase/tests/run.sh"
+    "db:test": "bash supabase/tests/run.sh",
+    "admin:create": "node --env-file-if-exists=.env.local --import tsx scripts/create-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
