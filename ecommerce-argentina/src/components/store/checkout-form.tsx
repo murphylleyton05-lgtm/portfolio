@@ -5,14 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useForm, useWatch, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock } from "lucide-react";
+import { Lock, Store, Truck } from "lucide-react";
 import { siteConfig } from "@site-config";
 import { Alert } from "@/components/ui/alert";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { placeOrder } from "@/lib/actions/checkout";
-import { PROVINCES, parsePostalCode } from "@/lib/argentina";
+import { PROVINCES, parsePostalCode, provinceFromPostalCode } from "@/lib/argentina";
 import { useCart } from "@/lib/cart/store";
 import { cartSubtotal } from "@/lib/cart/types";
 import { useCartSync } from "@/lib/cart/use-cart-sync";
@@ -22,8 +22,8 @@ import {
   type CheckoutFormValues,
   type ShippingFormInput,
 } from "@/lib/checkout/schema";
-import { quoteShipping } from "@/lib/shipping";
-import { formatPrice } from "@/lib/utils";
+import { deliveryMethods, quoteShipping } from "@/lib/shipping";
+import { cn, formatPrice } from "@/lib/utils";
 
 type Props = {
   /** false en modo demo (sin Supabase): se muestra el formulario pero no se puede enviar. */
@@ -38,11 +38,15 @@ export function CheckoutForm({ ordersEnabled, submitLabel }: Props) {
   const clearCart = useCart((state) => state.clear);
   const [serverError, setServerError] = useState<{ message: string; problems?: string[] } | null>(null);
 
-  const { register, handleSubmit, setError, formState, control } = useForm<CheckoutFormInput, unknown, CheckoutFormValues>({
+  const { register, handleSubmit, setError, setValue, getValues, formState, control } = useForm<
+    CheckoutFormInput,
+    unknown,
+    CheckoutFormValues
+  >({
     resolver: zodResolver(checkoutFormSchema),
     mode: "onTouched",
     defaultValues: {
-      deliveryMethod: "shipping",
+      deliveryMethod: deliveryMethods()[0] ?? "shipping",
       email: "",
       name: "",
       phone: "",
@@ -114,7 +118,8 @@ export function CheckoutForm({ ordersEnabled, submitLabel }: Props) {
       <div className="flex flex-col gap-8">
         {!ordersEnabled && (
           <Alert tone="warning" title="Tienda en modo demo">
-            Podés probar el formulario, pero para recibir pedidos hay que configurar Supabase y Mercado Pago (ver README).
+            Podés probar el formulario, pero para recibir pedidos hay que configurar Supabase y Mercado Pago (ver
+            README).
           </Alert>
         )}
         {serverError && (
@@ -153,7 +158,14 @@ export function CheckoutForm({ ordersEnabled, submitLabel }: Props) {
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Teléfono" hint="Para coordinar la entrega." id="phone" error={err("phone")}>
-              <Input {...aria("phone")} type="tel" autoComplete="tel" inputMode="tel" placeholder="11 2345-6789" {...register("phone")} />
+              <Input
+                {...aria("phone")}
+                type="tel"
+                autoComplete="tel"
+                inputMode="tel"
+                placeholder="11 2345-6789"
+                {...register("phone")}
+              />
             </Field>
             <Field label="DNI (opcional)" id="dni" error={err("dni")}>
               <Input {...aria("dni")} inputMode="numeric" placeholder="Sin puntos" {...register("dni")} />
@@ -163,38 +175,85 @@ export function CheckoutForm({ ordersEnabled, submitLabel }: Props) {
 
         <fieldset className="flex flex-col gap-4">
           <legend className="mb-2 text-lg font-semibold">Entrega</legend>
-          <input type="hidden" value="shipping" {...register("deliveryMethod")} />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Calle" className="sm:col-span-2" id="address.street" error={err("address.street")}>
-              <Input {...aria("address.street")} autoComplete="address-line1" {...register("address.street")} />
-            </Field>
-            <Field label="Número" id="address.number" error={err("address.number")}>
-              <Input {...aria("address.number")} inputMode="numeric" {...register("address.number")} />
-            </Field>
-            <Field label="Piso / depto (opcional)" id="address.apartment" error={err("address.apartment")}>
-              <Input {...aria("address.apartment")} autoComplete="address-line2" {...register("address.apartment")} />
-            </Field>
-            <Field label="Localidad" id="address.city" error={err("address.city")}>
-              <Input {...aria("address.city")} autoComplete="address-level2" {...register("address.city")} />
-            </Field>
-            <Field label="Código postal" id="address.postalCode" error={err("address.postalCode")}>
-              <Input {...aria("address.postalCode")} autoComplete="postal-code" placeholder="1425 o C1425ABC" {...register("address.postalCode")} />
-            </Field>
-            <Field label="Provincia" className="sm:col-span-2" id="address.province" error={err("address.province")}>
-              <Select
-                {...aria("address.province")}
-                autoComplete="address-level1"
-                {...register("address.province")}
-              >
-                <option value="">Elegí una provincia</option>
-                {PROVINCES.map((province) => (
-                  <option key={province} value={province}>
-                    {province}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+          <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Método de entrega">
+            {deliveryMethods().map((method) => {
+              const selected = deliveryMethod === method;
+              const Icon = method === "shipping" ? Truck : Store;
+              return (
+                <label
+                  key={method}
+                  className={cn(
+                    "flex cursor-pointer gap-3 rounded-xl border p-4 transition",
+                    selected ? "border-primary ring-2 ring-primary/15" : "border-border hover:border-primary/50",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    value={method}
+                    className="mt-1 size-4 accent-primary"
+                    {...register("deliveryMethod")}
+                  />
+                  <span className="flex flex-col gap-0.5 text-sm">
+                    <span className="flex items-center gap-2 font-medium">
+                      <Icon className="size-4" aria-hidden />
+                      {method === "shipping" ? "Envío a domicilio" : siteConfig.pickup.label}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {method === "shipping"
+                        ? siteConfig.shipping.freeShippingThreshold
+                          ? `Gratis desde ${formatPrice(siteConfig.shipping.freeShippingThreshold)}`
+                          : "Costo según tu código postal"
+                        : `${siteConfig.pickup.address} · ${siteConfig.pickup.hours}`}
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
           </div>
+          {deliveryMethod === "shipping" ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Calle" className="sm:col-span-2" id="address.street" error={err("address.street")}>
+                <Input {...aria("address.street")} autoComplete="address-line1" {...register("address.street")} />
+              </Field>
+              <Field label="Número" id="address.number" error={err("address.number")}>
+                <Input {...aria("address.number")} inputMode="numeric" {...register("address.number")} />
+              </Field>
+              <Field label="Piso / depto (opcional)" id="address.apartment" error={err("address.apartment")}>
+                <Input {...aria("address.apartment")} autoComplete="address-line2" {...register("address.apartment")} />
+              </Field>
+              <Field label="Localidad" id="address.city" error={err("address.city")}>
+                <Input {...aria("address.city")} autoComplete="address-level2" {...register("address.city")} />
+              </Field>
+              <Field label="Código postal" id="address.postalCode" error={err("address.postalCode")}>
+                <Input
+                  {...aria("address.postalCode")}
+                  autoComplete="postal-code"
+                  placeholder="1425 o C1425ABC"
+                  {...register("address.postalCode", {
+                    onChange: (event) => {
+                      // Con CPA (C1425ABC) completamos la provincia si está vacía.
+                      const province = provinceFromPostalCode(event.target.value);
+                      if (province && !getValues("address.province")) {
+                        setValue("address.province", province, { shouldValidate: formState.isSubmitted });
+                      }
+                    },
+                  })}
+                />
+              </Field>
+              <Field label="Provincia" className="sm:col-span-2" id="address.province" error={err("address.province")}>
+                <Select {...aria("address.province")} autoComplete="address-level1" {...register("address.province")}>
+                  <option value="">Elegí una provincia</option>
+                  {PROVINCES.map((province) => (
+                    <option key={province} value={province}>
+                      {province}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </div>
+          ) : (
+            <Alert tone="info">{siteConfig.pickup.instructions}</Alert>
+          )}
         </fieldset>
 
         <Field label="Notas para el pedido (opcional)" id="notes" error={err("notes")}>
@@ -232,10 +291,16 @@ export function CheckoutForm({ ordersEnabled, submitLabel }: Props) {
             <dd className="tabular-nums">{formatPrice(subtotal)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt>Envío{quote ? ` · ${quote.zoneName}` : ""}</dt>
-            <dd className="tabular-nums">{quote ? (quote.cost ? formatPrice(quote.cost) : "Gratis") : "Ingresá tu CP"}</dd>
+            <dt>{deliveryMethod === "pickup" ? "Retiro" : `Envío${quote ? ` · ${quote.zoneName}` : ""}`}</dt>
+            <dd className="tabular-nums">
+              {quote ? (quote.cost ? formatPrice(quote.cost) : "Gratis") : "Ingresá tu CP"}
+            </dd>
           </div>
-          {quote?.eta && <p className="text-xs text-muted-foreground">Llega en {quote.eta}.</p>}
+          {quote?.eta && (
+            <p className="text-xs text-muted-foreground">
+              {quote.method === "pickup" ? `Retirás: ${quote.eta}.` : `Llega en ${quote.eta}.`}
+            </p>
+          )}
           <div className="flex justify-between border-t border-border pt-2 text-base font-semibold">
             <dt>Total</dt>
             <dd className="tabular-nums">{formatPrice(total)}</dd>

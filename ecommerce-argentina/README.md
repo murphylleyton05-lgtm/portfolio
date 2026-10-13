@@ -114,3 +114,21 @@ Con `RESEND_API_KEY` y `EMAIL_FROM` configurados se envían:
 | Marcás el pedido como "Listo para retirar" | Cliente              |
 
 Sin la clave, los emails se imprimen en la consola del servidor.
+
+## Envíos, retiro y WhatsApp
+
+Todo se configura en [`site.config.ts`](./site.config.ts):
+
+```ts
+shipping: {
+  enabled: true,
+  freeShippingThreshold: 150000, // null = sin envío gratis
+  zones: [
+    { id: "caba", name: "CABA", postalCodeRanges: [[1000, 1499]], cost: 4500, eta: "24 a 48 hs hábiles" },
+    { id: "gba", name: "GBA", postalCodeRanges: [[1600, 1999]], cost: 6500, eta: "48 a 72 hs hábiles" },
+  ],
+  defaultZone: { id: "interior", name: "Resto del país", cost: 9900, eta: "3 a 7 días hábiles" },
+},
+pickup: { enabled: true, address: "...", hours: "..." },
+contact: { whatsapp: "5491123456789", ... },
+```

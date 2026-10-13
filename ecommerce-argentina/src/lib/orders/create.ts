@@ -64,6 +64,9 @@ export async function createOrder(
     postalCode: form.deliveryMethod === "shipping" ? form.address.postalCode : undefined,
     subtotal,
   });
+  if (!shipping) {
+    return { ok: false, error: "El método de entrega elegido no está disponible. Revisá el código postal." };
+  }
   const total = roundMoney(subtotal + shipping.cost);
 
   const supabase = createServiceClient();

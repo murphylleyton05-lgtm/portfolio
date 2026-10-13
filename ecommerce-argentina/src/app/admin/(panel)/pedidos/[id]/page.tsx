@@ -6,12 +6,14 @@ import { z } from "zod";
 import { Card, PageHeader } from "@/components/admin/page-header";
 import { OrderStatusForm } from "@/components/admin/order-status-form";
 import { OrderSummary } from "@/components/store/order-summary";
+import { WhatsAppIcon } from "@/components/store/brand-icons";
 import { Badge } from "@/components/ui/badge";
 import { requireAdmin } from "@/lib/admin/auth";
+import { toWhatsAppNumber } from "@/lib/argentina";
 import { absoluteUrl } from "@/lib/env";
 import { formatAddress, shippingAddressOf } from "@/lib/orders/queries";
 import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from "@/lib/orders/status";
-import { formatDate } from "@/lib/utils";
+import { formatDate, whatsappUrl } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Pedido" };
 
@@ -24,6 +26,7 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/pedid
   if (error) throw new Error(`No se pudo leer el pedido: ${error.message}`);
   if (!order) notFound();
   const address = shippingAddressOf(order);
+  const customerWhatsApp = toWhatsAppNumber(order.customer_phone);
 
   return (
     <>
@@ -74,6 +77,16 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/pedid
               <a href={`tel:${order.customer_phone.replace(/[^\d+]/g, "")}`} className="flex items-center gap-2 hover:underline">
                 <Phone className="size-4" aria-hidden /> {order.customer_phone}
               </a>
+              {customerWhatsApp && (
+                <a
+                  href={whatsappUrl(`¡Hola ${order.customer_name.split(" ")[0]}! Te escribimos por tu pedido #${order.number}.`, customerWhatsApp)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-[#128c4a] hover:underline"
+                >
+                  <WhatsAppIcon width={16} height={16} /> Escribirle por WhatsApp
+                </a>
+              )}
             </div>
           </Card>
           <Card>

@@ -6,6 +6,7 @@ import { CircleCheck, Clock } from "lucide-react";
 import { z } from "zod";
 import { siteConfig } from "@site-config";
 import { OrderSummary } from "@/components/store/order-summary";
+import { WhatsAppLink } from "@/components/store/whatsapp-button";
 import { Badge } from "@/components/ui/badge";
 import { Alert } from "@/components/ui/alert";
 import { Button, buttonClasses } from "@/components/ui/button";
@@ -91,8 +92,9 @@ async function OrderView({ params, searchParams }: PageProps<"/pedido/[id]">) {
         <Link href="/productos" className={buttonClasses("outline")}>
           Seguir comprando
         </Link>
+        <WhatsAppLink message={`¡Hola! Te escribo por mi pedido #${order.number}.`} label="Consultar por mi pedido" />
         <a href={`mailto:${siteConfig.contact.email}?subject=Pedido%20%23${order.number}`} className={buttonClasses("ghost")}>
-          ¿Dudas? Escribinos
+          Escribinos por email
         </a>
       </div>
     </div>

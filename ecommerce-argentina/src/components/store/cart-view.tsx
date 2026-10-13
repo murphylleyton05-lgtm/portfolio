@@ -11,6 +11,7 @@ import { useCart } from "@/lib/cart/store";
 import { MAX_QUANTITY_PER_ITEM, cartSubtotal } from "@/lib/cart/types";
 import { useCartSync } from "@/lib/cart/use-cart-sync";
 import { formatPrice } from "@/lib/utils";
+import { ShippingEstimator } from "./shipping-estimator";
 
 export function CartView() {
   const { hydrated, syncing, notices } = useCartSync();
@@ -136,6 +137,7 @@ export function CartView() {
               : "¡Tenés envío gratis!"}
           </p>
         )}
+        <ShippingEstimator subtotal={subtotal} />
         <Link
           href="/checkout"
           aria-disabled={syncing}

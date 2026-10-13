@@ -1,6 +1,9 @@
+import { Suspense } from "react";
 import { CartHydrator } from "@/lib/cart/hydrator";
+import { HideOnCheckout } from "@/components/store/floating-whatsapp";
 import { SiteFooter } from "@/components/store/site-footer";
 import { SiteHeader } from "@/components/store/site-header";
+import { WhatsAppFloatingButton } from "@/components/store/whatsapp-button";
 
 export default function StoreLayout({ children }: LayoutProps<"/">) {
   return (
@@ -16,6 +19,11 @@ export default function StoreLayout({ children }: LayoutProps<"/">) {
         {children}
       </main>
       <SiteFooter />
+      <Suspense fallback={null}>
+        <HideOnCheckout>
+          <WhatsAppFloatingButton />
+        </HideOnCheckout>
+      </Suspense>
       <CartHydrator />
     </>
   );

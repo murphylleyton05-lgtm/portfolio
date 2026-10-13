@@ -156,3 +156,27 @@ cambiarla.
   Resend). Las respuestas van a `contact.email` (`replyTo`).
 - **No se mandan emails al crear el pedido** (antes de pagar): la página del
   pedido ya muestra todo y evita spam por carritos abandonados.
+
+## Extras Argentina (envío, retiro, WhatsApp)
+
+- **Envío por zonas de código postal** configurables en `site.config.ts →
+  shipping.zones` (rangos de CP numéricos). Por defecto: CABA (1000–1499),
+  GBA (1600–1999) y "Resto del país" para todo lo demás. Se acepta CP de 4
+  dígitos o CPA ("C1425ABC"). Los CP argentinos de 4 dígitos no respetan
+  límites provinciales exactos: si necesitás precisión por provincia, agregá
+  zonas con rangos más finos.
+- **Envío gratis** desde `shipping.freeShippingThreshold` (o `null` para
+  desactivarlo). Se aplica sobre el subtotal de productos.
+- **El costo se calcula con la misma función pura en el navegador y en el
+  servidor** (`quoteShipping`); el servidor recalcula al crear el pedido.
+- **Retiro en el local** sin cargo (`pickup` en la config); se puede apagar
+  cualquiera de los dos métodos con `enabled: false`.
+- **Provincia autocompletada** a partir de la letra del CPA.
+- **Sin integración con correos** (Andreani, OCA, Correo Argentino): el MVP usa
+  tarifa por zona. El costo real de cada envío lo gestiona la tienda.
+- **WhatsApp**: botón flotante en toda la tienda (oculto en carrito y checkout
+  para no tapar el botón de pago), "Consultar por WhatsApp" en cada producto
+  con el link del producto, en la página del pedido con el número, y en el
+  admin un link para escribirle al cliente (convierte teléfonos argentinos al
+  formato 549… con una heurística simple).
+- **Cotizador de envío** por CP en la página de producto y en el carrito.

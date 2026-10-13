@@ -7,6 +7,8 @@ import { siteConfig } from "@site-config";
 import { AddToCart } from "@/components/store/add-to-cart";
 import { ProductGrid } from "@/components/store/product-card";
 import { ProductGallery } from "@/components/store/product-gallery";
+import { ShippingEstimator } from "@/components/store/shipping-estimator";
+import { WhatsAppLink } from "@/components/store/whatsapp-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCatalog, getProductBySlug, getRelatedProducts } from "@/lib/catalog/data";
 import type { CatalogProduct } from "@/lib/catalog/types";
@@ -74,6 +76,8 @@ async function ProductDetail({ params }: Pick<PageProps<"/productos/[slug]">, "p
         <div className="flex flex-col gap-6">
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{product.name}</h1>
           <AddToCart product={product} />
+          <WhatsAppLink message={`¡Hola! Quiero consultar por "${product.name}": ${absoluteUrl(`/productos/${product.slug}`)}`} />
+          <ShippingEstimator subtotal={product.minPrice} />
           <ul className="flex flex-col gap-3 border-t border-border pt-6 text-sm">
             {siteConfig.shipping.enabled && (
               <li className="flex gap-3">
