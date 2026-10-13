@@ -1,0 +1,66 @@
+# CI del ecommerce: lint, tipos, tests unitarios, build y tests de la base
+# (migraciones + seed + pagos/stock/RLS) contra un Postgres real.
+name: Ecommerce Argentina
+
+on:
+  push:
+    paths:
+      - "ecommerce-argentina/**"
+      - ".github/workflows/ecommerce-argentina.yml"
+  pull_request:
+    paths:
+      - "ecommerce-argentina/**"
+      - ".github/workflows/ecommerce-argentina.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ecommerce-argentina-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: Lint, tipos, tests y build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ecommerce-argentina
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ecommerce-argentina/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # Sin variables de entorno: compila en modo demo (catálogo de ejemplo).
+      - run: npm run build
+
+  database:
+    name: Tests de base de datos
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Migraciones + seed + tests SQL
+        working-directory: ecommerce-argentina
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+        run: bash supabase/tests/run.sh

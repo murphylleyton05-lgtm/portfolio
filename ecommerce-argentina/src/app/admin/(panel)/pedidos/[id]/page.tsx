@@ -7,6 +7,7 @@ import { Card, PageHeader } from "@/components/admin/page-header";
 import { OrderStatusForm } from "@/components/admin/order-status-form";
 import { OrderSummary } from "@/components/store/order-summary";
 import { WhatsAppIcon } from "@/components/store/brand-icons";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { requireAdmin } from "@/lib/admin/auth";
 import { toWhatsAppNumber } from "@/lib/argentina";
@@ -22,7 +23,11 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/pedid
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
 
-  const { data: order, error } = await supabase.from("orders").select("*, items:order_items(*)").eq("id", id.data).maybeSingle();
+  const { data: order, error } = await supabase
+    .from("orders")
+    .select("*, items:order_items(*)")
+    .eq("id", id.data)
+    .maybeSingle();
   if (error) throw new Error(`No se pudo leer el pedido: ${error.message}`);
   if (!order) notFound();
   const address = shippingAddressOf(order);
@@ -30,7 +35,10 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/pedid
 
   return (
     <>
-      <Link href="/admin/pedidos" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        href="/admin/pedidos"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="size-4" aria-hidden /> Pedidos
       </Link>
       <PageHeader
@@ -38,6 +46,14 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/pedid
         description={`Creado el ${formatDate(order.created_at)}${order.paid_at ? ` · Pagado el ${formatDate(order.paid_at)}` : ""}`}
         actions={<Badge tone={ORDER_STATUS_TONE[order.status]}>{ORDER_STATUS_LABEL[order.status]}</Badge>}
       />
+      {order.mp_payment_status &&
+        ["refunded", "charged_back", "cancelled", "amount_mismatch"].includes(order.mp_payment_status) && (
+          <Alert tone="error" title="Revisá el pago antes de despachar" className="mb-6">
+            {order.mp_payment_status === "amount_mismatch"
+              ? "El monto pagado en Mercado Pago no coincide con el total del pedido."
+              : `Mercado Pago informa el pago como "${order.mp_payment_status}" (reintegro, contracargo o cancelación).`}
+          </Alert>
+        )}
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <div className="flex flex-col gap-6">
           <Card>
@@ -74,12 +90,18 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/pedid
               <a href={`mailto:${order.customer_email}`} className="flex items-center gap-2 hover:underline">
                 <Mail className="size-4" aria-hidden /> {order.customer_email}
               </a>
-              <a href={`tel:${order.customer_phone.replace(/[^\d+]/g, "")}`} className="flex items-center gap-2 hover:underline">
+              <a
+                href={`tel:${order.customer_phone.replace(/[^\d+]/g, "")}`}
+                className="flex items-center gap-2 hover:underline"
+              >
                 <Phone className="size-4" aria-hidden /> {order.customer_phone}
               </a>
               {customerWhatsApp && (
                 <a
-                  href={whatsappUrl(`¡Hola ${order.customer_name.split(" ")[0]}! Te escribimos por tu pedido #${order.number}.`, customerWhatsApp)}
+                  href={whatsappUrl(
+                    `¡Hola ${order.customer_name.split(" ")[0]}! Te escribimos por tu pedido #${order.number}.`,
+                    customerWhatsApp,
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-[#128c4a] hover:underline"

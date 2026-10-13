@@ -29,8 +29,8 @@ export async function proxy(request: NextRequest) {
   const loggedIn = Boolean(data?.claims?.sub);
   const isLoginPage = request.nextUrl.pathname === "/admin/login";
 
+  // Al login se puede entrar siempre (ej. una sesión que ya no es admin).
   if (!loggedIn && !isLoginPage) return redirectWithCookies(request, response, "/admin/login");
-  if (loggedIn && isLoginPage) return redirectWithCookies(request, response, "/admin");
   return response;
 }
 
