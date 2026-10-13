@@ -65,3 +65,26 @@ cambiarla.
 - **Funciones internas en el esquema `private`** (no expuesto por la API).
 - **Tests SQL con un "shim" de Supabase** (`supabase/tests/00_supabase_shim.sql`)
   para poder correr migraciones y pruebas en cualquier Postgres 15+.
+
+## Tienda pública
+
+- **Filtros y búsqueda en memoria** sobre el catálogo cacheado (sin acentos,
+  por nombre, descripción, categoría y SKU). Es más simple y rápido que una
+  consulta por combinación de filtros para tiendas de hasta ~2000 productos.
+  Si crecés más, mover `queryCatalog` a SQL (full text search).
+- **Los filtros son formularios GET** (`next/form`): funcionan sin JavaScript y
+  las URLs se pueden compartir. Las búsquedas y rangos de precio llevan
+  `noindex`; las categorías sí se indexan.
+- **Categorías como filtro** (`/productos?categoria=remeras`) en vez de rutas
+  propias, para no duplicar páginas.
+- **Orden por defecto**: con stock primero, después destacados, después nuevos.
+- **Carrito en `localStorage`** (Zustand con `persist`), sincronizado entre
+  pestañas. Al abrir carrito o checkout se refrescan precio y stock con el
+  servidor y se avisa qué cambió. El servidor nunca confía en precios del
+  navegador: recalcula todo al crear el pedido.
+- **Sin cuentas de cliente ni favoritos** (fuera del MVP).
+- **Placeholders SVG** livianos generados por script (no dependen de servicios
+  externos). Las fotos reales que subas desde el admin se optimizan con
+  `next/image`.
+- **404 "suave" para humanos**: con streaming, un producto inexistente responde
+  200 con `noindex` y la página de "no encontrado"; los bots reciben 404 real.

@@ -1,0 +1,102 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { CircleCheck, Clock } from "lucide-react";
+import { z } from "zod";
+import { siteConfig } from "@site-config";
+import { OrderSummary } from "@/components/store/order-summary";
+import { Badge } from "@/components/ui/badge";
+import { buttonClasses } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { canCreateOrders } from "@/lib/env.server";
+import { formatAddress, getOrderForCustomer, shippingAddressOf } from "@/lib/orders/queries";
+import { ORDER_STATUS_LABEL, ORDER_STATUS_MESSAGE, ORDER_STATUS_TONE } from "@/lib/orders/status";
+import { formatDate } from "@/lib/utils";
+
+export const metadata: Metadata = { title: "Tu pedido", robots: { index: false, follow: false } };
+
+const paramsSchema = z.object({ id: z.uuid(), token: z.uuid() });
+
+export default function OrderPage({ params, searchParams }: PageProps<"/pedido/[id]">) {
+  return (
+    <div className="container-page max-w-3xl py-8">
+      <Suspense fallback={<OrderSkeleton />}>
+        <OrderView params={params} searchParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function OrderView({ params, searchParams }: PageProps<"/pedido/[id]">) {
+  const [{ id }, query] = await Promise.all([params, searchParams]);
+  const parsed = paramsSchema.safeParse({ id, token: Array.isArray(query.token) ? query.token[0] : query.token });
+  if (!parsed.success || !canCreateOrders) notFound();
+
+  const order = await getOrderForCustomer(parsed.data.id, parsed.data.token);
+  if (!order) notFound();
+
+  const address = shippingAddressOf(order);
+  const paid = order.status !== "pending_payment" && order.status !== "cancelled";
+
+  return (
+    <div className="flex flex-col gap-8">
+      <header className="flex flex-col gap-3">
+        {paid ? (
+          <CircleCheck className="size-10 text-emerald-600" aria-hidden />
+        ) : (
+          <Clock className="size-10 text-amber-600" aria-hidden />
+        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Pedido #{order.number}</h1>
+          <Badge tone={ORDER_STATUS_TONE[order.status]}>{ORDER_STATUS_LABEL[order.status]}</Badge>
+        </div>
+        <p className="text-muted-foreground">{ORDER_STATUS_MESSAGE[order.status]}</p>
+        <p className="text-sm text-muted-foreground">
+          Lo hiciste el {formatDate(order.created_at)}. Te enviamos los detalles a <strong>{order.customer_email}</strong>.
+        </p>
+      </header>
+
+      <section aria-labelledby="detalle" className="rounded-2xl border border-border p-6">
+        <h2 id="detalle" className="mb-2 font-semibold">
+          Detalle
+        </h2>
+        <OrderSummary order={order} />
+      </section>
+
+      <section aria-labelledby="entrega" className="rounded-2xl border border-border p-6 text-sm">
+        <h2 id="entrega" className="mb-2 font-semibold">
+          Entrega
+        </h2>
+        {order.delivery_method === "pickup" ? (
+          <p>
+            Retiro en {siteConfig.pickup.address} · {siteConfig.pickup.hours}. {siteConfig.pickup.instructions}
+          </p>
+        ) : (
+          <p>Envío a {address ? formatAddress(address) : "la dirección indicada"}.</p>
+        )}
+        {order.notes && <p className="mt-2 text-muted-foreground">Notas: {order.notes}</p>}
+      </section>
+
+      <div className="flex flex-wrap gap-3">
+        <Link href="/productos" className={buttonClasses("outline")}>
+          Seguir comprando
+        </Link>
+        <a href={`mailto:${siteConfig.contact.email}?subject=Pedido%20%23${order.number}`} className={buttonClasses("ghost")}>
+          ¿Dudas? Escribinos
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function OrderSkeleton() {
+  return (
+    <div role="status" aria-label="Cargando pedido" className="flex flex-col gap-4">
+      <Skeleton className="size-10 rounded-full" />
+      <Skeleton className="h-8 w-56" />
+      <Skeleton className="h-4 w-80" />
+      <Skeleton className="h-64 rounded-2xl" />
+    </div>
+  );
+}
