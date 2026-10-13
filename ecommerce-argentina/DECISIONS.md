@@ -190,6 +190,6 @@ shipping.zones` (rangos de CP numéricos). Por defecto: CABA (1000–1499),
   cambia el pedido: la devolución se coordina y se cancela desde el admin.
 - **Link a Defensa de las y los Consumidores** (Res. 271/2020) en el pie.
 - **Razón social, CUIT y QR de Data Fiscal** se cargan en `site.config.ts →
-  legal`. El link de Data Fiscal se muestra cuando lo completás.
+legal`. El link de Data Fiscal se muestra cuando lo completás.
 - **No se incluyen términos y condiciones ni política de privacidad**: dependen
   de cada negocio y conviene que los redacte un profesional.
