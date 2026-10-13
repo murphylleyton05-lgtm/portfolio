@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath, updateTag } from "next/cache";
+import { after } from "next/server";
 import { requireAdminAction } from "@/lib/admin/auth";
 import { orderStatusSchema } from "@/lib/admin/schemas";
 import { CATALOG_TAG } from "@/lib/catalog/data";
+import { sendOrderEmails, sendOrderStatusEmail } from "@/lib/email/orders";
 import { ORDER_STATUS_LABEL } from "@/lib/orders/status";
 
 export type OrderStatusState = { ok?: boolean; error?: string; message?: string };
@@ -22,9 +24,18 @@ export async function updateOrderStatus(_prev: OrderStatusState, formData: FormD
     return { error: "No se pudo cambiar el estado." };
   }
 
+  // Emails: confirmación si se marcó como pagado a mano (una sola vez) y aviso
+  // de "enviado" / "listo para retirar".
+  const { status, orderId } = parsed.data;
+  after(async () => {
+    if (status === "shipped" || status === "ready_for_pickup") await sendOrderStatusEmail(orderId);
+    if (status !== "pending_payment" && status !== "cancelled") await sendOrderEmails(orderId);
+  });
+
   // Cambiar el estado puede descontar o reponer stock.
   updateTag(CATALOG_TAG);
   revalidatePath(`/admin/pedidos/${parsed.data.orderId}`);
   revalidatePath("/admin/pedidos");
-  return { ok: true, message: `Estado actualizado a "${ORDER_STATUS_LABEL[parsed.data.status]}".` };
+  const notified = status === "shipped" || status === "ready_for_pickup" ? " Le avisamos al cliente por email." : "";
+  return { ok: true, message: `Estado actualizado a "${ORDER_STATUS_LABEL[status]}".${notified}` };
 }

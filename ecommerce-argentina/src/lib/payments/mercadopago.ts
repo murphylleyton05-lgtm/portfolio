@@ -1,8 +1,10 @@
 import "server-only";
 import MercadoPagoConfig, { MPNotFoundError, Payment, Preference, WebhookSignatureValidator } from "mercadopago";
 import type { PreferenceRequest } from "mercadopago/dist/clients/preference/commonTypes";
+import { after } from "next/server";
 import { z } from "zod";
 import { siteConfig } from "@site-config";
+import { sendOrderEmails } from "@/lib/email/orders";
 import { absoluteUrl, publicEnv } from "@/lib/env";
 import { isMercadoPagoConfigured, serverEnv } from "@/lib/env.server";
 import { orderPath, type CreatedOrder } from "@/lib/orders/create";
@@ -184,6 +186,9 @@ export async function syncPayment(paymentId: string): Promise<SyncResult | null>
     p_payment_status_detail: payment.status_detail ?? null,
   });
   if (rpcError) throw new Error(`No se pudo actualizar el pedido: ${rpcError.message}`);
+
+  // Email de confirmación después de responder (se manda una sola vez por pedido).
+  if (status === "approved") after(() => sendOrderEmails(order.id));
 
   return { orderId: order.id, paymentStatus: status, newlyPaid: Boolean(newlyPaid) };
 }

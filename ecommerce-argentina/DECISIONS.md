@@ -136,3 +136,23 @@ cambiarla.
 - **Pedidos sin borrar**: solo se cambian de estado (historial completo).
 - **Miniaturas del admin sin optimizar** (`unoptimized`) para no gastar cuota
   de optimización de imágenes de Vercel en pantallas internas.
+
+## Emails (Resend)
+
+- **Qué se manda**: confirmación al cliente cuando el pago se aprueba (o cuando
+  el admin marca el pedido como pagado a mano), aviso de "nueva venta" al email
+  de `site.config.ts → contact.email`, y aviso al cliente cuando el pedido pasa
+  a "Enviado" o "Listo para retirar".
+- **Una sola confirmación por pedido**: se reserva con
+  `orders.confirmation_email_sent_at` antes de enviar (si el envío falla se
+  libera para reintentar) y además se usa la `Idempotency-Key` de Resend. El
+  webhook y la página de vuelta pueden llegar juntos sin duplicar emails.
+- **Se envían después de responder** (`after()`), así el webhook contesta
+  rápido a Mercado Pago aunque Resend demore.
+- **HTML hecho a mano con estilos inline** (sin React Email) para no sumar
+  dependencias; todo dato del cliente se escapa. Incluye versión texto plano.
+- **Sin `RESEND_API_KEY` los emails se imprimen en la consola** del servidor.
+- **Remitente en `EMAIL_FROM`** (tiene que ser de un dominio verificado en
+  Resend). Las respuestas van a `contact.email` (`replyTo`).
+- **No se mandan emails al crear el pedido** (antes de pagar): la página del
+  pedido ya muestra todo y evita spam por carritos abandonados.

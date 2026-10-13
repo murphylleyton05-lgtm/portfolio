@@ -102,3 +102,15 @@ O desde el SQL Editor de Supabase, después de crear el usuario en
 insert into public.admin_users (user_id)
 select id from auth.users where email = 'vos@tumail.com';
 ```
+
+## Emails
+
+Con `RESEND_API_KEY` y `EMAIL_FROM` configurados se envían:
+
+| Cuándo                                     | A quién              |
+| ------------------------------------------ | -------------------- |
+| Se aprueba el pago (o lo marcás pagado)    | Cliente + la tienda  |
+| Marcás el pedido como "Enviado"            | Cliente              |
+| Marcás el pedido como "Listo para retirar" | Cliente              |
+
+Sin la clave, los emails se imprimen en la consola del servidor.
