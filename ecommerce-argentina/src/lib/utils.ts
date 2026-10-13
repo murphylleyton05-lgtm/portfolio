@@ -21,6 +21,7 @@ export function formatPrice(amount: number) {
 const dateFormatter = new Intl.DateTimeFormat(siteConfig.locale, {
   dateStyle: "medium",
   timeStyle: "short",
+  hourCycle: "h23",
   timeZone: siteConfig.timeZone,
 });
 

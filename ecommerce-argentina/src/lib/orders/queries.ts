@@ -13,6 +13,9 @@ export async function getOrderForCustomer(id: string, token: string): Promise<Or
     .select("*, items:order_items(*)")
     .eq("id", id)
     .eq("access_token", token)
+    // Con signal propio Next no deduplica el GET: después de confirmar un pago
+    // en el mismo render, la segunda lectura trae el estado actualizado.
+    .abortSignal(AbortSignal.timeout(10_000))
     .maybeSingle();
   if (error) throw new Error(`No se pudo leer el pedido: ${error.message}`);
   return data;

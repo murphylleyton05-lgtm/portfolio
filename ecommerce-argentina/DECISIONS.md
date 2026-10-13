@@ -88,3 +88,29 @@ cambiarla.
   `next/image`.
 - **404 "suave" para humanos**: con streaming, un producto inexistente responde
   200 con `noindex` y la página de "no encontrado"; los bots reciben 404 real.
+
+## Pagos (Mercado Pago Checkout Pro)
+
+- **Flujo**: el checkout crea el pedido (`pending_payment`), crea la preferencia
+  y redirige a Mercado Pago. Las `back_urls` vuelven a `/pedido/<id>?token=…`.
+- **El estado del pago nunca se toma de la URL ni del cuerpo del webhook**: se
+  consulta siempre `GET /v1/payments/:id` con el access token. Además se exige
+  que el monto pagado cubra el total y que la moneda sea ARS.
+- **Doble confirmación**: el webhook (`/api/webhooks/mercadopago`) y la página
+  de vuelta sincronizan el pago. Ambos llaman a `confirm_order_payment`, que es
+  idempotente. Así funciona aunque el webhook se demore (o en local, donde MP no
+  puede llegar).
+- **Firma del webhook** (`x-signature`) validada con el validador oficial del
+  SDK cuando está `MERCADOPAGO_WEBHOOK_SECRET`. Sin ventana de tiempo: un
+  reenvío es inofensivo porque el pago se vuelve a consultar.
+- **`notification_url` y `auto_return` solo con sitio https** (Mercado Pago los
+  rechaza con `http://localhost`). En local el pago se confirma al volver.
+- **Envío como un ítem más** de la preferencia ("Envío"), no con `shipments`.
+- **Sin `binary_mode`**: se aceptan pagos en efectivo (Rapipago/Pago Fácil) que
+  quedan pendientes hasta acreditarse.
+- **Si Mercado Pago falla al crear la preferencia**, el pedido queda creado y el
+  cliente va a su página, donde tiene un botón para reintentar el pago.
+- **Sin Mercado Pago configurado** (pero con Supabase), los pedidos se crean
+  igual como "pendiente de pago" para cobrar por otro medio (transferencia).
+- **Credenciales `TEST-…`** usan `sandbox_init_point`; las de producción (o de
+  usuarios de prueba `APP_USR-…`) usan `init_point`.

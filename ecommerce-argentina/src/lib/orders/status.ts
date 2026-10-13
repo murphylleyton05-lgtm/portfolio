@@ -33,7 +33,7 @@ export const ORDER_STATUS_TONE: Record<OrderStatus, BadgeTone> = {
 
 /** Mensaje para el cliente en la página de su pedido. */
 export const ORDER_STATUS_MESSAGE: Record<OrderStatus, string> = {
-  pending_payment: "Tu pedido está reservado y espera el pago.",
+  pending_payment: "Recibimos tu pedido. Falta confirmar el pago.",
   paid: "¡Gracias! Recibimos tu pago y ya estamos preparando tu pedido.",
   preparing: "Estamos preparando tu pedido.",
   shipped: "Tu pedido está en camino.",

@@ -16,7 +16,9 @@ export const CATALOG_TAG = "catalog";
  */
 export async function getCatalog(): Promise<Catalog> {
   "use cache";
-  cacheLife("hours");
+  // Se refresca cada minuto (stock que cambia por ventas) y al instante cuando
+  // el admin guarda cambios (updateTag/revalidateTag).
+  cacheLife("minutes");
   cacheTag(CATALOG_TAG);
 
   if (!isSupabaseConfigured) return getDemoCatalog();
