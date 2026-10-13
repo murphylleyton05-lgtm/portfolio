@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="Jean Recto Clásico">
+<rect width="800" height="1000" fill="#d0d9e7"/>
+<g transform="translate(60 120) scale(1.7)"><path fill="#27467a" d="M130 40h140l20 320h-70l-20-220-20 220h-70z"/><path stroke="#d0d9e7" stroke-opacity=".35" stroke-width="5" d="M132 62h136"/></g>
+<text x="400" y="930" fill="#27467a" fill-opacity=".7" font-family="ui-sans-serif, system-ui, sans-serif" font-size="30" text-anchor="middle" letter-spacing="2">JEAN RECTO CLÁSICO</text>
+</svg>

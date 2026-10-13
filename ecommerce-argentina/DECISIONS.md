@@ -34,3 +34,34 @@ cambiarla.
   dependencias de desarrollo de `eslint-config-next`. No llegan al bundle de
   producción y la única "solución" automática es bajar a Next 14, así que se
   dejaron.
+
+## Base de datos
+
+- **Variantes "planas"**: cada variante tiene un nombre libre ("M", "Negro / L",
+  "Único") en vez de un sistema de opciones × valores. Todo producto tiene al
+  menos una variante; el stock vive en la variante.
+- **Precios en `numeric(12,2)` en pesos**. La variante puede pisar el precio del
+  producto (`price` null = usa el del producto).
+- **Imágenes como `text[]` en `products`** (la primera es la portada), sin tabla
+  aparte. Guardan URLs públicas de Supabase Storage o rutas de `/public`.
+- **Compra como invitado**: no hay cuentas de cliente. `customers` se hace
+  *upsert* por email y cada pedido guarda una copia de los datos del cliente.
+- **El cliente ve su pedido con un token secreto** (`/pedido/<id>?token=<uuid>`)
+  que va en el link de vuelta de Mercado Pago y en el email.
+- **Stock**: se valida al crear el pedido y se descuenta recién cuando el pago
+  se aprueba (no se reserva). Puede haber sobreventa si dos personas pagan la
+  última unidad al mismo tiempo: el stock queda en 0 (nunca negativo) y el
+  admin lo ve. Para una tienda chica es preferible a reservar stock de carritos
+  abandonados.
+- **Estados del pedido**: `pending_payment → paid → preparing → shipped /
+  ready_for_pickup → delivered`, o `cancelled`. Cambiar a cancelado (o volver a
+  pendiente) repone stock; pasar a cualquier estado "pagado" lo descuenta si no
+  estaba descontado (sirve para cobros por transferencia).
+- **Un pago aprobado sobre un pedido cancelado no lo reactiva**: queda
+  registrado el pago para que el admin decida.
+- **Admins en tabla `admin_users`** + función `is_admin()` usada en las políticas
+  RLS y en Storage. Defensa en profundidad: aunque el código del panel tuviera
+  un error, la base no deja escribir a quien no es admin.
+- **Funciones internas en el esquema `private`** (no expuesto por la API).
+- **Tests SQL con un "shim" de Supabase** (`supabase/tests/00_supabase_shim.sql`)
+  para poder correr migraciones y pruebas en cualquier Postgres 15+.

@@ -45,3 +45,32 @@ src/
   data/               ← catálogo demo (fuente del seed)
 DECISIONS.md          ← decisiones tomadas y cómo cambiarlas
 ```
+
+## Base de datos (Supabase)
+
+Las migraciones están en [`supabase/migrations`](./supabase/migrations) y los
+datos de ejemplo en [`supabase/seed.sql`](./supabase/seed.sql):
+
+| Tabla              | Para qué                                                     |
+| ------------------ | ------------------------------------------------------------ |
+| `categories`       | Categorías del catálogo                                      |
+| `products`         | Productos (precio base, precio tachado, imágenes, activo)    |
+| `product_variants` | Variantes (talle/color) con **stock** y precio opcional      |
+| `customers`        | Clientes (compra como invitado, se identifican por email)    |
+| `orders`           | Pedidos: estado, entrega, totales y datos de Mercado Pago     |
+| `order_items`      | Items del pedido (copia de nombre y precio al comprar)       |
+| `admin_users`      | Usuarios de Supabase Auth con acceso al panel                |
+
+Seguridad con **RLS**: el público solo lee el catálogo activo; los admins
+gestionan todo; los pedidos los crea el servidor con la secret key. El stock se
+descuenta una sola vez cuando se aprueba el pago (`confirm_order_payment`) y se
+repone si el admin cancela el pedido (`set_order_status`).
+
+Tests de la base (migraciones + seed + pagos/stock/RLS) contra un Postgres vacío:
+
+```bash
+DATABASE_URL=postgres://postgres@localhost:5432/postgres npm run db:test
+```
+
+Si editás `src/data/demo-catalog.ts`, regenerá seed e imágenes con
+`npm run demo:generate`.

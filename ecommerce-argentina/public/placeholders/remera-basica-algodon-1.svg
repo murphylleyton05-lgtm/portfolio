@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="Remera Básica Algodón">
+<rect width="800" height="1000" fill="#f4efe6"/>
+<g transform="translate(160 210) scale(1.2)"><path fill="#2f2f2f" d="M120 60 160 40q40 30 80 0l40 20 70 50-30 60-30-15v185H110V155l-30 15-30-60z"/></g>
+<text x="400" y="930" fill="#2f2f2f" fill-opacity=".7" font-family="ui-sans-serif, system-ui, sans-serif" font-size="30" text-anchor="middle" letter-spacing="2">REMERA BÁSICA ALGODÓN</text>
+</svg>

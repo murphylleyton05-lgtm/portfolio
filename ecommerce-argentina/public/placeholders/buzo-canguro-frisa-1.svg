@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="Buzo Canguro Frisa">
+<rect width="800" height="1000" fill="#ece9f3"/>
+<g transform="translate(160 210) scale(1.2)"><path fill="#3b3363" d="M150 70q0-50 50-50t50 50l50 20 60 190-40 15-35-125v180H115V170L80 295l-40-15 60-190z"/><ellipse cx="200" cy="72" rx="32" ry="38" fill="#ece9f3" opacity=".35"/><path fill="#ece9f3" opacity=".25" d="M150 250h100l15 70H135z"/></g>
+<text x="400" y="930" fill="#3b3363" fill-opacity=".7" font-family="ui-sans-serif, system-ui, sans-serif" font-size="30" text-anchor="middle" letter-spacing="2">BUZO CANGURO FRISA</text>
+</svg>

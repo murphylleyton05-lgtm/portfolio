@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="Pack x3 Medias de Algodón">
+<rect width="800" height="1000" fill="#eef2f6"/>
+<g transform="translate(160 210) scale(1.2)"><path fill="#475569" opacity=".45" d="M120 60h60v200q0 20 20 30l60 20q30 15 20 45-10 20-40 15l-90-20q-30-10-30-40z"/><path fill="#475569" d="M170 40h60v210q0 20 20 30l60 20q30 15 20 45-10 20-40 15l-90-20q-30-10-30-40z"/></g>
+<text x="400" y="930" fill="#475569" fill-opacity=".7" font-family="ui-sans-serif, system-ui, sans-serif" font-size="30" text-anchor="middle" letter-spacing="2">PACK X3 MEDIAS DE ALGODÓN</text>
+</svg>

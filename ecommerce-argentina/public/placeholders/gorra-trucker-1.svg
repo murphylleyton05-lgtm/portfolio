@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="Gorra Trucker">
+<rect width="800" height="1000" fill="#f6ebe7"/>
+<g transform="translate(160 210) scale(1.2)"><path fill="#9a3412" d="M110 220q0-110 90-110t90 110z"/><path fill="#9a3412" d="M100 215h200q60 5 50 30H110z"/><circle cx="200" cy="114" r="8" fill="#f6ebe7" opacity=".5"/></g>
+<text x="400" y="930" fill="#9a3412" fill-opacity=".7" font-family="ui-sans-serif, system-ui, sans-serif" font-size="30" text-anchor="middle" letter-spacing="2">GORRA TRUCKER</text>
+</svg>

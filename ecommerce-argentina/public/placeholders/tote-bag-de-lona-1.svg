@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="Tote Bag de Lona">
+<rect width="800" height="1000" fill="#f5f1e8"/>
+<g transform="translate(160 210) scale(1.2)"><path fill="none" stroke="#8a7350" stroke-width="14" d="M150 160q0-100 50-100t50 100"/><path fill="#8a7350" d="M110 150h180l20 200H90z"/></g>
+<text x="400" y="930" fill="#8a7350" fill-opacity=".7" font-family="ui-sans-serif, system-ui, sans-serif" font-size="30" text-anchor="middle" letter-spacing="2">TOTE BAG DE LONA</text>
+</svg>
