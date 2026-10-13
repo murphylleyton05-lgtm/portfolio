@@ -21,7 +21,8 @@ async function loadOrder(orderId: string): Promise<OrderWithItems | null> {
   return data;
 }
 
-const customerOrderUrl = (order: OrderWithItems) => absoluteUrl(orderPath({ id: order.id, accessToken: order.access_token }));
+const customerOrderUrl = (order: OrderWithItems) =>
+  absoluteUrl(orderPath({ id: order.id, accessToken: order.access_token }));
 
 /**
  * Email de confirmación al cliente + aviso a la tienda. Se manda UNA sola vez
@@ -47,7 +48,11 @@ export async function sendOrderEmails(orderId: string) {
     if (!order) return;
 
     const confirmation = orderConfirmationEmail(order, customerOrderUrl(order));
-    const sent = await sendEmail({ to: order.customer_email, ...confirmation, idempotencyKey: `order-confirmation/${order.id}` });
+    const sent = await sendEmail({
+      to: order.customer_email,
+      ...confirmation,
+      idempotencyKey: `order-confirmation/${order.id}`,
+    });
     if (!sent.ok) {
       await supabase.from("orders").update({ confirmation_email_sent_at: null }).eq("id", orderId);
       return;
@@ -55,7 +60,11 @@ export async function sendOrderEmails(orderId: string) {
 
     if (siteConfig.contact.email) {
       const notification = newOrderNotificationEmail(order, absoluteUrl(`/admin/pedidos/${order.id}`));
-      await sendEmail({ to: siteConfig.contact.email, ...notification, idempotencyKey: `order-notification/${order.id}` });
+      await sendEmail({
+        to: siteConfig.contact.email,
+        ...notification,
+        idempotencyKey: `order-notification/${order.id}`,
+      });
     }
   } catch (error) {
     console.error("[sendOrderEmails]", error);

@@ -43,7 +43,12 @@ export function ImagesField({
         setUploadError(`"${file.name}" pesa más de 5 MB.`);
         continue;
       }
-      const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const extension =
+        file.name
+          .split(".")
+          .pop()
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]/g, "") || "jpg";
       const path = `products/${crypto.randomUUID()}.${extension}`;
       const { error } = await supabase.storage
         .from(PRODUCT_IMAGES_BUCKET)
@@ -71,10 +76,15 @@ export function ImagesField({
     <div className="flex flex-col gap-3">
       <ul className="grid grid-cols-3 gap-3 sm:grid-cols-5">
         {value.map((url, index) => (
-          <li key={url} className="group relative aspect-[4/5] overflow-hidden rounded-lg border border-border bg-muted">
+          <li
+            key={url}
+            className="group relative aspect-[4/5] overflow-hidden rounded-lg border border-border bg-muted"
+          >
             <Image src={url} alt={`Imagen ${index + 1}`} fill sizes="160px" unoptimized className="object-cover" />
             {index === 0 && (
-              <span className="absolute top-1 left-1 rounded bg-primary px-1.5 py-0.5 text-[10px] text-primary-foreground">Portada</span>
+              <span className="absolute top-1 left-1 rounded bg-primary px-1.5 py-0.5 text-[10px] text-primary-foreground">
+                Portada
+              </span>
             )}
             <div className="absolute inset-x-1 bottom-1 flex justify-between gap-1">
               <IconButton label="Mover a la izquierda" onClick={() => move(index, -1)} disabled={index === 0}>
@@ -83,7 +93,11 @@ export function ImagesField({
               <IconButton label="Quitar imagen" onClick={() => onChange(value.filter((item) => item !== url))}>
                 <X className="size-3.5" />
               </IconButton>
-              <IconButton label="Mover a la derecha" onClick={() => move(index, 1)} disabled={index === value.length - 1}>
+              <IconButton
+                label="Mover a la derecha"
+                onClick={() => move(index, 1)}
+                disabled={index === value.length - 1}
+              >
                 <ChevronRight className="size-3.5" />
               </IconButton>
             </div>
@@ -115,7 +129,9 @@ export function ImagesField({
         aria-label="Elegir imágenes"
         onChange={(event) => handleFiles(event.target.files)}
       />
-      <p className="text-xs text-muted-foreground">Hasta 10 imágenes de 5 MB. La primera es la portada. Ideal: 4:5 (ej. 1200×1500).</p>
+      <p className="text-xs text-muted-foreground">
+        Hasta 10 imágenes de 5 MB. La primera es la portada. Ideal: 4:5 (ej. 1200×1500).
+      </p>
       {(uploadError || error) && (
         <p role="alert" className="text-sm text-red-600">
           {uploadError || error}

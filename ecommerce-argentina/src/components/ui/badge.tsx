@@ -13,10 +13,18 @@ const tones = {
 
 export type BadgeTone = keyof typeof tones;
 
-export function Badge({ tone = "neutral", className, ...props }: HTMLAttributes<HTMLSpanElement> & { tone?: BadgeTone }) {
+export function Badge({
+  tone = "neutral",
+  className,
+  ...props
+}: HTMLAttributes<HTMLSpanElement> & { tone?: BadgeTone }) {
   return (
     <span
-      className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap", tones[tone], className)}
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap",
+        tones[tone],
+        className,
+      )}
       {...props}
     />
   );

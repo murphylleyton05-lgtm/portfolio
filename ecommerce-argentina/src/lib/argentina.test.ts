@@ -17,7 +17,6 @@ describe("parsePostalCode", () => {
   });
 });
 
-
 describe("provinceFromPostalCode", () => {
   it("deduce la provincia de la letra del CPA", () => {
     expect(provinceFromPostalCode("C1425ABC")).toBe("Ciudad Autónoma de Buenos Aires");

@@ -9,25 +9,23 @@ export const contentType = "image/png";
 export default function OpenGraphImage() {
   const { colors } = siteConfig;
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: 24,
-          padding: 80,
-          background: colors.primary,
-          color: colors.primaryForeground,
-        }}
-      >
-        <div style={{ display: "flex", fontSize: 88, fontWeight: 700 }}>{siteConfig.name}</div>
-        <div style={{ display: "flex", fontSize: 40, opacity: 0.85 }}>{siteConfig.tagline}</div>
-        <div style={{ display: "flex", width: 120, height: 10, background: colors.accent, borderRadius: 5 }} />
-      </div>
-    ),
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: 24,
+        padding: 80,
+        background: colors.primary,
+        color: colors.primaryForeground,
+      }}
+    >
+      <div style={{ display: "flex", fontSize: 88, fontWeight: 700 }}>{siteConfig.name}</div>
+      <div style={{ display: "flex", fontSize: 40, opacity: 0.85 }}>{siteConfig.tagline}</div>
+      <div style={{ display: "flex", width: 120, height: 10, background: colors.accent, borderRadius: 5 }} />
+    </div>,
     size,
   );
 }

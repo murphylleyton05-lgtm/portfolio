@@ -55,7 +55,11 @@ export function CategoryForm({ category }: { category?: Category }) {
       <Button type="submit" loading={pending} variant={category ? "outline" : "primary"}>
         {category ? "Guardar" : "Crear"}
       </Button>
-      {state.error && <Alert tone="error" className="sm:col-span-5">{state.error}</Alert>}
+      {state.error && (
+        <Alert tone="error" className="sm:col-span-5">
+          {state.error}
+        </Alert>
+      )}
     </form>
   );
 }

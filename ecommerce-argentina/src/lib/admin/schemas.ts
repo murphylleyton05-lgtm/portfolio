@@ -44,7 +44,11 @@ export const variantInputSchema = z.object({
   name: z.string().trim().min(1, "Requerido").max(80, "Máximo 80 caracteres"),
   sku: z.preprocess(emptyToUndefined, z.string().trim().max(60, "Máximo 60 caracteres").optional()),
   price: optionalMoney,
-  stock: z.coerce.number({ error: "Ingresá un número" }).int("Sin decimales").min(0, "No puede ser negativo").max(1_000_000),
+  stock: z.coerce
+    .number({ error: "Ingresá un número" })
+    .int("Sin decimales")
+    .min(0, "No puede ser negativo")
+    .max(1_000_000),
 });
 
 export const productFormSchema = z
@@ -63,13 +67,18 @@ export const productFormSchema = z
   })
   .superRefine((data, ctx) => {
     if (data.compareAtPrice !== undefined && data.compareAtPrice <= data.price) {
-      ctx.addIssue({ code: "custom", path: ["compareAtPrice"], message: "Tiene que ser mayor al precio (es el precio tachado)" });
+      ctx.addIssue({
+        code: "custom",
+        path: ["compareAtPrice"],
+        message: "Tiene que ser mayor al precio (es el precio tachado)",
+      });
     }
     const names = new Set<string>();
     const skus = new Set<string>();
     data.variants.forEach((variant, index) => {
       const name = variant.name.toLowerCase();
-      if (names.has(name)) ctx.addIssue({ code: "custom", path: ["variants", index, "name"], message: "Nombre repetido" });
+      if (names.has(name))
+        ctx.addIssue({ code: "custom", path: ["variants", index, "name"], message: "Nombre repetido" });
       names.add(name);
       if (variant.sku) {
         const sku = variant.sku.toLowerCase();
@@ -84,7 +93,11 @@ export type ProductFormValues = z.output<typeof productFormSchema>;
 
 export const stockUpdateSchema = z.object({
   variantId: z.uuid(),
-  stock: z.coerce.number({ error: "Ingresá un número" }).int("Sin decimales").min(0, "No puede ser negativo").max(1_000_000),
+  stock: z.coerce
+    .number({ error: "Ingresá un número" })
+    .int("Sin decimales")
+    .min(0, "No puede ser negativo")
+    .max(1_000_000),
 });
 
 export const orderStatusSchema = z.object({

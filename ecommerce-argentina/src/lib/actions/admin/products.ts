@@ -9,8 +9,7 @@ import { PRODUCT_IMAGES_BUCKET, fieldErrorsOf, productFormSchema, storagePathFro
 import { CATALOG_TAG } from "@/lib/catalog/data";
 
 export type SaveProductResult =
-  | { ok: true; id: string; variantIds: string[] }
-  | { ok: false; error: string; fieldErrors?: Record<string, string> };
+  { ok: true; id: string; variantIds: string[] } | { ok: false; error: string; fieldErrors?: Record<string, string> };
 
 const UNIQUE_VIOLATION = "23505";
 
@@ -25,7 +24,8 @@ export async function saveProduct(input: unknown): Promise<SaveProductResult> {
   const { supabase } = session;
 
   const parsed = productFormSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Revisá los campos marcados.", fieldErrors: fieldErrorsOf(parsed.error) };
+  if (!parsed.success)
+    return { ok: false, error: "Revisá los campos marcados.", fieldErrors: fieldErrorsOf(parsed.error) };
   const data = parsed.data;
 
   const row = {
@@ -43,7 +43,11 @@ export async function saveProduct(input: unknown): Promise<SaveProductResult> {
   let productId = data.id;
   let previousImages: string[] = [];
   if (productId) {
-    const { data: existing, error } = await supabase.from("products").select("images").eq("id", productId).maybeSingle();
+    const { data: existing, error } = await supabase
+      .from("products")
+      .select("images")
+      .eq("id", productId)
+      .maybeSingle();
     if (error || !existing) return { ok: false, error: "El producto ya no existe." };
     previousImages = existing.images;
     const { error: updateError } = await supabase.from("products").update(row).eq("id", productId);
@@ -82,7 +86,11 @@ export async function saveProduct(input: unknown): Promise<SaveProductResult> {
   const { error: upsertError } = await supabase.from("product_variants").upsert(rows, { onConflict: "id" });
   if (upsertError) {
     if (upsertError.code === UNIQUE_VIOLATION) {
-      return { ok: false, error: "Hay un SKU que ya usa otro producto.", fieldErrors: { variants: "SKU repetido en otro producto" } };
+      return {
+        ok: false,
+        error: "Hay un SKU que ya usa otro producto.",
+        fieldErrors: { variants: "SKU repetido en otro producto" },
+      };
     }
     console.error("[saveProduct] variants", upsertError);
     return { ok: false, error: "No se pudieron guardar las variantes." };
@@ -102,7 +110,11 @@ export async function saveProduct(input: unknown): Promise<SaveProductResult> {
 
 function productError(error: { code?: string; message: string }): SaveProductResult {
   if (error.code === UNIQUE_VIOLATION) {
-    return { ok: false, error: "Ya existe un producto con ese slug.", fieldErrors: { slug: "Ya existe un producto con ese slug" } };
+    return {
+      ok: false,
+      error: "Ya existe un producto con ese slug.",
+      fieldErrors: { slug: "Ya existe un producto con ese slug" },
+    };
   }
   console.error("[saveProduct]", error);
   return { ok: false, error: "No se pudo guardar el producto." };

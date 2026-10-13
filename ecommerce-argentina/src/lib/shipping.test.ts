@@ -24,11 +24,17 @@ describe("findShippingZone", () => {
 describe("quoteShipping", () => {
   it("cobra según la zona", () => {
     const caba = siteConfig.shipping.zones.find((z) => z.id === "caba")!;
-    expect(quoteShipping({ method: "shipping", postalCode: "1425", subtotal: 1000 })).toMatchObject({ cost: caba.cost, free: false });
+    expect(quoteShipping({ method: "shipping", postalCode: "1425", subtotal: 1000 })).toMatchObject({
+      cost: caba.cost,
+      free: false,
+    });
   });
 
   it("envío gratis desde el mínimo configurado", () => {
-    expect(quoteShipping({ method: "shipping", postalCode: "5000", subtotal: threshold })).toMatchObject({ cost: 0, free: true });
+    expect(quoteShipping({ method: "shipping", postalCode: "5000", subtotal: threshold })).toMatchObject({
+      cost: 0,
+      free: true,
+    });
   });
 
   it("retiro en el local es sin cargo", () => {

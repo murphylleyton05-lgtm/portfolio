@@ -27,7 +27,11 @@ export function ProductForm({ categories, product }: Props) {
   const [saved, setSaved] = useState(false);
   const [slugTouched, setSlugTouched] = useState(Boolean(product));
 
-  const { register, handleSubmit, control, setValue, setError, reset, formState } = useForm<ProductFormInput, unknown, ProductFormValues>({
+  const { register, handleSubmit, control, setValue, setError, reset, formState } = useForm<
+    ProductFormInput,
+    unknown,
+    ProductFormValues
+  >({
     resolver: zodResolver(productFormSchema),
     mode: "onTouched",
     defaultValues: product ?? {
@@ -91,12 +95,18 @@ export function ProductForm({ categories, product }: Props) {
                   {...aria("name", errors.name)}
                   {...register("name", {
                     onChange: (event) => {
-                      if (!slugTouched) setValue("slug", slugify(event.target.value), { shouldValidate: formState.isSubmitted });
+                      if (!slugTouched)
+                        setValue("slug", slugify(event.target.value), { shouldValidate: formState.isSubmitted });
                     },
                   })}
                 />
               </Field>
-              <Field id="slug" label="URL (slug)" hint="Se usa en /productos/<slug>. Solo minúsculas, números y guiones." error={errors.slug?.message}>
+              <Field
+                id="slug"
+                label="URL (slug)"
+                hint="Se usa en /productos/<slug>. Solo minúsculas, números y guiones."
+                error={errors.slug?.message}
+              >
                 <Input {...aria("slug", errors.slug)} {...register("slug", { onChange: () => setSlugTouched(true) })} />
               </Field>
               <Field id="description" label="Descripción" error={errors.description?.message}>
@@ -110,7 +120,9 @@ export function ProductForm({ categories, product }: Props) {
             <Controller
               control={control}
               name="images"
-              render={({ field }) => <ImagesField value={field.value} onChange={field.onChange} error={errors.images?.message} />}
+              render={({ field }) => (
+                <ImagesField value={field.value} onChange={field.onChange} error={errors.images?.message} />
+              )}
             />
           </Card>
 
@@ -118,26 +130,41 @@ export function ProductForm({ categories, product }: Props) {
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
                 <h2 className="font-semibold">Variantes y stock</h2>
-                <p className="text-xs text-muted-foreground">Talles, colores, etc. Si no tiene opciones, dejá una sola llamada &quot;Único&quot;.</p>
+                <p className="text-xs text-muted-foreground">
+                  Talles, colores, etc. Si no tiene opciones, dejá una sola llamada &quot;Único&quot;.
+                </p>
               </div>
               <Button type="button" variant="outline" size="sm" onClick={() => append({ ...emptyVariant })}>
                 <Plus className="size-4" aria-hidden /> Agregar variante
               </Button>
             </div>
             {errors.variants?.message && <p className="mb-2 text-sm text-red-600">{errors.variants.message}</p>}
-            {errors.variants?.root?.message && <p className="mb-2 text-sm text-red-600">{errors.variants.root.message}</p>}
+            {errors.variants?.root?.message && (
+              <p className="mb-2 text-sm text-red-600">{errors.variants.root.message}</p>
+            )}
             <div className="flex flex-col gap-3">
               {fields.map((field, index) => {
                 const fieldErrors = errors.variants?.[index];
                 return (
-                  <fieldset key={field.id} className="grid grid-cols-2 gap-3 rounded-lg border border-border p-3 sm:grid-cols-[1fr_1fr_8rem_6rem_auto]">
+                  <fieldset
+                    key={field.id}
+                    className="grid grid-cols-2 gap-3 rounded-lg border border-border p-3 sm:grid-cols-[1fr_1fr_8rem_6rem_auto]"
+                  >
                     <legend className="sr-only">Variante {index + 1}</legend>
                     <input type="hidden" {...register(`variants.${index}.id`)} />
                     <Field id={`variants.${index}.name`} label="Nombre" error={fieldErrors?.name?.message}>
-                      <Input {...aria(`variants.${index}.name`, fieldErrors?.name)} placeholder="M / Negro" {...register(`variants.${index}.name`)} />
+                      <Input
+                        {...aria(`variants.${index}.name`, fieldErrors?.name)}
+                        placeholder="M / Negro"
+                        {...register(`variants.${index}.name`)}
+                      />
                     </Field>
                     <Field id={`variants.${index}.sku`} label="SKU" error={fieldErrors?.sku?.message}>
-                      <Input {...aria(`variants.${index}.sku`, fieldErrors?.sku)} placeholder="Opcional" {...register(`variants.${index}.sku`)} />
+                      <Input
+                        {...aria(`variants.${index}.sku`, fieldErrors?.sku)}
+                        placeholder="Opcional"
+                        {...register(`variants.${index}.sku`)}
+                      />
                     </Field>
                     <Field id={`variants.${index}.price`} label="Precio propio" error={fieldErrors?.price?.message}>
                       <Input
@@ -183,9 +210,21 @@ export function ProductForm({ categories, product }: Props) {
           <Card>
             <div className="flex flex-col gap-4">
               <Field id="price" label="Precio (ARS)" error={errors.price?.message}>
-                <Input {...aria("price", errors.price)} type="number" inputMode="decimal" min={0} step="0.01" {...register("price")} />
+                <Input
+                  {...aria("price", errors.price)}
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step="0.01"
+                  {...register("price")}
+                />
               </Field>
-              <Field id="compareAtPrice" label="Precio anterior (tachado)" hint="Opcional. Muestra la oferta." error={errors.compareAtPrice?.message}>
+              <Field
+                id="compareAtPrice"
+                label="Precio anterior (tachado)"
+                hint="Opcional. Muestra la oferta."
+                error={errors.compareAtPrice?.message}
+              >
                 <Input
                   {...aria("compareAtPrice", errors.compareAtPrice)}
                   type="number"

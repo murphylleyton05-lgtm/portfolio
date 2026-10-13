@@ -24,7 +24,13 @@ const emptyToUndefined = (value: unknown) => {
 export const catalogQuerySchema = z.object({
   q: z.preprocess(emptyToUndefined, z.string().trim().max(80).optional()).catch(undefined),
   categoria: z
-    .preprocess(emptyToUndefined, z.string().regex(/^[a-z0-9-]{1,80}$/).optional())
+    .preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^[a-z0-9-]{1,80}$/)
+        .optional(),
+    )
     .catch(undefined),
   min: z.preprocess(emptyToUndefined, z.coerce.number().int().min(0).optional()).catch(undefined),
   max: z.preprocess(emptyToUndefined, z.coerce.number().int().min(0).optional()).catch(undefined),
@@ -63,7 +69,12 @@ export function queryCatalog(
     if (query.stock && product.totalStock <= 0) return false;
     if (terms.length) {
       const haystack = normalizeText(
-        [product.name, product.description, product.category?.name ?? "", ...product.variants.map((v) => v.sku ?? "")].join(" "),
+        [
+          product.name,
+          product.description,
+          product.category?.name ?? "",
+          ...product.variants.map((v) => v.sku ?? ""),
+        ].join(" "),
       );
       if (!terms.every((term) => haystack.includes(term))) return false;
     }
@@ -99,7 +110,10 @@ export function queryCatalog(
 }
 
 /** Arma la URL del listado conservando filtros y cambiando solo lo indicado. */
-export function catalogHref(query: Partial<CatalogQuery>, changes: Partial<Record<keyof CatalogQuery, string | number | undefined>> = {}) {
+export function catalogHref(
+  query: Partial<CatalogQuery>,
+  changes: Partial<Record<keyof CatalogQuery, string | number | undefined>> = {},
+) {
   const merged: Record<string, string | number | undefined> = { ...query, ...changes };
   if (merged.orden === "destacados") delete merged.orden;
   if (merged.pagina === 1 || merged.pagina === "1") delete merged.pagina;

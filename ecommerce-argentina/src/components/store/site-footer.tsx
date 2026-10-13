@@ -46,7 +46,11 @@ export async function SiteFooter() {
             Todos los productos
           </Link>
           {categories.map((category) => (
-            <Link key={category.id} href={`/productos?categoria=${category.slug}`} className="text-muted-foreground hover:text-foreground">
+            <Link
+              key={category.id}
+              href={`/productos?categoria=${category.slug}`}
+              className="text-muted-foreground hover:text-foreground"
+            >
               {category.name}
             </Link>
           ))}
@@ -82,7 +86,10 @@ export async function SiteFooter() {
           >
             <WhatsAppIcon width={16} height={16} /> WhatsApp
           </a>
-          <a href={`mailto:${siteConfig.contact.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
+          <a
+            href={`mailto:${siteConfig.contact.email}`}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
             <Mail className="size-4" aria-hidden /> {siteConfig.contact.email}
           </a>
           <a

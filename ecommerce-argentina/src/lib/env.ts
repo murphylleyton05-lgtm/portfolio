@@ -4,8 +4,7 @@ import { z } from "zod";
  * Variables públicas (disponibles en el navegador). Se leen con referencias
  * literales a `process.env.NEXT_PUBLIC_*` para que Next.js las inyecte en el bundle.
  */
-const emptyToUndefined = (value: unknown) =>
-  typeof value === "string" && value.trim() === "" ? undefined : value;
+const emptyToUndefined = (value: unknown) => (typeof value === "string" && value.trim() === "" ? undefined : value);
 
 const publicSchema = z.object({
   siteUrl: z.url(),
@@ -28,17 +27,13 @@ const parsedPublic = publicSchema.safeParse({
 });
 
 if (!parsedPublic.success) {
-  throw new Error(
-    `Variables de entorno públicas inválidas:\n${z.prettifyError(parsedPublic.error)}`,
-  );
+  throw new Error(`Variables de entorno públicas inválidas:\n${z.prettifyError(parsedPublic.error)}`);
 }
 
 export const publicEnv = parsedPublic.data;
 
 /** true cuando hay URL + publishable key: el catálogo se lee de Supabase. */
-export const isSupabaseConfigured = Boolean(
-  publicEnv.supabaseUrl && publicEnv.supabasePublishableKey,
-);
+export const isSupabaseConfigured = Boolean(publicEnv.supabaseUrl && publicEnv.supabasePublishableKey);
 
 export function absoluteUrl(path = "/") {
   return new URL(path, `${publicEnv.siteUrl}/`).toString();

@@ -48,7 +48,8 @@ export default async function AdminOrdersPage({ searchParams }: PageProps<"/admi
   const href = (changes: Record<string, string | number | undefined>) => {
     const params = new URLSearchParams();
     const merged = { estado, q, pagina: undefined as number | undefined, ...changes };
-    for (const [key, value] of Object.entries(merged)) if (value !== undefined && value !== "" && value !== 1) params.set(key, String(value));
+    for (const [key, value] of Object.entries(merged))
+      if (value !== undefined && value !== "" && value !== 1) params.set(key, String(value));
     const search = params.toString();
     return search ? `/admin/pedidos?${search}` : "/admin/pedidos";
   };
@@ -71,7 +72,13 @@ export default async function AdminOrdersPage({ searchParams }: PageProps<"/admi
         <label htmlFor="q" className="sr-only">
           Buscar pedidos
         </label>
-        <Input id="q" name="q" defaultValue={q} placeholder="Buscar por #número, nombre o email" className="max-w-sm bg-background" />
+        <Input
+          id="q"
+          name="q"
+          defaultValue={q}
+          placeholder="Buscar por #número, nombre o email"
+          className="max-w-sm bg-background"
+        />
         <Button type="submit" variant="outline">
           Buscar
         </Button>
@@ -138,4 +145,3 @@ function tab(active: boolean) {
     active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary",
   );
 }
-

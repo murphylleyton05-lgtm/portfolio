@@ -20,7 +20,10 @@ export function Alert({
   className?: string;
 }) {
   return (
-    <div role={tone === "error" ? "alert" : "status"} className={cn("rounded-lg border px-4 py-3 text-sm", tones[tone], className)}>
+    <div
+      role={tone === "error" ? "alert" : "status"}
+      className={cn("rounded-lg border px-4 py-3 text-sm", tones[tone], className)}
+    >
       {title && <p className="font-medium">{title}</p>}
       {children && <div className={cn(title && "mt-1")}>{children}</div>}
     </div>

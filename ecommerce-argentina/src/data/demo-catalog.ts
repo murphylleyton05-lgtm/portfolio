@@ -44,9 +44,27 @@ const variantId = (product: number, variant: number) =>
 
 export const demoCategories: DemoCategory[] = [
   { id: categoryId(1), name: "Remeras", slug: "remeras", description: "Remeras y musculosas de algodón.", position: 1 },
-  { id: categoryId(2), name: "Buzos y camperas", slug: "buzos-y-camperas", description: "Abrigo para todos los días.", position: 2 },
-  { id: categoryId(3), name: "Pantalones", slug: "pantalones", description: "Joggers y jeans de calce cómodo.", position: 3 },
-  { id: categoryId(4), name: "Accesorios", slug: "accesorios", description: "Gorras, bolsos, medias y más.", position: 4 },
+  {
+    id: categoryId(2),
+    name: "Buzos y camperas",
+    slug: "buzos-y-camperas",
+    description: "Abrigo para todos los días.",
+    position: 2,
+  },
+  {
+    id: categoryId(3),
+    name: "Pantalones",
+    slug: "pantalones",
+    description: "Joggers y jeans de calce cómodo.",
+    position: 3,
+  },
+  {
+    id: categoryId(4),
+    name: "Accesorios",
+    slug: "accesorios",
+    description: "Gorras, bolsos, medias y más.",
+    position: 4,
+  },
 ];
 
 function sizes(product: number, prefix: string, list: Array<[string, number]>): DemoVariant[] {
@@ -70,7 +88,12 @@ export const demoProducts: DemoProduct[] = [
     featured: true,
     palette: ["#f4efe6", "#2f2f2f"],
     shape: "tshirt",
-    variants: sizes(1, "REM-BAS", [["S", 10], ["M", 15], ["L", 12], ["XL", 6]]),
+    variants: sizes(1, "REM-BAS", [
+      ["S", 10],
+      ["M", 15],
+      ["L", 12],
+      ["XL", 6],
+    ]),
   },
   {
     id: productId(2),
@@ -83,7 +106,12 @@ export const demoProducts: DemoProduct[] = [
     compareAtPrice: 34990,
     palette: ["#e8eef2", "#1e3a5f"],
     shape: "tshirt",
-    variants: sizes(2, "REM-OVS", [["S", 4], ["M", 8], ["L", 7], ["XL", 2]]),
+    variants: sizes(2, "REM-OVS", [
+      ["S", 4],
+      ["M", 8],
+      ["L", 7],
+      ["XL", 2],
+    ]),
   },
   {
     id: productId(3),
@@ -95,7 +123,11 @@ export const demoProducts: DemoProduct[] = [
     price: 19990,
     palette: ["#eef3ea", "#3f6212"],
     shape: "tank",
-    variants: sizes(3, "MUS-DRY", [["S", 9], ["M", 11], ["L", 5]]),
+    variants: sizes(3, "MUS-DRY", [
+      ["S", 9],
+      ["M", 11],
+      ["L", 5],
+    ]),
   },
   {
     id: productId(4),
@@ -108,7 +140,12 @@ export const demoProducts: DemoProduct[] = [
     featured: true,
     palette: ["#ece9f3", "#3b3363"],
     shape: "hoodie",
-    variants: sizes(4, "BUZ-CAN", [["S", 5], ["M", 9], ["L", 8], ["XL", 3]]),
+    variants: sizes(4, "BUZ-CAN", [
+      ["S", 5],
+      ["M", 9],
+      ["L", 8],
+      ["XL", 3],
+    ]),
   },
   {
     id: productId(5),
@@ -119,7 +156,12 @@ export const demoProducts: DemoProduct[] = [
     price: 47990,
     palette: ["#f3ece4", "#7c5a3a"],
     shape: "sweater",
-    variants: sizes(5, "BUZ-RED", [["S", 6], ["M", 7], ["L", 6], ["XL", 4]]),
+    variants: sizes(5, "BUZ-RED", [
+      ["S", 6],
+      ["M", 7],
+      ["L", 6],
+      ["XL", 4],
+    ]),
   },
   {
     id: productId(6),
@@ -133,7 +175,11 @@ export const demoProducts: DemoProduct[] = [
     featured: true,
     palette: ["#e6f0ef", "#0f4c45"],
     shape: "jacket",
-    variants: sizes(6, "CAM-ROM", [["M", 4], ["L", 5], ["XL", 2]]),
+    variants: sizes(6, "CAM-ROM", [
+      ["M", 4],
+      ["L", 5],
+      ["XL", 2],
+    ]),
   },
   {
     id: productId(7),
@@ -144,7 +190,12 @@ export const demoProducts: DemoProduct[] = [
     price: 44990,
     palette: ["#ececec", "#3a3a3a"],
     shape: "pants",
-    variants: sizes(7, "JOG-FRI", [["S", 7], ["M", 10], ["L", 8], ["XL", 4]]),
+    variants: sizes(7, "JOG-FRI", [
+      ["S", 7],
+      ["M", 10],
+      ["L", 8],
+      ["XL", 4],
+    ]),
   },
   {
     id: productId(8),
@@ -155,7 +206,13 @@ export const demoProducts: DemoProduct[] = [
     price: 64990,
     palette: ["#e7edf6", "#27467a"],
     shape: "pants",
-    variants: sizes(8, "JEA-REC", [["38", 3], ["40", 6], ["42", 6], ["44", 4], ["46", 2]]),
+    variants: sizes(8, "JEA-REC", [
+      ["38", 3],
+      ["40", 6],
+      ["42", 6],
+      ["44", 4],
+      ["46", 2],
+    ]),
   },
   {
     id: productId(9),
@@ -189,7 +246,10 @@ export const demoProducts: DemoProduct[] = [
     price: 9990,
     palette: ["#eef2f6", "#475569"],
     shape: "socks",
-    variants: sizes(11, "MED-PK3", [["35 a 39", 18], ["40 a 44", 2]]),
+    variants: sizes(11, "MED-PK3", [
+      ["35 a 39", 18],
+      ["40 a 44", 2],
+    ]),
   },
   {
     id: productId(12),

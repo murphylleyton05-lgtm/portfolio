@@ -42,11 +42,7 @@ export function slugify(input: string) {
 
 /** Normaliza texto para búsquedas sin acentos ni mayúsculas. */
 export function normalizeText(input: string) {
-  return input
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim();
+  return input.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 }
 
 /** Redondea a 2 decimales evitando errores de punto flotante. */

@@ -44,14 +44,20 @@ function button(href: string, label: string) {
 function itemsTable(order: OrderWithItems) {
   const rows = order.items
     .map((item) => {
-      const variant = item.variant_name !== "Único" ? ` <span style="color:${colors.mutedForeground}">(${escapeHtml(item.variant_name)})</span>` : "";
+      const variant =
+        item.variant_name !== "Único"
+          ? ` <span style="color:${colors.mutedForeground}">(${escapeHtml(item.variant_name)})</span>`
+          : "";
       return `<tr>
 <td style="padding:8px 0;border-bottom:1px solid ${colors.border};">${item.quantity} × ${escapeHtml(item.product_name)}${variant}</td>
 <td style="padding:8px 0;border-bottom:1px solid ${colors.border};text-align:right;white-space:nowrap;">${formatPrice(Number(item.unit_price) * item.quantity)}</td>
 </tr>`;
     })
     .join("");
-  const shippingLabel = order.delivery_method === "pickup" ? "Retiro en el local" : `Envío${order.shipping_zone ? ` (${escapeHtml(order.shipping_zone)})` : ""}`;
+  const shippingLabel =
+    order.delivery_method === "pickup"
+      ? "Retiro en el local"
+      : `Envío${order.shipping_zone ? ` (${escapeHtml(order.shipping_zone)})` : ""}`;
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;margin:16px 0;">
 ${rows}
 <tr><td style="padding:8px 0;">Subtotal</td><td style="padding:8px 0;text-align:right;">${formatPrice(Number(order.subtotal))}</td></tr>
@@ -70,7 +76,10 @@ function deliveryText(order: OrderWithItems) {
 
 function itemsText(order: OrderWithItems) {
   return order.items
-    .map((item) => `- ${item.quantity} x ${item.product_name}${item.variant_name !== "Único" ? ` (${item.variant_name})` : ""}: ${formatPrice(Number(item.unit_price) * item.quantity)}`)
+    .map(
+      (item) =>
+        `- ${item.quantity} x ${item.product_name}${item.variant_name !== "Único" ? ` (${item.variant_name})` : ""}: ${formatPrice(Number(item.unit_price) * item.quantity)}`,
+    )
     .join("\n");
 }
 
@@ -133,7 +142,9 @@ Panel: ${adminUrl}`;
 /** Aviso al cliente cuando el pedido se despacha o está listo para retirar. */
 export function orderStatusEmail(order: OrderWithItems, orderUrl: string) {
   const ready = order.status === "ready_for_pickup";
-  const subject = ready ? `Tu pedido #${order.number} está listo para retirar` : `Tu pedido #${order.number} está en camino`;
+  const subject = ready
+    ? `Tu pedido #${order.number} está listo para retirar`
+    : `Tu pedido #${order.number} está en camino`;
   const message = ready
     ? `Ya podés retirar tu pedido en ${siteConfig.pickup.address} (${siteConfig.pickup.hours}). Traé tu DNI o el número de pedido.`
     : `Despachamos tu pedido. ${deliveryText(order)}`;

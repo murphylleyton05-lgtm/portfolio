@@ -7,13 +7,7 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import {
-  demoCategories,
-  demoCreatedAt,
-  demoImages,
-  demoProducts,
-  type DemoProduct,
-} from "../src/data/demo-catalog";
+import { demoCategories, demoCreatedAt, demoImages, demoProducts, type DemoProduct } from "../src/data/demo-catalog";
 
 const root = join(import.meta.dirname, "..");
 
@@ -82,8 +76,7 @@ function buildSeed() {
 const shapes: Record<DemoProduct["shape"], (fg: string, bg: string) => string> = {
   tshirt: (fg) =>
     `<path fill="${fg}" d="M120 60 160 40q40 30 80 0l40 20 70 50-30 60-30-15v185H110V155l-30 15-30-60z"/>`,
-  tank: (fg) =>
-    `<path fill="${fg}" d="M140 40q10 70-20 100v200h160V140q-30-30-20-100h-30q-30 50-60 0z"/>`,
+  tank: (fg) => `<path fill="${fg}" d="M140 40q10 70-20 100v200h160V140q-30-30-20-100h-30q-30 50-60 0z"/>`,
   hoodie: (fg, bg) =>
     `<path fill="${fg}" d="M150 70q0-50 50-50t50 50l50 20 60 190-40 15-35-125v180H115V170L80 295l-40-15 60-190z"/>` +
     `<ellipse cx="200" cy="72" rx="32" ry="38" fill="${bg}" opacity=".35"/>` +
@@ -118,12 +111,15 @@ function mix(hexA: string, hexB: string, weight: number) {
   const parse = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
   const [a, b] = [parse(hexA), parse(hexB)];
   return `#${a
-    .map((channel, i) => Math.round(channel * (1 - weight) + b[i] * weight).toString(16).padStart(2, "0"))
+    .map((channel, i) =>
+      Math.round(channel * (1 - weight) + b[i] * weight)
+        .toString(16)
+        .padStart(2, "0"),
+    )
     .join("")}`;
 }
 
-const escapeXml = (text: string) =>
-  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const escapeXml = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 function placeholderSvg(product: DemoProduct, detail: boolean) {
   const [bg, fg] = product.palette;

@@ -1,6 +1,14 @@
 import type { ReactNode } from "react";
 
-export function PageHeader({ title, description, actions }: { title: string; description?: ReactNode; actions?: ReactNode }) {
+export function PageHeader({
+  title,
+  description,
+  actions,
+}: {
+  title: string;
+  description?: ReactNode;
+  actions?: ReactNode;
+}) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
@@ -13,5 +21,7 @@ export function PageHeader({ title, description, actions }: { title: string; des
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-xl border border-border bg-background p-4 sm:p-6 ${className}`}>{children}</section>;
+  return (
+    <section className={`rounded-xl border border-border bg-background p-4 sm:p-6 ${className}`}>{children}</section>
+  );
 }

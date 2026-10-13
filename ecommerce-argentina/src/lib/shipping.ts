@@ -18,7 +18,9 @@ type Zone = { id: string; name: string; cost: number; eta: string };
 export function findShippingZone(postalCode: string | undefined): Zone | null {
   const code = postalCode ? parsePostalCode(postalCode) : null;
   if (code === null) return null;
-  const zone = siteConfig.shipping.zones.find((z) => z.postalCodeRanges.some(([from, to]) => code >= from && code <= to));
+  const zone = siteConfig.shipping.zones.find((z) =>
+    z.postalCodeRanges.some(([from, to]) => code >= from && code <= to),
+  );
   return zone ?? siteConfig.shipping.defaultZone;
 }
 
@@ -35,10 +37,21 @@ export function deliveryMethods(): DeliveryMethod[] {
  * y el servidor (para cobrar). Devuelve null si el método no está habilitado o
  * falta un CP válido.
  */
-export function quoteShipping(input: { method: DeliveryMethod; postalCode?: string; subtotal: number }): ShippingQuote | null {
+export function quoteShipping(input: {
+  method: DeliveryMethod;
+  postalCode?: string;
+  subtotal: number;
+}): ShippingQuote | null {
   if (input.method === "pickup") {
     if (!siteConfig.pickup.enabled) return null;
-    return { method: "pickup", zoneId: "pickup", zoneName: "Retiro en el local", cost: 0, eta: siteConfig.pickup.hours, free: true };
+    return {
+      method: "pickup",
+      zoneId: "pickup",
+      zoneName: "Retiro en el local",
+      cost: 0,
+      eta: siteConfig.pickup.hours,
+      free: true,
+    };
   }
   if (!siteConfig.shipping.enabled) return null;
   const zone = findShippingZone(input.postalCode);

@@ -61,7 +61,8 @@ async function OrderView({ params, searchParams }: PageProps<"/pedido/[id]">) {
         </div>
         <p className="text-muted-foreground">{ORDER_STATUS_MESSAGE[order.status]}</p>
         <p className="text-sm text-muted-foreground">
-          Realizado el {formatDate(order.created_at)} · Te enviamos los detalles a <strong>{order.customer_email}</strong>
+          Realizado el {formatDate(order.created_at)} · Te enviamos los detalles a{" "}
+          <strong>{order.customer_email}</strong>
         </p>
       </header>
 
@@ -93,7 +94,10 @@ async function OrderView({ params, searchParams }: PageProps<"/pedido/[id]">) {
           Seguir comprando
         </Link>
         <WhatsAppLink message={`¡Hola! Te escribo por mi pedido #${order.number}.`} label="Consultar por mi pedido" />
-        <a href={`mailto:${siteConfig.contact.email}?subject=Pedido%20%23${order.number}`} className={buttonClasses("ghost")}>
+        <a
+          href={`mailto:${siteConfig.contact.email}?subject=Pedido%20%23${order.number}`}
+          className={buttonClasses("ghost")}
+        >
           Escribinos por email
         </a>
       </div>
@@ -113,8 +117,8 @@ function PaymentBox({ order }: { order: NonNullable<Awaited<ReturnType<typeof ge
   if (paymentStatus === "pending" || paymentStatus === "in_process" || paymentStatus === "authorized") {
     return (
       <Alert tone="info" title="Tu pago está en proceso">
-        Si pagaste en efectivo o por transferencia puede tardar hasta 48 hs en acreditarse. Te avisamos por email cuando se
-        confirme.
+        Si pagaste en efectivo o por transferencia puede tardar hasta 48 hs en acreditarse. Te avisamos por email cuando
+        se confirme.
       </Alert>
     );
   }

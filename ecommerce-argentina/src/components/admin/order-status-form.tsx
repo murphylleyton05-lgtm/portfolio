@@ -29,8 +29,8 @@ export function OrderStatusForm({ orderId, status }: { orderId: string; status: 
         </Button>
       </div>
       <p className="text-xs text-muted-foreground">
-        Cancelar (o volver a &quot;pendiente&quot;) repone el stock. Marcar como pagado/preparando/enviado lo descuenta si todavía no
-        se había descontado.
+        Cancelar (o volver a &quot;pendiente&quot;) repone el stock. Marcar como pagado/preparando/enviado lo descuenta
+        si todavía no se había descontado.
       </p>
       {state.error && <Alert tone="error">{state.error}</Alert>}
       {state.ok && state.message && <Alert tone="success">{state.message}</Alert>}

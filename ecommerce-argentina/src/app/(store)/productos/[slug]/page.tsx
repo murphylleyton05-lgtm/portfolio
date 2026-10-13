@@ -76,7 +76,9 @@ async function ProductDetail({ params }: Pick<PageProps<"/productos/[slug]">, "p
         <div className="flex flex-col gap-6">
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{product.name}</h1>
           <AddToCart product={product} />
-          <WhatsAppLink message={`¡Hola! Quiero consultar por "${product.name}": ${absoluteUrl(`/productos/${product.slug}`)}`} />
+          <WhatsAppLink
+            message={`¡Hola! Quiero consultar por "${product.name}": ${absoluteUrl(`/productos/${product.slug}`)}`}
+          />
           <ShippingEstimator subtotal={product.minPrice} />
           <ul className="flex flex-col gap-3 border-t border-border pt-6 text-sm">
             {siteConfig.shipping.enabled && (

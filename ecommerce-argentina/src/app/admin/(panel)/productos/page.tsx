@@ -26,7 +26,9 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/ad
 
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, slug, price, active, featured, images, category:categories(name), variants:product_variants(stock)")
+    .select(
+      "id, name, slug, price, active, featured, images, category:categories(name), variants:product_variants(stock)",
+    )
     .order("created_at", { ascending: false });
   if (error) throw new Error(`No se pudieron leer los productos: ${error.message}`);
 
@@ -60,17 +62,24 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/ad
             return (
               <li key={product.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="relative aspect-[4/5] w-12 shrink-0 overflow-hidden rounded-md bg-muted">
-                  {product.images[0] && <Image src={product.images[0]} alt="" fill sizes="48px" unoptimized className="object-cover" />}
+                  {product.images[0] && (
+                    <Image src={product.images[0]} alt="" fill sizes="48px" unoptimized className="object-cover" />
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <Link href={`/admin/productos/${product.id}`} className="font-medium underline-offset-4 hover:underline">
+                  <Link
+                    href={`/admin/productos/${product.id}`}
+                    className="font-medium underline-offset-4 hover:underline"
+                  >
                     {product.name}
                   </Link>
                   <p className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     {product.category?.name ?? "Sin categoría"} · {formatPrice(product.price)} · Stock {stock}
                     {!product.active && <Badge tone="neutral">Pausado</Badge>}
                     {product.featured && <Badge tone="info">Destacado</Badge>}
-                    {stock <= siteConfig.catalog.lowStockThreshold && <Badge tone={stock === 0 ? "danger" : "warning"}>Stock bajo</Badge>}
+                    {stock <= siteConfig.catalog.lowStockThreshold && (
+                      <Badge tone={stock === 0 ? "danger" : "warning"}>Stock bajo</Badge>
+                    )}
                   </p>
                 </div>
                 <form action={setProductActive}>
@@ -86,7 +95,9 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/ad
               </li>
             );
           })}
-          {!products.length && <li className="px-4 py-10 text-center text-sm text-muted-foreground">No hay productos.</li>}
+          {!products.length && (
+            <li className="px-4 py-10 text-center text-sm text-muted-foreground">No hay productos.</li>
+          )}
         </ul>
       </Card>
     </>

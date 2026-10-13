@@ -15,7 +15,8 @@ async function main() {
   const secret = process.env.SUPABASE_SECRET_KEY;
 
   if (!url || !secret) throw new Error("Faltan NEXT_PUBLIC_SUPABASE_URL y/o SUPABASE_SECRET_KEY en .env.local");
-  if (!email || !/^\S+@\S+\.\S+$/.test(email)) throw new Error('Uso: npm run admin:create -- email@dominio.com "contraseña"');
+  if (!email || !/^\S+@\S+\.\S+$/.test(email))
+    throw new Error('Uso: npm run admin:create -- email@dominio.com "contraseña"');
 
   const supabase = createClient(url, secret, { auth: { persistSession: false, autoRefreshToken: false } });
 

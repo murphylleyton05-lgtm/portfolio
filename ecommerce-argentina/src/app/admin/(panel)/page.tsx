@@ -24,7 +24,11 @@ export default async function AdminHome() {
       <PageHeader title="Inicio" description="Resumen de la tienda." />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Link key={stat.label} href={stat.href} className="rounded-xl border border-border bg-background p-4 transition hover:border-primary">
+          <Link
+            key={stat.label}
+            href={stat.href}
+            className="rounded-xl border border-border bg-background p-4 transition hover:border-primary"
+          >
             <p className="text-sm text-muted-foreground">{stat.label}</p>
             <p className="mt-1 text-2xl font-semibold tabular-nums">{stat.value}</p>
           </Link>
@@ -43,12 +47,17 @@ export default async function AdminHome() {
             <ul className="divide-y divide-border">
               {data.recentOrders.map((order) => (
                 <li key={order.id}>
-                  <Link href={`/admin/pedidos/${order.id}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm hover:bg-muted/50">
+                  <Link
+                    href={`/admin/pedidos/${order.id}`}
+                    className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm hover:bg-muted/50"
+                  >
                     <span className="font-medium">#{order.number}</span>
                     <span className="flex-1 truncate">{order.customer_name}</span>
                     <Badge tone={ORDER_STATUS_TONE[order.status]}>{ORDER_STATUS_LABEL[order.status]}</Badge>
                     <span className="w-24 text-right tabular-nums">{formatPrice(order.total)}</span>
-                    <span className="w-full text-xs text-muted-foreground sm:w-auto">{formatDate(order.created_at)}</span>
+                    <span className="w-full text-xs text-muted-foreground sm:w-auto">
+                      {formatDate(order.created_at)}
+                    </span>
                   </Link>
                 </li>
               ))}

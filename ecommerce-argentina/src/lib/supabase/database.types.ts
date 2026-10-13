@@ -369,13 +369,7 @@ export type Database = {
     };
     Enums: {
       order_status:
-        | "pending_payment"
-        | "paid"
-        | "preparing"
-        | "shipped"
-        | "ready_for_pickup"
-        | "delivered"
-        | "cancelled";
+        "pending_payment" | "paid" | "preparing" | "shipped" | "ready_for_pickup" | "delivered" | "cancelled";
       delivery_method: "shipping" | "pickup";
     };
     CompositeTypes: {

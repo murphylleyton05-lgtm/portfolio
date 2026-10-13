@@ -30,7 +30,11 @@ export function OrderSummary({ order }: { order: OrderWithItems }) {
           <dd className="tabular-nums">{formatPrice(order.subtotal)}</dd>
         </div>
         <div className="flex justify-between">
-          <dt>{order.delivery_method === "pickup" ? "Retiro" : `Envío${order.shipping_zone ? ` · ${order.shipping_zone}` : ""}`}</dt>
+          <dt>
+            {order.delivery_method === "pickup"
+              ? "Retiro"
+              : `Envío${order.shipping_zone ? ` · ${order.shipping_zone}` : ""}`}
+          </dt>
           <dd className="tabular-nums">{order.shipping_cost ? formatPrice(order.shipping_cost) : "Gratis"}</dd>
         </div>
         <div className="flex justify-between text-base font-semibold">

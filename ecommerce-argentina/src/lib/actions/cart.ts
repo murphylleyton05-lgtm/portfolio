@@ -21,7 +21,9 @@ export type RefreshedLine = {
  * Devuelve precio y stock actuales de las variantes del carrito. Las que ya no
  * existen o están pausadas no vuelven (el cliente las saca del carrito).
  */
-export async function refreshCart(lines: unknown): Promise<{ ok: true; lines: RefreshedLine[] } | { ok: false; error: string }> {
+export async function refreshCart(
+  lines: unknown,
+): Promise<{ ok: true; lines: RefreshedLine[] } | { ok: false; error: string }> {
   const parsed = refreshSchema.safeParse(lines);
   if (!parsed.success) return { ok: false, error: "Carrito inválido." };
   try {

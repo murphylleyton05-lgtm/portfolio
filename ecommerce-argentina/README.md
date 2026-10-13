@@ -24,17 +24,17 @@ entrar al admin hasta que configures Supabase.
 
 ## Scripts
 
-| Comando             | Qué hace                                              |
-| ------------------- | ----------------------------------------------------- |
-| `npm run dev`       | Servidor de desarrollo                                |
-| `npm run build`     | Build de producción                                   |
-| `npm run lint`      | ESLint                                                |
-| `npm run typecheck` | Genera tipos de rutas y corre TypeScript              |
-| `npm run test`      | Tests unitarios (Vitest)                              |
-| `npm run check`     | Todo lo anterior junto (lo mismo que corre el CI)     |
-| `npm run admin:create -- email "clave"` | Crea un usuario admin del panel |
-| `npm run db:test`   | Tests SQL (migraciones, pagos, stock, RLS)            |
-| `npm run demo:generate` | Regenera `seed.sql` e imágenes demo               |
+| Comando                                 | Qué hace                                          |
+| --------------------------------------- | ------------------------------------------------- |
+| `npm run dev`                           | Servidor de desarrollo                            |
+| `npm run build`                         | Build de producción                               |
+| `npm run lint`                          | ESLint                                            |
+| `npm run typecheck`                     | Genera tipos de rutas y corre TypeScript          |
+| `npm run test`                          | Tests unitarios (Vitest)                          |
+| `npm run check`                         | Todo lo anterior junto (lo mismo que corre el CI) |
+| `npm run admin:create -- email "clave"` | Crea un usuario admin del panel                   |
+| `npm run db:test`                       | Tests SQL (migraciones, pagos, stock, RLS)        |
+| `npm run demo:generate`                 | Regenera `seed.sql` e imágenes demo               |
 
 ## Estructura
 
@@ -54,15 +54,15 @@ DECISIONS.md          ← decisiones tomadas y cómo cambiarlas
 Las migraciones están en [`supabase/migrations`](./supabase/migrations) y los
 datos de ejemplo en [`supabase/seed.sql`](./supabase/seed.sql):
 
-| Tabla              | Para qué                                                     |
-| ------------------ | ------------------------------------------------------------ |
-| `categories`       | Categorías del catálogo                                      |
-| `products`         | Productos (precio base, precio tachado, imágenes, activo)    |
-| `product_variants` | Variantes (talle/color) con **stock** y precio opcional      |
-| `customers`        | Clientes (compra como invitado, se identifican por email)    |
-| `orders`           | Pedidos: estado, entrega, totales y datos de Mercado Pago     |
-| `order_items`      | Items del pedido (copia de nombre y precio al comprar)       |
-| `admin_users`      | Usuarios de Supabase Auth con acceso al panel                |
+| Tabla              | Para qué                                                  |
+| ------------------ | --------------------------------------------------------- |
+| `categories`       | Categorías del catálogo                                   |
+| `products`         | Productos (precio base, precio tachado, imágenes, activo) |
+| `product_variants` | Variantes (talle/color) con **stock** y precio opcional   |
+| `customers`        | Clientes (compra como invitado, se identifican por email) |
+| `orders`           | Pedidos: estado, entrega, totales y datos de Mercado Pago |
+| `order_items`      | Items del pedido (copia de nombre y precio al comprar)    |
+| `admin_users`      | Usuarios de Supabase Auth con acceso al panel             |
 
 Seguridad con **RLS**: el público solo lee el catálogo activo; los admins
 gestionan todo; los pedidos los crea el servidor con la secret key. El stock se
@@ -96,7 +96,7 @@ npm run admin:create -- vos@tumail.com "una-clave-segura"
 ```
 
 O desde el SQL Editor de Supabase, después de crear el usuario en
-*Authentication → Users → Add user*:
+_Authentication → Users → Add user_:
 
 ```sql
 insert into public.admin_users (user_id)
@@ -107,11 +107,11 @@ select id from auth.users where email = 'vos@tumail.com';
 
 Con `RESEND_API_KEY` y `EMAIL_FROM` configurados se envían:
 
-| Cuándo                                     | A quién              |
-| ------------------------------------------ | -------------------- |
-| Se aprueba el pago (o lo marcás pagado)    | Cliente + la tienda  |
-| Marcás el pedido como "Enviado"            | Cliente              |
-| Marcás el pedido como "Listo para retirar" | Cliente              |
+| Cuándo                                     | A quién             |
+| ------------------------------------------ | ------------------- |
+| Se aprueba el pago (o lo marcás pagado)    | Cliente + la tienda |
+| Marcás el pedido como "Enviado"            | Cliente             |
+| Marcás el pedido como "Listo para retirar" | Cliente             |
 
 Sin la clave, los emails se imprimen en la consola del servidor.
 

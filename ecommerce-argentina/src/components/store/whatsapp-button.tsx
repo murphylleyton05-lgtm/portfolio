@@ -19,14 +19,25 @@ export function WhatsAppFloatingButton() {
 }
 
 /** Link "Consultar por WhatsApp" con un mensaje armado (producto, pedido, etc.). */
-export function WhatsAppLink({ message, label = "Consultar por WhatsApp", className }: { message: string; label?: string; className?: string }) {
+export function WhatsAppLink({
+  message,
+  label = "Consultar por WhatsApp",
+  className,
+}: {
+  message: string;
+  label?: string;
+  className?: string;
+}) {
   if (!siteConfig.contact.whatsapp) return null;
   return (
     <a
       href={whatsappUrl(message)}
       target="_blank"
       rel="noopener noreferrer"
-      className={className ?? "inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#25d366] px-4 text-sm font-medium text-[#128c4a] transition hover:bg-[#25d366]/10"}
+      className={
+        className ??
+        "inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#25d366] px-4 text-sm font-medium text-[#128c4a] transition hover:bg-[#25d366]/10"
+      }
     >
       <WhatsAppIcon width={18} height={18} />
       {label}

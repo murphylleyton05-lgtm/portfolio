@@ -35,7 +35,16 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean;
 };
 
-export function Button({ variant, size, loading, className, children, disabled, type = "button", ...props }: ButtonProps) {
+export function Button({
+  variant,
+  size,
+  loading,
+  className,
+  children,
+  disabled,
+  type = "button",
+  ...props
+}: ButtonProps) {
   return (
     <button
       type={type}

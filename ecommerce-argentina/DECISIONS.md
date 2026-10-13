@@ -7,7 +7,7 @@ cambiarla.
 ## Proyecto
 
 - **Carpeta propia dentro del monorepo `portfolio`** (`ecommerce-argentina/`). En
-  Vercel hay que poner *Root Directory = `ecommerce-argentina`*.
+  Vercel hay que poner _Root Directory = `ecommerce-argentina`_.
 - **Next.js 16.4 con Cache Components** (lo que trae `create-next-app` por
   defecto). El catálogo se cachea con `"use cache"` + `cacheTag("catalog")` y se
   invalida cuando el admin guarda cambios o entra un pago. Lo que depende del
@@ -30,7 +30,7 @@ cambiarla.
 - **Headers de seguridad básicos** en `next.config.ts` (nosniff, referrer,
   frame-options, permissions-policy). No se agregó CSP estricta para no romper
   el checkout de Mercado Pago ni scripts de terceros que quieras sumar.
-- **`npm audit`** reporta 5 vulnerabilidades *high* en `braces`/`micromatch`,
+- **`npm audit`** reporta 5 vulnerabilidades _high_ en `braces`/`micromatch`,
   dependencias de desarrollo de `eslint-config-next`. No llegan al bundle de
   producción y la única "solución" automática es bajar a Next 14, así que se
   dejaron.
@@ -45,7 +45,7 @@ cambiarla.
 - **Imágenes como `text[]` en `products`** (la primera es la portada), sin tabla
   aparte. Guardan URLs públicas de Supabase Storage o rutas de `/public`.
 - **Compra como invitado**: no hay cuentas de cliente. `customers` se hace
-  *upsert* por email y cada pedido guarda una copia de los datos del cliente.
+  _upsert_ por email y cada pedido guarda una copia de los datos del cliente.
 - **El cliente ve su pedido con un token secreto** (`/pedido/<id>?token=<uuid>`)
   que va en el link de vuelta de Mercado Pago y en el email.
 - **Stock**: se valida al crear el pedido y se descuenta recién cuando el pago
@@ -54,7 +54,7 @@ cambiarla.
   admin lo ve. Para una tienda chica es preferible a reservar stock de carritos
   abandonados.
 - **Estados del pedido**: `pending_payment → paid → preparing → shipped /
-  ready_for_pickup → delivered`, o `cancelled`. Cambiar a cancelado (o volver a
+ready_for_pickup → delivered`, o `cancelled`. Cambiar a cancelado (o volver a
   pendiente) repone stock; pasar a cualquier estado "pagado" lo descuenta si no
   estaba descontado (sirve para cobros por transferencia).
 - **Un pago aprobado sobre un pedido cancelado no lo reactiva**: queda
@@ -160,7 +160,7 @@ cambiarla.
 ## Extras Argentina (envío, retiro, WhatsApp)
 
 - **Envío por zonas de código postal** configurables en `site.config.ts →
-  shipping.zones` (rangos de CP numéricos). Por defecto: CABA (1000–1499),
+shipping.zones` (rangos de CP numéricos). Por defecto: CABA (1000–1499),
   GBA (1600–1999) y "Resto del país" para todo lo demás. Se acepta CP de 4
   dígitos o CPA ("C1425ABC"). Los CP argentinos de 4 dígitos no respetan
   límites provinciales exactos: si necesitás precisión por provincia, agregá

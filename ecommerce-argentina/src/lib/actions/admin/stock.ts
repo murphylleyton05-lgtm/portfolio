@@ -12,7 +12,10 @@ export async function updateStock(_prev: StockState, formData: FormData): Promis
   const parsed = stockUpdateSchema.safeParse({ variantId: formData.get("variantId"), stock: formData.get("stock") });
   if (!parsed.success) return { error: Object.values(fieldErrorsOf(parsed.error))[0] };
 
-  const { error } = await supabase.from("product_variants").update({ stock: parsed.data.stock }).eq("id", parsed.data.variantId);
+  const { error } = await supabase
+    .from("product_variants")
+    .update({ stock: parsed.data.stock })
+    .eq("id", parsed.data.variantId);
   if (error) return { error: "No se pudo guardar." };
   updateTag(CATALOG_TAG);
   revalidatePath("/admin/stock");

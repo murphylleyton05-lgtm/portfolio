@@ -37,7 +37,12 @@ export function ProductCard({ product, preload = false }: { product: CatalogProd
       </div>
       <div className="flex flex-col gap-1">
         <h3 className="text-sm leading-snug font-medium group-hover:underline">{product.name}</h3>
-        <Price amount={product.minPrice} compareAt={product.hasPriceRange ? null : product.compareAtPrice} from={product.hasPriceRange} size="sm" />
+        <Price
+          amount={product.minPrice}
+          compareAt={product.hasPriceRange ? null : product.compareAtPrice}
+          from={product.hasPriceRange}
+          size="sm"
+        />
       </div>
     </Link>
   );

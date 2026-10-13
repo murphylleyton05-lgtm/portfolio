@@ -25,11 +25,7 @@ export async function getCatalog(): Promise<Catalog> {
 
   const supabase = createPublicClient();
   const [categoriesResult, productsResult] = await Promise.all([
-    supabase
-      .from("categories")
-      .select("id, name, slug, description, position")
-      .order("position")
-      .order("name"),
+    supabase.from("categories").select("id, name, slug, description, position").order("position").order("name"),
     supabase
       .from("products")
       .select(

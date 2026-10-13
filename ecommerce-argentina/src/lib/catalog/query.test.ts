@@ -7,7 +7,15 @@ const { products } = getDemoCatalog();
 describe("parseCatalogQuery", () => {
   it("usa valores por defecto con parámetros vacíos o inválidos", () => {
     const query = parseCatalogQuery({ q: "  ", min: "abc", orden: "cualquiera", pagina: "-3", categoria: "<script>" });
-    expect(query).toEqual({ q: undefined, categoria: undefined, min: undefined, max: undefined, orden: "destacados", pagina: 1, stock: undefined });
+    expect(query).toEqual({
+      q: undefined,
+      categoria: undefined,
+      min: undefined,
+      max: undefined,
+      orden: "destacados",
+      pagina: 1,
+      stock: undefined,
+    });
   });
 
   it("toma el primer valor si un parámetro viene repetido", () => {

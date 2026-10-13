@@ -12,14 +12,28 @@ const order = {
   customer_phone: "11 2345-6789",
   customer_dni: null,
   delivery_method: "shipping",
-  shipping_address: { street: "Av. Rivadavia", number: "1234", city: "CABA", province: "Ciudad Autónoma de Buenos Aires", postalCode: "C1406ABC" },
+  shipping_address: {
+    street: "Av. Rivadavia",
+    number: "1234",
+    city: "CABA",
+    province: "Ciudad Autónoma de Buenos Aires",
+    postalCode: "C1406ABC",
+  },
   shipping_zone: "CABA",
   subtotal: 49980,
   shipping_cost: 4500,
   total: 54480,
   notes: "Tocar timbre <b>B</b>",
   items: [
-    { id: "i1", product_name: "Remera Básica", variant_name: "M", unit_price: 24990, quantity: 2, image: null, sku: "REM-M" },
+    {
+      id: "i1",
+      product_name: "Remera Básica",
+      variant_name: "M",
+      unit_price: 24990,
+      quantity: 2,
+      image: null,
+      sku: "REM-M",
+    },
   ],
 } as unknown as OrderWithItems;
 

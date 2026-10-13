@@ -102,8 +102,7 @@ export function CheckoutForm({ ordersEnabled, submitLabel }: Props) {
   const err = (name: string) =>
     (
       name.split(".").reduce<unknown>((acc, key) => (acc as Record<string, unknown> | undefined)?.[key], errors) as
-        | { message?: string }
-        | undefined
+        { message?: string } | undefined
     )?.message;
 
   /** id + atributos aria que conectan el control con su mensaje de error. */

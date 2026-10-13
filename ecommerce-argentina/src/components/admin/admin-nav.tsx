@@ -26,7 +26,9 @@ export function AdminNav() {
             aria-current={active ? "page" : undefined}
             className={cn(
               "flex items-center gap-2 rounded-lg px-3 py-2 text-sm whitespace-nowrap transition",
-              active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              active
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
             <Icon className="size-4" aria-hidden />

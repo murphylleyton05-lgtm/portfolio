@@ -63,7 +63,10 @@ export function CartView() {
             const max = Math.min(item.stock, MAX_QUANTITY_PER_ITEM);
             return (
               <li key={item.variantId} className="flex gap-4 py-4">
-                <Link href={`/productos/${item.slug}`} className="relative aspect-[4/5] w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:w-24">
+                <Link
+                  href={`/productos/${item.slug}`}
+                  className="relative aspect-[4/5] w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:w-24"
+                >
                   {item.image && <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" />}
                 </Link>
                 <div className="flex flex-1 flex-col gap-2">
@@ -72,7 +75,9 @@ export function CartView() {
                       <Link href={`/productos/${item.slug}`} className="text-sm font-medium hover:underline">
                         {item.name}
                       </Link>
-                      {item.variantName !== "Único" && <p className="text-sm text-muted-foreground">{item.variantName}</p>}
+                      {item.variantName !== "Único" && (
+                        <p className="text-sm text-muted-foreground">{item.variantName}</p>
+                      )}
                     </div>
                     <p className="text-sm font-semibold tabular-nums">{formatPrice(item.price * item.quantity)}</p>
                   </div>

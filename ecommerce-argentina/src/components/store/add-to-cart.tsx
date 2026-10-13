@@ -60,16 +60,19 @@ export function AddToCart({ product }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <Price amount={shownPrice} compareAt={product.compareAtPrice} from={!variant && new Set(product.variants.map((v) => v.price)).size > 1} size="lg" />
+      <Price
+        amount={shownPrice}
+        compareAt={product.compareAtPrice}
+        from={!variant && new Set(product.variants.map((v) => v.price)).size > 1}
+        size="lg"
+      />
       {siteConfig.payments.installmentsBanner && (
         <p className="-mt-3 text-sm text-muted-foreground">{siteConfig.payments.installmentsBanner}</p>
       )}
 
       {!singleVariant && (
         <fieldset>
-          <legend className="mb-2 text-sm font-medium">
-            Opción{variant ? `: ${variant.name}` : ""}
-          </legend>
+          <legend className="mb-2 text-sm font-medium">Opción{variant ? `: ${variant.name}` : ""}</legend>
           <div className="flex flex-wrap gap-2">
             {product.variants.map((v) => {
               const unavailable = v.stock <= 0;
@@ -88,7 +91,9 @@ export function AddToCart({ product }: Props) {
                   }}
                   className={cn(
                     "min-w-12 rounded-lg border px-3 py-2 text-sm transition",
-                    selected ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary",
+                    selected
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border hover:border-primary",
                     unavailable && "cursor-not-allowed text-muted-foreground line-through opacity-60",
                   )}
                 >
@@ -137,7 +142,10 @@ export function AddToCart({ product }: Props) {
         </p>
       )}
       {added && !error && (
-        <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+        <div
+          role="status"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+        >
           <span className="flex items-center gap-2">
             <Check className="size-4" aria-hidden /> Agregado al carrito
           </span>
@@ -154,7 +162,9 @@ function StockLabel({ stock }: { stock: number | null }) {
   if (stock === null) return null;
   if (stock <= 0) return <p className="text-sm font-medium text-red-600">Sin stock</p>;
   if (stock <= siteConfig.catalog.lowStockThreshold) {
-    return <p className="text-sm font-medium text-amber-700">¡Últimas {stock === 1 ? "unidad" : `${stock} unidades`}!</p>;
+    return (
+      <p className="text-sm font-medium text-amber-700">¡Últimas {stock === 1 ? "unidad" : `${stock} unidades`}!</p>
+    );
   }
   return <p className="text-sm text-emerald-700">En stock</p>;
 }

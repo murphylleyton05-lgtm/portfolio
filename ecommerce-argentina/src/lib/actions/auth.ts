@@ -10,7 +10,11 @@ const loginSchema = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres").max(200),
 });
 
-export type LoginState = { error?: string; fieldErrors?: Partial<Record<"email" | "password", string>>; email?: string };
+export type LoginState = {
+  error?: string;
+  fieldErrors?: Partial<Record<"email" | "password", string>>;
+  email?: string;
+};
 
 export async function signIn(_prev: LoginState, formData: FormData): Promise<LoginState> {
   if (!isSupabaseConfigured) return { error: "Configurá Supabase para usar el panel (ver README)." };

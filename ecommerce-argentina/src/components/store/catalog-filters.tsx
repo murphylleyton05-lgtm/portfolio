@@ -23,7 +23,9 @@ export function CatalogFilters({ query, categories }: Props) {
       <details className="lg:hidden">
         <summary className="inline-flex h-11 cursor-pointer list-none items-center gap-2 rounded-lg border border-border px-4 text-sm font-medium [&::-webkit-details-marker]:hidden">
           <SlidersHorizontal className="size-4" aria-hidden /> Filtros
-          {hasActiveFilters(query) && <span className="size-2 rounded-full bg-accent" aria-label="(hay filtros activos)" />}
+          {hasActiveFilters(query) && (
+            <span className="size-2 rounded-full bg-accent" aria-label="(hay filtros activos)" />
+          )}
         </summary>
         <div className="mt-4 rounded-xl border border-border p-4">
           <FiltersForm query={query} categories={categories} idPrefix="m" />
@@ -65,17 +67,41 @@ function FiltersForm({ query, categories, idPrefix }: Props & { idPrefix: string
           <label htmlFor={id("min")} className="text-sm font-medium">
             Precio mín.
           </label>
-          <Input id={id("min")} name="min" type="number" inputMode="numeric" min={0} step={1} defaultValue={query.min} placeholder="$" />
+          <Input
+            id={id("min")}
+            name="min"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            step={1}
+            defaultValue={query.min}
+            placeholder="$"
+          />
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor={id("max")} className="text-sm font-medium">
             Precio máx.
           </label>
-          <Input id={id("max")} name="max" type="number" inputMode="numeric" min={0} step={1} defaultValue={query.max} placeholder="$" />
+          <Input
+            id={id("max")}
+            name="max"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            step={1}
+            defaultValue={query.max}
+            placeholder="$"
+          />
         </div>
       </div>
       <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="stock" value="1" defaultChecked={Boolean(query.stock)} className="size-4 accent-primary" />
+        <input
+          type="checkbox"
+          name="stock"
+          value="1"
+          defaultChecked={Boolean(query.stock)}
+          className="size-4 accent-primary"
+        />
         Solo con stock
       </label>
       <Button type="submit">Aplicar filtros</Button>

@@ -207,7 +207,11 @@ export async function syncPaymentsForOrder(orderId: string): Promise<SyncResult 
  * Valida la firma `x-signature` de un webhook. Si no hay clave secreta
  * configurada, no se valida (el pago igual se verifica contra la API).
  */
-export function verifyWebhookSignature(input: { signature: string | null; requestId: string | null; dataId: string | null }) {
+export function verifyWebhookSignature(input: {
+  signature: string | null;
+  requestId: string | null;
+  dataId: string | null;
+}) {
   if (!serverEnv.mercadoPagoWebhookSecret) return { ok: true as const, verified: false };
   try {
     WebhookSignatureValidator.validate({

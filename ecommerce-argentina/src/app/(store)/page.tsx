@@ -29,7 +29,9 @@ export default async function HomePage() {
       <section className="border-b border-border bg-muted/50">
         <div className="container-page flex flex-col items-start gap-6 py-16 sm:py-24">
           <p className="text-sm font-medium text-accent">{siteConfig.name}</p>
-          <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">{siteConfig.tagline}</h1>
+          <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+            {siteConfig.tagline}
+          </h1>
           <p className="max-w-xl text-muted-foreground">{siteConfig.description}</p>
           <div className="flex flex-wrap gap-3">
             <Link href="/productos" className={buttonClasses("primary", "lg")}>
@@ -73,7 +75,9 @@ export default async function HomePage() {
                   className="flex h-full flex-col justify-between gap-6 rounded-xl border border-border p-5 transition hover:border-primary"
                 >
                   <span className="font-medium">{category.name}</span>
-                  {category.description && <span className="text-sm text-muted-foreground">{category.description}</span>}
+                  {category.description && (
+                    <span className="text-sm text-muted-foreground">{category.description}</span>
+                  )}
                 </Link>
               </li>
             ))}

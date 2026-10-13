@@ -17,9 +17,7 @@ export type CreatedOrder = {
   form: CheckoutFormValues;
 };
 
-export type CreateOrderResult =
-  | { ok: true; order: CreatedOrder }
-  | { ok: false; error: string; problems?: string[] };
+export type CreateOrderResult = { ok: true; order: CreatedOrder } | { ok: false; error: string; problems?: string[] };
 
 /**
  * Crea el pedido con precios y stock leídos del servidor (nunca del navegador).
@@ -73,10 +71,7 @@ export async function createOrder(
 
   const { data: customer, error: customerError } = await supabase
     .from("customers")
-    .upsert(
-      { email: form.email, name: form.name, phone: form.phone, dni: form.dni ?? null },
-      { onConflict: "email" },
-    )
+    .upsert({ email: form.email, name: form.name, phone: form.phone, dni: form.dni ?? null }, { onConflict: "email" })
     .select("id")
     .single();
   if (customerError) {

@@ -29,7 +29,10 @@ export default async function StockPage({ searchParams }: PageProps<"/admin/stoc
 
   return (
     <>
-      <PageHeader title="Stock" description={`Las variantes con ${threshold} unidades o menos se marcan como stock bajo.`} />
+      <PageHeader
+        title="Stock"
+        description={`Las variantes con ${threshold} unidades o menos se marcan como stock bajo.`}
+      />
       <div className="mb-4 flex gap-2">
         <Link href="/admin/stock" className={tab(!bajo)}>
           Todo
@@ -53,7 +56,10 @@ export default async function StockPage({ searchParams }: PageProps<"/admin/stoc
               <tr key={variant.id}>
                 <td className="px-4 py-2">
                   {variant.product ? (
-                    <Link href={`/admin/productos/${variant.product.id}`} className="underline-offset-4 hover:underline">
+                    <Link
+                      href={`/admin/productos/${variant.product.id}`}
+                      className="underline-offset-4 hover:underline"
+                    >
                       {variant.product.name}
                     </Link>
                   ) : (
@@ -75,7 +81,11 @@ export default async function StockPage({ searchParams }: PageProps<"/admin/stoc
                 </td>
                 <td className="px-4 py-2 text-muted-foreground">{variant.sku ?? "—"}</td>
                 <td className="px-4 py-2">
-                  <StockRowForm variantId={variant.id} stock={variant.stock} label={`${variant.product?.name ?? ""} ${variant.name}`} />
+                  <StockRowForm
+                    variantId={variant.id}
+                    stock={variant.stock}
+                    label={`${variant.product?.name ?? ""} ${variant.name}`}
+                  />
                 </td>
               </tr>
             ))}

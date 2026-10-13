@@ -33,7 +33,10 @@ export type Province = (typeof PROVINCES)[number];
  * Devuelve null si el formato no es válido.
  */
 export function parsePostalCode(input: string): number | null {
-  const match = input.trim().toUpperCase().match(/^[A-Z]?(\d{4})[A-Z]{0,3}$/);
+  const match = input
+    .trim()
+    .toUpperCase()
+    .match(/^[A-Z]?(\d{4})[A-Z]{0,3}$/);
   return match ? Number(match[1]) : null;
 }
 
@@ -67,7 +70,10 @@ const PROVINCE_BY_LETTER: Record<string, Province> = {
 
 /** Si el CP viene en formato CPA ("C1425ABC") devuelve la provincia. */
 export function provinceFromPostalCode(input: string): Province | null {
-  const match = input.trim().toUpperCase().match(/^([A-Z])\d{4}[A-Z]{0,3}$/);
+  const match = input
+    .trim()
+    .toUpperCase()
+    .match(/^([A-Z])\d{4}[A-Z]{0,3}$/);
   return match ? (PROVINCE_BY_LETTER[match[1]] ?? null) : null;
 }
 

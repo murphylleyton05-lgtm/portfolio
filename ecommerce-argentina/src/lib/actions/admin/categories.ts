@@ -24,7 +24,8 @@ export async function saveCategory(_prev: CategoryState, formData: FormData): Pr
     ? await supabase.from("categories").update(row).eq("id", id)
     : await supabase.from("categories").insert(row);
   if (error) {
-    if (error.code === "23505") return { error: "Ya existe una categoría con ese slug.", fieldErrors: { slug: "Slug repetido" } };
+    if (error.code === "23505")
+      return { error: "Ya existe una categoría con ese slug.", fieldErrors: { slug: "Slug repetido" } };
     return { error: "No se pudo guardar la categoría." };
   }
   updateTag(CATALOG_TAG);

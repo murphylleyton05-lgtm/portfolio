@@ -15,7 +15,11 @@ export async function getDashboardData(supabase: SupabaseClient<Database>) {
   const [pending, toPrepare, sales, recent, lowStock] = await Promise.all([
     supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "pending_payment"),
     supabase.from("orders").select("id", { count: "exact", head: true }).in("status", ["paid", "preparing"]),
-    supabase.from("orders").select("total").in("status", [...PAID_STATUSES]).gte("paid_at", since),
+    supabase
+      .from("orders")
+      .select("total")
+      .in("status", [...PAID_STATUSES])
+      .gte("paid_at", since),
     supabase
       .from("orders")
       .select("id, number, status, customer_name, total, created_at")

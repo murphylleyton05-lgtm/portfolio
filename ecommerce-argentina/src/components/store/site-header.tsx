@@ -24,7 +24,9 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
       {announcements.length > 0 && (
-        <p className="bg-primary px-4 py-1.5 text-center text-xs text-primary-foreground">{announcements.join(" · ")}</p>
+        <p className="bg-primary px-4 py-1.5 text-center text-xs text-primary-foreground">
+          {announcements.join(" · ")}
+        </p>
       )}
       <div className="container-page flex h-16 items-center gap-2 md:gap-6">
         <MobileMenu links={links} />
