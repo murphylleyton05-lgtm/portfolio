@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Pre-Entrega Módulo 10 · Lleyton Murphy</title>
+<style>
+  @page { size: A4; margin: 13mm 14mm 15mm 14mm; }
+  :root {
+    --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+    --line: #e1e0d9; --base: #c3c2b7; --plane: #f6f5f1;
+    --navy: #0f2a4a; --blue: #2a78d6; --blue-d: #184f95; --wash: #eef4fc; --wash2: #cde2fb;
+    --good: #0ca30c; --warn: #fab219; --crit: #d03b3b; --red: #e34948;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #ffffff; color: var(--ink); }
+  body { font-family: Inter, system-ui, sans-serif; font-size: 9.3pt; line-height: 1.42; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { break-after: page; }
+  .page:last-child { break-after: auto; }
+  h1, h2, h3, h4 { margin: 0; line-height: 1.2; }
+  p { margin: 0 0 6px; }
+  ul, ol { margin: 0 0 6px; padding-left: 16px; }
+  li { margin-bottom: 2px; }
+  strong { font-weight: 600; }
+
+  /* Encabezados de sección */
+  .sec { display: flex; align-items: baseline; gap: 10px; border-bottom: 2px solid var(--navy); padding-bottom: 5px; margin-bottom: 10px; }
+  .sec .num { font-size: 8pt; font-weight: 700; letter-spacing: .08em; color: #fff; background: var(--navy); padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+  .sec h2 { font-size: 15pt; font-weight: 700; color: var(--navy); }
+  h3 { font-size: 11pt; font-weight: 700; color: var(--navy); margin: 12px 0 6px; }
+  h3 .tag { font-size: 7.5pt; font-weight: 600; color: var(--blue-d); background: var(--wash); border-radius: 3px; padding: 1px 6px; margin-left: 6px; vertical-align: 1px; letter-spacing: .02em; }
+  .lead { font-size: 10pt; color: var(--ink2); }
+  .small { font-size: 8pt; color: var(--ink2); }
+  .muted { color: var(--muted); }
+
+  /* Portada */
+  .cover { background: var(--navy); color: #fff; border-radius: 10px; padding: 20px 22px 18px; margin-bottom: 12px; }
+  .cover .kicker { font-size: 8pt; letter-spacing: .12em; text-transform: uppercase; color: #9ec5f4; font-weight: 600; }
+  .cover h1 { font-size: 23pt; font-weight: 700; margin: 6px 0 6px; letter-spacing: -.01em; }
+  .cover .tagline { font-size: 11.5pt; color: #dbe7f5; margin-bottom: 12px; }
+  .cover .meta { display: flex; gap: 18px; flex-wrap: wrap; font-size: 8.3pt; color: #b7d3f6; border-top: 1px solid rgba(255,255,255,.18); padding-top: 9px; }
+  .cover .meta b { color: #fff; font-weight: 600; }
+
+  /* Tiles */
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0 10px; }
+  .tile { border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px 8px; background: #fcfcfb; }
+  .tile .lbl { font-size: 7.6pt; color: var(--ink2); font-weight: 500; }
+  .tile .val { font-size: 19pt; font-weight: 700; color: var(--navy); line-height: 1.1; margin: 3px 0 2px; }
+  .tile .sub { font-size: 7.4pt; color: var(--muted); line-height: 1.3; }
+
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+  .box { border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; background: #fcfcfb; }
+  .box.wash { background: var(--wash); border-color: var(--wash2); }
+  .box.navy { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .box.navy h4 { color: #fff; }
+  .box h4 { font-size: 9.6pt; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .callout { border-left: 3px solid var(--blue); background: var(--wash); padding: 8px 11px; border-radius: 0 6px 6px 0; margin: 8px 0; }
+  .callout.navy { border-left-color: var(--navy); }
+
+  /* Tablas */
+  table { width: 100%; border-collapse: collapse; font-size: 8.3pt; line-height: 1.35; margin: 4px 0 8px; }
+  th { text-align: left; font-weight: 600; color: var(--ink2); font-size: 7.6pt; text-transform: uppercase; letter-spacing: .03em; border-bottom: 1.5px solid var(--base); padding: 5px 6px; vertical-align: bottom; }
+  td { border-bottom: 1px solid var(--line); padding: 5px 6px; vertical-align: top; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.tot td { font-weight: 700; border-top: 1.5px solid var(--base); border-bottom: none; background: var(--plane); }
+  tr.hl td { background: var(--wash); font-weight: 600; }
+  td .t { font-weight: 600; color: var(--ink); display: block; }
+  td .d { color: var(--ink2); font-size: 7.6pt; }
+  .fb td:first-child { width: 40%; }
+  .fb td:first-child .t { color: var(--navy); }
+
+  /* Diagrama */
+  .arq { width: 100%; height: auto; display: block; margin: 2px 0 4px; }
+  .arq text { font-family: Inter, system-ui, sans-serif; }
+  .arq .banda { font-size: 11px; font-weight: 700; letter-spacing: .1em; fill: var(--muted); }
+  .arq .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; }
+  .arq .tt { font-size: 15.5px; font-weight: 700; fill: var(--ink); }
+  .arq .dd { font-size: 12.5px; fill: var(--ink2); }
+  .arq .lk { font-size: 11.5px; fill: var(--ink2); font-weight: 500; }
+  .arq .badge circle { fill: var(--navy); stroke: #fff; stroke-width: 2; }
+  .arq .badge text { font-size: 11.5px; font-weight: 700; fill: #fff; text-anchor: middle; }
+  .arq .fl { stroke: var(--ink2); stroke-width: 1.8; fill: none; }
+  .arq .flv { stroke: var(--good); stroke-width: 2.4; fill: none; }
+  .pasos { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 16px; font-size: 8.2pt; margin: 4px 0 6px; padding: 0; list-style: none; }
+  .pasos li { display: grid; grid-template-columns: 18px 1fr; gap: 6px; align-items: start; }
+  .pasos .b { width: 16px; height: 16px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 7.5pt; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+
+  /* Semáforo */
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+  .dot.g { background: var(--good); } .dot.y { background: var(--warn); } .dot.r { background: var(--crit); }
+  .sem { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .sem .box { padding: 8px 10px; }
+  .sem .box h4 { display: block; }
+  .sem ul { font-size: 8pt; padding-left: 14px; margin: 0; }
+  .sem .rule { font-size: 7.8pt; color: var(--ink2); margin-bottom: 4px; }
+
+  /* Fases */
+  .fase-h { display: inline-block; font-size: 7.3pt; font-weight: 700; color: #fff; border-radius: 3px; padding: 1px 6px; margin-bottom: 3px; letter-spacing: .03em; }
+  .f0 { background: #6d6c68; } .f1 { background: #5598e7; } .f2 { background: #256abf; } .f3 { background: var(--navy); }
+  .fases td { font-size: 7.9pt; }
+  .fases td:first-child { width: 17%; }
+  .no { color: #a32a2a; }
+
+  /* Gantt */
+  .gantt { display: grid; grid-template-columns: 128px repeat(10, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; font-size: 7.6pt; margin: 6px 0 4px; }
+  .gantt .h { background: var(--plane); color: var(--ink2); font-weight: 600; padding: 4px 3px; text-align: center; border-bottom: 1px solid var(--line); border-left: 1px solid var(--line); line-height: 1.2; }
+  .gantt .h:first-child { text-align: left; padding-left: 8px; border-left: none; }
+  .gantt .rl { padding: 5px 8px; font-weight: 600; border-bottom: 1px solid var(--line); line-height: 1.2; }
+  .gantt .cell { border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; }
+  .gantt .bar { position: absolute; top: 5px; bottom: 5px; border-radius: 4px; color: #fff; font-weight: 600; font-size: 7pt; display: flex; align-items: center; padding-left: 6px; white-space: nowrap; z-index: 2; }
+  .gantt .last { border-bottom: none; }
+
+  /* Pricing */
+  .price { border: 1px solid var(--line); border-radius: 9px; overflow: hidden; background: #fcfcfb; display: flex; flex-direction: column; }
+  .price .top { background: var(--navy); color: #fff; padding: 9px 11px 8px; }
+  .price .top .k { font-size: 7.4pt; letter-spacing: .08em; text-transform: uppercase; color: #9ec5f4; font-weight: 600; }
+  .price .top .v { font-size: 18pt; font-weight: 700; line-height: 1.15; margin-top: 2px; }
+  .price .top .v small { font-size: 9pt; font-weight: 500; color: #dbe7f5; }
+  .price .top .w { font-size: 7.8pt; color: #dbe7f5; }
+  .price .bd { padding: 7px 10px 8px; font-size: 7.8pt; line-height: 1.36; }
+  .price .bd ul { padding-left: 14px; margin: 0 0 4px; }
+  .price .bd .lbl { font-size: 7.3pt; font-weight: 700; color: var(--blue-d); text-transform: uppercase; letter-spacing: .05em; margin: 5px 0 2px; }
+
+  /* Ciclo de vida del caso */
+  .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin: 6px 0 8px; }
+  .flow .st { position: relative; background: var(--wash); border: 1px solid var(--wash2); padding: 7px 8px 7px 14px; font-size: 7.8pt; line-height: 1.3; min-height: 64px; }
+  .flow .st:first-child { border-radius: 7px 0 0 7px; padding-left: 9px; }
+  .flow .st:last-child { border-radius: 0 7px 7px 0; background: var(--navy); color: #fff; border-color: var(--navy); }
+  .flow .st b { display: block; font-size: 8.3pt; color: var(--navy); margin-bottom: 2px; }
+  .flow .st:last-child b { color: #fff; }
+  .flow .st:not(:last-child)::after { content: ""; position: absolute; right: -9px; top: 50%; transform: translateY(-50%); border-left: 9px solid var(--wash2); border-top: 12px solid transparent; border-bottom: 12px solid transparent; z-index: 3; }
+  .mono { font-family: "DejaVu Sans Mono", monospace; font-size: 7.4pt; color: var(--blue-d); }
+
+  /* Objeciones */
+  .obj { border: 1px solid var(--line); border-radius: 9px; margin-bottom: 9px; overflow: hidden; }
+  .obj .q { background: var(--navy); color: #fff; padding: 7px 12px; font-size: 10.5pt; font-weight: 700; display: flex; gap: 10px; align-items: baseline; }
+  .obj .q span { font-size: 7.5pt; color: #9ec5f4; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
+  .obj .a { display: grid; grid-template-columns: 1.65fr 1fr; }
+  .obj .a > div { padding: 8px 12px; font-size: 8.5pt; }
+  .obj .a .r { background: var(--wash); border-left: 1px solid var(--wash2); font-size: 8pt; }
+  .obj .a .r h4 { font-size: 7.5pt; letter-spacing: .06em; text-transform: uppercase; color: var(--blue-d); margin-bottom: 4px; }
+  .obj .a .r ul { padding-left: 13px; margin: 0; }
+
+  /* Gráfico */
+  .chart { width: 100%; height: auto; display: block; }
+  .chart .grid { stroke: var(--line); stroke-width: 1; }
+  .chart .base { stroke: var(--base); stroke-width: 1; }
+  .chart .tick { font-size: 10px; fill: var(--muted); font-family: Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  .chart .lab { font-size: 10.5px; fill: var(--ink2); font-family: Inter, system-ui, sans-serif; }
+  .chart .lab.strong { fill: var(--ink); font-weight: 600; }
+  .chart .pos { fill: var(--blue); }
+  .chart .neg { fill: var(--red); }
+  .chart .mark { stroke: var(--ink2); stroke-width: 1; }
+  .ctitle { font-size: 9pt; font-weight: 700; color: var(--ink); margin: 0; }
+  .csub { font-size: 7.8pt; color: var(--ink2); margin: 1px 0 2px; }
+  .src { font-size: 7.3pt; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ============================ PÁGINA 1 ============================ -->
+<section class="page">
+  <div class="cover">
+    <div class="kicker">Propuesta técnico-comercial · Pre-entrega Módulo 10</div>
+    <h1>Asistente de Soporte Supervisado</h1>
+    <div class="tagline">Cada consulta de un cliente respondida con la política vigente, verificada antes de salir y registrada en el CRM, sin sumar personas al equipo.</div>
+    <div class="meta">
+      <div>Para <b>Comité de Dirección · Lleyton Tech Store</b></div>
+      <div>Preparado por <b>Lleyton Murphy · Lleyton IA Automation</b></div>
+      <div>Fecha <b>Octubre 2026</b></div>
+      <div>Kickoff propuesto <b>lunes 2 de noviembre de 2026</b></div>
+    </div>
+  </div>
+
+  <div class="sec"><span class="num">Sección 1</span><h2>Narrativa ejecutiva y arquitectura de valor</h2></div>
+
+  <h3>El problema: un proceso manual que no escala</h3>
+  <p>El equipo de soporte de Lleyton Tech Store recibe unas <strong>1.500 consultas por mes</strong> en la casilla de soporte. Cada una sigue el mismo recorrido a mano: leer y clasificar el correo, buscar la regla en el Manual de Políticas, redactar la respuesta, cargar o actualizar al cliente en HubSpot y avisar al equipo. Son <strong>8,5 minutos por consulta y 212,5 horas por mes</strong>: 1,3 personas de tiempo completo y <strong>USD 1.700 mensuales</strong> dedicados a trabajo repetitivo.</p>
+  <div class="cols2">
+    <div class="box">
+      <h4>Dónde duele hoy</h4>
+      <ul>
+        <li><strong>Respuestas que dependen de quién atiende.</strong> Pagar en 12 cuotas tiene un recargo del 27%. Si alguien contesta «sin interés» por error, el reclamo es seguro.</li>
+        <li><strong>Picos que el equipo no absorbe.</strong> En Hot Sale o Cyber Monday el volumen se multiplica por cinco. Atenderlo a mano exigiría 6,6 personas.</li>
+        <li><strong>Un CRM incompleto.</strong> La carga manual deja contactos duplicados y casos sin registrar.</li>
+        <li><strong>Plazos en riesgo.</strong> La primera respuesta comprometida (4, 24 o 48 horas hábiles según la prioridad) depende de cuánta gente esté disponible.</li>
+      </ul>
+    </div>
+    <div class="box wash">
+      <h4>La promesa: qué cambia</h4>
+      <p>El asistente resuelve solo las consultas que la política responde con claridad y deja a las personas lo que necesita criterio. Cada respuesta pasa por un control de calidad antes de salir. Lo sensible (reintegros, temas legales, datos personales) siempre lo decide una persona.</p>
+      <p style="margin:0">Las consultas que el semáforo marca en verde reciben la primera respuesta en minutos y no en horas. Las personas del equipo dejan de copiar y pegar políticas y pasan a resolver los casos difíciles.</p>
+    </div>
+  </div>
+
+  <h3>Resultado medible a 90 días <span class="tag">metas contractuales</span></h3>
+  <div class="tiles">
+    <div class="tile"><div class="lbl">Consultas resueltas sin intervención humana</div><div class="val">85%</div><div class="sub">En la prueba real el asistente resolvió bien 5 de 5. La meta se fija más baja a propósito.</div></div>
+    <div class="tile"><div class="lbl">Horas liberadas por mes</div><div class="val">195 h</div><div class="sub">1,2 personas de tiempo completo · USD 1.560 por mes</div></div>
+    <div class="tile"><div class="lbl">Precisión verificada</div><div class="val">≥ 95%</div><div class="sub">Control del 100% antes de enviar, más un muestreo humano mensual</div></div>
+    <div class="tile"><div class="lbl">Recupero de la inversión</div><div class="val">Día 41</div><div class="sub">Con la rampa de fases incluida · ROI del primer año: 300%</div></div>
+  </div>
+
+  <div class="callout navy">
+    <strong>Qué se le pide hoy al comité:</strong> aprobar las <strong>Fases 0 y 1</strong>, que duran tres semanas. En ese período el asistente no le escribe a ningún cliente ni toca el CRM. A la firma se paga el 50% del fee de configuración. El resto del proyecto se decide el <strong>día 23</strong> con los resultados medidos sobre correos reales. Si los criterios de salida no se cumplen, el proyecto se puede cancelar y la segunda mitad no se paga.
+  </div>
+  <p class="src">De dónde salen los números: el baseline, el ahorro y el ROI operativo vienen de la Pre-entrega del Módulo 9 y no se recalcularon. La precisión y el costo por consulta salen de las 10 corridas reales del Módulo 8. Lo nuevo de este documento es el modelo comercial, el payback con la rampa de fases y el plan de despliegue.</p>
+</section>
+
+<!-- ============================ PÁGINA 2 ============================ -->
+<section class="page">
+  <h3 style="margin-top:0">Diagrama de arquitectura de valor: la capa de orquestación</h3>
+  <p class="small" style="margin-bottom:4px">El sistema funciona como un equipo con un coordinador. Un <strong>Coordinador (agente manager)</strong> recibe cada caso y lo reparte entre <strong>especialistas (workers)</strong> con una sola tarea cada uno. Los especialistas trabajan con las herramientas que la empresa ya usa. Las personas intervienen donde el semáforo lo indica.</p>
+
+  <svg class="arq" viewBox="0 0 1000 592" role="img" aria-label="Arquitectura: coordinador, especialistas y herramientas">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52514e"/></marker>
+      <marker id="ahv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0ca30c"/></marker>
+    </defs>
+
+    <!-- Bandas -->
+    <text x="40" y="13" class="banda">PERSONAS</text>
+    <rect x="16" y="112" width="968" height="318" rx="14" fill="#eef4fc" stroke="#cde2fb" stroke-width="1.5"/>
+    <text x="40" y="140" class="banda" style="fill:#256abf">CAPA DE ORQUESTACIÓN · EL SISTEMA</text>
+    <text x="40" y="584" class="banda">SISTEMAS Y FUENTES DE DATOS</text>
+
+    <!-- Personas -->
+    <rect x="40" y="22" width="200" height="70" rx="10" fill="#fff" stroke="#898781" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="140" y="49" class="tt" text-anchor="middle">Clientes</text>
+    <text x="140" y="68" class="dd" text-anchor="middle">escriben a soporte@</text>
+    <text x="140" y="84" class="dd" text-anchor="middle">~1.500 consultas por mes</text>
+
+    <rect x="760" y="22" width="200" height="70" rx="10" fill="#fff" stroke="#898781" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="860" y="49" class="tt" text-anchor="middle">Equipo de soporte</text>
+    <text x="860" y="68" class="dd" text-anchor="middle">aprueba o edita en Slack</text>
+    <text x="860" y="84" class="dd" text-anchor="middle">canal #ops-soporte</text>
+
+    <!-- Memoria -->
+    <rect x="40" y="176" width="200" height="80" rx="10" fill="#f3f2ee" stroke="#c3c2b7" stroke-width="1.5"/>
+    <text x="140" y="196" class="tag" text-anchor="middle" fill="#898781">FUENTE</text>
+    <text x="140" y="216" class="tt" text-anchor="middle" style="font-size:14.5px">Memoria del cliente</text>
+    <text x="140" y="235" class="dd" text-anchor="middle">historial resumido</text>
+    <text x="140" y="250" class="dd" text-anchor="middle">de cada cliente</text>
+
+    <!-- Coordinador -->
+    <rect x="300" y="154" width="420" height="124" rx="12" fill="#0f2a4a"/>
+    <text x="510" y="177" class="tag" text-anchor="middle" fill="#9ec5f4">AGENTE MANAGER</text>
+    <text x="510" y="202" text-anchor="middle" style="font-size:21px;font-weight:700;fill:#fff">Coordinador</text>
+    <text x="510" y="225" text-anchor="middle" style="font-size:13px;fill:#dbe7f5">Filtra respuestas automáticas, clasifica tema</text>
+    <text x="510" y="243" text-anchor="middle" style="font-size:13px;fill:#dbe7f5">y prioridad, reparte el trabajo entre los</text>
+    <text x="510" y="261" text-anchor="middle" style="font-size:13px;fill:#dbe7f5">especialistas, aplica el semáforo y registra.</text>
+
+    <!-- Semáforo -->
+    <rect x="760" y="164" width="200" height="104" rx="10" fill="#fff" stroke="#52514e" stroke-width="1.5"/>
+    <text x="860" y="184" class="tag" text-anchor="middle" fill="#898781">REGLA DE AUTONOMÍA</text>
+    <text x="860" y="204" class="tt" text-anchor="middle">Semáforo</text>
+    <circle cx="784" cy="221" r="6" fill="#0ca30c"/><text x="796" y="225" class="dd" style="font-size:12px">verde: sale solo</text>
+    <circle cx="784" cy="239" r="6" fill="#fab219"/><text x="796" y="243" class="dd" style="font-size:12px">amarillo: con aprobación</text>
+    <circle cx="784" cy="257" r="6" fill="#d03b3b"/><text x="796" y="261" class="dd" style="font-size:12px">rojo: solo una persona</text>
+
+    <!-- Especialistas -->
+    <g>
+      <rect x="40" y="320" width="200" height="92" rx="10" fill="#fff" stroke="#2a78d6" stroke-width="1.6"/>
+      <text x="140" y="340" class="tag" text-anchor="middle" fill="#2a78d6">ESPECIALISTA</text>
+      <text x="140" y="362" class="tt" text-anchor="middle">Políticas</text>
+      <text x="140" y="382" class="dd" text-anchor="middle">Responde solo con el</text>
+      <text x="140" y="398" class="dd" text-anchor="middle">manual y cita la sección</text>
+    </g>
+    <g>
+      <rect x="280" y="320" width="200" height="92" rx="10" fill="#fff" stroke="#2a78d6" stroke-width="1.6"/>
+      <text x="380" y="340" class="tag" text-anchor="middle" fill="#2a78d6">SUPERVISOR</text>
+      <text x="380" y="362" class="tt" text-anchor="middle">Calidad</text>
+      <text x="380" y="382" class="dd" text-anchor="middle">Califica de 1 a 5 cada</text>
+      <text x="380" y="398" class="dd" text-anchor="middle">respuesta antes de salir</text>
+    </g>
+    <g>
+      <rect x="520" y="320" width="200" height="92" rx="10" fill="#fff" stroke="#2a78d6" stroke-width="1.6"/>
+      <text x="620" y="340" class="tag" text-anchor="middle" fill="#2a78d6">ESPECIALISTA</text>
+      <text x="620" y="362" class="tt" text-anchor="middle">CRM</text>
+      <text x="620" y="382" class="dd" text-anchor="middle">Busca antes de crear y</text>
+      <text x="620" y="398" class="dd" text-anchor="middle">marca el origen del caso</text>
+    </g>
+    <g>
+      <rect x="760" y="320" width="200" height="92" rx="10" fill="#fff" stroke="#2a78d6" stroke-width="1.6"/>
+      <text x="860" y="340" class="tag" text-anchor="middle" fill="#2a78d6">ESPECIALISTA</text>
+      <text x="860" y="362" class="tt" text-anchor="middle">Redacción</text>
+      <text x="860" y="382" class="dd" text-anchor="middle">Arma el correo final con</text>
+      <text x="860" y="398" class="dd" text-anchor="middle">el tono de la marca</text>
+    </g>
+
+    <!-- Sistemas -->
+    <g>
+      <rect x="40" y="468" width="200" height="92" rx="10" fill="#f3f2ee" stroke="#c3c2b7" stroke-width="1.5"/>
+      <text x="140" y="488" class="tag" text-anchor="middle" fill="#898781">BASE DE CONOCIMIENTO</text>
+      <text x="140" y="510" class="tt" text-anchor="middle" style="font-size:14.5px">Manual de Políticas</text>
+      <text x="140" y="530" class="dd" text-anchor="middle">versión 2.1 vigente:</text>
+      <text x="140" y="546" class="dd" text-anchor="middle">envíos, pagos, cambios</text>
+    </g>
+    <g>
+      <rect x="280" y="468" width="200" height="92" rx="10" fill="#f3f2ee" stroke="#c3c2b7" stroke-width="1.5"/>
+      <text x="380" y="488" class="tag" text-anchor="middle" fill="#898781">HERRAMIENTA</text>
+      <text x="380" y="510" class="tt" text-anchor="middle" style="font-size:14.5px">Registro de auditoría</text>
+      <text x="380" y="530" class="dd" text-anchor="middle">una traza por consulta</text>
+      <text x="380" y="546" class="dd" text-anchor="middle">→ tablero y factura</text>
+    </g>
+    <g>
+      <rect x="520" y="468" width="200" height="92" rx="10" fill="#f3f2ee" stroke="#c3c2b7" stroke-width="1.5"/>
+      <text x="620" y="488" class="tag" text-anchor="middle" fill="#898781">HERRAMIENTA</text>
+      <text x="620" y="510" class="tt" text-anchor="middle" style="font-size:14.5px">HubSpot · CRM</text>
+      <text x="620" y="530" class="dd" text-anchor="middle">fuente única de verdad:</text>
+      <text x="620" y="546" class="dd" text-anchor="middle">contactos y casos</text>
+    </g>
+    <g>
+      <rect x="760" y="468" width="200" height="92" rx="10" fill="#f3f2ee" stroke="#c3c2b7" stroke-width="1.5"/>
+      <text x="860" y="488" class="tag" text-anchor="middle" fill="#898781">HERRAMIENTA</text>
+      <text x="860" y="510" class="tt" text-anchor="middle" style="font-size:14.5px">Gmail · soporte@</text>
+      <text x="860" y="530" class="dd" text-anchor="middle">lee y crea borradores;</text>
+      <text x="860" y="546" class="dd" text-anchor="middle">envía solo en verde</text>
+    </g>
+
+    <!-- Flechas -->
+    <path class="fl" d="M240,57 C330,57 420,92 420,150" marker-end="url(#ah)"/>
+    <line class="fl" x1="243" y1="216" x2="297" y2="216" marker-start="url(#ah)" marker-end="url(#ah)"/>
+    <path class="fl" d="M510,278 V296 M140,296 H620"/>
+    <line class="fl" x1="140" y1="296" x2="140" y2="317" marker-end="url(#ah)"/>
+    <line class="fl" x1="380" y1="296" x2="380" y2="317" marker-end="url(#ah)"/>
+    <line class="fl" x1="620" y1="296" x2="620" y2="317" marker-end="url(#ah)"/>
+    <line class="fl" x1="240" y1="366" x2="277" y2="366" marker-end="url(#ah)"/>
+    <line class="fl" x1="720" y1="216" x2="757" y2="216" marker-end="url(#ah)"/>
+    <line class="fl" x1="860" y1="161" x2="860" y2="95" marker-start="url(#ah)" marker-end="url(#ah)"/>
+    <text x="872" y="124" class="lk">amarillo · rojo:</text>
+    <text x="872" y="140" class="lk">aprobar / editar</text>
+    <line class="flv" x1="860" y1="268" x2="860" y2="316" marker-end="url(#ahv)"/>
+    <text x="872" y="300" class="lk" style="fill:#006300;font-weight:600">verde</text>
+    <line class="fl" x1="140" y1="415" x2="140" y2="465" marker-start="url(#ah)" marker-end="url(#ah)"/>
+    <text x="152" y="446" class="lk">consulta</text>
+    <line class="fl" x1="380" y1="412" x2="380" y2="465" marker-end="url(#ah)"/>
+    <text x="400" y="446" class="lk">registra cada paso</text>
+    <line class="fl" x1="620" y1="415" x2="620" y2="465" marker-start="url(#ah)" marker-end="url(#ah)"/>
+    <text x="640" y="446" class="lk">busca · actualiza</text>
+    <line class="fl" x1="860" y1="412" x2="860" y2="465" marker-end="url(#ah)"/>
+    <text x="872" y="446" class="lk">borrador · envío</text>
+
+    <!-- Insignias -->
+    <g class="badge"><circle cx="342" cy="73" r="10"/><text x="342" y="77">1</text></g>
+    <g class="badge"><circle cx="270" cy="216" r="10"/><text x="270" y="220">2</text></g>
+    <g class="badge"><circle cx="215" cy="296" r="10"/><text x="215" y="300">3</text></g>
+    <g class="badge"><circle cx="256" cy="366" r="9"/><text x="256" y="370">4</text></g>
+    <g class="badge"><circle cx="738" cy="216" r="10"/><text x="738" y="220">5</text></g>
+    <g class="badge"><circle cx="620" cy="440" r="10"/><text x="620" y="444">6</text></g>
+    <g class="badge"><circle cx="380" cy="440" r="10"/><text x="380" y="444">7</text></g>
+  </svg>
+
+  <ul class="pasos">
+    <li><span class="b">1</span><span><strong>Llega el correo.</strong> El Coordinador descarta las respuestas automáticas (para que no se armen cadenas de correos entre sistemas) y clasifica el caso por tema y prioridad.</span></li>
+    <li><span class="b">2</span><span><strong>Recupera el historial</strong> del cliente para que no tenga que repetir su caso.</span></li>
+    <li><span class="b">3</span><span><strong>Reparte el trabajo.</strong> Pide al especialista en Políticas una respuesta basada solo en el Manual vigente. Si el manual no lo cubre, el especialista dice «no sé» y el caso se deriva.</span></li>
+    <li><span class="b">4</span><span><strong>Control de calidad.</strong> El Supervisor califica la respuesta contra el manual. Con 4 o 5 puntos, sale. Con 2 o 3, se corrige una sola vez. Con 1 punto o ante cualquier riesgo, va a una persona.</span></li>
+    <li><span class="b">5</span><span><strong>Semáforo.</strong> En verde, Redacción envía la respuesta por Gmail. En amarillo, queda un borrador y el equipo lo aprueba o lo edita en Slack. En rojo, el caso lo resuelve solo una persona.</span></li>
+    <li><span class="b">6</span><span><strong>CRM al día.</strong> El especialista en CRM busca al cliente antes de crearlo, actualiza el caso en HubSpot y marca quién respondió: el asistente o una persona.</span></li>
+    <li><span class="b">7</span><span><strong>Todo deja huella.</strong> Cada paso queda en el registro de auditoría con el mismo código de traza. De ahí salen el tablero de la Dirección y la factura del componente por resultado.</span></li>
+  </ul>
+  <p class="src">El diagrama redibuja sin jerga técnica la arquitectura Coordinador–Especialistas del Módulo 2. Agrega las integraciones del M4 (Gmail, HubSpot y Slack), la base de conocimiento del M5 y el Supervisor de Calidad del M8.</p>
+</section>
+
+<!-- ============================ PÁGINA 3 ============================ -->
+<section class="page">
+  <h3 style="margin-top:0">Traducción función → beneficio</h3>
+  <table class="fb">
+    <thead><tr><th>Lo que hace el sistema (función)</th><th>Lo que gana Lleyton Tech Store (beneficio)</th></tr></thead>
+    <tbody>
+      <tr><td><span class="t">Un coordinador que reparte el trabajo entre especialistas</span></td><td>Cada parte del trabajo la hace un especialista con una sola tarea. Si una parte falla, el problema queda aislado y se corrige sin frenar el resto del servicio.</td></tr>
+      <tr><td><span class="t">Clasificación automática por tema y prioridad</span></td><td>Cada correo queda ordenado en segundos. Los casos urgentes, como un pedido perdido o un cobro duplicado, no esperan detrás de una consulta de factura.</td></tr>
+      <tr><td><span class="t">Respuestas basadas solo en el Manual de Políticas vigente, con la sección citada</span></td><td>Todos los clientes reciben el mismo criterio. La información verificada aparece en segundos, sin buscar en carpetas ni depender de la memoria de quien atiende.</td></tr>
+      <tr><td><span class="t">Regla «no sé»: si el manual no lo dice, no inventa y deriva</span></td><td>La empresa no hace promesas que no pueda cumplir. Los casos nuevos llegan a una persona con el contexto listo.</td></tr>
+      <tr><td><span class="t">Supervisor de Calidad que califica cada respuesta antes de enviarla</span></td><td>Se revisa el 100% de las respuestas, no una muestra. Lo dudoso se corrige o se frena antes de que llegue al cliente.</td></tr>
+      <tr><td><span class="t">Memoria del historial de cada cliente</span></td><td>El cliente no repite su caso y la respuesta tiene en cuenta lo que ya pasó.</td></tr>
+      <tr><td><span class="t">Registro en HubSpot que busca al cliente antes de crearlo</span></td><td>El CRM queda completo y sin duplicados, sin carga manual. Cada caso registra su origen y su calidad.</td></tr>
+      <tr><td><span class="t">Escalamiento con el borrador listo y botones Aprobar / Editar</span></td><td>Los casos sensibles se resuelven con un clic en lugar de redactarse desde cero.</td></tr>
+      <tr><td><span class="t">Filtro de respuestas automáticas, límite de reintentos y tope de gasto mensual</span></td><td>No se arman cadenas de correos entre sistemas ni llegan facturas de consumo sorpresa: el gasto tiene techo.</td></tr>
+      <tr><td><span class="t">Código de traza por consulta y tablero mensual de indicadores</span></td><td>Cualquier respuesta se audita de punta a punta en minutos. La Dirección ve cada mes las horas ahorradas, la precisión y el costo.</td></tr>
+      <tr><td><span class="t">Interruptor que vuelve todo a la aprobación humana</span></td><td>Si la calidad baja, el sistema pasa al modo con aprobación y el servicio sigue funcionando bajo control.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box" style="margin-top:4px">
+    <h4>Lo que el sistema nunca hace</h4>
+    <div class="cols2" style="gap:4px 18px">
+      <ul style="margin:0">
+        <li>Prometer o aprobar reintegros. Solo prepara un borrador que aprueba una persona, según el punto 6.3 del manual.</li>
+        <li>Pedir el número de tarjeta, el código de seguridad ni contraseñas.</li>
+        <li>Borrar o fusionar registros. Ninguno de sus accesos tiene permiso de borrado.</li>
+      </ul>
+      <ul style="margin:0">
+        <li>Responder con información que no esté en el Manual vigente.</li>
+        <li>Enviar un caso amarillo o rojo sin que lo apruebe una persona.</li>
+        <li>Superar el tope de gasto mensual. Si se alcanza, el sistema se detiene y los casos pasan al equipo.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PÁGINA 4 ============================ -->
+<section class="page">
+  <h3 style="margin-top:0">Business case: baseline manual y ahorro <span class="tag">Módulo 9, sin recalcular</span></h3>
+  <p class="small">El baseline es el proceso tal como se hace hoy, con HubSpot ya en uso. Supuestos del M9: 1.500 consultas por mes; costo laboral de USD 8 por hora; el 85% de las consultas se resuelve sin intervención (la prueba real dio 5 de 5); cada caso derivado le lleva 4 minutos a una persona.</p>
+  <table>
+    <colgroup><col style="width:40%"><col><col><col><col><col></colgroup>
+    <thead><tr><th>Tarea del proceso</th><th class="n">Min. por<br>consulta hoy</th><th class="n">Horas/mes<br>hoy</th><th class="n">Horas/mes con<br>el sistema</th><th class="n">Horas<br>liberadas</th><th class="n">USD<br>por mes</th></tr></thead>
+    <tbody>
+      <tr><td>Leer y clasificar el correo (tema y prioridad)</td><td class="n">1,5</td><td class="n">37,5</td><td class="n">0,0</td><td class="n">37,5</td><td class="n">300</td></tr>
+      <tr><td>Buscar la política y redactar <span class="d">(una persona atiende solo el 15% derivado)</span></td><td class="n">5,0</td><td class="n">125,0</td><td class="n">15,0</td><td class="n">110,0</td><td class="n">880</td></tr>
+      <tr><td>Cargar o actualizar al cliente en HubSpot</td><td class="n">1,5</td><td class="n">37,5</td><td class="n">0,0</td><td class="n">37,5</td><td class="n">300</td></tr>
+      <tr><td>Avisar al equipo y registrar el caso</td><td class="n">0,5</td><td class="n">12,5</td><td class="n">0,0</td><td class="n">12,5</td><td class="n">100</td></tr>
+      <tr><td>Supervisión de calidad (muestreo humano del 5%)</td><td class="n">—</td><td class="n">0,0</td><td class="n">2,5</td><td class="n">−2,5</td><td class="n">−20</td></tr>
+      <tr class="tot"><td>Total</td><td class="n">8,5</td><td class="n">212,5</td><td class="n">17,5</td><td class="n">195,0</td><td class="n">1.560</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols2">
+    <div class="box">
+      <h4>ROI operativo del sistema (M9)</h4>
+      <table style="margin:0">
+        <tr><td>Ahorro en horas</td><td class="n">USD 1.560</td></tr>
+        <tr><td>Costo técnico de operación</td><td class="n">USD 74,50</td></tr>
+        <tr><td>Beneficio neto mensual</td><td class="n">USD 1.485</td></tr>
+        <tr class="hl"><td>ROI mensual</td><td class="n">1.994%</td></tr>
+        <tr><td>Recupero de 40 h de implementación</td><td class="n">12 días</td></tr>
+      </table>
+      <p class="small" style="margin:5px 0 0">Mide cuánto cuesta operar el sistema: consumo de IA, mantenimiento y entornos de prueba. Si la plataforma de orquestación pasa a un plan pago, el ROI baja a 1.153%; en esta propuesta ese costo lo absorbe el retainer.</p>
+    </div>
+    <div class="box wash">
+      <h4>ROI para el cliente con esta propuesta (M10)</h4>
+      <table style="margin:0">
+        <tr><td></td><td class="n"><b>Mes en régimen</b></td><td class="n"><b>Año 1</b></td></tr>
+        <tr><td>Ahorro en horas</td><td class="n">1.560</td><td class="n">17.227</td></tr>
+        <tr><td>Fee de configuración</td><td class="n">—</td><td class="n">800</td></tr>
+        <tr><td>Retainer mensual</td><td class="n">180</td><td class="n">1.980</td></tr>
+        <tr><td>Success fee (máximo)</td><td class="n">153</td><td class="n">1.530</td></tr>
+        <tr><td><b>Costo total (TCO)</b></td><td class="n"><b>333</b></td><td class="n"><b>4.310</b></td></tr>
+        <tr><td>Beneficio neto (USD)</td><td class="n">1.227</td><td class="n">12.917</td></tr>
+        <tr class="hl"><td>ROI (neto ÷ costo)</td><td class="n">368%</td><td class="n">300%</td></tr>
+      </table>
+    </div>
+  </div>
+  <p class="small" style="margin-top:5px"><strong>Qué cambió respecto del M9:</strong> el baseline y el ahorro son los mismos. Se suma el servicio que opera el sistema, lo mejora y responde por él (retainer), más el pago por resultado (success fee). No hacen falta licencias nuevas.</p>
+
+  <div style="margin-top:4px">
+    <p class="ctitle">Beneficio neto acumulado de Lleyton Tech Store, primer año (USD)</p>
+    <p class="csub">Ahorro de horas menos lo pagado (setup, retainer y success fee), mes a mes desde el kickoff de noviembre de 2026</p>
+    <svg class="chart" viewBox="0 0 680 168" role="img" aria-label="Beneficio neto acumulado por mes: -373 en noviembre, 647 en diciembre y 12.917 en octubre">
+      <line x1="56" x2="660" y1="132.0" y2="132.0" class="base"/>
+<text x="48" y="136.0" class="tick" text-anchor="end">0</text>
+<line x1="56" x2="660" y1="100.0" y2="100.0" class="grid"/>
+<text x="48" y="104.0" class="tick" text-anchor="end">4 mil</text>
+<line x1="56" x2="660" y1="68.0" y2="68.0" class="grid"/>
+<text x="48" y="72.0" class="tick" text-anchor="end">8 mil</text>
+<line x1="56" x2="660" y1="36.0" y2="36.0" class="grid"/>
+<text x="48" y="40.0" class="tick" text-anchor="end">12 mil</text>
+<path class="neg" d="M70.2,132.0 V132.0 Q70.2,135.0 73.2,135.0 H89.2 Q92.2,135.0 92.2,132.0 V132.0 Z"/>
+<text x="81.2" y="162" class="tick" text-anchor="middle">nov</text>
+<path class="pos" d="M120.5,132.0 V130.8 Q120.5,126.8 124.5,126.8 H138.5 Q142.5,126.8 142.5,130.8 V132.0 Z"/>
+<text x="131.5" y="162" class="tick" text-anchor="middle">dic</text>
+<path class="pos" d="M170.8,132.0 V121.0 Q170.8,117.0 174.8,117.0 H188.8 Q192.8,117.0 192.8,121.0 V132.0 Z"/>
+<text x="181.8" y="162" class="tick" text-anchor="middle">ene</text>
+<path class="pos" d="M221.2,132.0 V111.2 Q221.2,107.2 225.2,107.2 H239.2 Q243.2,107.2 243.2,111.2 V132.0 Z"/>
+<text x="232.2" y="162" class="tick" text-anchor="middle">feb</text>
+<path class="pos" d="M271.5,132.0 V101.4 Q271.5,97.4 275.5,97.4 H289.5 Q293.5,97.4 293.5,101.4 V132.0 Z"/>
+<text x="282.5" y="162" class="tick" text-anchor="middle">mar</text>
+<path class="pos" d="M321.8,132.0 V91.6 Q321.8,87.6 325.8,87.6 H339.8 Q343.8,87.6 343.8,91.6 V132.0 Z"/>
+<text x="332.8" y="162" class="tick" text-anchor="middle">abr</text>
+<path class="pos" d="M372.2,132.0 V81.7 Q372.2,77.7 376.2,77.7 H390.2 Q394.2,77.7 394.2,81.7 V132.0 Z"/>
+<text x="383.2" y="162" class="tick" text-anchor="middle">may</text>
+<path class="pos" d="M422.5,132.0 V71.9 Q422.5,67.9 426.5,67.9 H440.5 Q444.5,67.9 444.5,71.9 V132.0 Z"/>
+<text x="433.5" y="162" class="tick" text-anchor="middle">jun</text>
+<path class="pos" d="M472.8,132.0 V62.1 Q472.8,58.1 476.8,58.1 H490.8 Q494.8,58.1 494.8,62.1 V132.0 Z"/>
+<text x="483.8" y="162" class="tick" text-anchor="middle">jul</text>
+<path class="pos" d="M523.2,132.0 V52.3 Q523.2,48.3 527.2,48.3 H541.2 Q545.2,48.3 545.2,52.3 V132.0 Z"/>
+<text x="534.2" y="162" class="tick" text-anchor="middle">ago</text>
+<path class="pos" d="M573.5,132.0 V42.5 Q573.5,38.5 577.5,38.5 H591.5 Q595.5,38.5 595.5,42.5 V132.0 Z"/>
+<text x="584.5" y="162" class="tick" text-anchor="middle">sep</text>
+<path class="pos" d="M623.8,132.0 V32.7 Q623.8,28.7 627.8,28.7 H641.8 Q645.8,28.7 645.8,32.7 V132.0 Z"/>
+<text x="634.8" y="162" class="tick" text-anchor="middle">oct</text>
+<text x="81.2" y="148.0" class="lab" text-anchor="middle">−373</text>
+<text x="634.8" y="20.7" class="lab strong" text-anchor="middle">12.917</text>
+<line x1="124.2" x2="124.2" y1="24" y2="132.0" class="mark"/>
+<text x="130.2" y="34" class="lab strong">Recupero del setup: día 41</text>
+<text x="130.2" y="48" class="lab">mediados de diciembre</text>
+
+    </svg>
+  </div>
+  <table style="margin-top:4px">
+    <colgroup><col style="width:25%"><col style="width:9%"><col style="width:13%"><col></colgroup>
+    <thead><tr><th>Fase (rampa del ahorro)</th><th>Días</th><th class="n">Ahorro mensual*</th><th>Por qué</th></tr></thead>
+    <tbody>
+      <tr><td>0 · Modo sombra</td><td>8–14</td><td class="n">USD 0</td><td>El equipo hace todo; el asistente trabaja en paralelo.</td></tr>
+      <tr><td>1 · Piloto de solo lectura</td><td>15–22</td><td class="n">USD 400</td><td>Cada caso llega clasificado, priorizado y avisado.</td></tr>
+      <tr><td>2 · Escritura con aprobación</td><td>23–63</td><td class="n">USD 1.200</td><td>Revisar un borrador: 2,5 min (redactar: 5). CRM y avisos automáticos.</td></tr>
+      <tr><td>3 · Autonomía supervisada</td><td>desde 64</td><td class="n">USD 1.560</td><td>El ahorro completo calculado en el M9.</td></tr>
+    </tbody>
+  </table>
+  <p class="src">* Supuestos de la rampa, propios de este documento (meses de 30 días). Payback: noviembre cierra en −USD 373 y la Fase 2 deja USD 1.020 netos por mes, así que el setup se recupera hacia el <strong>día 41</strong>. Sensibilidad: con 70% de casos resueltos sin intervención en lugar de 85%, el beneficio neto en régimen sigue siendo <strong>USD 1.134 por mes</strong>.</p>
+</section>
+
+<!-- ============================ PÁGINA 5 ============================ -->
+<section class="page">
+  <div class="sec"><span class="num">Sección 2</span><h2>Roadmap de despliegue por horizontes temporales</h2></div>
+  <p class="small">La autonomía se gana con datos. Cada fase habilita una capacidad nueva solo después de demostrar la anterior, y cada una tiene un criterio de salida medible que firma el Líder de Soporte.</p>
+
+  <div class="gantt">
+    <div class="h">Semana (inicio)</div>
+    <div class="h">S1<br>2/11</div><div class="h">S2<br>9/11</div><div class="h">S3<br>16/11</div><div class="h">S4<br>23/11</div><div class="h">S5<br>30/11</div><div class="h">S6<br>7/12</div><div class="h">S7<br>14/12</div><div class="h">S8<br>21/12</div><div class="h">S9<br>28/12</div><div class="h">S10<br>4/1 →</div>
+
+    <div class="rl">Preparación</div>
+    <div class="cell"><div class="bar" style="left:3px;right:3px;background:#898781">accesos</div></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+    <div class="rl">Fase 0 · Modo sombra</div>
+    <div class="cell"></div>
+    <div class="cell"><div class="bar f0" style="left:3px;right:3px">sombra</div></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+    <div class="rl">Fase 1 · Solo lectura</div>
+    <div class="cell"></div><div class="cell"></div>
+    <div class="cell"><div class="bar f1" style="left:3px;right:-14px">piloto</div></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+    <div class="rl">Fase 2 · Escritura con aprobación humana</div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"><div class="bar f2" style="left:16px;width:calc(600% - 22px)">borradores + CRM, cada respuesta aprobada por una persona</div></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+    <div class="rl last">Fase 3 · Autonomía supervisada</div>
+    <div class="cell last"></div><div class="cell last"></div><div class="cell last"></div><div class="cell last"></div><div class="cell last"></div><div class="cell last"></div><div class="cell last"></div><div class="cell last"></div><div class="cell last"></div>
+    <div class="cell last"><div class="bar f3" style="left:3px;right:3px;padding-left:4px;font-size:6.4pt">autónomo</div></div>
+  </div>
+  <p class="src">Decisiones de avance (Go/No-Go): <strong>16/11</strong> (F0 → F1), <strong>24/11</strong> (F1 → F2) y <strong>4/1/2027</strong> (F2 → F3). <strong>Horizonte 1</strong> (días 1–30): probar sin riesgo y empezar a escribir con aprobación. <strong>Horizonte 2</strong> (días 31–63): estabilizar con aprobación humana. <strong>Horizonte 3</strong> (día 64 en adelante): autonomía supervisada y mejora continua.</p>
+
+  <table class="fases">
+    <thead><tr><th>Fase</th><th>Qué puede hacer el asistente</th><th>Qué tiene prohibido</th><th>Quién valida</th><th>Criterio de salida</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="fase-h f0">FASE 0</span><br><strong>Modo sombra</strong><br><span class="d">9–15/11</span><br><span class="d"><em>Mitiga:</em> lanzar sin conocer la precisión con correos reales. Equivocarse cuesta cero.</span></td>
+        <td>Procesa en paralelo el 100% de los correos reales. Clasifica, busca la política, redacta y se autoevalúa. Todo queda en su registro interno.</td>
+        <td class="no">Enviar correos, crear borradores, escribir en HubSpot o publicar en Slack. Nadie fuera del proyecto ve sus respuestas.</td>
+        <td>Líder de Soporte. Cada día compara 20 respuestas del asistente con las que envió el equipo.</td>
+        <td>≥ 300 consultas procesadas · precisión ≥ 95% en la muestra humana · coincidencia Supervisor–humano ≥ 90% · 0 casos rojos marcados como verdes · costo ≤ USD 0,005 por consulta</td>
+      </tr>
+      <tr>
+        <td><span class="fase-h f1">FASE 1</span><br><strong>Piloto de solo lectura</strong><br><span class="d">16–23/11</span><br><span class="d"><em>Mitiga:</em> que el equipo no confíe en el asistente o que la clasificación no sirva en la práctica.</span></td>
+        <td>Lee Gmail, HubSpot y el manual. Publica en el canal interno una ficha por caso: tema, prioridad, color del semáforo, sección del manual y respuesta sugerida.</td>
+        <td class="no">Escribirle a un cliente, crear o modificar registros en HubSpot o crear borradores en Gmail.</td>
+        <td>Agentes de soporte, que marcan cada ficha como útil o no útil. Consolida el Líder de Soporte.</td>
+        <td>≥ 80% de las sugerencias útiles sin cambios de contenido · clasificación correcta ≥ 90% · 0 incidentes con datos sensibles</td>
+      </tr>
+      <tr>
+        <td><span class="fase-h f2">FASE 2</span><br><strong>Escritura controlada con aprobación humana</strong><br><span class="d">24/11–3/1</span><br><span class="d"><em>Mitiga:</em> errores de escritura en el CRM y respuestas incorrectas que lleguen al cliente.</span></td>
+        <td>Crea el borrador en Gmail y lo presenta en Slack con los botones Aprobar y Editar. Crea o actualiza contacto y caso en HubSpot: busca antes de crear, toca solo los campos permitidos y marca el origen.</td>
+        <td class="no">Enviar sin aprobación, borrar o fusionar registros, responder casos rojos (los deriva) o prometer reintegros.</td>
+        <td>Un agente de soporte aprueba cada respuesta. El Líder de Soporte revisa los indicadores cada semana.</td>
+        <td>4 semanas seguidas con ≥ 85% de respuestas aprobadas sin edición · precisión ≥ 95% · 0 duplicados en HubSpot · 100% de los casos con código de traza · satisfacción ≥ 4,2/5</td>
+      </tr>
+      <tr>
+        <td><span class="fase-h f3">FASE 3</span><br><strong>Autonomía supervisada</strong><br><span class="d">desde el 4/1/2027</span><br><span class="d"><em>Mitiga:</em> que la calidad se degrade sin que nadie lo note (cambios de política o de proveedor).</span></td>
+        <td>Envía solo los casos verdes que el Supervisor de Calidad aprueba con 4 o 5. Los amarillos siguen con aprobación y los rojos van a una persona.</td>
+        <td class="no">Todo lo rojo: reintegros fuera de política, montos de más de $300.000, temas legales, datos de tarjeta o contraseñas, borrado de datos.</td>
+        <td>El Supervisor de Calidad en cada respuesta, un muestreo humano del 5% y una revisión mensual con el Líder de Soporte.</td>
+        <td><em>Permanencia:</em> si en una semana la precisión baja de 95%, la reapertura supera el 10% o hay un incidente rojo, el interruptor vuelve todo a la Fase 2 en minutos, sin perder casos.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ PÁGINA 6 ============================ -->
+<section class="page">
+  <h3 style="margin-top:0">Semáforo de autonomía: qué decide quién <span class="tag">diseño vertical · M7</span></h3>
+  <p class="small">El semáforo se apoya en el propio Manual de Políticas (puntos 6.3 y 7). Ante la duda, el Coordinador asigna el color más restrictivo.</p>
+  <div class="sem">
+    <div class="box"><h4><span class="dot g"></span>Verde · sale solo (Fase 3)</h4>
+      <div class="rule">Consultas informativas que el manual responde con claridad.</div>
+      <ul><li>Plazos y costos de envío por zona</li><li>Medios de pago, cuotas y recargos</li><li>Facturación (tipo A o B, plazos)</li><li>Condiciones de cambio, devolución y garantía (informar)</li><li>Horarios y canales</li><li>«No sé» con derivación cuando el manual no lo cubre</li></ul></div>
+    <div class="box"><h4><span class="dot y"></span>Amarillo · borrador + aprobación</h4>
+      <div class="rule">Pedidos que generan una gestión o un compromiso.</div>
+      <ul><li>Iniciar un arrepentimiento, un cambio o una devolución</li><li>Producto con falla de fábrica</li><li>Pedido demorado o perdido con reclamo</li><li>Cliente que escribe por tercera vez por el mismo caso</li><li>Cliente molesto o con tono de queja</li></ul></div>
+    <div class="box"><h4><span class="dot r"></span>Rojo · solo una persona</h4>
+      <div class="rule">El asistente avisa al equipo y no responde el fondo del caso.</div>
+      <ul><li>Reintegros fuera de política o de más de $300.000</li><li>Menciones de acciones legales o de Defensa del Consumidor</li><li>Pedidos de acceso o baja de datos personales</li><li>Cualquier pedido de datos de tarjeta o contraseñas</li><li>Borrado o fusión de registros</li></ul></div>
+  </div>
+
+  <h3>Estrategia de fallback ante errores o demoras de la IA</h3>
+  <p class="small">Principio rector: <strong>si algo falla, el caso va a una persona; nunca sale una respuesta sin verificar.</strong> El cliente siempre recibe respuesta dentro del plazo comprometido en el manual (4, 24 o 48 horas hábiles).</p>
+  <table>
+    <thead><tr><th style="width:27%">Situación</th><th>Qué hace el sistema automáticamente</th><th style="width:24%">Efecto para el cliente</th></tr></thead>
+    <tbody>
+      <tr><td><strong>La IA tarda más de 30 segundos o no responde</strong></td><td>Reintenta una vez a los 10 segundos. Si vuelve a fallar, pasa al proveedor de IA de respaldo, evaluado en el M9. Si ese también falla, el caso va a la cola humana con una alerta en Slack.</td><td>Le responde una persona dentro del plazo comprometido.</td></tr>
+      <tr><td><strong>El Supervisor de Calidad devuelve una evaluación ilegible o incompleta</strong></td><td>La respuesta se trata como rechazada: no sale y va a una persona. Ya se probó en el M8: en una corrida de validación, 10 de 10 casos fueron a una persona y ninguno llegó a un cliente.</td><td>No recibe ninguna respuesta sin verificar.</td></tr>
+      <tr><td><strong>Falla un especialista o un sistema (HubSpot, Gmail)</strong></td><td>El especialista informa el error en un formato estándar en lugar de cortar el proceso. El caso queda en pendientes y se reprocesa. Como siempre se busca antes de crear, no se generan duplicados.</td><td>No se pierden casos ni se duplican registros.</td></tr>
+      <tr><td><strong>La clasificación automática no está disponible</strong></td><td>Clasifica con reglas fijas por palabras clave, que no tienen costo. Si hay duda, el caso va a una persona.</td><td>El caso entra igual a la cola correcta.</td></tr>
+      <tr><td><strong>Cadena de correos automáticos o reintentos en bucle</strong></td><td>Filtra las respuestas automáticas, permite una sola corrección por respuesta y aplica un tope de gasto de USD 30 por mes en la llave de producción.</td><td>No hay cadenas de correos ni costos fuera de control.</td></tr>
+      <tr><td><strong>Más del 5% de errores en una hora, o precisión semanal menor al 95%</strong></td><td>El interruptor general vuelve todo a la Fase 2 (aprobación humana) y avisa al Líder de Soporte.</td><td>El servicio sigue. Solo cambia quién aprueba.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ PÁGINA 7 ============================ -->
+<section class="page">
+  <div class="sec"><span class="num">Sección 3</span><h2>Modelo comercial e incentivos</h2></div>
+  <p class="small">El pricing es híbrido: un fee único de configuración, un retainer mensual de soporte y un success fee que se paga solo por los casos que el asistente resuelve sin ayuda. Lleyton IA Automation cobra más cuando Lleyton Tech Store ahorra más, y el riesgo de arranque se comparte.</p>
+  <div class="cols3">
+    <div class="price">
+      <div class="top"><div class="k">1 · Fee de configuración inicial</div><div class="v">USD 800 <small>único</small></div><div class="w">50% a la firma · 50% el día 23, solo si se cumplen los criterios de las Fases 0 y 1</div></div>
+      <div class="bd">
+        <div class="lbl">Incluye</div>
+        <ul>
+          <li>Nueva medición del baseline (50 casos)</li>
+          <li>Manual v2.1 cargado y batería de 30 preguntas reales</li>
+          <li>Conexión a Gmail, HubSpot y Slack con permisos mínimos, sin borrado</li>
+          <li>Trazabilidad en HubSpot y reporte «Casos facturables»</li>
+          <li>Semáforo configurado y Fases 0 y 1 con sus informes</li>
+          <li>Capacitación (1 h) y soporte del primer mes</li>
+        </ul>
+      </div>
+    </div>
+    <div class="price">
+      <div class="top"><div class="k">2 · Retainer mensual de soporte</div><div class="v">USD 180 <small>/ mes</small></div><div class="w">Desde el mes 2, cuando el sistema ya ahorra horas · sin permanencia después del mes 3 · baja con 30 días de aviso</div></div>
+      <div class="bd">
+        <div class="lbl">Alcance del soporte recurrente</div>
+        <ul>
+          <li><strong>Ajuste de instrucciones (prompt tuning)</strong> mensual con los casos corregidos y derivados</li>
+          <li><strong>Base de conocimiento:</strong> cada versión nueva del manual, cargada y probada en 2 días hábiles</li>
+          <li><strong>Gestión de modelos:</strong> versiones, precios, prueba comparativa antes de cambiar y proveedor de respaldo</li>
+          <li><strong>Revisión de métricas:</strong> tablero mensual, reunión de 30 min y auditoría de equidad</li>
+          <li><strong>Operación y alertas:</strong> incidentes críticos atendidos en 4 h hábiles</li>
+          <li><strong>Consumo de IA</strong> incluido hasta USD 30 por mes; el excedente se cobra al costo</li>
+        </ul>
+        <div class="lbl">No incluye</div>
+        <div>Canales, procesos o integraciones nuevas (por ejemplo, WhatsApp): se cotizan aparte.</div>
+      </div>
+    </div>
+    <div class="price">
+      <div class="top"><div class="k">3 · Success fee (por resultado)</div><div class="v">USD 0,12 <small>/ caso</small></div><div class="w">Por cada Caso Resuelto por el Agente · solo en la Fase 3 · tope de USD 400 por mes</div></div>
+      <div class="bd">
+        <div class="lbl">Por qué ese precio</div>
+        <div>Resolver un caso a mano cuesta USD 1,13 (8,5 min a USD 8 por hora). El fee es la décima parte de lo que ese mismo caso le ahorra a la empresa.</div>
+        <div class="lbl">Compuerta de calidad</div>
+        <div>Si la precisión del mes (muestreo humano) queda por debajo del 95%, ese mes no se cobra success fee. Un caso que el muestreo encuentra incorrecto nunca se factura.</div>
+        <div class="lbl">Ejemplos de factura</div>
+        <div>Mes típico: 180 + 1.275 casos × 0,12 = <strong>USD 333</strong>.<br>Mes de pico (×5 volumen): 180 + tope de 400 = <strong>USD 580</strong>, cuando atenderlo a mano costaría 6,6 personas.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>KPI de facturación: Caso Resuelto por el Agente (CRA)</h3>
+  <div class="cols2">
+    <div>
+      <p style="margin-bottom:3px">Un caso de HubSpot cuenta como CRA solo si cumple <strong>las cuatro condiciones</strong>:</p>
+      <ol style="margin-bottom:4px">
+        <li>La respuesta la envió el asistente con la aprobación del Supervisor de Calidad (origen = asistente autónomo).</li>
+        <li>Ninguna persona intervino en el caso: nadie aprobó, editó, respondió ni reasignó.</li>
+        <li>Se cumplió la ventana de conversión sin que el cliente reabriera el caso hacia una persona.</li>
+        <li>El caso tiene código de traza y su fila correspondiente en el registro de auditoría.</li>
+      </ol>
+      <p class="small">Es <strong>atribuible</strong> (solo actuó el asistente), <strong>auditable</strong> (está en el CRM y en el registro con el mismo código) y mide valor real: cada CRA ahorra los 8,5 minutos del proceso manual. No se factura sobre ventas porque el asistente no controla precio, stock ni la decisión de compra, y eso generaría disputas de atribución.</p>
+    </div>
+    <div class="box wash">
+      <h4>Ventana de conversión: 7 días corridos</h4>
+      <p>Un caso se atribuye contractualmente al asistente cuando pasan <strong>7 días corridos desde su última interacción</strong> con el cliente y se cumplen las condiciones 1, 2 y 4.</p>
+      <ul style="margin-bottom:0">
+        <li>Cubre una semana completa y supera con margen el plazo de respuesta más largo (48 h hábiles): si la respuesta no sirvió, el cliente vuelve a escribir en esos días.</li>
+        <li>Si el cliente vuelve a escribir y el asistente lo resuelve solo, la ventana se reinicia desde esa respuesta. Si el caso pasa a una persona, no se factura.</li>
+        <li>Es más corta que el ciclo de facturación: si la ventana cierra en el mes siguiente, el caso se factura ese mes.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PÁGINA 8 ============================ -->
+<section class="page">
+  <div class="sec"><span class="num">Sección 4</span><h2>Plan de implementación a 30 días y control de metadatos</h2></div>
+  <p class="small">Kickoff el lunes 2 de noviembre de 2026; cierre del plan el martes 1 de diciembre (día 30). Los responsables de Lleyton Tech Store son roles del cliente; los de Lleyton IA Automation son roles del proveedor.</p>
+  <table>
+    <thead><tr><th style="width:9%">Día · fecha</th><th>Hito y evidencia de cumplimiento</th><th style="width:27%">Responsable (rol)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>D1</strong><br>lun 2/11</td><td><strong>Kickoff y acta de alcance.</strong> Se firman el semáforo, los criterios de salida de cada fase, el KPI de facturación y la ventana de 7 días.</td><td>Sponsor ejecutivo (Gerente General, cliente), que aprueba · Arquitecto de Automatización (proveedor), que redacta</td></tr>
+      <tr><td><strong>D3</strong><br>mié 4/11</td><td><strong>Accesos con permisos mínimos.</strong> Gmail (leer y crear borradores), HubSpot (contactos y casos, sin borrado) y Slack (un canal). Llaves separadas para prueba y producción, cada una con su tope de gasto.</td><td>Responsable de TI y Seguridad (cliente)</td></tr>
+      <tr><td><strong>D5</strong><br>vie 6/11</td><td><strong>Trazabilidad lista en el CRM.</strong> Nueve propiedades del caso, la vista «Casos facturables» y el reporte mensual, creados y probados con casos de prueba.</td><td>Administrador de HubSpot (cliente)</td></tr>
+      <tr><td><strong>D5</strong><br>vie 6/11</td><td><strong>Conocimiento y batería de prueba.</strong> Manual v2.1 cargado, 30 preguntas reales con su respuesta correcta aprobada y baseline cronometrado de nuevo sobre 50 casos.</td><td>Líder de Soporte (Supervisor de Atención al Cliente, cliente)</td></tr>
+      <tr><td><strong>D8</strong><br>lun 9/11</td><td><strong>Arranca la Fase 0 (modo sombra)</strong> con el 100% del tráfico real procesado en paralelo.</td><td>Arquitecto de Automatización (proveedor)</td></tr>
+      <tr><td><strong>D12</strong><br>vie 13/11</td><td><strong>Informe de sombra.</strong> Precisión, coincidencia entre el Supervisor y las personas, costo por consulta y distribución de casos por color del semáforo.</td><td>Analista de Calidad (proveedor)</td></tr>
+      <tr><td><strong>D15</strong><br>lun 16/11</td><td><strong>Go/No-Go 1 (F0 → F1)</strong> y capacitación del equipo de soporte (1 hora).</td><td>Líder de Soporte (cliente)</td></tr>
+      <tr><td><strong>D17</strong><br>mié 18/11</td><td><strong>Revisión de mitad de piloto</strong> con el equipo. Se ajusta el formato de la ficha según las marcas de útil y no útil.</td><td>Analista de Calidad (proveedor) · Líder de Soporte (cliente)</td></tr>
+      <tr><td><strong>D23</strong><br>mar 24/11</td><td><strong>Go/No-Go 2 (F1 → F2).</strong> Con el informe del piloto, se activan las escrituras con aprobación y la trazabilidad pasa a producción. Se paga el 2º 50% del setup.</td><td>Sponsor ejecutivo (cliente)</td></tr>
+      <tr><td><strong>D26</strong><br>vie 27/11</td><td><strong>Control de escrituras.</strong> 0 duplicados en HubSpot y 100% de los casos con origen y código de traza.</td><td>Administrador de HubSpot (cliente)</td></tr>
+      <tr><td><strong>D30</strong><br>mar 1/12</td><td><strong>Cierre de los 30 días.</strong> Conciliación de prueba entre HubSpot y el registro de auditoría, primer tablero mensual para la Dirección y plan de pase a la Fase 3.</td><td>Responsable de Finanzas (cliente), en la conciliación · Arquitecto de Automatización (proveedor)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Ciclo de vida de un caso y su marca en el CRM</h3>
+  <div class="flow">
+    <div class="st"><b>1 · Llega</b>Se crea el código de traza y el caso en HubSpot con <span class="mono">fase</span> y <span class="mono">color_semaforo</span>.</div>
+    <div class="st"><b>2 · Responde</b>Se graban <span class="mono">origen_respuesta</span>, la calidad y la <span class="mono">ultima_interaccion_agente</span>.</div>
+    <div class="st"><b>3 · Ventana</b>El estado pasa a EN_VENTANA durante 7 días. Cualquier acción humana marca la intervención.</div>
+    <div class="st"><b>4 · Cierre</b>Al día 7 el caso queda FACTURABLE o NO_FACTURABLE, con la fecha en <span class="mono">cierre_ventana</span>.</div>
+    <div class="st"><b>5 · Factura</b>Se usa el reporte del CRM del cliente, conciliado con el registro de auditoría.</div>
+  </div>
+</section>
+
+<!-- ============================ PÁGINA 9 ============================ -->
+<section class="page">
+  <h3 style="margin-top:0">Trazabilidad de metadatos: el CRM como única fuente de verdad para facturar</h3>
+  <p class="small">Cada interacción del asistente queda marcada en el caso de HubSpot en el momento en que ocurre. La factura del success fee sale de esas marcas y de ningún otro lado.</p>
+  <table>
+    <thead><tr><th style="width:24%">Propiedad del caso en HubSpot</th><th style="width:32%">Valores</th><th>Quién la escribe y para qué sirve</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">origen_respuesta</span></td><td>AGENTE_AUTONOMO · AGENTE_CON_APROBACION · HUMANO</td><td>El sistema, al enviar. Si alguien toca Aprobar o Editar en Slack, el valor pasa a «con aprobación». Define si el caso puede facturarse.</td></tr>
+      <tr><td><span class="mono">codigo_traza</span></td><td>p. ej. trc-20261124-101532-48213</td><td>El sistema, al recibir el correo. Es el mismo código en todos los pasos y en el registro de auditoría, y une el caso con su evidencia.</td></tr>
+      <tr><td><span class="mono">fase_despliegue</span></td><td>F0 · F1 · F2 · F3</td><td>El sistema. Solo los casos de F3 pueden facturarse.</td></tr>
+      <tr><td><span class="mono">color_semaforo</span></td><td>VERDE · AMARILLO · ROJO</td><td>El Coordinador. Solo un caso verde puede ser autónomo.</td></tr>
+      <tr><td><span class="mono">calidad_respuesta</span></td><td>1–5 y ACEPTADO · CORREGIR · RECHAZADO</td><td>El Supervisor de Calidad. Sirve de evidencia para la compuerta de calidad y para las disputas.</td></tr>
+      <tr><td><span class="mono">ultima_interaccion_agente</span></td><td>fecha y hora</td><td>El sistema, en cada respuesta. Es el punto desde el que corre la ventana.</td></tr>
+      <tr><td><span class="mono">intervencion_humana</span></td><td>Sí · No</td><td>El sistema la marca sola ante cualquier acción humana (aprobar, editar, responder, reasignar). Un «Sí» excluye el caso de la factura.</td></tr>
+      <tr><td><span class="mono">cierre_ventana</span></td><td>fecha = última interacción + 7 días</td><td>El sistema. Define en qué mes se factura el caso.</td></tr>
+      <tr><td><span class="mono">estado_facturacion</span></td><td>EN_VENTANA · FACTURABLE · NO_FACTURABLE · EN_DISPUTA</td><td>El sistema, al cerrar la ventana. Solo el cliente puede marcar EN_DISPUTA.</td></tr>
+    </tbody>
+  </table>
+  <p class="small">La versión de las instrucciones y de la base de conocimiento con la que se respondió cada caso queda en el registro de auditoría, bajo el mismo código de traza.</p>
+
+  <div class="cols2" style="margin-top:6px">
+    <div class="box">
+      <h4>Reglas para que no haya disputas de atribución</h4>
+      <ol style="margin:0">
+        <li><strong>Sin traza no hay factura.</strong> Un caso sin código de traza o sin su fila en el registro de auditoría no se cobra.</li>
+        <li><strong>La factura sale del CRM del cliente.</strong> El último día hábil del mes, Finanzas exporta el reporte «Casos facturables» (FACTURABLE, con la ventana cerrada en el mes). Lleyton IA Automation factura exactamente ese número y solo tiene acceso de lectura al reporte.</li>
+        <li><strong>Conciliación cruzada.</strong> El número de HubSpot se compara, código por código, con el registro de auditoría. Si la diferencia supera el 1%, esa diferencia no se factura hasta aclararla.</li>
+      </ol>
+    </div>
+    <div class="box">
+      <h4>&nbsp;</h4>
+      <ol start="4" style="margin:0">
+        <li><strong>Historial a la vista.</strong> Las propiedades las escribe solo el usuario de integración. HubSpot guarda quién cambió cada valor y cuándo, así que cualquier cambio manual queda registrado.</li>
+        <li><strong>Disputas con plazo.</strong> El cliente marca EN_DISPUTA hasta 10 días después de recibir la factura. Se revisa la traza completa: pregunta, respuesta, calificación y fechas. Si en 5 días hábiles no hay acuerdo, el caso no se cobra.</li>
+        <li><strong>Doble uso de los datos.</strong> Con las mismas marcas se arma el tablero de la Dirección: horas ahorradas, precisión, reapertura y costo.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PÁGINA 10 ============================ -->
+<section class="page">
+  <h3 style="margin-top:0">Defensa ante comité: tres objeciones anticipadas</h3>
+
+  <div class="obj">
+    <div class="q"><span>Objeción 1</span>«Esto ya lo hace mi CRM.»</div>
+    <div class="a">
+      <div>HubSpot es donde queda registrado el caso, y lo va a seguir siendo: en esta propuesta es la única fuente de verdad, incluso para facturar. Pero el CRM no lee el correo, no busca la regla en el manual, no redacta la respuesta ni la verifica. Ese trabajo hoy lo hacen personas: <strong>212,5 horas por mes medidas con HubSpot ya en uso</strong>. El asistente hace ese trabajo y deja el resultado dentro del CRM, más completo que hoy. Cada caso queda con su origen, su calidad y su código de traza, sin duplicados, porque el sistema busca antes de crear. No reemplaza al CRM: lo alimenta.</div>
+      <div class="r"><h4>Respaldo</h4><ul><li>195 h/mes liberadas: 1,2 personas</li><li>0 licencias nuevas: funciona sobre Gmail, HubSpot y Slack</li><li>HubSpot sigue siendo el sistema con el que se audita y se factura</li></ul></div>
+    </div>
+  </div>
+
+  <div class="obj">
+    <div class="q"><span>Objeción 2</span>«¿Y si el agente alucina y borra datos?»</div>
+    <div class="a">
+      <div><strong>No puede borrar:</strong> ninguno de sus accesos tiene permiso de borrado en Gmail, HubSpot ni Slack, y el sistema no tiene ninguna acción de borrado. <strong>Para no inventar tiene tres barreras.</strong> Responde solo con el Manual vigente y, si la respuesta no está, dice «no sé» y deriva. El Supervisor de Calidad califica cada respuesta antes de que salga, y por debajo de 4 sobre 5 no sale. Lo sensible (reintegros, montos altos, temas legales, datos personales) está en rojo y siempre lo resuelve una persona. <strong>Y la autonomía se gana por fases:</strong> tres semanas sin escribir nada, después cada respuesta aprobada por una persona, y recién entonces autonomía, con 4 semanas de al menos 85% de respuestas aprobadas sin cambios. Si la calidad baja, el sistema vuelve solo al modo con aprobación.</div>
+      <div class="r"><h4>Respaldo</h4><ul><li>Prueba real del M8: 10 de 10 respuestas correctas en la configuración elegida</li><li>Cuando el Supervisor falló en una corrida de validación, 10 de 10 casos fueron a una persona y ninguno llegó a un cliente</li><li>Tope de gasto, filtro de respuestas automáticas y una sola corrección por respuesta</li></ul></div>
+    </div>
+  </div>
+
+  <div class="obj">
+    <div class="q"><span>Objeción 3</span>«Es caro para el ahorro que genera.»</div>
+    <div class="a">
+      <div>En régimen, Lleyton Tech Store paga <strong>USD 333 por mes y libera USD 1.560 en horas: USD 4,7 por cada dólar</strong>. El setup se recupera hacia el <strong>día 41</strong> y el primer año deja USD 12.917 netos (ROI del 300%). Además, el riesgo está repartido. La mitad del setup se paga solo si las Fases 0 y 1 cumplen los criterios. El retainer arranca cuando el sistema ya ahorra. El success fee se cobra solo por casos resueltos sin ayuda: vale la décima parte de lo que cuesta ese caso a mano, tiene un tope de USD 400 y no se cobra si la precisión del mes baja del 95%.</div>
+      <div class="r"><h4>Respaldo</h4><ul><li>Con 70% de autonomía en lugar de 85%: beneficio neto de USD 1.134 por mes</li><li>Pico ×5 (Hot Sale): 6,6 personas a mano contra 0,5 con el sistema, sin contratar temporales</li><li>Una persona de soporte cuesta ~USD 1.280 por mes. El sistema cuesta la cuarta parte y libera 1,2 personas</li></ul></div>
+    </div>
+  </div>
+
+  <div class="callout navy" style="margin-top:4px">
+    <strong>Cierre para el comité:</strong> el proyecto arranca con tres semanas en las que el asistente no le escribe a nadie, se mide sobre correos reales y avanza solo si cumple criterios firmados de antemano. La decisión de hoy es <strong>aprobar las Fases 0 y 1 por USD 400</strong>. Todo lo demás se decide el 24 de noviembre con datos.
+  </div>
+  <p class="src">Pre-entrega Módulo 10 · Lleyton Murphy · Proyecto integrador M1 → M11. El sistema que se presenta es el construido a lo largo del curso: arquitectura Coordinador–Especialistas (M2), memoria (M3), integraciones Gmail, HubSpot y Slack (M4), base de conocimiento (M5), Supervisor de Calidad (M8) y gobernanza, TCO y ROI (M9).</p>
+</section>
+
+</body>
+</html>
