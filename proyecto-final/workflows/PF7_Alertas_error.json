@@ -1,0 +1,248 @@
+{
+  "name": "PF 7 - Alertas de error (Error Trigger)",
+  "nodes": [
+    {
+      "id": "ca2d8cdc-f6f9-4b2f-bd88-afd588d043d1",
+      "name": "Error Trigger (cualquier workflow PF)",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "be8da4d9-ce0a-4292-b89d-f0e38722fbb8",
+      "name": "Normalizar incidente",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "fecha",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "f2",
+              "name": "workflow",
+              "value": "={{ $json.workflow?.name ?? \"desconocido\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f3",
+              "name": "nodo",
+              "value": "={{ $json.execution?.lastNodeExecuted ?? $json.execution?.error?.node?.name ?? \"desconocido\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f4",
+              "name": "error",
+              "value": "={{ ($json.execution?.error?.message ?? \"Error sin mensaje\").slice(0, 500) }}",
+              "type": "string"
+            },
+            {
+              "id": "f5",
+              "name": "execution_id",
+              "value": "={{ $json.execution?.id ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f6",
+              "name": "execution_url",
+              "value": "={{ $json.execution?.url ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f7",
+              "name": "email_supervisor",
+              "value": "<__PLACEHOLDER_VALUE__Email del supervisor que recibe las alertas__>",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "9c779a7b-ccc8-40c8-8849-4d5caf5e1808",
+      "name": "Registrar incidente (PF Incidentes)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "GLGL9yAGal6rKPi8",
+          "cachedResultName": "PF Incidentes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $json.fecha }}",
+            "workflow": "={{ $json.workflow }}",
+            "nodo": "={{ $json.nodo }}",
+            "error": "={{ $json.error }}",
+            "execution_id": "={{ $json.execution_id }}",
+            "execution_url": "={{ $json.execution_url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nodo",
+              "displayName": "nodo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "error",
+              "displayName": "error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "execution_url",
+              "displayName": "execution_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f03cb35d-7cd5-4b7d-9df6-58beb0bf5988",
+      "name": "Alertar al equipo (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        300
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $('Normalizar incidente').item.json.email_supervisor }}",
+        "subject": "=[ALERTA] Falla en {{ $('Normalizar incidente').item.json.workflow }}",
+        "emailType": "html",
+        "message": "=<p><b>Se detuvo una ejecución del sistema de soporte.</b></p><ul><li>Workflow: {{ $('Normalizar incidente').item.json.workflow }}</li><li>Paso: {{ $('Normalizar incidente').item.json.nodo }}</li><li>Error: {{ $('Normalizar incidente').item.json.error }}</li><li>Fecha: {{ $('Normalizar incidente').item.json.fecha }}</li></ul><p>Ejecución: {{ $('Normalizar incidente').item.json.execution_url }}</p><p>El caso no se perdió: queda registrado en PF Incidentes y el Manager lo deriva a revisión humana.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "onError": "continueRegularOutput",
+      "webhookId": "3fec99e1-9933-4fcb-ad44-43eb58d4b17d"
+    },
+    {
+      "id": "431a5fa6-bf87-4850-80a2-4f4334caf262",
+      "name": "Sticky Note cef617bb",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        164
+      ],
+      "parameters": {
+        "content": "## PF 7 · Alertas de error\nSe ejecuta automáticamente cuando falla cualquier workflow del sistema (PF 1 a PF 6). Registra el incidente y avisa al equipo humano por Gmail. Nada se ejecuta por defecto: el caso queda trazado.",
+        "color": 3,
+        "width": 940,
+        "height": 276
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger (cualquier workflow PF)": {
+      "main": [
+        [
+          {
+            "node": "Normalizar incidente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar incidente": {
+      "main": [
+        [
+          {
+            "node": "Registrar incidente (PF Incidentes)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar incidente (PF Incidentes)": {
+      "main": [
+        [
+          {
+            "node": "Alertar al equipo (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "d698RPr6un9c9GxA",
+  "active": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": []
+}

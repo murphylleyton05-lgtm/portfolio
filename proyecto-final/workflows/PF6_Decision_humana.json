@@ -1,0 +1,808 @@
+{
+  "name": "PF 6 - Decision humana (Webhook Aprobar/Rechazar)",
+  "nodes": [
+    {
+      "id": "f6f5a634-5d1a-4913-9318-e729582abb94",
+      "name": "Webhook decisión del supervisor (GET)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "pf-decision",
+        "responseMode": "responseNode",
+        "options": {
+          "ignoreBots": true
+        }
+      },
+      "webhookId": "5d58ef24-4d94-4164-8e84-3eeb37d1f7d3"
+    },
+    {
+      "id": "04cabaf1-db0a-4c06-8e9c-636ed56e71a0",
+      "name": "Normalizar decisión",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1",
+              "name": "trace_id",
+              "value": "={{ $json.query?.trace ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "d2",
+              "name": "token",
+              "value": "={{ $json.query?.token ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "d3",
+              "name": "accion",
+              "value": "={{ ($json.query?.accion ?? \"\").toLowerCase() }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ebb90d34-4505-4135-ba65-aecf3057889d",
+      "name": "Leer caso en la cola",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "asxbyihc0Pe64j4Q",
+          "cachedResultName": "PF Cola Aprobacion"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.trace_id }}"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "c087ef08-3b62-442a-85bf-83db227b9293",
+      "name": "¿Enlace válido y caso PENDIENTE?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.token_aprobacion ?? \"\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "={{ $('Normalizar decisión').first().json.token }}"
+            },
+            {
+              "leftValue": "={{ $json.token_aprobacion ?? \"\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "leftValue": "={{ $json.estado ?? \"\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "PENDIENTE"
+            },
+            {
+              "leftValue": "={{ $('Normalizar decisión').first().json.accion }}",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              },
+              "rightValue": "^(aprobar|rechazar)$"
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "ff989252-98bd-4c2d-b09c-22384f0e86bf",
+      "name": "¿Aprobar o rechazar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        200
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Normalizar decisión').first().json.accion }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "aprobar"
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "42b87afa-619b-4cff-a3a2-bd9926c45aec",
+      "name": "Cola: marcar APROBADA",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        100
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "asxbyihc0Pe64j4Q",
+          "cachedResultName": "PF Cola Aprobacion"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalizar decisión').first().json.trace_id }}"
+            },
+            {
+              "keyName": "estado",
+              "condition": "eq",
+              "keyValue": "PENDIENTE"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado": "APROBADA",
+            "decidido_en": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "decidido_en",
+              "displayName": "decidido_en",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "9878f4f4-9ead-4672-88d3-8af985ce81d7",
+      "name": "Payload mínimo → CRM + Despacho",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1320,
+        100
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"trace_id\": $('Leer caso en la cola').first().json.trace_id, \"email_cliente\": $('Leer caso en la cola').first().json.email_cliente, \"nombre\": $('Leer caso en la cola').first().json.nombre, \"mensaje\": $('Leer caso en la cola').first().json.mensaje, \"respuesta_final\": $('Leer caso en la cola').first().json.respuesta_propuesta, \"fuentes_texto\": $('Leer caso en la cola').first().json.fuentes, \"exactitud_factual\": $('Leer caso en la cola').first().json.exactitud_factual, \"estado_veredicto\": $('Leer caso en la cola').first().json.estado_veredicto, \"origen_respuesta\": \"HUMANO_APROBADO\" } }}"
+      }
+    },
+    {
+      "id": "7c97f6ee-ee02-48a2-bc94-7c584599c317",
+      "name": "Ejecutar PF 4 · CRM + Despacho",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        1540,
+        100
+      ],
+      "parameters": {
+        "mode": "once",
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "LSj1ioe8J3VQYPP0",
+          "cachedResultName": "PF 4 - Worker CRM + Despacho (Gmail)"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "20e9d5f9-7b1a-4fca-a2f6-57c18a7342f0",
+      "name": "Solicitud: RESUELTO_HUMANO",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1760,
+        100
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bmhwphkg52cWFvTU",
+          "cachedResultName": "PF Solicitudes"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalizar decisión').first().json.trace_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado": "RESUELTO_HUMANO",
+            "ruta_final": "HITL_APROBADO",
+            "despachado": "={{ $('Ejecutar PF 4 · CRM + Despacho').first().json.status === 'despachado' }}",
+            "fecha_cierre": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ruta_final",
+              "displayName": "ruta_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "despachado",
+              "displayName": "despachado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_cierre",
+              "displayName": "fecha_cierre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "17e62b96-2b5b-4859-98b7-865e96dd353c",
+      "name": "Registrar span 06 (decisión humana)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1980,
+        200
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mg2CNoQvcgctuBOr",
+          "cachedResultName": "PF Auditoria Trazas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('Normalizar decisión').first().json.trace_id }}",
+            "span_id": "06-decision-humana",
+            "timestamp": "={{ $now.toISO() }}",
+            "workflow": "PF 6 - Decision humana",
+            "paso": "=Supervisor: {{ $('Normalizar decisión').first().json.accion.toUpperCase() }}",
+            "detalle": "={{ JSON.stringify({ accion: $('Normalizar decisión').first().json.accion, despacho: $('Ejecutar PF 4 · CRM + Despacho').isExecuted ? $('Ejecutar PF 4 · CRM + Despacho').first().json.status : 'no aplica' }) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "span_id",
+              "displayName": "span_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso",
+              "displayName": "paso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "detalle",
+              "displayName": "detalle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "eec05d86-364b-422e-b025-260fdb8fc38e",
+      "name": "Cola: marcar RECHAZADA",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        320
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "asxbyihc0Pe64j4Q",
+          "cachedResultName": "PF Cola Aprobacion"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalizar decisión').first().json.trace_id }}"
+            },
+            {
+              "keyName": "estado",
+              "condition": "eq",
+              "keyValue": "PENDIENTE"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado": "RECHAZADA",
+            "decidido_en": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "decidido_en",
+              "displayName": "decidido_en",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "1458ada1-e1d0-48e1-abed-b515250e1f3a",
+      "name": "Solicitud: RECHAZADO_HUMANO",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1320,
+        320
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bmhwphkg52cWFvTU",
+          "cachedResultName": "PF Solicitudes"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalizar decisión').first().json.trace_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado": "RECHAZADO_HUMANO",
+            "ruta_final": "HITL_RECHAZADO",
+            "despachado": false,
+            "fecha_cierre": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ruta_final",
+              "displayName": "ruta_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "despachado",
+              "displayName": "despachado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_cierre",
+              "displayName": "fecha_cierre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6fb57866-ff3d-4e69-8772-8e0376a3e122",
+      "name": "Responder: enlace inválido o ya resuelto",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        880,
+        520
+      ],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<html><body style=\"font-family:sans-serif\"><h2>Enlace inválido o caso ya resuelto</h2><p>No se repitió ninguna acción (operación idempotente).</p></body></html>",
+        "options": {
+          "responseCode": 409,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "e78a7cf5-aecf-45d5-8ecb-c1f9e6730929",
+      "name": "Responder: decisión registrada",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2200,
+        200
+      ],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<html><body style=\"font-family:sans-serif\"><h2>{{ $('Normalizar decisión').first().json.accion === 'aprobar' ? 'Aprobado: la respuesta se envió al cliente' : 'Rechazado: el caso queda para respuesta manual' }}</h2><p>Caso {{ $('Normalizar decisión').first().json.trace_id }}. La decisión quedó registrada en la auditoría.</p></body></html>",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "2c49ce33-c3cc-47d0-a2d3-5df12cff91c0",
+      "name": "Sticky Note 711ee289",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -11
+      ],
+      "parameters": {
+        "content": "## PF 6 · Decisión humana (salida de la cola HITL)\nEl supervisor hace clic en Aprobar o Rechazar desde el correo. Se valida el token de un solo uso y que el caso siga PENDIENTE: un segundo clic no repite nada. Aprobar reutiliza el Worker PF 4 (CRM + Gmail) con origen HUMANO_APROBADO.",
+        "color": 2,
+        "width": 2420,
+        "height": 671
+      }
+    }
+  ],
+  "connections": {
+    "Webhook decisión del supervisor (GET)": {
+      "main": [
+        [
+          {
+            "node": "Normalizar decisión",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar decisión": {
+      "main": [
+        [
+          {
+            "node": "Leer caso en la cola",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer caso en la cola": {
+      "main": [
+        [
+          {
+            "node": "¿Enlace válido y caso PENDIENTE?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Enlace válido y caso PENDIENTE?": {
+      "main": [
+        [
+          {
+            "node": "¿Aprobar o rechazar?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder: enlace inválido o ya resuelto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Aprobar o rechazar?": {
+      "main": [
+        [
+          {
+            "node": "Cola: marcar APROBADA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cola: marcar RECHAZADA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cola: marcar APROBADA": {
+      "main": [
+        [
+          {
+            "node": "Payload mínimo → CRM + Despacho",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload mínimo → CRM + Despacho": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar PF 4 · CRM + Despacho",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar PF 4 · CRM + Despacho": {
+      "main": [
+        [
+          {
+            "node": "Solicitud: RESUELTO_HUMANO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solicitud: RESUELTO_HUMANO": {
+      "main": [
+        [
+          {
+            "node": "Registrar span 06 (decisión humana)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar span 06 (decisión humana)": {
+      "main": [
+        [
+          {
+            "node": "Responder: decisión registrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cola: marcar RECHAZADA": {
+      "main": [
+        [
+          {
+            "node": "Solicitud: RECHAZADO_HUMANO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solicitud: RECHAZADO_HUMANO": {
+      "main": [
+        [
+          {
+            "node": "Registrar span 06 (decisión humana)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "JC7Qyk6nBUKS4km8",
+  "active": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": []
+}

@@ -1,0 +1,899 @@
+{
+  "name": "PF 4 - Worker CRM + Despacho (Gmail)",
+  "nodes": [
+    {
+      "id": "72267a05-4af1-4908-ac4d-36dd4f8e2524",
+      "name": "Entrada desde el Manager o la Decisión humana",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    },
+    {
+      "id": "b02a14d1-ca31-4e18-ad1c-958b798585cc",
+      "name": "Entrada (contrato)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "trace_id",
+              "value": "={{ $json.trace_id }}",
+              "type": "string"
+            },
+            {
+              "id": "c2",
+              "name": "idempotency_key",
+              "value": "={{ $json.idempotency_key ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c3",
+              "name": "email_cliente",
+              "value": "={{ $json.email_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "c4",
+              "name": "nombre",
+              "value": "={{ $json.nombre ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c5",
+              "name": "mensaje",
+              "value": "={{ $json.mensaje ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c6",
+              "name": "respuesta_final",
+              "value": "={{ $json.respuesta_final }}",
+              "type": "string"
+            },
+            {
+              "id": "c7",
+              "name": "fuentes_texto",
+              "value": "={{ $json.fuentes_texto ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c8",
+              "name": "exactitud_factual",
+              "value": "={{ $json.exactitud_factual ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "c9",
+              "name": "estado_veredicto",
+              "value": "={{ $json.estado_veredicto ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c10",
+              "name": "origen_respuesta",
+              "value": "={{ $json.origen_respuesta ?? \"AGENTE_AUTONOMO\" }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "670a7b42-b2b5-4f96-923b-499c3b901126",
+      "name": "¿Ya fue despachado? (idempotencia)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "KPRMeIEBiFqNxR4Z",
+          "cachedResultName": "PF CRM Casos"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.trace_id }}"
+            },
+            {
+              "keyName": "estado_caso",
+              "condition": "eq",
+              "keyValue": "DESPACHADO"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "28ce8062-de9f-480e-959f-6a2ac3aeb441",
+      "name": "¿Existe un despacho previo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.trace_id ?? \"\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "aa3f02d0-10f0-4f7e-9652-2a02fddafa20",
+      "name": "Omitir: ya despachado (no se duplica)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        120
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"status\": \"omitido_duplicado\", \"trace_id\": $('Entrada (contrato)').first().json.trace_id, \"detalle\": \"El caso ya figura como DESPACHADO en el CRM; no se reenvía el correo.\" } }}"
+      }
+    },
+    {
+      "id": "7d9cecee-14a6-4c38-ac9b-e23caa1ac4df",
+      "name": "Consolidar caso en CRM (VALIDADO)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        360
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "KPRMeIEBiFqNxR4Z",
+          "cachedResultName": "PF CRM Casos"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Entrada (contrato)').first().json.trace_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('Entrada (contrato)').first().json.trace_id }}",
+            "idempotency_key": "={{ $('Entrada (contrato)').first().json.idempotency_key }}",
+            "email_cliente": "={{ $('Entrada (contrato)').first().json.email_cliente }}",
+            "nombre": "={{ $('Entrada (contrato)').first().json.nombre }}",
+            "mensaje": "={{ $('Entrada (contrato)').first().json.mensaje }}",
+            "respuesta_final": "={{ $('Entrada (contrato)').first().json.respuesta_final }}",
+            "fuentes": "={{ $('Entrada (contrato)').first().json.fuentes_texto }}",
+            "exactitud_factual": "={{ $('Entrada (contrato)').first().json.exactitud_factual }}",
+            "estado_veredicto": "={{ $('Entrada (contrato)').first().json.estado_veredicto }}",
+            "origen_respuesta": "={{ $('Entrada (contrato)').first().json.origen_respuesta }}",
+            "estado_caso": "VALIDADO",
+            "canal_despacho": "gmail",
+            "fecha_registro": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "idempotency_key",
+              "displayName": "idempotency_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_cliente",
+              "displayName": "email_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta_final",
+              "displayName": "respuesta_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuentes",
+              "displayName": "fuentes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "exactitud_factual",
+              "displayName": "exactitud_factual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado_veredicto",
+              "displayName": "estado_veredicto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "origen_respuesta",
+              "displayName": "origen_respuesta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado_caso",
+              "displayName": "estado_caso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "canal_despacho",
+              "displayName": "canal_despacho",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "gmail_message_id",
+              "displayName": "gmail_message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_registro",
+              "displayName": "fecha_registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_despacho",
+              "displayName": "fecha_despacho",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "981bb292-f48d-47c1-85f3-ba2b194ee91c",
+      "name": "Despachar respuesta al cliente (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        360
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $('Entrada (contrato)').first().json.email_cliente }}",
+        "subject": "=Re: tu consulta a Lleyton Tech Store [{{ $('Entrada (contrato)').first().json.trace_id }}]",
+        "emailType": "html",
+        "message": "=<p>Hola {{ $('Entrada (contrato)').first().json.nombre || '' }},</p><p>{{ $('Entrada (contrato)').first().json.respuesta_final.replace(/\\n/g, '<br>') }}</p><hr><p style=\"color:#666;font-size:12px\">{{ $('Entrada (contrato)').first().json.origen_respuesta === 'AGENTE_AUTONOMO' ? 'Respuesta verificada por nuestro Supervisor de Calidad (exactitud ' + $('Entrada (contrato)').first().json.exactitud_factual + '/5).' : 'Respuesta revisada y aprobada por un supervisor de atención al cliente.' }} Código de seguimiento: {{ $('Entrada (contrato)').first().json.trace_id }}. Si necesitás hablar con una persona, respondé este correo.</p><p>Lleyton Tech Store · Soporte</p>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Lleyton Tech Store · Soporte"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput",
+      "webhookId": "6c08df30-de9c-4052-ad32-e7ae7566d65c"
+    },
+    {
+      "id": "3a201a6d-3b88-4e00-b059-e1b8aafaa23d",
+      "name": "Marcar DESPACHADO en CRM",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1340,
+        280
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "KPRMeIEBiFqNxR4Z",
+          "cachedResultName": "PF CRM Casos"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Entrada (contrato)').first().json.trace_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado_caso": "DESPACHADO",
+            "gmail_message_id": "={{ $json.id }}",
+            "fecha_despacho": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "idempotency_key",
+              "displayName": "idempotency_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_cliente",
+              "displayName": "email_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta_final",
+              "displayName": "respuesta_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuentes",
+              "displayName": "fuentes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "exactitud_factual",
+              "displayName": "exactitud_factual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado_veredicto",
+              "displayName": "estado_veredicto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "origen_respuesta",
+              "displayName": "origen_respuesta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado_caso",
+              "displayName": "estado_caso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "canal_despacho",
+              "displayName": "canal_despacho",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "gmail_message_id",
+              "displayName": "gmail_message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_registro",
+              "displayName": "fecha_registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_despacho",
+              "displayName": "fecha_despacho",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d73dc50d-5a0f-4d01-b7ea-32f8b6486e1c",
+      "name": "Salida: despachado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1560,
+        280
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"status\": \"despachado\", \"canal\": \"gmail\", \"trace_id\": $('Entrada (contrato)').first().json.trace_id, \"gmail_message_id\": $('Despachar respuesta al cliente (Gmail)').first().json.id } }}"
+      }
+    },
+    {
+      "id": "b120a7c0-093c-4f5a-822c-160937e5d47e",
+      "name": "Marcar ERROR_DESPACHO en CRM",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1340,
+        480
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "KPRMeIEBiFqNxR4Z",
+          "cachedResultName": "PF CRM Casos"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Entrada (contrato)').first().json.trace_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado_caso": "ERROR_DESPACHO"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "idempotency_key",
+              "displayName": "idempotency_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_cliente",
+              "displayName": "email_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta_final",
+              "displayName": "respuesta_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fuentes",
+              "displayName": "fuentes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "exactitud_factual",
+              "displayName": "exactitud_factual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado_veredicto",
+              "displayName": "estado_veredicto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "origen_respuesta",
+              "displayName": "origen_respuesta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado_caso",
+              "displayName": "estado_caso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "canal_despacho",
+              "displayName": "canal_despacho",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "gmail_message_id",
+              "displayName": "gmail_message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_registro",
+              "displayName": "fecha_registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_despacho",
+              "displayName": "fecha_despacho",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6c9e0a46-3820-4c9f-bc52-ea90b46874a4",
+      "name": "Salida: error de despacho (alerta al Manager)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1560,
+        480
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"status\": \"error_despacho\", \"canal\": \"gmail\", \"trace_id\": $('Entrada (contrato)').first().json.trace_id, \"error\": String($('Despachar respuesta al cliente (Gmail)').first().json.error?.message ?? $('Despachar respuesta al cliente (Gmail)').first().json.error ?? 'Gmail no respondió').slice(0, 300) } }}"
+      }
+    },
+    {
+      "id": "352fbab9-9729-4b49-b697-10f472dc5a21",
+      "name": "Sticky Note 5f190717",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -16
+      ],
+      "parameters": {
+        "content": "## PF 4 · Worker CRM + Despacho\nSolo recibe casos ya aprobados (por el Supervisor o por una persona). Idempotente: si el caso ya figura DESPACHADO, no reenvía. Consolida el caso en el CRM, envía por Gmail con 3 reintentos y marca el estado final. Si Gmail falla, devuelve error_despacho para que el Manager alerte.",
+        "color": 6,
+        "width": 1780,
+        "height": 636
+      }
+    }
+  ],
+  "connections": {
+    "Entrada desde el Manager o la Decisión humana": {
+      "main": [
+        [
+          {
+            "node": "Entrada (contrato)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Entrada (contrato)": {
+      "main": [
+        [
+          {
+            "node": "¿Ya fue despachado? (idempotencia)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Ya fue despachado? (idempotencia)": {
+      "main": [
+        [
+          {
+            "node": "¿Existe un despacho previo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Existe un despacho previo?": {
+      "main": [
+        [
+          {
+            "node": "Omitir: ya despachado (no se duplica)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Consolidar caso en CRM (VALIDADO)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar caso en CRM (VALIDADO)": {
+      "main": [
+        [
+          {
+            "node": "Despachar respuesta al cliente (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Despachar respuesta al cliente (Gmail)": {
+      "main": [
+        [
+          {
+            "node": "Marcar DESPACHADO en CRM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Marcar ERROR_DESPACHO en CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar DESPACHADO en CRM": {
+      "main": [
+        [
+          {
+            "node": "Salida: despachado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar ERROR_DESPACHO en CRM": {
+      "main": [
+        [
+          {
+            "node": "Salida: error de despacho (alerta al Manager)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "LSj1ioe8J3VQYPP0",
+  "active": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": []
+}

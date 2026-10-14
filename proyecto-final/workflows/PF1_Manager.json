@@ -1,0 +1,1627 @@
+{
+  "name": "PF 1 - Manager (Orquestador asincrono)",
+  "nodes": [
+    {
+      "id": "58e86dfb-b6c1-4bf9-984e-e4672e2d77c0",
+      "name": "Webhook · solicitud entrante (POST)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pf-soporte",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "d7d4150f-ed39-4521-9158-9adece669249"
+    },
+    {
+      "id": "a44fa82f-c6e5-4266-a807-d4077733a0cf",
+      "name": "Normalizar solicitud + traceId",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "n1",
+              "name": "trace_id",
+              "value": "=trc-{{ $now.toFormat(\"yyyyLLdd-HHmmss\") }}-{{ $execution.id }}",
+              "type": "string"
+            },
+            {
+              "id": "n2",
+              "name": "email_cliente",
+              "value": "={{ String($json.body?.email ?? \"\").trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "n3",
+              "name": "nombre",
+              "value": "={{ String($json.body?.nombre ?? \"\").trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "n4",
+              "name": "mensaje",
+              "value": "={{ String($json.body?.mensaje ?? \"\").trim().slice(0, 4000) }}",
+              "type": "string"
+            },
+            {
+              "id": "n5",
+              "name": "canal",
+              "value": "={{ $json.body?.canal ?? \"webhook\" }}",
+              "type": "string"
+            },
+            {
+              "id": "n6",
+              "name": "idempotency_key",
+              "value": "={{ $json.headers?.[\"idempotency-key\"] ?? $json.body?.message_id ?? (String($json.body?.email ?? \"\") + \"|\" + String($json.body?.mensaje ?? \"\")).hash(\"sha256\").slice(0, 24) }}",
+              "type": "string"
+            },
+            {
+              "id": "n7",
+              "name": "modo_prueba",
+              "value": "={{ $json.body?.modo_prueba === true }}",
+              "type": "boolean"
+            },
+            {
+              "id": "n8",
+              "name": "simular_falla",
+              "value": "={{ $json.body?.simular_falla ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "n9",
+              "name": "recibido_en",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "n10",
+              "name": "email_supervisor",
+              "value": "<__PLACEHOLDER_VALUE__Email del supervisor que recibe la cola de revisión humana__>",
+              "type": "string"
+            },
+            {
+              "id": "n11",
+              "name": "url_decision",
+              "value": "https://lleytoncito.app.n8n.cloud/webhook/pf-decision",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f06feaff-e39c-4b86-98f7-20b60510cc1d",
+      "name": "¿Payload válido? (email + mensaje)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.email_cliente }}",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              },
+              "rightValue": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+            },
+            {
+              "leftValue": "={{ $json.mensaje }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "8ad0cec1-cc76-438f-993a-22b0248a6ce8",
+      "name": "¿Solicitud ya recibida? (idempotencia)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bmhwphkg52cWFvTU",
+          "cachedResultName": "PF Solicitudes"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "idempotency_key",
+              "condition": "eq",
+              "keyValue": "={{ $json.idempotency_key }}"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "25f87611-c2eb-406e-8705-4c5eff3151a8",
+      "name": "¿Es duplicada?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.idempotency_key ?? \"\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "fd90a8bc-873a-4574-bb52-72078b01cdd4",
+      "name": "Responder 200 (duplicada, no se reprocesa)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1100,
+        540
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"estado\": \"duplicada\", \"mensaje\": \"La solicitud ya fue recibida; no se reprocesa ni se reenvía.\", \"trace_id\": $json.trace_id, \"estado_actual\": $json.estado } }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "ffeff3de-d56a-4b18-bb10-6933f5a67f3f",
+      "name": "Registrar solicitud (RECIBIDO)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bmhwphkg52cWFvTU",
+          "cachedResultName": "PF Solicitudes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "idempotency_key": "={{ $('Normalizar solicitud + traceId').first().json.idempotency_key }}",
+            "trace_id": "={{ $('Normalizar solicitud + traceId').first().json.trace_id }}",
+            "email_cliente": "={{ $('Normalizar solicitud + traceId').first().json.email_cliente }}",
+            "nombre": "={{ $('Normalizar solicitud + traceId').first().json.nombre }}",
+            "canal": "={{ $('Normalizar solicitud + traceId').first().json.canal }}",
+            "mensaje": "={{ $('Normalizar solicitud + traceId').first().json.mensaje }}",
+            "estado": "RECIBIDO",
+            "intentos": 0,
+            "despachado": false,
+            "fecha_recepcion": "={{ $('Normalizar solicitud + traceId').first().json.recibido_en }}",
+            "modo_prueba": "={{ $('Normalizar solicitud + traceId').first().json.modo_prueba }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "idempotency_key",
+              "displayName": "idempotency_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_cliente",
+              "displayName": "email_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "canal",
+              "displayName": "canal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ruta_final",
+              "displayName": "ruta_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "intentos",
+              "displayName": "intentos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "despachado",
+              "displayName": "despachado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_recepcion",
+              "displayName": "fecha_recepcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_cierre",
+              "displayName": "fecha_cierre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "modo_prueba",
+              "displayName": "modo_prueba",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "220be871-63dd-4a3b-85f0-07e4ad75ea06",
+      "name": "Responder 202 al instante (procesa en 2.º plano)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1320,
+        300
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"estado\": \"recibido\", \"trace_id\": $('Normalizar solicitud + traceId').first().json.trace_id, \"idempotency_key\": $('Normalizar solicitud + traceId').first().json.idempotency_key, \"procesamiento\": \"asincrono\", \"mensaje\": \"Recibimos tu consulta. Te respondemos por email con una respuesta verificada.\" } }}",
+        "options": {
+          "responseCode": 202
+        }
+      }
+    },
+    {
+      "id": "4a147dbf-3158-400b-a6cc-18fa65255915",
+      "name": "Leer memoria del cliente (largo plazo)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1540,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "7sTA5ze3TlqNEpdq",
+          "cachedResultName": "Memoria Agente M3"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalizar solicitud + traceId').first().json.email_cliente }}"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "54db6fe8-6405-45ba-8c60-e239a49a82a9",
+      "name": "Acople contextual + semáforo de riesgo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const s = $('Normalizar solicitud + traceId').first().json;\nconst mem = $input.first().json || {};\nlet resumen = 'sin historial previo';\nif (mem.resumen_consolidado) {\n  try {\n    const r = JSON.parse(mem.resumen_consolidado);\n    resumen = [r.asunto_principal].concat(r.puntos_clave || []).filter(Boolean).join(' | ') || String(mem.resumen_consolidado);\n  } catch (e) { resumen = String(mem.resumen_consolidado).slice(0, 500); }\n}\nconst t = s.mensaje.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\nconst motivos = [];\nif (/(abogad|carta documento|defensa del consumidor|denuncia|demanda|coprec|juicio|accion legal|acciones legales)/.test(t)) motivos.push('mencion legal (Manual 6.3)');\nconst montos = (s.mensaje.match(/\\$\\s?[\\d.]{4,}/g) || []).map(m => Number(m.replace(/[^\\d]/g, '')));\nif (montos.some(m => m > 300000)) motivos.push('monto mayor a $300.000 (Manual 6.3)');\nif (/(numero de (mi )?tarjeta|codigo de seguridad|cvv|contrasena)/.test(t)) motivos.push('datos sensibles (Manual 7)');\nif (/(borren mis datos|eliminen mis datos|baja de mis datos)/.test(t)) motivos.push('pedido sobre datos personales (Manual 7)');\nreturn [{ json: { ...s,\n  memoria_resumen: resumen, memoria_existe: !!mem.session_id, message_count: Number(mem.message_count || 0),\n  riesgo: motivos.length ? 'ROJO' : 'VERDE', motivo_riesgo: motivos.join('; '),\n  intento: 1, critica_previa: '', respuesta_previa: ''\n} }];"
+      }
+    },
+    {
+      "id": "122fc8c0-e682-4c07-b0e4-38caaa1e4e04",
+      "name": "Payload mínimo → Worker RAG",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1980,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "trace_id",
+              "value": "={{ $json.trace_id }}",
+              "type": "string"
+            },
+            {
+              "id": "r2",
+              "name": "pregunta",
+              "value": "={{ $json.mensaje }}",
+              "type": "string"
+            },
+            {
+              "id": "r3",
+              "name": "nombre",
+              "value": "={{ $json.nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "r4",
+              "name": "memoria_resumen",
+              "value": "={{ $json.memoria_resumen }}",
+              "type": "string"
+            },
+            {
+              "id": "r5",
+              "name": "intento",
+              "value": "={{ $json.intento }}",
+              "type": "number"
+            },
+            {
+              "id": "r6",
+              "name": "critica_previa",
+              "value": "={{ $json.critica_previa }}",
+              "type": "string"
+            },
+            {
+              "id": "r7",
+              "name": "respuesta_previa",
+              "value": "={{ $json.respuesta_previa }}",
+              "type": "string"
+            },
+            {
+              "id": "r8",
+              "name": "modo_prueba",
+              "value": "={{ $json.modo_prueba }}",
+              "type": "boolean"
+            },
+            {
+              "id": "r9",
+              "name": "simular_falla",
+              "value": "={{ $json.simular_falla }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d5a87c28-bc4f-46dd-9085-6c2d2d1dccde",
+      "name": "Responder 400 (payload inválido)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        660,
+        540
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"estado\": \"rechazado\", \"error\": \"Faltan email válido o mensaje\" }",
+        "options": {
+          "responseCode": 400
+        }
+      }
+    },
+    {
+      "id": "79d16ac9-5ac1-4e38-a10c-368d614e55b7",
+      "name": "Ejecutar PF 2 · Worker RAG",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2200,
+        300
+      ],
+      "parameters": {
+        "mode": "once",
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "VHldZxEXjDwD4x5I",
+          "cachedResultName": "PF 2 - Worker RAG (Resolutor de Politicas)"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "173271d5-a396-4822-a786-d103bfc62f5b",
+      "name": "Ejecutar PF 3 · Supervisor QA (AI-as-a-Judge)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2420,
+        300
+      ],
+      "parameters": {
+        "mode": "once",
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "m1l9tjVnz9UlFWbJ",
+          "cachedResultName": "PF 3 - Supervisor QA (AI-as-a-Judge)"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "aa256687-35f3-433c-80a1-7de1761ed513",
+      "name": "Consolidar decisión (veredicto + semáforo)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const s = $('Acople contextual + semáforo de riesgo').first().json;\nconst v = $input.first().json;\nlet ruta = v.decision;\nlet motivo = '';\nif (s.riesgo === 'ROJO') { ruta = 'ESCALAR'; motivo = 'RIESGO_ROJO: ' + s.motivo_riesgo; }\nelse if (ruta === 'ESCALAR') motivo = v.veredicto_valido ? ('UMBRAL: exactitud ' + v.veredicto.exactitud_factual + '/5 (' + v.veredicto.estado_veredicto + ')') : 'SUPERVISOR_SIN_JSON_VALIDO';\nconst fuentes_texto = (v.fuentes || []).map(f => f.documento + ' v' + f.version + ', seccion ' + f.seccion + ' \"' + f.titulo + '\", pag. ' + f.pagina).join(' | ') || (v.regla_no_se ? 'Sin cobertura documental (regla No se)' : 'Sin fuente citada');\nreturn [{ json: {\n  trace_id: s.trace_id, idempotency_key: s.idempotency_key, email_cliente: s.email_cliente, nombre: s.nombre, mensaje: s.mensaje,\n  memoria_resumen: s.memoria_resumen, modo_prueba: s.modo_prueba, simular_falla: s.simular_falla,\n  email_supervisor: s.email_supervisor, url_decision: s.url_decision, riesgo: s.riesgo,\n  ruta, motivo, intento: v.intento, respuesta: v.respuesta, regla_no_se: v.regla_no_se, fuentes_texto,\n  exactitud_factual: v.veredicto.exactitud_factual, estado_veredicto: v.veredicto.estado_veredicto,\n  categoria_error: v.veredicto.categoria_error, critica: v.veredicto.critica\n} }];"
+      }
+    },
+    {
+      "id": "e092bb2e-40a5-4a8f-9134-f91127661882",
+      "name": "Ruta: ACEPTAR / CORREGIR / ESCALAR",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2860,
+        300
+      ],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "outputKey": "ACEPTAR",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.ruta }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "ACEPTAR"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "CORREGIR (1 reintento)",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.ruta }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "CORREGIR"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "ESCALAR (HITL)"
+        }
+      }
+    },
+    {
+      "id": "4c2e3b7a-9e1a-4191-84b4-194a4c1fa8ea",
+      "name": "Payload mínimo → CRM + Despacho",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3080,
+        80
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"trace_id\": $json.trace_id, \"idempotency_key\": $json.idempotency_key, \"email_cliente\": $json.email_cliente, \"nombre\": $json.nombre, \"mensaje\": $json.mensaje, \"respuesta_final\": $json.respuesta, \"fuentes_texto\": $json.fuentes_texto, \"exactitud_factual\": $json.exactitud_factual, \"estado_veredicto\": $json.estado_veredicto, \"origen_respuesta\": \"AGENTE_AUTONOMO\" } }}"
+      }
+    },
+    {
+      "id": "0d990fa7-7809-460e-ad8e-b4c09f6ea497",
+      "name": "Ejecutar PF 4 · CRM + Despacho",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        3300,
+        80
+      ],
+      "parameters": {
+        "mode": "once",
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "LSj1ioe8J3VQYPP0",
+          "cachedResultName": "PF 4 - Worker CRM + Despacho (Gmail)"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "d321cd7c-dae7-4073-9665-12c8f9b95ed5",
+      "name": "¿Despacho confirmado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3520,
+        80
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.status }}",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              },
+              "rightValue": "^(despachado|omitido_duplicado)$"
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "5c25d751-3094-49fe-88a7-2a67036f4a91",
+      "name": "Cierre: RESUELTO_AUTONOMO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3740,
+        0
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"estado\": \"RESUELTO_AUTONOMO\", \"ruta_final\": \"ACEPTAR\", \"despachado\": true, \"detalle\": $json.status } }}"
+      }
+    },
+    {
+      "id": "86f643a2-8b24-4103-859f-10d00c177c8b",
+      "name": "Falla técnica → alerta + payload HITL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2640,
+        760
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"trace_id\": $('Acople contextual + semáforo de riesgo').first().json.trace_id, \"email_cliente\": $('Acople contextual + semáforo de riesgo').first().json.email_cliente, \"nombre\": $('Acople contextual + semáforo de riesgo').first().json.nombre, \"mensaje\": $('Acople contextual + semáforo de riesgo').first().json.mensaje, \"respuesta_propuesta\": \"(sin respuesta: falló un servicio externo, ver crítica)\", \"fuentes_texto\": \"\", \"exactitud_factual\": 0, \"estado_veredicto\": \"SIN_VEREDICTO\", \"critica\": String($json.error?.message ?? $json.error ?? $json.status ?? 'Falla de un worker').slice(0, 300), \"motivo\": \"FALLA_TECNICA\", \"email_supervisor\": $('Acople contextual + semáforo de riesgo').first().json.email_supervisor, \"url_decision\": $('Acople contextual + semáforo de riesgo').first().json.url_decision } }}"
+      }
+    },
+    {
+      "id": "cb20f176-1882-4352-889c-67100e02a37d",
+      "name": "Preparar reintento con la crítica del Supervisor",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3080,
+        300
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"trace_id\": $json.trace_id, \"mensaje\": $json.mensaje, \"nombre\": $json.nombre, \"memoria_resumen\": $json.memoria_resumen, \"intento\": $json.intento + 1, \"critica_previa\": $json.critica, \"respuesta_previa\": $json.respuesta, \"modo_prueba\": $json.modo_prueba, \"simular_falla\": $json.simular_falla } }}"
+      }
+    },
+    {
+      "id": "008e3227-1f7f-4a44-b7ad-66bc233cb355",
+      "name": "Payload mínimo → Cola HITL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3080,
+        520
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"trace_id\": $json.trace_id, \"email_cliente\": $json.email_cliente, \"nombre\": $json.nombre, \"mensaje\": $json.mensaje, \"respuesta_propuesta\": $json.respuesta, \"fuentes_texto\": $json.fuentes_texto, \"exactitud_factual\": $json.exactitud_factual, \"estado_veredicto\": $json.estado_veredicto, \"critica\": $json.critica, \"motivo\": $json.motivo || \"UMBRAL\", \"email_supervisor\": $json.email_supervisor, \"url_decision\": $json.url_decision } }}"
+      }
+    },
+    {
+      "id": "3552e5f4-de4c-4c0b-9cab-e1ddd4bb2b3d",
+      "name": "Ejecutar PF 5 · Cola HITL",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        3300,
+        520
+      ],
+      "parameters": {
+        "mode": "once",
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bzwt1EvhJMeoyF8b",
+          "cachedResultName": "PF 5 - Cola HITL (Revision humana)"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "7d7a8f70-b9da-4493-81ff-ec3ddfcdac28",
+      "name": "Cierre: EN_REVISION_HUMANA",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3520,
+        520
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"estado\": \"EN_REVISION_HUMANA\", \"ruta_final\": \"ESCALAR\", \"despachado\": false, \"detalle\": $('Consolidar decisión (veredicto + semáforo)').first().json.motivo } }}"
+      }
+    },
+    {
+      "id": "dce63578-d74e-47ac-a7fc-7317c3d50e80",
+      "name": "Ejecutar PF 5 · Cola HITL (falla técnica)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2860,
+        760
+      ],
+      "parameters": {
+        "mode": "once",
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bzwt1EvhJMeoyF8b",
+          "cachedResultName": "PF 5 - Cola HITL (Revision humana)"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "667666b2-5219-4003-994d-31ec1f2996cb",
+      "name": "Cierre: ERROR_ESCALADO",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3080,
+        760
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ { \"estado\": \"ERROR_ESCALADO\", \"ruta_final\": \"FALLA_TECNICA\", \"despachado\": false, \"detalle\": $('Falla técnica → alerta + payload HITL').first().json.critica } }}"
+      }
+    },
+    {
+      "id": "53527912-2e14-4aa6-929f-4b9db20b3fff",
+      "name": "Cerrar solicitud (estado final)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3960,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bmhwphkg52cWFvTU",
+          "cachedResultName": "PF Solicitudes"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trace_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalizar solicitud + traceId').first().json.trace_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado": "={{ $json.estado }}",
+            "ruta_final": "={{ $json.ruta_final }}",
+            "despachado": "={{ $json.despachado }}",
+            "intentos": "={{ $('Consolidar decisión (veredicto + semáforo)').isExecuted ? $('Consolidar decisión (veredicto + semáforo)').first().json.intento : 1 }}",
+            "fecha_cierre": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "idempotency_key",
+              "displayName": "idempotency_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_cliente",
+              "displayName": "email_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "canal",
+              "displayName": "canal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ruta_final",
+              "displayName": "ruta_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "intentos",
+              "displayName": "intentos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "despachado",
+              "displayName": "despachado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_recepcion",
+              "displayName": "fecha_recepcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_cierre",
+              "displayName": "fecha_cierre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "modo_prueba",
+              "displayName": "modo_prueba",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d1c205e7-5967-4ae3-adc7-79612096862e",
+      "name": "Actualizar memoria del cliente (upsert)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4180,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "7sTA5ze3TlqNEpdq",
+          "cachedResultName": "Memoria Agente M3"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Normalizar solicitud + traceId').first().json.email_cliente }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('Normalizar solicitud + traceId').first().json.email_cliente }}",
+            "user_name": "={{ $('Normalizar solicitud + traceId').first().json.nombre }}",
+            "fecha_actualizacion": "={{ $now.toISO() }}",
+            "resumen_consolidado": "={{ JSON.stringify({ asunto_principal: 'Ultima consulta: ' + $('Normalizar solicitud + traceId').first().json.mensaje.slice(0, 140), puntos_clave: [ 'Resultado: ' + $('Cerrar solicitud (estado final)').first().json.estado, 'trace ' + $('Normalizar solicitud + traceId').first().json.trace_id ], accion_requerida: $('Cerrar solicitud (estado final)').first().json.estado === 'RESUELTO_AUTONOMO' ? 'Ninguna' : 'Seguimiento humano pendiente' }) }}",
+            "estado_del_caso": "={{ $('Cerrar solicitud (estado final)').first().json.estado }}",
+            "datos_clave": "={{ JSON.stringify({ ultimo_trace: $('Normalizar solicitud + traceId').first().json.trace_id, canal: $('Normalizar solicitud + traceId').first().json.canal }) }}",
+            "message_count": "={{ $('Acople contextual + semáforo de riesgo').first().json.message_count + 1 }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_actualizacion",
+              "displayName": "fecha_actualizacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "resumen_consolidado",
+              "displayName": "resumen_consolidado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado_del_caso",
+              "displayName": "estado_del_caso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datos_clave",
+              "displayName": "datos_clave",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_count",
+              "displayName": "message_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "aa17d0c2-0b79-45e6-a567-da1857740c03",
+      "name": "Registrar span 99 (cierre de la traza)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4400,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mg2CNoQvcgctuBOr",
+          "cachedResultName": "PF Auditoria Trazas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $('Normalizar solicitud + traceId').first().json.trace_id }}",
+            "span_id": "99-cierre-manager",
+            "timestamp": "={{ $now.toISO() }}",
+            "workflow": "PF 1 - Manager",
+            "paso": "=Cierre: {{ $('Cerrar solicitud (estado final)').first().json.estado }}",
+            "detalle": "={{ JSON.stringify({ ruta_final: $('Cerrar solicitud (estado final)').first().json.ruta_final, despachado: $('Cerrar solicitud (estado final)').first().json.despachado, riesgo: $('Acople contextual + semáforo de riesgo').first().json.riesgo, motivo_riesgo: $('Acople contextual + semáforo de riesgo').first().json.motivo_riesgo }) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "span_id",
+              "displayName": "span_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso",
+              "displayName": "paso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "detalle",
+              "displayName": "detalle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0c809a2e-c060-4217-88da-ae755bb7096e",
+      "name": "Sticky Note 9a3ef600",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        189
+      ],
+      "parameters": {
+        "content": "## 1 · Recepción asíncrona e idempotente\nResponde 202 en milisegundos con el traceId y sigue en segundo plano. Una solicitud repetida (misma Idempotency-Key o mismo email+mensaje) responde 200 \"duplicada\" y no se reprocesa.",
+        "color": 7,
+        "width": 1540,
+        "height": 491
+      }
+    },
+    {
+      "id": "4da1203e-0d66-4676-b598-a29960a91698",
+      "name": "Sticky Note f9496577",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        164
+      ],
+      "parameters": {
+        "content": "## 2 · Memoria + Manager-Worker\nLee la memoria de largo plazo del cliente, aplica el semáforo de riesgo (M7) y delega en sub-workflows con payload mínimo: PF 2 responde con RAG y PF 3 audita. Nada se registra ni se envía antes del veredicto.",
+        "color": 4,
+        "width": 1320,
+        "height": 276
+      }
+    },
+    {
+      "id": "0e44f2ee-58a6-4fd2-a1ba-43c3047a9269",
+      "name": "Sticky Note 462451ac",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        -136
+      ],
+      "parameters": {
+        "content": "## 3 · Ruteo por veredicto\nACEPTAR (≥ 4/5) → CRM + Gmail. CORREGIR → 1 reintento con la crítica. ESCALAR o riesgo rojo → cola humana. Si un worker o una API se cae, la rama de error alerta al supervisor y deja el caso en la cola.",
+        "color": 5,
+        "width": 1100,
+        "height": 796
+      }
+    }
+  ],
+  "connections": {
+    "Webhook · solicitud entrante (POST)": {
+      "main": [
+        [
+          {
+            "node": "Normalizar solicitud + traceId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar solicitud + traceId": {
+      "main": [
+        [
+          {
+            "node": "¿Payload válido? (email + mensaje)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Payload válido? (email + mensaje)": {
+      "main": [
+        [
+          {
+            "node": "¿Solicitud ya recibida? (idempotencia)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder 400 (payload inválido)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Solicitud ya recibida? (idempotencia)": {
+      "main": [
+        [
+          {
+            "node": "¿Es duplicada?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es duplicada?": {
+      "main": [
+        [
+          {
+            "node": "Responder 200 (duplicada, no se reprocesa)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar solicitud (RECIBIDO)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar solicitud (RECIBIDO)": {
+      "main": [
+        [
+          {
+            "node": "Responder 202 al instante (procesa en 2.º plano)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responder 202 al instante (procesa en 2.º plano)": {
+      "main": [
+        [
+          {
+            "node": "Leer memoria del cliente (largo plazo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer memoria del cliente (largo plazo)": {
+      "main": [
+        [
+          {
+            "node": "Acople contextual + semáforo de riesgo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acople contextual + semáforo de riesgo": {
+      "main": [
+        [
+          {
+            "node": "Payload mínimo → Worker RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload mínimo → Worker RAG": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar PF 2 · Worker RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar PF 2 · Worker RAG": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar PF 3 · Supervisor QA (AI-as-a-Judge)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falla técnica → alerta + payload HITL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar PF 3 · Supervisor QA (AI-as-a-Judge)": {
+      "main": [
+        [
+          {
+            "node": "Consolidar decisión (veredicto + semáforo)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falla técnica → alerta + payload HITL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar decisión (veredicto + semáforo)": {
+      "main": [
+        [
+          {
+            "node": "Ruta: ACEPTAR / CORREGIR / ESCALAR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ruta: ACEPTAR / CORREGIR / ESCALAR": {
+      "main": [
+        [
+          {
+            "node": "Payload mínimo → CRM + Despacho",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preparar reintento con la crítica del Supervisor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Payload mínimo → Cola HITL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload mínimo → CRM + Despacho": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar PF 4 · CRM + Despacho",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar PF 4 · CRM + Despacho": {
+      "main": [
+        [
+          {
+            "node": "¿Despacho confirmado?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falla técnica → alerta + payload HITL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Despacho confirmado?": {
+      "main": [
+        [
+          {
+            "node": "Cierre: RESUELTO_AUTONOMO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falla técnica → alerta + payload HITL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cierre: RESUELTO_AUTONOMO": {
+      "main": [
+        [
+          {
+            "node": "Cerrar solicitud (estado final)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falla técnica → alerta + payload HITL": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar PF 5 · Cola HITL (falla técnica)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar reintento con la crítica del Supervisor": {
+      "main": [
+        [
+          {
+            "node": "Payload mínimo → Worker RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload mínimo → Cola HITL": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar PF 5 · Cola HITL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar PF 5 · Cola HITL": {
+      "main": [
+        [
+          {
+            "node": "Cierre: EN_REVISION_HUMANA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cierre: EN_REVISION_HUMANA": {
+      "main": [
+        [
+          {
+            "node": "Cerrar solicitud (estado final)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar PF 5 · Cola HITL (falla técnica)": {
+      "main": [
+        [
+          {
+            "node": "Cierre: ERROR_ESCALADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cierre: ERROR_ESCALADO": {
+      "main": [
+        [
+          {
+            "node": "Cerrar solicitud (estado final)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cerrar solicitud (estado final)": {
+      "main": [
+        [
+          {
+            "node": "Actualizar memoria del cliente (upsert)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar memoria del cliente (upsert)": {
+      "main": [
+        [
+          {
+            "node": "Registrar span 99 (cierre de la traza)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "kHRmewf2VGO6IHeu",
+  "active": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": []
+}

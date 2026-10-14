@@ -1,0 +1,351 @@
+{
+  "name": "PF 3 - Supervisor QA (AI-as-a-Judge)",
+  "nodes": [
+    {
+      "id": "22ae80d8-51a6-4606-b911-7625e14607b5",
+      "name": "Entrada desde el Manager",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    },
+    {
+      "id": "44f242ff-56c4-403c-84f8-2496c829a50a",
+      "name": "Payload JSON para el Juez",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": true,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "payload_juez",
+              "value": "={{ { \"query_usuario\": $json.pregunta, \"contexto_recuperado\": $json.contexto, \"respuesta_propuesta\": $json.respuesta } }}",
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4eaf0f08-df86-4681-9dd7-f1b96e39da4f",
+      "name": "Juez (AI-as-a-Judge · JSON Schema)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ],
+      "parameters": {
+        "resource": "text",
+        "operation": "response",
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.modelo_juez || 'gpt-4o' }}"
+        },
+        "responses": {
+          "values": [
+            {
+              "type": "text",
+              "role": "system",
+              "content": "Sos el SUPERVISOR DE CALIDAD (AI-as-a-Judge) del sistema de soporte de Lleyton Tech Store.\nRecibis un objeto JSON con: query_usuario, contexto_recuperado y respuesta_propuesta.\nEvalua la respuesta SOLO contra contexto_recuperado (fragmentos del Manual de Politicas v2.1). No uses conocimiento propio.\n\nRUBRICA exactitud_factual (entero 1-5):\n5 = todos los datos (plazos, montos, porcentajes, condiciones) coinciden con el contexto, responde completo y cita la seccion con su pagina.\n4 = correcta y fiel al contexto, con una omision menor (por ejemplo falta citar una de las secciones usadas o un detalle secundario).\n3 = parcialmente correcta: omite una condicion relevante o mezcla politicas distintas.\n2 = mayormente incorrecta o incompleta, aunque no inventa datos.\n1 = inventa datos que no estan en el contexto, contradice la politica o promete algo fuera de politica.\n\nCASOS ESPECIALES (calibracion del M8):\n- Si el contexto NO contiene la respuesta y el agente responde \"No sé\" y ofrece derivar, es CORRECTO (5).\n- Si el contexto SI contiene la respuesta y el agente responde \"No sé\", exactitud maxima 2 (CORREGIR) y la critica debe indicar la seccion que responde.\n- Si el cliente pide un reintegro fuera de politica, un monto mayor a $300.000 o menciona acciones legales, la respuesta correcta es explicar que se deriva al Supervisor (seccion 6.3) sin prometer nada.\n\nREGLAS DE VEREDICTO (estado_veredicto):\n- ACEPTADO: exactitud_factual 4 o 5.\n- CORREGIR: exactitud_factual 2 o 3 y el error se puede arreglar con tu critica.\n- RECHAZADO: exactitud_factual 1, o la respuesta promete reintegros o excepciones fuera de politica, pide datos sensibles o es riesgosa para la empresa. Requiere revision humana.\n\ncategoria_error: la causa principal del problema (\"ninguno\" solo si la respuesta es perfecta).\ncritica: 1 a 3 frases concretas y accionables que digan que corregir y cual es la seccion correcta. Si es ACEPTADO con 5, escribi \"Sin observaciones\".\nResponde UNICAMENTE con el JSON del esquema."
+            },
+            {
+              "type": "text",
+              "role": "user",
+              "content": "={{ JSON.stringify($json.payload_juez) }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {
+          "maxTokens": 400,
+          "temperature": 0,
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "veredicto_supervisor",
+              "description": "Veredicto estructurado del Supervisor de Calidad",
+              "strict": true,
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"exactitud_factual\": { \"type\": \"integer\", \"minimum\": 1, \"maximum\": 5, \"description\": \"Exactitud factual de la respuesta respecto del contexto (1 a 5)\" },\n    \"estado_veredicto\": { \"type\": \"string\", \"enum\": [\"ACEPTADO\", \"CORREGIR\", \"RECHAZADO\"] },\n    \"categoria_error\": { \"type\": \"string\", \"enum\": [\"ninguno\", \"dato_inventado\", \"dato_incompleto\", \"sin_cita_de_fuente\", \"fuera_de_politica\", \"no_aplico_regla_no_se\", \"no_se_indebido\", \"tono_o_formato\"] },\n    \"critica\": { \"type\": \"string\", \"description\": \"Critica accionable para el reintento\" }\n  },\n  \"required\": [\"exactitud_factual\", \"estado_veredicto\", \"categoria_error\", \"critica\"],\n  \"additionalProperties\": false\n}"
+            }
+          }
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000
+    },
+    {
+      "id": "bc3b30bd-c3fa-483d-954a-a7f3cf819d45",
+      "name": "Validar veredicto + umbral (fail-safe)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const UMBRAL_EXACTITUD = 4;\nconst MAX_INTENTOS = 2;\nconst PRECIOS = { 'gpt-4o': [2.5, 10], 'gpt-4o-mini': [0.15, 0.6] };\nconst entrada = $('Payload JSON para el Juez').first().json;\nconst modeloJuez = entrada.modelo_juez || 'gpt-4o';\nconst r = $input.first().json;\nfunction textoJuez(x) {\n  const outs = Array.isArray(x.output) ? x.output : [];\n  for (const o of outs) for (const c of (o.content || [])) if (c.text !== undefined) return c.text;\n  if (x.output_text !== undefined) return x.output_text;\n  if (x.text !== undefined) return x.text;\n  if (x.exactitud_factual !== undefined) return x;\n  return JSON.stringify(x);\n}\nconst raw = textoJuez(r);\nlet v = raw;\nif (typeof v === 'string') {\n  const limpio = v.replace(/```json/gi, '').replace(/```/g, '');\n  const m = limpio.match(/\\{[\\s\\S]*\\}/);\n  try { v = JSON.parse(m ? m[0] : limpio); } catch (e) { v = null; }\n}\nif (v && typeof v === 'object') {\n  v.exactitud_factual = parseInt(v.exactitud_factual, 10);\n  v.estado_veredicto = String(v.estado_veredicto || '').trim().toUpperCase();\n}\nconst valido = !!v && Number.isInteger(v.exactitud_factual) && ['ACEPTADO', 'CORREGIR', 'RECHAZADO'].includes(v.estado_veredicto);\nconst veredicto = valido\n  ? { exactitud_factual: v.exactitud_factual, estado_veredicto: v.estado_veredicto, categoria_error: v.categoria_error || 'ninguno', critica: v.critica || '' }\n  : { exactitud_factual: 1, estado_veredicto: 'RECHAZADO', categoria_error: 'tono_o_formato', critica: 'El supervisor no devolvio un JSON valido; se congela la autonomia y se deriva a revision humana.' };\nlet decision;\nif (veredicto.estado_veredicto === 'ACEPTADO' && veredicto.exactitud_factual >= UMBRAL_EXACTITUD) decision = 'ACEPTAR';\nelse if (veredicto.estado_veredicto !== 'RECHAZADO' && (entrada.intento || 1) < MAX_INTENTOS) decision = 'CORREGIR';\nelse decision = 'ESCALAR';\nconst tin = (r.usage && r.usage.input_tokens) || 0;\nconst tout = (r.usage && r.usage.output_tokens) || 0;\nconst p = PRECIOS[modeloJuez] || PRECIOS['gpt-4o'];\nconst { payload_juez, ...resto } = entrada;\nreturn [{ json: { ...resto,\n  veredicto, veredicto_json: JSON.stringify(veredicto), veredicto_valido: valido, decision,\n  umbral_exactitud: UMBRAL_EXACTITUD, modelo_juez: modeloJuez, tokens_juez_in: tin, tokens_juez_out: tout,\n  costo_juez_usd: (tin * p[0] + tout * p[1]) / 1e6, prompt_version_juez: 'supervisor-qa@pf-1.0'\n} }];"
+      }
+    },
+    {
+      "id": "c91fbff4-e2ee-4d8b-adf9-9ede42d0e8cf",
+      "name": "Registrar span 03 (veredicto en auditoría)",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mg2CNoQvcgctuBOr",
+          "cachedResultName": "PF Auditoria Trazas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "trace_id": "={{ $json.trace_id }}",
+            "span_id": "=03-supervisor-qa-intento-{{ $json.intento }}",
+            "timestamp": "={{ $now.toISO() }}",
+            "workflow": "PF 3 - Supervisor QA",
+            "paso": "=Veredicto: {{ $json.veredicto.estado_veredicto }} ({{ $json.veredicto.exactitud_factual }}/5) -> {{ $json.decision }}",
+            "modelo": "={{ $json.modelo_juez }}",
+            "tokens_in": "={{ $json.tokens_juez_in }}",
+            "tokens_out": "={{ $json.tokens_juez_out }}",
+            "costo_usd": "={{ $json.costo_juez_usd }}",
+            "confidence": "={{ $json.veredicto.exactitud_factual / 5 }}",
+            "prompt_version": "={{ $json.prompt_version_juez }}",
+            "detalle": "={{ $json.veredicto_json }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "span_id",
+              "displayName": "span_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso",
+              "displayName": "paso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "modelo",
+              "displayName": "modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tokens_in",
+              "displayName": "tokens_in",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tokens_out",
+              "displayName": "tokens_out",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "costo_usd",
+              "displayName": "costo_usd",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence",
+              "displayName": "confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prompt_version",
+              "displayName": "prompt_version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "detalle",
+              "displayName": "detalle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "30accb16-9016-4f89-a15c-0777c5088468",
+      "name": "Salida del Supervisor (veredicto + decisión)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        300
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $('Validar veredicto + umbral (fail-safe)').first().json }}"
+      }
+    },
+    {
+      "id": "70d2a0f6-a619-4ba2-a863-2c1209352b6a",
+      "name": "Sticky Note 9d8d0d3a",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        164
+      ],
+      "parameters": {
+        "content": "## PF 3 · Supervisor QA (AI-as-a-Judge)\nToda respuesta pasa por aquí antes de tocar el CRM o al cliente. El Juez (gpt-4o, temperatura 0) devuelve JSON forzado por esquema. Umbral: exactitud_factual ≥ 4 y ACEPTADO para salir solo. 2-3 → 1 corrección; 1, RECHAZADO o JSON inválido → revisión humana (fail-safe).",
+        "color": 5,
+        "width": 1420,
+        "height": 276
+      }
+    }
+  ],
+  "connections": {
+    "Entrada desde el Manager": {
+      "main": [
+        [
+          {
+            "node": "Payload JSON para el Juez",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload JSON para el Juez": {
+      "main": [
+        [
+          {
+            "node": "Juez (AI-as-a-Judge · JSON Schema)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Juez (AI-as-a-Judge · JSON Schema)": {
+      "main": [
+        [
+          {
+            "node": "Validar veredicto + umbral (fail-safe)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar veredicto + umbral (fail-safe)": {
+      "main": [
+        [
+          {
+            "node": "Registrar span 03 (veredicto en auditoría)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar span 03 (veredicto en auditoría)": {
+      "main": [
+        [
+          {
+            "node": "Salida del Supervisor (veredicto + decisión)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "m1l9tjVnz9UlFWbJ",
+  "active": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": []
+}
