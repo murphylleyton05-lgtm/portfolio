@@ -887,7 +887,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "executionTimeout": 120
   },
   "id": "LSj1ioe8J3VQYPP0",
   "active": false,

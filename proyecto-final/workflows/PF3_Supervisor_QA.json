@@ -339,7 +339,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "executionTimeout": 120
   },
   "id": "m1l9tjVnz9UlFWbJ",
   "active": false,

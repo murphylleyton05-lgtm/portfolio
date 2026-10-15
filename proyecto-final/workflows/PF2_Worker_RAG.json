@@ -866,7 +866,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "executionTimeout": 120
   },
   "id": "VHldZxEXjDwD4x5I",
   "active": false,

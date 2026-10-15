@@ -304,8 +304,8 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "estado": "RESUELTO_HUMANO",
-            "ruta_final": "HITL_APROBADO",
+            "estado": "={{ ['despachado', 'omitido_duplicado'].includes($('Ejecutar PF 4 · CRM + Despacho').first().json.status) ? 'RESUELTO_HUMANO' : 'ERROR_DESPACHO' }}",
+            "ruta_final": "={{ ['despachado', 'omitido_duplicado'].includes($('Ejecutar PF 4 · CRM + Despacho').first().json.status) ? 'HITL_APROBADO' : 'HITL_APROBADO_ENVIO_FALLIDO' }}",
             "despachado": "={{ $('Ejecutar PF 4 · CRM + Despacho').first().json.status === 'despachado' }}",
             "fecha_cierre": "={{ $now.toISO() }}"
           },
@@ -616,7 +616,7 @@
       ],
       "parameters": {
         "respondWith": "text",
-        "responseBody": "=<html><body style=\"font-family:sans-serif\"><h2>{{ $('Normalizar decisión').first().json.accion === 'aprobar' ? 'Aprobado: la respuesta se envió al cliente' : 'Rechazado: el caso queda para respuesta manual' }}</h2><p>Caso {{ $('Normalizar decisión').first().json.trace_id }}. La decisión quedó registrada en la auditoría.</p></body></html>",
+        "responseBody": "=<html><body style=\"font-family:sans-serif\"><h2>{{ $('Normalizar decisión').first().json.accion === 'aprobar' ? (['despachado', 'omitido_duplicado'].includes($('Ejecutar PF 4 · CRM + Despacho').first().json.status) ? 'Aprobado: la respuesta se envió al cliente' : 'Aprobado, pero el envío falló: el caso quedó en ERROR_DESPACHO para reenviarlo a mano') : 'Rechazado: el caso queda para respuesta manual' }}</h2><p>Caso {{ $('Normalizar decisión').first().json.trace_id }}. La decisión quedó registrada en la auditoría.</p></body></html>",
         "options": {
           "responseCode": 200,
           "responseHeaders": {
@@ -796,7 +796,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "executionTimeout": 180
   },
   "id": "JC7Qyk6nBUKS4km8",
   "active": false,

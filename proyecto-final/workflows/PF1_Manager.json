@@ -1615,7 +1615,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "executionTimeout": 180
   },
   "id": "kHRmewf2VGO6IHeu",
   "active": false,

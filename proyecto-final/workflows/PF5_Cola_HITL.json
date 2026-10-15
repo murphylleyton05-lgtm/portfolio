@@ -405,7 +405,8 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "executionTimeout": 120
   },
   "id": "bzwt1EvhJMeoyF8b",
   "active": false,
