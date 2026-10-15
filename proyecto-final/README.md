@@ -10,7 +10,8 @@ Sistema Manager-Worker en n8n para la atención al cliente de Lleyton Tech Store
 
 | Métrica | Valor |
 |---|---|
-| Acuse al cliente (202 + trace_id) | 283 ms |
+| Acuse al cliente (202 + trace_id), en producción | 128 ms |
+| Pruebas en producción con envío real por Gmail | consulta autónoma, semáforo rojo, aprobación humana, duplicado y alerta de error: todas OK |
 | Acuerdo del Juez (gpt-4o) con la revisión humana | 11/11 · exactitud media 4,82/5 |
 | Respuesta defectuosa inyectada | RECHAZADO 1/5 → cola humana |
 | Costo de IA por consulta | USD 0,0037 (USD 3,68 cada 1.000) |
