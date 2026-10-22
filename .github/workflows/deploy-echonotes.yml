@@ -54,6 +54,9 @@ jobs:
           cp -r portfolio-hidrocarburos/* site/hidrocarburos/
           mkdir -p site/chat
           cp chatfolio/web/index.html site/chat/
+          # Copia de la base de conocimiento al lado de la página: el chat la lee del mismo dominio, sin depender de GitHub raw.
+          mkdir -p site/chat/conocimiento
+          cp chatfolio/conocimiento/*.md site/chat/conocimiento/
       # Imagen de vista previa del Chatfolio (LinkedIn, WhatsApp): screenshot de og.html con el Chrome del runner.
       # Si falla, el sitio se publica igual (solo falta la imagen).
       - name: Imagen de vista previa del Chatfolio (og.png)
