@@ -54,6 +54,13 @@ jobs:
           cp -r portfolio-hidrocarburos/* site/hidrocarburos/
           mkdir -p site/chat
           cp chatfolio/web/index.html site/chat/
+      # Imagen de vista previa del Chatfolio (LinkedIn, WhatsApp): screenshot de og.html con el Chrome del runner.
+      # Si falla, el sitio se publica igual (solo falta la imagen).
+      - name: Imagen de vista previa del Chatfolio (og.png)
+        continue-on-error: true
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+        run: npx -y playwright@1.56.1 screenshot --channel chrome --viewport-size "1200, 627" --wait-for-timeout 2500 "file://$PWD/chatfolio/web/og.html" site/chat/og.png
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
