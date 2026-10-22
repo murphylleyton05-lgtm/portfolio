@@ -52,6 +52,8 @@ jobs:
           cp vaca-muerta-ops-intelligence/web/index.html site/operaciones/
           mkdir -p site/hidrocarburos
           cp -r portfolio-hidrocarburos/* site/hidrocarburos/
+          mkdir -p site/chat
+          cp chatfolio/web/index.html site/chat/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
