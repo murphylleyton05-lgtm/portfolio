@@ -23,7 +23,7 @@ Colección de mis proyectos: apps, automatizaciones y experimentos. Cada proyect
 | [🛢️ Vaca Muerta Operations Intelligence](./vaca-muerta-ops-intelligence) | Tablero de operaciones con la producción **oficial** (petróleo/gas por mes, actividad, ranking de operadores) y medidas DAX para Power BI. Se regenera por CI con datos reales. | Python · pandas · Power BI (DAX) |
 | [🎙️ EchoNotes](./echonotes) | App de notas por voz con transcripción en tiempo real, 100% en el navegador. | React · Vite · Web Speech API |
 | [🟢 WhatsApp + CRM + IA](./whatsapp-crm-automation) | Stack self-hosted de atención por WhatsApp, CRM y respuestas automáticas con IA. | Chatwoot · n8n · Claude · Docker |
-| [💬 Chatfolio](./chatfolio) | Portfolio conversacional: un asistente con RAG responde sobre mi experiencia, proyectos y stack, y me avisa por Gmail cuando alguien quiere contactarme. Web en `/portfolio/chat/`. | n8n · OpenAI · Pinecone · JavaScript |
+| [💬 Chatfolio](./chatfolio) | Portfolio conversacional: un asistente responde sobre mi experiencia, proyectos y stack, analiza búsquedas laborales y me avisa por Gmail cuando alguien quiere contactarme. **En vivo:** https://murphylleyton05-lgtm.github.io/portfolio/chat/ | n8n · OpenAI · RAG agéntico · JavaScript |
 
 ---
 
