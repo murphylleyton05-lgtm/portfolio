@@ -3,7 +3,6 @@
 ## Quién es Lleyton Murphy
 Soy Lleyton Murphy, Data Analyst Jr. especializado en Business Intelligence y automatización de procesos con IA. Construyo pipelines ETL con Python y SQL, dashboards en Power BI y Excel, y flujos automatizados con n8n y APIs de IA (Claude y OpenAI).
 Mi proyecto más representativo es Vaca Muerta Analytics: un sistema que procesa, analiza y monitorea solo, cada mes, la producción oficial de más de 2.400 pozos de Vaca Muerta.
-También tengo una marca propia de automatización para PyMEs, Lleyton IA Automation (2025 – actualidad).
 
 ## Qué rol busca Lleyton
 Lleyton busca su primera posición como:
