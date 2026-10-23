@@ -1,14 +1,11 @@
 # Experiencia de Lleyton Murphy
 
 ## Experiencia laboral de Lleyton
-Lleyton está buscando su primera posición formal en Data, BI u Operations, o en AI Automation. Su experiencia práctica viene de su marca propia, Lleyton IA Automation, y de los proyectos de su portfolio público, construidos con datos reales (por ejemplo, la producción oficial de Vaca Muerta) y llevados a producción con actualización automática.
+Lleyton está buscando su primera posición formal en Data, BI u Operations, o en AI Automation. Todavía no tuvo un empleo formal en el área: su experiencia práctica viene de los proyectos de su portfolio público, construidos con datos reales (por ejemplo, la producción oficial de Vaca Muerta) y llevados a producción con actualización automática.
 
-## Lleyton IA Automation: marca propia de automatización para PyMEs (2025 – actualidad)
-- **Qué es:** el emprendimiento de Lleyton para automatizar procesos de PyMEs con IA.
-- **Qué hizo Lleyton:**
-  - Diseñó un stack self-hosted de atención por WhatsApp + CRM + IA (WhatsApp Cloud API, Chatwoot, n8n, Claude y Docker Compose) que responde consultas y clasifica contactos.
-  - Desarrolló la web de la marca y demos interactivas: un asistente de IA, un dashboard ejecutivo y un CRM.
-  - Automatizó la prospección de clientes con Apify.
+## Proyecto propio: atención por WhatsApp + CRM + IA
+- **Qué es:** un stack self-hosted de atención al cliente por WhatsApp con IA.
+- **Qué hizo Lleyton:** combinó WhatsApp Cloud API, Chatwoot, n8n, Claude y Docker Compose para responder consultas y clasificar contactos.
 - **Código:** https://github.com/murphylleyton05-lgtm/portfolio/tree/main/whatsapp-crm-automation
 
 ## Formación práctica de Lleyton en Coderhouse
